@@ -1,7 +1,5 @@
 set search_path = views, public;
 
-
-drop materialized view if exists tmp_planning_summary cascade;
 create materialized view tmp_planning_summary
 as
 select
@@ -19,12 +17,12 @@ from
     from 
         tmp_release_summary_with_release_data rs where data ? 'planning'
     ) AS r
+with no data
 ;
 
 create unique index tmp_planning_summary_id on tmp_planning_summary(id);
 
 
-drop materialized view if exists planning_documents_summary;
 create materialized view planning_documents_summary
 as
 select
@@ -49,6 +47,7 @@ from
         jsonb_array_elements(planning -> 'documents') with ordinality
     where jsonb_typeof(planning -> 'documents') = 'array'
     ) AS r
+with no data
 ;
 
 create unique index planning_documents_summary_id on planning_documents_summary(id, document_index);
@@ -82,6 +81,7 @@ from
         jsonb_array_elements(planning -> 'milestones') with ordinality
     where jsonb_typeof(planning -> 'milestones') = 'array'
     ) AS r
+with no data
 ;
 
 create unique index planning_milestones_summary_id on planning_milestones_summary(id, milestone_index);
@@ -89,7 +89,6 @@ create index planning_milestones_summary_data_id on planning_milestones_summary(
 create index planning_milestones_summary_collection_id on planning_milestones_summary(collection_id);
 
 
-drop materialized view if exists planning_summary;
 create materialized view planning_summary
 as
 select
@@ -143,4 +142,9 @@ left join
     group by id
     ) milestoneType_counts
     using (id)
+with no data
 ;
+
+create unique index planning_summary_id on planning_summary(id);
+create index planning_summary_data_id on planning_summary(data_id);
+create index planning_summary_collection_id on planning_summary(collection_id);

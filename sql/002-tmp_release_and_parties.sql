@@ -1,6 +1,6 @@
 set search_path = views, public;
 
-drop materialized view if exists tmp_release_summary cascade;
+--drop materialized view if exists tmp_release_summary cascade;
 
 create materialized view tmp_release_summary
 as
@@ -22,6 +22,8 @@ join
     package_data pd on pd.id = r.package_data_id
 join
     data d on d.id = r.data_id
+where
+    collection_id in (select id from selected_collections)
 
 union
 
@@ -43,6 +45,8 @@ join
     package_data pd on pd.id = r.package_data_id
 join
     data d on d.id = r.data_id
+where
+    collection_id in (select id from selected_collections)
 
 union
 
@@ -62,6 +66,8 @@ from
     compiled_release_with_collection AS r
 join
     data d on d.id = r.data_id
+where
+    collection_id in (select id from selected_collections)
 with no data;
 
 create unique index tmp_release_summary_id on tmp_release_summary(id);

@@ -1,0 +1,20 @@
+[
+  {"name": "tmp_release_summary"},
+  {"name": "parties_summary"},
+  {"name": "buyer_summary"},
+  {"name": "procuringentity_summary"},
+  {"name": "tenderers_summary"},
+  {"name": "tmp_planning_summary"},
+  {"name": "tenderers_summary"},
+  {"name": "planning_documents_summary"},
+  {"name": "planning_milestones_summary"},
+  {"name": "planning_summary"},
+  {"name": "tmp_planning_summary", "clear": true},
+  {"name": "tmp_tender_summary"},
+  {"name": "tender_documents_summary"},
+  {"name": "tender_milestones_summary"},
+  {"name": "tender_items_summary"},
+  {"name": "tender_summary"},
+  {"name": "tmp_tender_summary", "clear": true}
+]
+

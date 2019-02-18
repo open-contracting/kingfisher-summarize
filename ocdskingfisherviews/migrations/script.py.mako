@@ -12,7 +12,7 @@ import sqlalchemy as sa
 ${imports if imports else ""}
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-sql_dir = os.path.join(dir_path, '../../sql/')
+sql_dir = os.path.join(dir_path, '../../../sql/')
 
 # revision identifiers, used by Alembic.
 revision = ${repr(up_revision)}

@@ -1,7 +1,5 @@
 set search_path = views, public;
 
-
-drop materialized view if exists buyer_summary;
 create materialized view buyer_summary
 as
 select
@@ -38,7 +36,8 @@ from
         tmp_release_summary_with_release_data) AS r
 left join
     parties_summary ps on r.id = ps.id and (buyer ->> 'id') = ps.parties_id
-where buyer is not null;
+where buyer is not null
+with no data;
 
 
 create unique index buyer_summary_id on buyer_summary(id);
@@ -46,7 +45,6 @@ create index buyer_summary_data_id on buyer_summary(data_id);
 create index buyer_summary_collection_id on buyer_summary(collection_id);
 
 
-drop materialized view if exists procuringEntity_summary;
 create materialized view procuringEntity_summary
 as
 select
@@ -83,15 +81,14 @@ from
         tmp_release_summary_with_release_data) AS r
 left join
     parties_summary ps on r.id = ps.id and (procuringEntity ->> 'id') = ps.parties_id
-where procuringEntity is not null;
-
+where procuringEntity is not null
+with no data;
 
 create unique index procuringEntity_summary_id on procuringEntity_summary(id);
 create index procuringEntity_summary_data_id on procuringEntity_summary(data_id);
 create index procuringEntity_summary_collection_id on procuringEntity_summary(collection_id);
 
 
-drop materialized view if exists tenderers_summary;
 create materialized view tenderers_summary
 as
 select
@@ -135,7 +132,8 @@ from
     ) AS r
 left join
     parties_summary ps on r.id = ps.id and (tenderer ->> 'id') = ps.parties_id
-where tenderer is not null;
+where tenderer is not null
+with no data;
 
 
 create unique index tenderers_summary_id on tenderers_summary(id, tenderer_index);

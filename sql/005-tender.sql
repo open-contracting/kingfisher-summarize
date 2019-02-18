@@ -1,7 +1,5 @@
 set search_path = views, public;
 
-
-drop materialized view if exists tmp_tender_summary cascade;
 create materialized view tmp_tender_summary
 as
 select
@@ -19,12 +17,10 @@ from
     from 
         tmp_release_summary_with_release_data rs where data ? 'tender'
     ) AS r
-;
+with no data;
 
 create unique index tmp_tender_summary_id on tmp_tender_summary(id);
 
-
-drop materialized view if exists tender_documents_summary;
 create materialized view tender_documents_summary
 as
 select
@@ -49,14 +45,13 @@ from
         jsonb_array_elements(tender -> 'documents') with ordinality
     where jsonb_typeof(tender -> 'documents') = 'array'
     ) AS r
-;
+with no data;
 
 create unique index tender_documents_summary_id on tender_documents_summary(id, document_index);
 create index tender_documents_summary_data_id on tender_documents_summary(data_id);
 create index tender_documents_summary_collection_id on tender_documents_summary(collection_id);
 
 
-drop materialized view if exists tender_milestones_summary;
 create materialized view tender_milestones_summary
 as
 select
@@ -82,7 +77,7 @@ from
         jsonb_array_elements(tender -> 'milestones') with ordinality
     where jsonb_typeof(tender -> 'milestones') = 'array'
     ) AS r
-;
+with no data;
 
 create unique index tender_milestones_summary_id on tender_milestones_summary(id, milestone_index);
 create index tender_milestones_summary_data_id on tender_milestones_summary(data_id);
@@ -90,7 +85,6 @@ create index tender_milestones_summary_collection_id on tender_milestones_summar
 
 
 
-drop materialized view if exists tender_items_summary;
 create materialized view tender_items_summary
 as
 select
@@ -127,7 +121,7 @@ from
         jsonb_array_elements(tender -> 'items') with ordinality
     where jsonb_typeof(tender -> 'items') = 'array'
     ) AS r
-;
+with no data;
 
 
 create unique index tender_items_summary_id on tender_items_summary(id, item_index);
@@ -135,7 +129,6 @@ create index tender_items_summary_data_id on tender_items_summary(data_id);
 create index tender_items_summary_collection_id on tender_items_summary(collection_id);
 
 
-drop materialized view if exists tender_summary cascade;
 create materialized view tender_summary
 as
 select
@@ -229,4 +222,8 @@ left join
     group by id
     ) items_counts
     using (id)
-;
+with no data;
+
+create unique index tender_summary_id on tender_summary(id);
+create index tender_summary_data_id on tender_summary(data_id);
+create index tender_summary_collection_id on tender_summary(collection_id);
