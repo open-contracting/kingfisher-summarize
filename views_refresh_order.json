@@ -15,6 +15,21 @@
   {"name": "tender_milestones_summary"},
   {"name": "tender_items_summary"},
   {"name": "tender_summary"},
-  {"name": "tmp_tender_summary", "clear": true}
+  {"name": "tmp_tender_summary", "clear": true},
+  {"name": "tmp_awards_summary"},
+  {"name": "award_suppliers_summary"},
+  {"name": "award_documents_summary"},
+  {"name": "award_items_summary"},
+  {"name": "awards_summary"},
+  {"name": "tmp_awards_summary", "clear": true},
+  {"name": "tmp_contracts_summary"},
+  {"name": "contract_items_summary"},
+  {"name": "contract_documents_summary"},
+  {"name": "contract_milestones_summary"},
+  {"name": "contract_implementation_documents_summary"},
+  {"name": "contract_implementation_milestones_summary"},
+  {"name": "contract_implementation_transactions_summary"},
+  {"name": "contracts_summary"},
+  {"name": "tmp_contracts_summary", "clear": true}
 ]
 

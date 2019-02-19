@@ -15,7 +15,8 @@ select
     package_data_id,
     coalesce(pd.data ->> 'version', '1.0') AS package_version,
     convert_to_timestamp(d.data ->> 'date') release_date,
-    d.data -> 'tag' release_tag
+    d.data -> 'tag' release_tag,
+    d.data ->> 'language' release_language
 from 
     release_with_collection AS r
 join
@@ -38,7 +39,8 @@ select
     package_data_id,
     coalesce(pd.data ->> 'version', '1.0') AS package_version,
     convert_to_timestamp(d.data -> 'compiledRelease' ->> 'date') release_date,
-    d.data -> 'compliedRelease' -> 'tag' release_tag
+    d.data -> 'compliedRelease' -> 'tag' release_tag,
+    d.data -> 'compliedRelease' ->> 'language' release_language
 from 
     record_with_collection AS r
 join
@@ -61,7 +63,8 @@ select
     null AS package_data_id,
     null AS package_version,  -- this would be useful but hard to get
     convert_to_timestamp(d.data ->> 'date') release_date,
-    d.data -> 'tag' release_tag
+    d.data -> 'tag' release_tag,
+    d.data ->> 'language' release_language
 from 
     compiled_release_with_collection AS r
 join
