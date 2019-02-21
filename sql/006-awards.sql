@@ -138,7 +138,7 @@ select
         jsonb_array_elements(case when jsonb_typeof(item->'additionalClassifications') = 'array' then item->'additionalClassifications' else '[]'::jsonb end) additional_classification
     where
         additional_classification ?& array['scheme', 'id']											   
-    ) parties_additionalIdentifiers_ids,
+    ) item_additionalIdentifiers_ids,
     jsonb_array_length(case when jsonb_typeof(item->'additionalClassifications') = 'array' then item->'additionalClassifications' else '[]'::jsonb end) as additional_classification_count
 from
     (select 
@@ -174,8 +174,8 @@ select
     award ->> 'id' AS award_id,
     award ->> 'title' AS award_title,
     award ->> 'status' AS award_status,
-    award -> 'value' -> 'amount' AS award_value_amount,
-    award -> 'value' -> 'currency' AS award_value_currency,
+    convert_to_numeric(award -> 'value' ->> 'amount') AS award_value_amount,
+    award -> 'value' ->> 'currency' AS award_value_currency,
     convert_to_timestamp(award ->> 'date') AS award_date,
 
     convert_to_timestamp(award -> 'contractPeriod' ->> 'startDate') AS award_contractPeriod_startDate,

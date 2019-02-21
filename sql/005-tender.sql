@@ -107,7 +107,7 @@ select
         jsonb_array_elements(case when jsonb_typeof(item->'additionalClassifications') = 'array' then item->'additionalClassifications' else '[]'::jsonb end) additional_classification
     where
         additional_classification ?& array['scheme', 'id']											   
-    ) parties_additionalIdentifiers_ids,
+    ) item_additionalIdentifiers_ids,
     jsonb_array_length(case when jsonb_typeof(item->'additionalClassifications') = 'array' then item->'additionalClassifications' else '[]'::jsonb end) as additional_classification_count
 from
     (select 
@@ -142,10 +142,10 @@ select
     tender ->> 'id' AS tender_id,
     tender ->> 'title' AS tender_title,
     tender ->> 'status' AS tender_status,
-    tender -> 'value' -> 'amount' AS tender_value_amount,
-    tender -> 'value' -> 'currency' AS tender_value_currency,
-    tender -> 'minValue' -> 'amount' AS tender_minValue_amount,
-    tender -> 'minValue' -> 'currency' AS tender_minValue_currency,
+    convert_to_timestamp(tender -> 'value' ->> 'amount') AS tender_value_amount,
+    tender -> 'value' ->> 'currency' AS tender_value_currency,
+    convert_to_numeric(tender -> 'minValue' ->> 'amount') AS tender_minValue_amount,
+    tender -> 'minValue' ->> 'currency' AS tender_minValue_currency,
     tender -> 'procurementMethod' AS tender_procurementMethod,
     tender ->> 'mainProcurementCategory' AS tender_mainProcurementCategory,
     tender -> 'additionalProcurementCategories' AS tender_additionalProcurementCategories,

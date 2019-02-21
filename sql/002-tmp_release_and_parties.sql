@@ -1,6 +1,6 @@
 set search_path = views, public;
 
---drop materialized view if exists tmp_release_summary cascade;
+drop materialized view if exists tmp_release_summary cascade;
 
 create materialized view tmp_release_summary
 as
@@ -131,6 +131,4 @@ create index parties_summary_data_id on parties_summary(data_id);
 create index parties_summary_collection_id on parties_summary(collection_id);
 create index parties_summary_party_id on parties_summary(id, parties_id);
 
---refresh materialized view tmp_release_summary;
---refresh materialized view parties_summary;
 

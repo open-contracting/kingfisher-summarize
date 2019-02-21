@@ -54,7 +54,7 @@ select
         jsonb_array_elements(case when jsonb_typeof(item->'additionalClassifications') = 'array' then item->'additionalClassifications' else '[]'::jsonb end) additional_classification
     where
         additional_classification ?& array['scheme', 'id']											   
-    ) parties_additionalIdentifiers_ids,
+    ) item_additionalIdentifiers_ids,
     jsonb_array_length(case when jsonb_typeof(item->'additionalClassifications') = 'array' then item->'additionalClassifications' else '[]'::jsonb end) as additional_classification_count
 from
     (select 
@@ -261,8 +261,8 @@ select
     contract ->> 'id' AS contract_id,
     contract ->> 'title' AS contract_title,
     contract ->> 'status' AS contract_status,
-    contract -> 'value' -> 'amount' AS contract_value_amount,
-    contract -> 'value' -> 'currency' AS contract_value_currency,
+    convert_to_numeric(contract -> 'value' ->> 'amount') AS contract_value_amount,
+    contract -> 'value' ->> 'currency' AS contract_value_currency,
     contract ->> 'dateSigned' AS dateSigned,
     convert_to_timestamp(contract -> 'period' ->> 'startDate') AS contract_period_startDate,
     convert_to_timestamp(contract -> 'period' ->> 'endDate') AS contract_period_endDate,
