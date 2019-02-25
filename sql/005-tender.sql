@@ -1,7 +1,7 @@
 set search_path = views, public;
 
-create materialized view tmp_tender_summary
-as
+drop table if exists tmp_tender_summary;
+
 select
     r.id,
     r.release_type,
@@ -10,6 +10,8 @@ select
     r.release_id,
     r.data_id,
     tender
+into 
+    tmp_tender_summary
 from
     (select 
         data -> 'tender' AS tender, 
@@ -17,12 +19,13 @@ from
     from 
         tmp_release_summary_with_release_data rs where data ? 'tender'
     ) AS r
-with no data;
+;
 
 create unique index tmp_tender_summary_id on tmp_tender_summary(id);
 
-create materialized view tender_documents_summary
-as
+
+drop table if exists tender_documents_summary;
+
 select
     r.id,
     document_index,
@@ -34,6 +37,8 @@ select
     document,
     document ->> 'documentType' as documentType,
     document ->> 'format' as format
+into
+    tender_documents_summary
 from
     (select 
         tps.*,
@@ -45,15 +50,15 @@ from
         jsonb_array_elements(tender -> 'documents') with ordinality
     where jsonb_typeof(tender -> 'documents') = 'array'
     ) AS r
-with no data;
+;
 
 create unique index tender_documents_summary_id on tender_documents_summary(id, document_index);
 create index tender_documents_summary_data_id on tender_documents_summary(data_id);
 create index tender_documents_summary_collection_id on tender_documents_summary(collection_id);
 
 
-create materialized view tender_milestones_summary
-as
+drop table if exists tender_milestones_summary;
+
 select
     r.id,
     milestone_index,
@@ -66,6 +71,8 @@ select
     milestone ->> 'type' as type,
     milestone ->> 'code' as code,  
     milestone ->> 'status' as status
+into
+    tender_milestones_summary
 from
     (select 
         tps.*,
@@ -77,7 +84,7 @@ from
         jsonb_array_elements(tender -> 'milestones') with ordinality
     where jsonb_typeof(tender -> 'milestones') = 'array'
     ) AS r
-with no data;
+;
 
 create unique index tender_milestones_summary_id on tender_milestones_summary(id, milestone_index);
 create index tender_milestones_summary_data_id on tender_milestones_summary(data_id);
@@ -85,8 +92,8 @@ create index tender_milestones_summary_collection_id on tender_milestones_summar
 
 
 
-create materialized view tender_items_summary
-as
+drop table if exists tender_items_summary;
+
 select
     r.id,
     item_index,
@@ -109,6 +116,8 @@ select
         additional_classification ?& array['scheme', 'id']											   
     ) item_additionalIdentifiers_ids,
     jsonb_array_length(case when jsonb_typeof(item->'additionalClassifications') = 'array' then item->'additionalClassifications' else '[]'::jsonb end) as additional_classification_count
+into
+    tender_items_summary
 from
     (select 
         tps.*,
@@ -121,7 +130,7 @@ from
         jsonb_array_elements(tender -> 'items') with ordinality
     where jsonb_typeof(tender -> 'items') = 'array'
     ) AS r
-with no data;
+;
 
 
 create unique index tender_items_summary_id on tender_items_summary(id, item_index);
@@ -129,8 +138,8 @@ create index tender_items_summary_data_id on tender_items_summary(data_id);
 create index tender_items_summary_collection_id on tender_items_summary(collection_id);
 
 
-create materialized view tender_summary
-as
+drop table if exists tender_summary;
+
 select
     r.id,
     r.release_type,
@@ -176,6 +185,8 @@ select
     milestones_count,
     milestoneType_counts,
     items_count
+into
+    tender_summary
 from
     tmp_tender_summary r
 left join
@@ -222,8 +233,10 @@ left join
     group by id
     ) items_counts
     using (id)
-with no data;
+;
 
 create unique index tender_summary_id on tender_summary(id);
 create index tender_summary_data_id on tender_summary(data_id);
 create index tender_summary_collection_id on tender_summary(collection_id);
+
+drop table if exists tmp_tender_summary;

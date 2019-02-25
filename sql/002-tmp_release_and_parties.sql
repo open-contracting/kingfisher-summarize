@@ -1,9 +1,9 @@
 set search_path = views, public;
 
-drop materialized view if exists tmp_release_summary cascade;
 
-create materialized view tmp_release_summary
-as
+drop view if exists tmp_release_summary_with_release_data;
+drop table if exists tmp_release_summary;
+
 select 
     r.id * 10 AS id,
     'release' AS release_type,
@@ -17,6 +17,9 @@ select
     convert_to_timestamp(d.data ->> 'date') release_date,
     d.data -> 'tag' release_tag,
     d.data ->> 'language' release_language
+
+into tmp_release_summary
+
 from 
     release_with_collection AS r
 join
@@ -70,8 +73,8 @@ from
 join
     data d on d.id = r.data_id
 where
-    collection_id in (select id from selected_collections)
-with no data;
+    collection_id in (select id from selected_collections);
+
 
 create unique index tmp_release_summary_id on tmp_release_summary(id);
 create index tmp_release_summary_data_id on tmp_release_summary(data_id);
@@ -79,7 +82,8 @@ create index tmp_release_summary_package_data_id on tmp_release_summary(package_
 create index tmp_release_summary_collection_id on tmp_release_summary(collection_id);
 
 
-create view tmp_release_summary_with_release_data
+
+create or replace view tmp_release_summary_with_release_data
 as
 select 
     case when release_type = 'record' then d.data -> 'compiledRelease' else d.data end AS data,
@@ -90,8 +94,9 @@ join
     data d on d.id = r.data_id;
 
 
-create materialized view parties_summary
-as
+
+drop table if exists parties_summary;
+
 select 
     r.id,
     ordinality - 1 AS party_index,
@@ -117,18 +122,19 @@ select
         additional_identifier ?& array['scheme', 'id']											   
     ) parties_additionalIdentifiers_ids,
     jsonb_array_length(case when jsonb_typeof(value->'additionalIdentifiers') = 'array' then value->'additionalIdentifiers' else '[]'::jsonb end) parties_additionalIdentifiers_count
+into parties_summary
 from 
     tmp_release_summary_with_release_data AS r
 cross join
     jsonb_array_elements(data -> 'parties') with ordinality AS parties
 where
-    jsonb_typeof(data -> 'parties') = 'array'
-with no data;
-
+    jsonb_typeof(data -> 'parties') = 'array';
 
 create unique index parties_summary_id on parties_summary(id, party_index);
 create index parties_summary_data_id on parties_summary(data_id);
 create index parties_summary_collection_id on parties_summary(collection_id);
 create index parties_summary_party_id on parties_summary(id, parties_id);
 
+--select common_comments('parties_summary')
 
+--Comment on column parties_summary.party_index IS 'Unique id representing a release, compiled_release or record';

@@ -1,7 +1,7 @@
 set search_path = views, public;
 
-create materialized view tmp_planning_summary
-as
+drop table if exists tmp_planning_summary;
+
 select
     r.id,
     r.release_type,
@@ -10,6 +10,8 @@ select
     r.release_id,
     r.data_id,
     planning
+into 
+    tmp_planning_summary
 from
     (select 
         data -> 'planning' AS planning, 
@@ -17,14 +19,13 @@ from
     from 
         tmp_release_summary_with_release_data rs where data ? 'planning'
     ) AS r
-with no data
 ;
 
 create unique index tmp_planning_summary_id on tmp_planning_summary(id);
 
 
-create materialized view planning_documents_summary
-as
+drop table if exists planning_documents_summary;
+
 select
     r.id,
     document_index,
@@ -36,6 +37,8 @@ select
     document,
     document ->> 'documentType' as documentType,
     document ->> 'format' as format
+into 
+    planning_documents_summary
 from
     (select 
         tps.*,
@@ -47,7 +50,6 @@ from
         jsonb_array_elements(planning -> 'documents') with ordinality
     where jsonb_typeof(planning -> 'documents') = 'array'
     ) AS r
-with no data
 ;
 
 create unique index planning_documents_summary_id on planning_documents_summary(id, document_index);
@@ -55,9 +57,8 @@ create index planning_documents_summary_data_id on planning_documents_summary(da
 create index planning_documents_summary_collection_id on planning_documents_summary(collection_id);
 
 
-drop materialized view if exists planning_milestones_summary;
-create materialized view planning_milestones_summary
-as
+drop table if exists planning_milestones_summary;
+
 select
     r.id,
     milestone_index,
@@ -70,6 +71,8 @@ select
     milestone ->> 'type' as type,
     milestone ->> 'code' as code,  
     milestone ->> 'status' as status
+into 
+    planning_milestones_summary
 from
     (select 
         tps.*,
@@ -81,7 +84,6 @@ from
         jsonb_array_elements(planning -> 'milestones') with ordinality
     where jsonb_typeof(planning -> 'milestones') = 'array'
     ) AS r
-with no data
 ;
 
 create unique index planning_milestones_summary_id on planning_milestones_summary(id, milestone_index);
@@ -89,8 +91,8 @@ create index planning_milestones_summary_data_id on planning_milestones_summary(
 create index planning_milestones_summary_collection_id on planning_milestones_summary(collection_id);
 
 
-create materialized view planning_summary
-as
+drop table if exists planning_summary;
+
 select
     r.id,
     r.release_type,
@@ -106,6 +108,8 @@ select
     documentType_counts,
     milestones_count,
     milestoneType_counts
+into
+    planning_summary
 from
     tmp_planning_summary r
 left join
@@ -142,9 +146,10 @@ left join
     group by id
     ) milestoneType_counts
     using (id)
-with no data
 ;
 
 create unique index planning_summary_id on planning_summary(id);
 create index planning_summary_data_id on planning_summary(data_id);
 create index planning_summary_collection_id on planning_summary(collection_id);
+
+drop table if exists tmp_planning_summary;

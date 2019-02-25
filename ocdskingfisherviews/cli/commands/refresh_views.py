@@ -1,19 +1,22 @@
-import json
 import os
 from timeit import default_timer as timer
+import glob
+from collections import OrderedDict
 
 import sqlalchemy as sa
-import alembic.config
 
 import ocdskingfisherviews.cli.commands.base
 
 
 
-class refreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
+class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
     command = 'refresh-views'
 
     def configure_subparser(self, subparser):
-        subparser.add_argument("--clear", help="clear all materialized views", action='store_true')
+        subparser.add_argument("--remove", help="remove all views", action='store_true')
+
+        subparser.add_argument("--start", help="Start at script. i.e 4 will start at 004-planning.sql", type=int, default=0)
+        subparser.add_argument("--end", help="End at script i.e 4 will end at 004-planning.sql", type=int, default=1000)
 
         subparser.add_argument("--sql", help="Just output sql and do not run", action='store_true')
         subparser.add_argument("--sql-timing", help="Add psql timing to sql output", action='store_true')
@@ -21,55 +24,49 @@ class refreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
     def run_command(self, args):
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
+
+        sql_scripts_path = os.path.join(dir_path, '../../../sql')
+        all_scripts = glob.glob(sql_scripts_path + '/*.sql') 
+
         
-        with open(os.path.join(dir_path, '../../../views_refresh_order.json')) as f:
-            view_order = json.load(f)
+        search_path_string = 'set search_path = views, public;\n'
                            
         engine = sa.create_engine(self.config.database_uri)
 
-        exists = set()
-        is_not_populated = set()
+        statements = OrderedDict()
 
-        with engine.begin() as connection:
-            results = connection.execute('''
-                SELECT relname, relispopulated  FROM pg_class join pg_namespace on pg_namespace.oid = relnamespace where nspname = 'views';
-            ''')
-            for result in results:
-                exists.add(result['relname'])
-                if not result['relispopulated']:
-                    is_not_populated.add(result['relname'])
+        if args.remove:
+            all_scripts.sort(reverse=True)
+        else:
+            all_scripts.sort()
 
+        for script_path in all_scripts:
+            script_name = script_path.split('/')[-1].split('.')[0]
+            script_number = int(script_name[:3])
 
-        statements = []
+            if script_number < args.start or script_number > args.end:
+                continue
 
-        sql_template = '''REFRESH MATERIALIZED VIEW {concurrently} "{name}" WITH {no} DATA'''
+            with open(script_path) as script_file:
+                script = search_path_string + script_file.read()
 
-        for item in view_order:
-            if item['name'] not in exists:
-                print("ERROR: View {} does not exist, you may need to upgrade your database".format(item['name']))
-                return
-            context = {"concurrently": "concurrently",
-                       "name": item['name'],
-                       "no": ""}
-            if item['name'] in is_not_populated or args.clear or item.get('clear') or item['name'].startswith('tmp_'):
-                context["concurrently"] = ""
-            if item.get('clear') or args.clear:
-                context["no"] = "NO"
-            statements.append(sql_template.format(**context))
+            if script_name.endswith('_downgrade') and args.remove:
+                statements[script_name] = script
+            if not script_name.endswith('_downgrade') and not args.remove:
+                statements[script_name] = script
 
-        statement_string = 'set search_path = views, public;\n'
-        statement_string += ";\n".join(statements) + ';'
         if args.sql:
+            all_sql = ';\n'.join(statements.values())
             if args.sql_timing:
-                statement_string = r'\timing' + '\n' + statement_string
-            print(statement_string)
+                all_sql = r'\timing' + '\n' + all_sql
+            print(all_sql)
             return
 
-        with engine.begin() as connection:
-            connection.execute('set search_path = views, public;\n')
-            for statement in statements:
+        for statement_name, statement in statements.items():
+            with engine.begin() as connection:
+                connection.execute('set search_path = views, public;\n')
                 start = timer()
-                print('running statement: {}'.format(statement))
-                connection.execute(statement)
+                print('running script: {}'.format(statement_name))
+                connection.execute(statement, tuple())
                 print('running time: {}s'.format(timer() - start))
 

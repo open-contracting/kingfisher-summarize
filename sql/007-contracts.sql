@@ -1,8 +1,7 @@
 set search_path = views, public;
 
 
-create materialized view tmp_contracts_summary
-as
+drop table if exists tmp_contracts_summary;
 select
     r.id,
     contract_index,
@@ -13,6 +12,8 @@ select
     r.data_id,
     contract,
     contract ->> 'awardID' as award_id
+into
+    tmp_contracts_summary
 from
     (select 
         rs.*,
@@ -24,15 +25,13 @@ from
         jsonb_array_elements(data -> 'contracts') with ordinality
     where jsonb_typeof(data -> 'contracts') = 'array'
     ) AS r
-with no data
 ;
 
 create unique index tmp_contracts_summary_id on tmp_contracts_summary(id, contract_index);
 create unique index tmp_contracts_summary_award_id on tmp_contracts_summary(id, award_id);
 
 
-create materialized view contract_items_summary
-as
+drop table if exists contract_items_summary;
 select
     r.id,
     contract_index,
@@ -56,6 +55,8 @@ select
         additional_classification ?& array['scheme', 'id']											   
     ) item_additionalIdentifiers_ids,
     jsonb_array_length(case when jsonb_typeof(item->'additionalClassifications') = 'array' then item->'additionalClassifications' else '[]'::jsonb end) as additional_classification_count
+into
+    contract_items_summary
 from
     (select 
         tas.*,
@@ -68,7 +69,6 @@ from
         jsonb_array_elements(contract -> 'items') with ordinality
     where jsonb_typeof(contract -> 'items') = 'array'
     ) AS r
-with no data
 ;
 
 create unique index contract_items_summary_id on contract_items_summary(id, contract_index, item_index);
@@ -76,8 +76,7 @@ create index contract_items_summary_data_id on contract_items_summary(data_id);
 create index contract_items_summary_collection_id on contract_items_summary(collection_id);
 
 
-create materialized view contract_documents_summary
-as
+drop table if exists contract_documents_summary;
 select
     r.id,
     contract_index,
@@ -90,6 +89,8 @@ select
     document,
     document ->> 'documentType' as documentType,
     document ->> 'format' as format
+into
+    contract_documents_summary
 from
     (select 
         tas.*,
@@ -101,7 +102,6 @@ from
         jsonb_array_elements(contract -> 'documents') with ordinality
     where jsonb_typeof(contract -> 'documents') = 'array'
     ) AS r
-with no data
 ;
 
 create unique index contract_documents_summary_id on contract_documents_summary(id, contract_index, document_index);
@@ -109,8 +109,7 @@ create index contract_documents_summary_data_id on contract_documents_summary(da
 create index contract_documents_summary_collection_id on contract_documents_summary(collection_id);
 
 
-create materialized view contract_milestones_summary
-as
+drop table if exists contract_milestones_summary;
 select
     r.id,
     contract_index,
@@ -124,6 +123,8 @@ select
     milestone ->> 'type' as type,
     milestone ->> 'code' as code,  
     milestone ->> 'status' as status
+into
+    contract_milestones_summary
 from
     (select 
         tps.*,
@@ -135,7 +136,6 @@ from
         jsonb_array_elements(contract -> 'milestones') with ordinality
     where jsonb_typeof(contract -> 'milestones') = 'array'
     ) AS r
-with no data
 ;
 
 create unique index contract_milestones_summary_id on contract_milestones_summary(id, contract_index, milestone_index);
@@ -143,8 +143,7 @@ create index contract_milestones_summary_data_id on contract_milestones_summary(
 create index contract_milestones_summary_collection_id on contract_milestones_summary(collection_id);
 
 
-create materialized view contract_implementation_documents_summary
-as
+drop table if exists contract_implementation_documents_summary;
 select
     r.id,
     contract_index,
@@ -157,6 +156,8 @@ select
     document,
     document ->> 'documentType' as documentType,
     document ->> 'format' as format
+into
+    contract_implementation_documents_summary
 from
     (select 
         tas.*,
@@ -168,7 +169,6 @@ from
         jsonb_array_elements(contract -> 'implementation' -> 'documents') with ordinality
     where jsonb_typeof(contract -> 'implementation' -> 'documents') = 'array'
     ) AS r
-with no data
 ;
 
 create unique index contract_implementation_documents_summary_id on contract_implementation_documents_summary(id, contract_index, document_index);
@@ -176,8 +176,7 @@ create index contract_implementation_documents_summary_data_id on contract_imple
 create index contract_implementation_documents_summary_collection_id on contract_implementation_documents_summary(collection_id);
 
 
-create materialized view contract_implementation_milestones_summary
-as
+drop table if exists contract_implementation_milestones_summary;
 select
     r.id,
     contract_index,
@@ -191,6 +190,8 @@ select
     milestone ->> 'type' as type,
     milestone ->> 'code' as code,  
     milestone ->> 'status' as status
+into
+    contract_implementation_milestones_summary
 from
     (select 
         tps.*,
@@ -202,7 +203,6 @@ from
         jsonb_array_elements(contract -> 'implementation' -> 'milestones') with ordinality
     where jsonb_typeof(contract -> 'implementation' -> 'milestones') = 'array'
     ) AS r
-with no data
 ;
 
 create unique index contract_implementation_milestones_summary_id on contract_implementation_milestones_summary(id, contract_index, milestone_index);
@@ -211,8 +211,7 @@ create index contract_implementation_milestones_summary_collection_id on contrac
 
 
 
-create materialized view contract_implementation_transactions_summary
-as
+drop table if exists contract_implementation_transactions_summary;
 select
     r.id,
     contract_index,
@@ -224,6 +223,8 @@ select
     r.data_id,
     convert_to_numeric(coalesce(transaction -> 'value' ->> 'amount', transaction -> 'amount' ->> 'amount')) transaction_amount,
     coalesce(transaction -> 'amount' ->> 'currency', transaction -> 'value' ->> 'currency') transaction_currency
+into
+    contract_implementation_transactions_summary
 from
     (select 
         tps.*,
@@ -235,7 +236,6 @@ from
         jsonb_array_elements(contract -> 'implementation' -> 'transactions') with ordinality
     where jsonb_typeof(contract -> 'implementation' -> 'transactions') = 'array'
     ) AS r
-with no data
 ;
 
 create unique index contract_implementation_transactions_summary_id on contract_implementation_transactions_summary(id, contract_index, transaction_index);
@@ -245,8 +245,7 @@ create index contract_implementation_transactions_summary_collection_id on contr
 
 
 
-create materialized view contracts_summary
-as
+drop table if exists contracts_summary;
 select
     r.id,
     r.contract_index,
@@ -277,6 +276,8 @@ select
     implementation_documentType_counts,
     implementation_milestones_count,
     implementation_milestoneType_counts
+into
+    contracts_summary
 from
     tmp_contracts_summary r
 left join
@@ -364,10 +365,11 @@ left join
     group by id, contract_index
     ) implementation_milestoneType_counts
     using (id, contract_index)
-with no data
 ;
 
 create unique index contracts_summary_id on contracts_summary(id, contract_index);
 create index contracts_summary_data_id on contracts_summary(data_id);
 create index contracts_summary_collection_id on contracts_summary(collection_id);
 create unique index contracts_summary_award_id on tmp_contracts_summary(id, award_id);
+
+drop table if exists tmp_contracts_summary;

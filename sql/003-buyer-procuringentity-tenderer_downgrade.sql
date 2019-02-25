@@ -1,5 +1,5 @@
 set search_path = views, public;
 
-drop materialized view tenderers_summary;
-drop materialized view procuringEntity_summary;
-drop materialized view buyer_summary;
+drop table if exists tenderers_summary;
+drop table if exists procuringEntity_summary;
+drop table if exists buyer_summary;

@@ -1,7 +1,7 @@
 set search_path = views, public;
 
-create materialized view tmp_awards_summary
-as
+drop table if exists tmp_awards_summary;
+
 select
     r.id,
     award_index,
@@ -11,6 +11,8 @@ select
     r.release_id,
     r.data_id,
     award
+into
+   tmp_awards_summary
 from
     (select 
         rs.*,
@@ -22,15 +24,14 @@ from
         jsonb_array_elements(data -> 'awards') with ordinality
     where jsonb_typeof(data -> 'awards') = 'array'
     ) AS r
-with no data
 ;
 
 create unique index tmp_awards_summary_id on tmp_awards_summary(id, award_index);
 
 
 
-create materialized view award_suppliers_summary
-as
+drop table if exists award_suppliers_summary;
+
 select
     r.id,
     award_index,
@@ -59,6 +60,8 @@ select
     case when ps.id is not null then 1 else 0 end link_to_parties,
     case when ps.id is not null and (ps.party -> 'roles') ? 'supplier' then 1 else 0 end link_with_role,
     ps.party_index
+into
+    award_suppliers_summary
 from 
     (select 
         tas.*,
@@ -74,7 +77,6 @@ from
 left join
     parties_summary ps on r.id = ps.id and (supplier ->> 'id') = ps.parties_id
 where supplier is not null
-with no data;
 ;
 
 create unique index award_suppliers_summary_id on award_suppliers_summary(id, award_index, supplier_index);
@@ -82,8 +84,8 @@ create index award_suppliers_summary_data_id on award_suppliers_summary(data_id)
 create index award_suppliers_summary_collection_id on award_suppliers_summary(collection_id);
 
 
-create materialized view award_documents_summary
-as
+drop table if exists award_documents_summary;
+
 select
     r.id,
     award_index,
@@ -96,6 +98,8 @@ select
     document,
     document ->> 'documentType' as documentType,
     document ->> 'format' as format
+into
+    award_documents_summary
 from
     (select 
         tas.*,
@@ -107,7 +111,6 @@ from
         jsonb_array_elements(award -> 'documents') with ordinality
     where jsonb_typeof(award -> 'documents') = 'array'
     ) AS r
-with no data
 ;
 
 create unique index award_documents_summary_id on award_documents_summary(id, award_index, document_index);
@@ -115,8 +118,8 @@ create index award_documents_summary_data_id on award_documents_summary(data_id)
 create index award_documents_summary_collection_id on award_documents_summary(collection_id);
 
 
-create materialized view award_items_summary
-as
+drop table if exists award_items_summary;
+
 select
     r.id,
     award_index,
@@ -140,6 +143,8 @@ select
         additional_classification ?& array['scheme', 'id']											   
     ) item_additionalIdentifiers_ids,
     jsonb_array_length(case when jsonb_typeof(item->'additionalClassifications') = 'array' then item->'additionalClassifications' else '[]'::jsonb end) as additional_classification_count
+into
+    award_items_summary
 from
     (select 
         tas.*,
@@ -152,7 +157,6 @@ from
         jsonb_array_elements(award -> 'items') with ordinality
     where jsonb_typeof(award -> 'items') = 'array'
     ) AS r
-with no data
 ;
 
 create unique index award_items_summary_id on award_items_summary(id, award_index, item_index);
@@ -160,8 +164,8 @@ create index award_items_summary_data_id on award_items_summary(data_id);
 create index award_items_summary_collection_id on award_items_summary(collection_id);
 
 
-create materialized view awards_summary
-as
+drop table if exists awards_summary;
+
 select
     r.id,
     r.award_index,
@@ -186,6 +190,8 @@ select
     documents_count,
     documentType_counts,
     items_count
+into 
+    awards_summary
 from
     tmp_awards_summary r
 left join
@@ -217,9 +223,10 @@ left join
     group by id, award_index
     ) items_counts
     using (id, award_index)
-with no data
 ;
 
 create unique index awards_summary_id on awards_summary(id, award_index);
 create index awards_summary_data_id on awards_summary(data_id);
 create index awards_summary_collection_id on awards_summary(collection_id);
+
+drop table if exists tmp_awards_summary;

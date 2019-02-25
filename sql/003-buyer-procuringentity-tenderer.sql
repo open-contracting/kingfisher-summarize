@@ -1,7 +1,7 @@
 set search_path = views, public;
 
-create materialized view buyer_summary
-as
+drop table if exists buyer_summary;
+
 select
     r.id,
     r.release_type,
@@ -28,6 +28,7 @@ select
     case when ps.id is not null then 1 else 0 end link_to_parties,
     case when ps.id is not null and (ps.party -> 'roles') ? 'buyer' then 1 else 0 end link_with_role,
     ps.party_index
+into buyer_summary
 from 
     (select 
         *,
@@ -37,7 +38,7 @@ from
 left join
     parties_summary ps on r.id = ps.id and (buyer ->> 'id') = ps.parties_id
 where buyer is not null
-with no data;
+;
 
 
 create unique index buyer_summary_id on buyer_summary(id);
@@ -45,8 +46,8 @@ create index buyer_summary_data_id on buyer_summary(data_id);
 create index buyer_summary_collection_id on buyer_summary(collection_id);
 
 
-create materialized view procuringEntity_summary
-as
+drop table if exists procuringEntity_summary;
+
 select
     r.id,
     r.release_type,
@@ -73,6 +74,7 @@ select
     case when ps.id is not null then 1 else 0 end link_to_parties,
     case when ps.id is not null and (ps.party -> 'roles') ? 'procuringEntity' then 1 else 0 end link_with_role,
     ps.party_index
+into procuringEntity_summary
 from 
     (select 
         *,
@@ -82,15 +84,15 @@ from
 left join
     parties_summary ps on r.id = ps.id and (procuringEntity ->> 'id') = ps.parties_id
 where procuringEntity is not null
-with no data;
+;
 
 create unique index procuringEntity_summary_id on procuringEntity_summary(id);
 create index procuringEntity_summary_data_id on procuringEntity_summary(data_id);
 create index procuringEntity_summary_collection_id on procuringEntity_summary(collection_id);
 
 
-create materialized view tenderers_summary
-as
+drop table if exists tenderers_summary;
+
 select
     r.id,
     tenderer_index,
@@ -118,6 +120,7 @@ select
     case when ps.id is not null then 1 else 0 end link_to_parties,
     case when ps.id is not null and (ps.party -> 'roles') ? 'tenderer' then 1 else 0 end link_with_role,
     ps.party_index
+    into tenderers_summary
 from 
     (select 
         rs.*,
@@ -133,7 +136,7 @@ from
 left join
     parties_summary ps on r.id = ps.id and (tenderer ->> 'id') = ps.parties_id
 where tenderer is not null
-with no data;
+;
 
 
 create unique index tenderers_summary_id on tenderers_summary(id, tenderer_index);

@@ -1,10 +1,9 @@
 set search_path = views, public;
 
-drop materialized view contracts_summary;
-drop materialized view contract_implementation_transactions_summary;
-drop materialized view contract_implementation_milestones_summary;
-drop materialized view contract_implementation_documents_summary;
-drop materialized view contract_milestones_summary;
-drop materialized view contract_documents_summary;
-drop materialized view contract_items_summary;
-drop materialized view tmp_contracts_summary;
+drop table if exists contracts_summary;
+drop table if exists contract_implementation_transactions_summary;
+drop table if exists contract_implementation_milestones_summary;
+drop table if exists contract_implementation_documents_summary;
+drop table if exists contract_milestones_summary;
+drop table if exists contract_documents_summary;
+drop table if exists contract_items_summary;
