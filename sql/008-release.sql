@@ -313,4 +313,3 @@ drop table if exists tmp_contract_implementation_milestones_aggregates;
 drop table if exists tmp_release_documents_aggregates;
 drop table if exists tmp_release_milestones_aggregates;
 
-drop table if exists tmp_release_summary cascade;

@@ -3,6 +3,7 @@ set search_path = views, public;
 drop table if exists buyer_summary;
 
 select
+    distinct on (r.id)
     r.id,
     r.release_type,
     r.collection_id,
@@ -49,6 +50,7 @@ create index buyer_summary_collection_id on buyer_summary(collection_id);
 drop table if exists procuringEntity_summary;
 
 select
+    distinct on (r.id)
     r.id,
     r.release_type,
     r.collection_id,
@@ -94,6 +96,7 @@ create index procuringEntity_summary_collection_id on procuringEntity_summary(co
 drop table if exists tenderers_summary;
 
 select
+    distinct on (r.id, tenderer_index)
     r.id,
     tenderer_index,
 	r.release_type,

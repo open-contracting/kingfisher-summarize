@@ -33,6 +33,7 @@ create unique index tmp_awards_summary_id on tmp_awards_summary(id, award_index)
 drop table if exists award_suppliers_summary;
 
 select
+    distinct on (r.id, award_index, supplier_index)
     r.id,
     award_index,
     supplier_index,
