@@ -199,7 +199,7 @@ left join
     select 
         id, 
         award_index,
-        jsonb_object_agg(documentType, documentType_count) documentType_counts, 
+        jsonb_object_agg(coalesce(documentType, ''), documentType_count) documentType_counts, 
         count(*) documents_count
     from
         (select 

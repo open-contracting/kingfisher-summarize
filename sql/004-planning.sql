@@ -116,7 +116,7 @@ left join
     (
     select 
         id, 
-        jsonb_object_agg(documentType, documentType_count) documentType_counts, 
+        jsonb_object_agg(coalesce(documentType, ''), documentType_count) documentType_counts, 
         count(*) documents_count
     from
         (select 
@@ -133,7 +133,7 @@ left join
     (
     select 
         id, 
-        jsonb_object_agg(type, milestoneType_count) milestoneType_counts, 
+        jsonb_object_agg(coalesce(type, ''), milestoneType_count) milestoneType_counts, 
         count(*) milestones_count
     from
         (select 

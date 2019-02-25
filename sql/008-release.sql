@@ -14,7 +14,7 @@ from
     (select id, count(*) total_parties from parties_summary group by id) parties_count
 left join
     (select
-        id, sum(role_count) as total_roles, jsonb_object_agg(role, role_count) role_counts
+        id, sum(role_count) as total_roles, jsonb_object_agg(coalesce(role, ''), role_count) role_counts
     from
         (select
             id, role, count(*) role_count
@@ -85,7 +85,7 @@ create unique index tmp_release_award_suppliers_aggregates_id on tmp_release_awa
 drop table if exists tmp_award_documents_aggregates;
 select 
     id, 
-    jsonb_object_agg(documentType, documentType_count) award_documentType_counts
+    jsonb_object_agg(coalesce(documentType, ''), documentType_count) award_documentType_counts
 into tmp_award_documents_aggregates
 from
     (select 
@@ -128,7 +128,7 @@ create unique index tmp_release_contracts_aggregates_id on tmp_release_contracts
 drop table if exists tmp_contract_documents_aggregates;
 select 
     id, 
-    jsonb_object_agg(documentType, documentType_count) contract_documentType_counts
+    jsonb_object_agg(coalesce(documentType, ''), documentType_count) contract_documentType_counts
 into tmp_contract_documents_aggregates
 from
     (select 
@@ -146,7 +146,7 @@ create unique index tmp_contract_documents_aggregates_id on tmp_contract_documen
 drop table if exists tmp_contract_implementation_documents_aggregates;
 select 
     id, 
-    jsonb_object_agg(documentType, documentType_count) contract_implemetation_documentType_counts
+    jsonb_object_agg(coalesce(documentType, ''), documentType_count) contract_implemetation_documentType_counts
 into tmp_contract_implementation_documents_aggregates
 from
     (select 
@@ -164,7 +164,7 @@ create unique index tmp_contract_implementation_documents_aggregates_id on tmp_c
 drop table if exists tmp_contract_milestones_aggregates;
 select 
     id, 
-    jsonb_object_agg(type, milestoneType_count) contract_milestoneType_counts
+    jsonb_object_agg(coalesce(type, ''), milestoneType_count) contract_milestoneType_counts
 into tmp_contract_milestones_aggregates
 from
     (select 
@@ -182,7 +182,7 @@ create unique index tmp_contract_milestones_aggregates_id on tmp_contract_milest
 drop table if exists tmp_contract_implementation_milestones_aggregates;
 select 
     id, 
-    jsonb_object_agg(type, milestoneType_count) contract_implementation_milestoneType_counts
+    jsonb_object_agg(coalesce(type, ''), milestoneType_count) contract_implementation_milestoneType_counts
 into tmp_contract_implementation_milestones_aggregates
 from
     (select 
