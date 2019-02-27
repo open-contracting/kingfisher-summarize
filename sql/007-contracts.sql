@@ -28,7 +28,7 @@ from
 ;
 
 create unique index tmp_contracts_summary_id on tmp_contracts_summary(id, contract_index);
-create unique index tmp_contracts_summary_award_id on tmp_contracts_summary(id, award_id);
+create index tmp_contracts_summary_award_id on tmp_contracts_summary(id, award_id);
 
 
 drop table if exists contract_items_summary;
