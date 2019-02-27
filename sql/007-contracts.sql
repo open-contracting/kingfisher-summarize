@@ -371,6 +371,6 @@ left join
 create unique index contracts_summary_id on contracts_summary(id, contract_index);
 create index contracts_summary_data_id on contracts_summary(data_id);
 create index contracts_summary_collection_id on contracts_summary(collection_id);
-create unique index contracts_summary_award_id on tmp_contracts_summary(id, award_id);
+create index contracts_summary_award_id on tmp_contracts_summary(id, award_id);
 
 drop table if exists tmp_contracts_summary;
