@@ -62,6 +62,8 @@ class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
             print(all_sql)
             return
 
+        start_all = timer()
+
         for statement_name, statement in statements.items():
             with engine.begin() as connection:
                 connection.execute('set search_path = views, public;\n')
@@ -69,4 +71,6 @@ class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
                 print('running script: {}'.format(statement_name))
                 connection.execute(statement, tuple())
                 print('running time: {}s'.format(timer() - start))
+
+        print('total running time: {}s'.format(timer() - start_all))
 

@@ -24,7 +24,7 @@ View Reference
 
 output_rst_table_template = '''
 {table_name}
----------------
+-------------------------------------------
 .. csv-table::
    :header-rows: 1
    :widths: 10, 10, 40
