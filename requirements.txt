@@ -1,10 +1,11 @@
 alembic==1.0.7
 Mako==1.0.7
-MarkupSafe==1.1.0
--e git+https://github.com/open-contracting/kingfisher-process.git@e7cda181b3b1b280bdfb830a0fc6f85cab8399fe#egg=ocdskingfisher
+MarkupSafe==1.1.1
+-e git+https://github.com/open-contracting/kingfisher-process.git@4360629cbaffe069315ea760b80bef52d8e681f6#egg=ocdskingfisher
+-e git+git@github.com:open-contracting/kingfisher-views.git@097e9328fd147f47e5ed0c314ac8de5f7ffd9239#egg=ocdskingfisher_views
 pgpasslib==1.1.0
 psycopg2==2.7.7
 python-dateutil==2.8.0
 python-editor==1.0.4
 six==1.12.0
-SQLAlchemy==1.2.17
+SQLAlchemy==1.2.18

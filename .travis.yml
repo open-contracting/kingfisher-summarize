@@ -1,0 +1,28 @@
+sudo: false
+addons:
+    chrome: stable
+    postgresql: "10"
+    apt:
+        packages:
+            - postgresql-10
+            - postgresql-client-10
+env:
+    global:
+        - PGPORT=5433
+        - KINGFISHER_PROCESS_DB_URI='postgres:///travis'
+services:
+    - postgresql
+language: python
+python:
+    - "3.5"
+install:
+    - "pip install -r requirements-dev.txt"
+    - "pip install -e ."
+before_script:
+    - "psql -c 'create schema views;' travis"
+    - "ocdskingfisher-process-cli upgrade-database"
+    - "ocdskingfisher-process-cli new-collection 'new' '2000-01-01 00:00:00'"
+    - "ocdskingfisher-process-cli local-load 1 fixtures release"
+    - "ocdskingfisher-views-cli upgrade-database"
+script:
+    - "pytest"

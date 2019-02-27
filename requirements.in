@@ -1,6 +1,4 @@
--e .
 -e git+https://github.com/open-contracting/kingfisher-process.git@master#egg=kingfisherprocess
 alembic
 pgpasslib
 psycopg2
-pytest
