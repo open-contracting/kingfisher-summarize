@@ -247,6 +247,7 @@ create index contract_implementation_transactions_summary_collection_id on contr
 
 drop table if exists contracts_summary;
 select
+    distinct on (r.id, r.contract_index)
     r.id,
     r.contract_index,
     r.release_type,
