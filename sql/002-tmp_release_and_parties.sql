@@ -135,6 +135,6 @@ create index parties_summary_data_id on parties_summary(data_id);
 create index parties_summary_collection_id on parties_summary(collection_id);
 create index parties_summary_party_id on parties_summary(id, parties_id);
 
---select common_comments('parties_summary')
+select common_comments('parties_summary');
 
---Comment on column parties_summary.party_index IS 'Unique id representing a release, compiled_release or record';
+Comment on column parties_summary.party_index IS 'Unique id representing a release, compiled_release or record';

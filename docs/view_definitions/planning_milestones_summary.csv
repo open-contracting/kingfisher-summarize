@@ -1,0 +1,12 @@
+Column Name,Data Type,Description
+id,integer,
+milestone_​index,bigint,
+release_​type,text,
+collection_​id,integer,
+ocid,text,
+release_​id,text,
+data_​id,integer,
+milestone,jsonb,
+type,text,
+code,text,
+status,text,
