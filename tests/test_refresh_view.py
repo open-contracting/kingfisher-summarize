@@ -37,9 +37,7 @@ VIEWS_TABLES = {
     "tender_items_summary",
     "tender_milestones_summary",
     "tender_summary",
-    "tenderers_summary",
-    "field_counts",
-    "field_counts_by_buyer"
+    "tenderers_summary"
 }
 
 
