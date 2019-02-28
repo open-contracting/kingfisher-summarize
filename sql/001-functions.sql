@@ -55,8 +55,10 @@ $$
 $$;
 
 
+drop function if exists flatten;
+
 CREATE OR REPLACE FUNCTION flatten(jsonb)
-    RETURNS TABLE(path text, value jsonb, object_property integer, array_item integer) 
+    RETURNS TABLE(path text, object_property integer, array_item integer) 
     LANGUAGE 'sql'
     PARALLEL SAFE
 AS
@@ -92,6 +94,6 @@ WITH RECURSIVE all_paths(path, "value", "object_property", "array_item") AS (
           ) a
      )
   )
-  SELECT path, "value", object_property, array_item FROM all_paths;
+  SELECT path, object_property, array_item FROM all_paths;
 $$;	
 
