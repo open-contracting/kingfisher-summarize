@@ -77,7 +77,8 @@ class DocsTableRefCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
             
                 for result in connection.execute(column_info_query, [table]):
                     result_dict = dict(result)
-                    result_dict['column_name'] = result_dict['column_name'].replace('_', '_\u200B')
+                    if 'timestamp' in result_dict['data_type']:
+                        result_dict['data_type'] = 'timestamp'
                     writer.writerow(result_dict)
 
             output_rst +=  output_rst_table_template.format(table_name=table)

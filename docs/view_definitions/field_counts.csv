@@ -1,6 +1,6 @@
 Column Name,Data Type,Description
-collection_​id,integer,
+collection_id,integer,
 path,text,
-object_​property,bigint,
-array_​count,bigint,
-distinct_​releases,bigint,
+object_property,bigint,
+array_count,bigint,
+distinct_releases,bigint,
