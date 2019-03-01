@@ -28,6 +28,11 @@ search_path_string = 'set search_path = views, public;'
 class FieldCountsCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
     command = 'field-counts'
 
+    def configure_subparser(self, subparser):
+        subparser.add_argument("--remove", help="Aemove field_count table", action='store_true')
+        subparser.add_argument("--threads", help="Amount of threads to use", type=int, default=1)
+
+
     def run_collection(self, collection):
 
         with self.engine.begin() as connection:
@@ -43,6 +48,13 @@ class FieldCountsCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
         self.engine = sa.create_engine(self.config.database_uri)
         overall_start = timer()
 
+        if args.remove:
+            with self.engine.begin() as connection:
+                connection.execute(search_path_string)
+                connection.execute('drop table if exists field_counts_temp;')
+                connection.execute('drop table if exists field_counts')
+            return
+
         with self.engine.begin() as connection:
             connection.execute(search_path_string)
 
@@ -52,7 +64,7 @@ class FieldCountsCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
                 result['id'] for result in connection.execute('select id from selected_collections')
             ]
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=args.threads) as executor:
             futures = [executor.submit(self.run_collection, collection) for collection in selected_collections]
 
             for future in concurrent.futures.as_completed(futures):
