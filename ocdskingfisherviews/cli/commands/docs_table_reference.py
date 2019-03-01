@@ -24,7 +24,7 @@ View Reference
 
 output_rst_table_template = '''
 {table_name}
--------------------------------------------
+-----------------------------------------------
 .. csv-table::
    :header-rows: 1
    :widths: 10, 10, 40
@@ -58,6 +58,8 @@ class DocsTableRefCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
                 if table_name.startswith('tmp_'):
                     continue
                 all_tables.append(table_name)
+
+        all_tables.append('field_counts')
 
         search_path_string = 'set search_path = views, public;'
                            

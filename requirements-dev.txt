@@ -1,6 +1,8 @@
+alabaster==0.7.12
 alembic==1.0.7
 atomicwrites==1.3.0
 attrs==18.2.0
+Babel==2.6.0
 bleach==3.1.0
 blinker==1.4
 cached-property==1.5.1
@@ -10,11 +12,13 @@ Click==7.0
 commonmark==0.8.1
 contextlib2==0.5.5
 Django==2.1.7
+docutils==0.14
 et-xmlfile==1.0.1
 Flask==1.0.2
 -e git+https://github.com/OpenDataServices/flatten-tool.git@4c13ef0b32a59e810919a3de09bc8f64ce8f9392#egg=flattentool
 future==0.17.1
 idna==2.8
+imagesize==1.1.0
 itsdangerous==1.1.0
 jdcal==1.4
 Jinja2==2.10
@@ -26,14 +30,18 @@ lxml==4.3.1
 Mako==1.0.7
 MarkupSafe==1.1.1
 more-itertools==6.0.0
--e git+https://github.com/open-contracting/kingfisher-process.git@e75e54a1664f21f05bdbf64ebaa345633b073065#egg=ocdskingfisher
+-e git+https://github.com/open-contracting/kingfisher-process.git@2449df935e8d52659a227602f7eba5309c3c62d3#egg=ocdskingfisher
+-e git+git@github.com:open-contracting/kingfisher-views.git@a933c80b6d7d4beb1de18e80a15d28de0724e0df#egg=ocdskingfisher_views
 ocdskit==0.0.5
 ocdsmerge==0.5.1
 openpyxl==2.6.0
+packaging==19.0
 pgpasslib==1.1.0
 pluggy==0.9.0
 psycopg2==2.7.7
 py==1.8.0
+Pygments==2.3.1
+pyparsing==2.3.1
 pyrsistent==0.14.11
 pytest==4.3.0
 python-dateutil==2.8.0
@@ -44,6 +52,9 @@ requests==2.21.0
 rfc3987==1.3.8
 schema==0.7.0
 six==1.12.0
+snowballstemmer==1.2.1
+Sphinx==1.8.4
+sphinxcontrib-websupport==1.1.0
 SQLAlchemy==1.2.18
 strict-rfc3339==0.7
 urllib3==1.24.1

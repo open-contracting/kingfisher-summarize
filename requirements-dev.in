@@ -6,4 +6,5 @@ Flask
 ocdsmerge
 pytest
 blinker
+sphinx
 redis

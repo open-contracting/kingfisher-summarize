@@ -5,6 +5,9 @@ import concurrent.futures
 import ocdskingfisherviews.cli.commands.base
 
 field_count_query = '''
+    set parallel_tuple_cost=0.00001;
+    set parallel_setup_cost=0.00001;
+
     select 
         collection_id,
         path, 
