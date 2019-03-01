@@ -24,13 +24,14 @@ jdcal==1.4
 Jinja2==2.10
 json-merge-patch==0.2
 jsonref==0.2
-jsonschema==3.0.0
+jsonschema==3.0.1
 -e git+https://github.com/open-contracting/lib-cove-ocds.git@2487c7160bb102559d34039a14bdeea38e25d5b6#egg=libcoveocds
-lxml==4.3.1
+logzero==1.5.0
+lxml==4.3.2
 Mako==1.0.7
 MarkupSafe==1.1.1
 more-itertools==6.0.0
--e git+https://github.com/open-contracting/kingfisher-process.git@2449df935e8d52659a227602f7eba5309c3c62d3#egg=ocdskingfisher
+-e git+https://github.com/open-contracting/kingfisher-process.git@81098c7c19120532801005df1656afdf9abe7f7a#egg=ocdskingfisher
 ocdskit==0.0.5
 ocdsmerge==0.5.1
 openpyxl==2.6.0

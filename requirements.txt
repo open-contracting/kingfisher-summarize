@@ -1,7 +1,8 @@
 alembic==1.0.7
+logzero==1.5.0
 Mako==1.0.7
 MarkupSafe==1.1.1
--e git+https://github.com/open-contracting/kingfisher-process.git@4360629cbaffe069315ea760b80bef52d8e681f6#egg=ocdskingfisher
+-e git+https://github.com/open-contracting/kingfisher-process.git@81098c7c19120532801005df1656afdf9abe7f7a#egg=ocdskingfisher
 pgpasslib==1.1.0
 psycopg2==2.7.7
 python-dateutil==2.8.0

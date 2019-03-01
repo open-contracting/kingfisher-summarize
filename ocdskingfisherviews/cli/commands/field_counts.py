@@ -1,6 +1,7 @@
 import sqlalchemy as sa
 from timeit import default_timer as timer
 import concurrent.futures
+from logzero import logger
 
 import ocdskingfisherviews.cli.commands.base
 
@@ -32,19 +33,21 @@ class FieldCountsCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
         subparser.add_argument("--remove", help="Aemove field_count table", action='store_true')
         subparser.add_argument("--threads", help="Amount of threads to use", type=int, default=1)
 
+        subparser.add_argument("--logfile", help="Add psql timing to sql output")
 
     def run_collection(self, collection):
 
         with self.engine.begin() as connection:
             start = timer()
             connection.execute(search_path_string)
-            print('processing collection: {}'.format(collection))
+            logger.info('processing collection: {}'.format(collection))
             results = tuple(connection.execute(field_count_query, collection))
             if results:
                 connection.execute('insert into field_counts_temp values (%s, %s, %s, %s, %s)', *results)
-            print('running time for collection {}: {}s'.format(collection, timer() - start))
+            logger.info('running time for collection {}: {}s'.format(collection, timer() - start))
 
-    def run_command(self, args):
+    def run_logged_command(self, args):
+
         self.engine = sa.create_engine(self.config.database_uri)
         overall_start = timer()
 
@@ -73,5 +76,5 @@ class FieldCountsCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
         with self.engine.begin() as connection:
             connection.execute('drop table if exists field_counts')
             connection.execute('alter table field_counts_temp rename to field_counts')
-            print('total running time: {}s'.format(timer() - overall_start))
+            logger.info('total running time: {}s'.format(timer() - overall_start))
 

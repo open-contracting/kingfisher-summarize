@@ -2,3 +2,4 @@
 alembic
 pgpasslib
 psycopg2
+logzero

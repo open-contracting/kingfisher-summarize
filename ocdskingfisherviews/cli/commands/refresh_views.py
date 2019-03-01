@@ -2,8 +2,10 @@ import os
 from timeit import default_timer as timer
 import glob
 from collections import OrderedDict
+import datetime
 
 import sqlalchemy as sa
+from logzero import logger
 
 import ocdskingfisherviews.cli.commands.base
 
@@ -21,7 +23,9 @@ class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
         subparser.add_argument("--sql", help="Just output sql and do not run", action='store_true')
         subparser.add_argument("--sql-timing", help="Add psql timing to sql output", action='store_true')
 
-    def run_command(self, args):
+        subparser.add_argument("--logfile", help="optional output logfile")
+
+    def run_logged_command(self, args):
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -62,15 +66,15 @@ class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
             print(all_sql)
             return
 
+
         start_all = timer()
 
         for statement_name, statement in statements.items():
             with engine.begin() as connection:
                 connection.execute('set search_path = views, public;\n')
                 start = timer()
-                print('running script: {}'.format(statement_name))
+                logger.info('running script: {}'.format(statement_name))
                 connection.execute(statement, tuple())
-                print('running time: {}s'.format(timer() - start))
+                logger.info('running time: {}s'.format(timer() - start))
 
-        print('total running time: {}s'.format(timer() - start_all))
-
+        logger.info('total running time: {}s'.format(timer() - start_all))
