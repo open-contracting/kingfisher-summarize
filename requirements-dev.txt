@@ -31,7 +31,6 @@ Mako==1.0.7
 MarkupSafe==1.1.1
 more-itertools==6.0.0
 -e git+https://github.com/open-contracting/kingfisher-process.git@2449df935e8d52659a227602f7eba5309c3c62d3#egg=ocdskingfisher
--e git+git@github.com:open-contracting/kingfisher-views.git@a933c80b6d7d4beb1de18e80a15d28de0724e0df#egg=ocdskingfisher_views
 ocdskit==0.0.5
 ocdsmerge==0.5.1
 openpyxl==2.6.0
