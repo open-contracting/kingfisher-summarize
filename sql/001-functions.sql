@@ -3,37 +3,21 @@ set search_path = views, public;
 CREATE OR REPLACE FUNCTION convert_to_numeric(
 	v_input text)
     RETURNS numeric
-    LANGUAGE 'plpgsql'
+    LANGUAGE 'sql'
     PARALLEL SAFE
 AS 
 $$
-    DECLARE v_num_value NUMERIC DEFAULT NULL;
-    BEGIN
-        BEGIN
-            v_num_value := v_input::NUMERIC;
-        EXCEPTION WHEN OTHERS THEN
-            RETURN NULL;
-        END;
-    RETURN v_num_value;
-    END;
+    select to_number('0'||v_input, '999999999999999999.99');
 $$;
 
 CREATE OR REPLACE FUNCTION convert_to_timestamp(
 	v_input text)
     RETURNS timestamp
-    LANGUAGE 'plpgsql'
+    LANGUAGE 'sql'
     PARALLEL SAFE
 AS 
 $$
-    DECLARE v_timestamp timestamp DEFAULT NULL;
-    BEGIN
-        BEGIN
-            v_timestamp := v_input::timestamp;
-        EXCEPTION WHEN OTHERS THEN
-            RETURN NULL;
-        END;
-    RETURN v_timestamp;
-    END;
+    select case when v_input ~ '^\d{4}-\d\d-\d\d[Tt ]\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|[Zz])?$' then v_input::timestamp else null end;
 $$;
 
 
