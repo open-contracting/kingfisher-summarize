@@ -2,13 +2,11 @@ import os
 from timeit import default_timer as timer
 import glob
 from collections import OrderedDict
-import datetime
 
 import sqlalchemy as sa
 from logzero import logger
 
 import ocdskingfisherviews.cli.commands.base
-
 
 
 class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
@@ -30,11 +28,10 @@ class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
         dir_path = os.path.dirname(os.path.realpath(__file__))
 
         sql_scripts_path = os.path.join(dir_path, '../../../sql')
-        all_scripts = glob.glob(sql_scripts_path + '/*.sql') 
+        all_scripts = glob.glob(sql_scripts_path + '/*.sql')
 
-        
         search_path_string = 'set search_path = views, public;\n'
-                           
+
         engine = sa.create_engine(self.config.database_uri)
 
         statements = OrderedDict()
@@ -65,7 +62,6 @@ class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
                 all_sql = r'\timing' + '\n' + all_sql
             print(all_sql)
             return
-
 
         start_all = timer()
 

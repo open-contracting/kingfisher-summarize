@@ -31,6 +31,7 @@ output_rst_table_template = '''
    :file: view_definitions/{table_name}.csv
 '''
 
+
 class DocsTableRefCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
     command = 'docs-table-ref'
 
@@ -43,8 +44,7 @@ class DocsTableRefCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
         docs_view_reference = os.path.join(docs_path, 'view-reference.rst')
 
         sql_scripts_path = os.path.join(dir_path, '../../../sql')
-        all_scripts = glob.glob(sql_scripts_path + '/*.sql') 
-        all_scripts.sort()
+        all_scripts = sorted(glob.glob(sql_scripts_path + '/*.sql'))
 
         all_tables = []
         for script_path in all_scripts:
@@ -61,31 +61,25 @@ class DocsTableRefCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
 
         all_tables.append('field_counts')
 
-        search_path_string = 'set search_path = views, public;'
-                           
         engine = sa.create_engine(self.config.database_uri)
 
-        
         output_rst = output_rst_base
 
         for table in all_tables:
-            results = []
             csv_file_name = os.path.join(docs_csv, table + '.csv')
             with engine.begin() as connection, open(csv_file_name, 'w+') as output:
                 writer = csv.DictWriter(output, ['column_name', 'data_type', 'column_description'])
                 writer.writerow({'column_name': 'Column Name',
                                  'data_type': 'Data Type',
                                  'column_description': 'Description'})
-            
+
                 for result in connection.execute(column_info_query, [table]):
                     result_dict = dict(result)
                     if 'timestamp' in result_dict['data_type']:
                         result_dict['data_type'] = 'timestamp'
                     writer.writerow(result_dict)
 
-            output_rst +=  output_rst_table_template.format(table_name=table)
+            output_rst += output_rst_table_template.format(table_name=table)
 
         with open(docs_view_reference, 'w+') as docs_view_reference_file:
             docs_view_reference_file.write(output_rst)
-
-

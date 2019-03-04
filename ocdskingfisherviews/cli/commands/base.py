@@ -3,6 +3,7 @@ import os.path
 import logzero
 from logzero import logger
 
+
 class CLICommand:
     command = ''
 

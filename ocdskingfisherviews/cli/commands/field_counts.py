@@ -9,22 +9,23 @@ field_count_query = '''
     set parallel_tuple_cost=0.00001;
     set parallel_setup_cost=0.00001;
 
-    select 
+    select
         collection_id,
-        path, 
-        sum(object_property) object_property, 
-        sum(array_item) array_count, 
+        path,
+        sum(object_property) object_property,
+        sum(array_item) array_count,
         count(distinct id) distinct_releases
-    from 
-        tmp_release_summary_with_release_data 
+    from
+        tmp_release_summary_with_release_data
     cross join
         flatten(data)
-    where 
+    where
         tmp_release_summary_with_release_data.collection_id = %s
     group by collection_id, path;
 '''
 
 search_path_string = 'set search_path = views, public;'
+
 
 class FieldCountsCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
     command = 'field-counts'
@@ -62,7 +63,9 @@ class FieldCountsCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
             connection.execute(search_path_string)
 
             connection.execute('drop table if exists field_counts_temp')
-            connection.execute('create table field_counts_temp(collection_id text, path text, object_property bigint, array_count bigint, distinct_releases bigint)')
+            connection.execute(
+                'create table field_counts_temp(collection_id text, path text, object_property bigint, array_count bigint, distinct_releases bigint)'
+            )
             selected_collections = [
                 result['id'] for result in connection.execute('select id from selected_collections')
             ]
@@ -77,4 +80,3 @@ class FieldCountsCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
             connection.execute('drop table if exists field_counts')
             connection.execute('alter table field_counts_temp rename to field_counts')
             logger.info('total running time: {}s'.format(timer() - overall_start))
-

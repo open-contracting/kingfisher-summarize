@@ -47,15 +47,16 @@ def test_refresh_runs(engine):
     get_current_tables_query = "select table_name from information_schema.tables where table_schema = 'views'"
 
     with engine.connect() as conn:
-       results = conn.execute(get_current_tables_query);
-       db_tables = {result['table_name'] for result in results}
-       assert db_tables.issuperset(VIEWS_TABLES)
+        results = conn.execute(get_current_tables_query)
+        db_tables = {result['table_name'] for result in results}
+        assert db_tables.issuperset(VIEWS_TABLES)
 
     run_command(['refresh-views', '--remove'])
     with engine.connect() as conn:
-       results = conn.execute(get_current_tables_query);
-       db_tables = {result['table_name'] for result in results}
-       assert db_tables.isdisjoint(VIEWS_TABLES)
+        results = conn.execute(get_current_tables_query)
+        db_tables = {result['table_name'] for result in results}
+        assert db_tables.isdisjoint(VIEWS_TABLES)
+
 
 def test_field_count_runs(engine):
     run_command(['refresh-views', '--remove'])
@@ -65,15 +66,14 @@ def test_field_count_runs(engine):
     get_current_tables_query = "select table_name from information_schema.tables where table_schema = 'views'"
 
     with engine.connect() as conn:
-       results = conn.execute(get_current_tables_query);
-       db_tables = {result['table_name'] for result in results}
-       assert 'field_counts' in db_tables
+        results = conn.execute(get_current_tables_query)
+        db_tables = {result['table_name'] for result in results}
+        assert 'field_counts' in db_tables
 
     run_command(['refresh-views', '--remove'])
     run_command(['field-counts', '--remove'])
 
     with engine.connect() as conn:
-       results = conn.execute(get_current_tables_query);
-       db_tables = {result['table_name'] for result in results}
-       assert 'field_counts' not in db_tables
-
+        results = conn.execute(get_current_tables_query)
+        db_tables = {result['table_name'] for result in results}
+        assert 'field_counts' not in db_tables

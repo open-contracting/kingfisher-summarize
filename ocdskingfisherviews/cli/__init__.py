@@ -23,4 +23,3 @@ def run_command(input_args=None):
         commands[args.subcommand].run_command(args)
     else:
         print("Please select a subcommand (try --help)")
-

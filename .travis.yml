@@ -25,4 +25,5 @@ before_script:
     - "ocdskingfisher-process-cli local-load 1 fixtures release_package"
     - "ocdskingfisher-views-cli upgrade-database"
 script:
+    - "flake8"
     - "pytest"

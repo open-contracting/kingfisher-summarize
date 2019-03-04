@@ -9,7 +9,6 @@ class MakeMigrationCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
     def configure_subparser(self, subparser):
         subparser.add_argument("message", help="Migration message. For sql scripts name it to same name as sql script")
 
-
     def run_command(self, args):
 
         alembicargs = [
@@ -18,4 +17,3 @@ class MakeMigrationCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
             'revision', '-m', args.message
         ]
         alembic.config.main(argv=alembicargs)
-

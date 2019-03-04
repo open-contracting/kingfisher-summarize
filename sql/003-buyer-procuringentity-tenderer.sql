@@ -2,6 +2,14 @@ set search_path = views, public;
 
 drop table if exists buyer_summary;
 
+with 
+    r AS (
+    select 
+        *,
+        data -> 'buyer' as buyer 
+     from 
+        tmp_release_summary_with_release_data
+    ) 
 select
     distinct on (r.id)
     r.id,
@@ -30,12 +38,7 @@ select
     case when ps.id is not null and (ps.party -> 'roles') ? 'buyer' then 1 else 0 end link_with_role,
     ps.party_index
 into buyer_summary
-from 
-    (select 
-        *,
-        data -> 'buyer' as buyer 
-    from 
-        tmp_release_summary_with_release_data) AS r
+from r
 left join
     parties_summary ps on r.id = ps.id and (buyer ->> 'id') = ps.parties_id
 where buyer is not null
@@ -49,6 +52,13 @@ create index buyer_summary_collection_id on buyer_summary(collection_id);
 
 drop table if exists procuringEntity_summary;
 
+with 
+r AS (
+    select 
+        *,
+        data -> 'tender' -> 'procuringEntity' as procuringEntity 
+    from 
+        tmp_release_summary_with_release_data)
 select
     distinct on (r.id)
     r.id,
@@ -78,11 +88,7 @@ select
     ps.party_index
 into procuringEntity_summary
 from 
-    (select 
-        *,
-        data -> 'tender' -> 'procuringEntity' as procuringEntity 
-    from 
-        tmp_release_summary_with_release_data) AS r
+    r
 left join
     parties_summary ps on r.id = ps.id and (procuringEntity ->> 'id') = ps.parties_id
 where procuringEntity is not null
@@ -95,6 +101,18 @@ create index procuringEntity_summary_collection_id on procuringEntity_summary(co
 
 drop table if exists tenderers_summary;
 
+with 
+r AS (
+    select 
+        rs.*,
+        value as tenderer,
+        ordinality - 1 as tenderer_index
+    from 
+        tmp_release_summary_with_release_data rs
+    cross join
+        jsonb_array_elements(data -> 'tender' -> 'tenderers') with ordinality as tenderer 
+    where
+        jsonb_typeof(data -> 'tender' -> 'tenderers') = 'array')
 select
     distinct on (r.id, tenderer_index)
     r.id,
@@ -125,17 +143,7 @@ select
     ps.party_index
     into tenderers_summary
 from 
-    (select 
-        rs.*,
-        value as tenderer,
-        ordinality - 1 as tenderer_index
-    from 
-        tmp_release_summary_with_release_data rs
-    cross join
-        jsonb_array_elements(data -> 'tender' -> 'tenderers') with ordinality as tenderer 
-    where
-        jsonb_typeof(data -> 'tender' -> 'tenderers') = 'array'
-    ) AS r
+    r
 left join
     parties_summary ps on r.id = ps.id and (tenderer ->> 'id') = ps.parties_id
 where tenderer is not null
