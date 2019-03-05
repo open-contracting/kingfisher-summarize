@@ -11,6 +11,7 @@ field_count_query = '''
 
     select
         collection_id,
+        release_type,
         path,
         sum(object_property) object_property,
         sum(array_item) array_count,
@@ -21,7 +22,7 @@ field_count_query = '''
         flatten(data)
     where
         tmp_release_summary_with_release_data.collection_id = %s
-    group by collection_id, path;
+    group by collection_id, release_type, path;
 '''
 
 search_path_string = 'set search_path = views, public;'
@@ -44,7 +45,7 @@ class FieldCountsCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
             logger.info('processing collection: {}'.format(collection))
             results = tuple(connection.execute(field_count_query, collection))
             if results:
-                connection.execute('insert into field_counts_temp values (%s, %s, %s, %s, %s)', *results)
+                connection.execute('insert into field_counts_temp values (%s, %s, %s, %s, %s, %s)', *results)
             logger.info('running time for collection {}: {}s'.format(collection, timer() - start))
 
     def run_logged_command(self, args):
@@ -64,7 +65,9 @@ class FieldCountsCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
 
             connection.execute('drop table if exists field_counts_temp')
             connection.execute(
-                'create table field_counts_temp(collection_id text, path text, object_property bigint, array_count bigint, distinct_releases bigint)'
+                '''create table field_counts_temp(
+                       collection_id text, release_type text, path text, object_property bigint, array_count bigint, distinct_releases bigint
+                )'''
             )
             selected_collections = [
                 result['id'] for result in connection.execute('select id from selected_collections')

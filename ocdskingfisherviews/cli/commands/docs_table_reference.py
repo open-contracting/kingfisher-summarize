@@ -59,6 +59,12 @@ class DocsTableRefCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
                     continue
                 all_tables.append(table_name)
 
+            for table_name in re.findall(r'^create unlogged table[\s]*([\S]*)\s', script, flags=(re.M | re.I)):
+                print(table_name)
+                if table_name.startswith('tmp_'):
+                    continue
+                all_tables.append(table_name)
+
         all_tables.append('field_counts')
 
         engine = sa.create_engine(self.config.database_uri)
