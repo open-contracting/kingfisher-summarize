@@ -2,6 +2,8 @@ set search_path = views, public;
 
 drop table if exists tmp_planning_summary;
 
+create unlogged table tmp_planning_summary
+AS
 select
     r.id,
     r.release_type,
@@ -10,8 +12,6 @@ select
     r.release_id,
     r.data_id,
     planning
-into 
-    tmp_planning_summary
 from
     (select 
         data -> 'planning' AS planning, 
@@ -25,7 +25,8 @@ create unique index tmp_planning_summary_id on tmp_planning_summary(id);
 
 
 drop table if exists planning_documents_summary;
-
+create unlogged table planning_documents_summary
+AS
 select
     r.id,
     document_index,
@@ -37,8 +38,6 @@ select
     document,
     document ->> 'documentType' as documentType,
     document ->> 'format' as format
-into 
-    planning_documents_summary
 from
     (select 
         tps.*,
@@ -56,9 +55,12 @@ create unique index planning_documents_summary_id on planning_documents_summary(
 create index planning_documents_summary_data_id on planning_documents_summary(data_id);
 create index planning_documents_summary_collection_id on planning_documents_summary(collection_id);
 
+select common_comments('planning_documents_summary');
 
 drop table if exists planning_milestones_summary;
 
+create unlogged table planning_milestones_summary
+AS
 select
     r.id,
     milestone_index,
@@ -71,8 +73,6 @@ select
     milestone ->> 'type' as type,
     milestone ->> 'code' as code,  
     milestone ->> 'status' as status
-into 
-    planning_milestones_summary
 from
     (select 
         tps.*,
@@ -90,9 +90,13 @@ create unique index planning_milestones_summary_id on planning_milestones_summar
 create index planning_milestones_summary_data_id on planning_milestones_summary(data_id);
 create index planning_milestones_summary_collection_id on planning_milestones_summary(collection_id);
 
+select common_comments('planning_milestones_summary');
+
 
 drop table if exists planning_summary;
 
+create unlogged table planning_summary
+AS
 select
     r.id,
     r.release_type,
@@ -108,8 +112,6 @@ select
     documentType_counts,
     milestones_count,
     milestoneType_counts
-into
-    planning_summary
 from
     tmp_planning_summary r
 left join
@@ -151,5 +153,7 @@ left join
 create unique index planning_summary_id on planning_summary(id);
 create index planning_summary_data_id on planning_summary(data_id);
 create index planning_summary_collection_id on planning_summary(collection_id);
+
+select common_comments('planning_summary');
 
 drop table if exists tmp_planning_summary;

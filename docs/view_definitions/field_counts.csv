@@ -1,5 +1,6 @@
 Column Name,Data Type,Description
 collection_id,text,
+release_type,text,
 path,text,
 object_property,bigint,
 array_count,bigint,

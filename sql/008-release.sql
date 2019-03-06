@@ -2,14 +2,13 @@ set search_path = views, public;
 
 drop table if exists tmp_release_party_aggregates;
 
+create unlogged table tmp_release_party_aggregates
+AS
 select
     id,
     role_counts,
     total_roles,
     total_parties
-
-into tmp_release_party_aggregates
-
 from
     (select id, count(*) total_parties from parties_summary group by id) parties_count
 left join
@@ -33,6 +32,8 @@ create unique index tmp_release_party_aggregates_id on tmp_release_party_aggrega
 
 drop table if exists tmp_release_awards_aggregates;
 
+create unlogged table tmp_release_awards_aggregates
+AS
 select
     id,
     count(*) as award_count,
@@ -42,8 +43,6 @@ select
     sum(items_count) AS total_award_items,
     sum(suppliers_count) AS total_award_suppliers,
     sum(award_value_amount) award_amount
-into 
-    tmp_release_awards_aggregates
 from
     awards_summary
 group by id;
@@ -51,29 +50,13 @@ group by id;
 create unique index tmp_release_awards_aggregates_id on tmp_release_awards_aggregates(id);
 
 
-
 drop table if exists tmp_release_award_suppliers_aggregates;
 
+create unlogged table tmp_release_award_suppliers_aggregates
+AS
 select 
     id, 
     count(distinct unique_identifier_attempt) AS unique_award_suppliers
-into 
-    tmp_release_award_suppliers_aggregates
-from
-    award_suppliers_summary
-group by id
-;
-
-create unique index tmp_release_award_suppliers_aggregates_id on tmp_release_award_suppliers_aggregates(id);
-
-
-drop table if exists tmp_release_award_suppliers_aggregates;
-
-select 
-    id, 
-    count(distinct unique_identifier_attempt) AS unique_award_suppliers
-into 
-    tmp_release_award_suppliers_aggregates
 from
     award_suppliers_summary
 group by id
@@ -83,10 +66,11 @@ create unique index tmp_release_award_suppliers_aggregates_id on tmp_release_awa
 
 
 drop table if exists tmp_award_documents_aggregates;
+create unlogged table tmp_award_documents_aggregates
+AS
 select 
     id, 
     jsonb_object_agg(coalesce(documentType, ''), documentType_count) award_documentType_counts
-into tmp_award_documents_aggregates
 from
     (select 
         id, documentType, count(*) documentType_count
@@ -103,6 +87,8 @@ create unique index tmp_award_documents_aggregates_id on tmp_award_documents_agg
 
 drop table if exists tmp_release_contracts_aggregates;
 
+create unlogged table tmp_release_contracts_aggregates
+AS
 select
     id,
     count(*) as contract_count,
@@ -115,8 +101,6 @@ select
     sum(items_count) AS total_contract_items,
     sum(implementation_documents_count) AS total_contract_implementation_documents,
     sum(implementation_milestones_count) AS total_contract_implementation_milestones
-into 
-    tmp_release_contracts_aggregates
 from
     contracts_summary
 group by id;
@@ -126,10 +110,11 @@ create unique index tmp_release_contracts_aggregates_id on tmp_release_contracts
 
 
 drop table if exists tmp_contract_documents_aggregates;
+create unlogged table tmp_contract_documents_aggregates
+AS
 select 
     id, 
     jsonb_object_agg(coalesce(documentType, ''), documentType_count) contract_documentType_counts
-into tmp_contract_documents_aggregates
 from
     (select 
         id, documentType, count(*) documentType_count
@@ -144,10 +129,12 @@ create unique index tmp_contract_documents_aggregates_id on tmp_contract_documen
 
 
 drop table if exists tmp_contract_implementation_documents_aggregates;
+
+create unlogged table tmp_contract_implementation_documents_aggregates
+AS
 select 
     id, 
     jsonb_object_agg(coalesce(documentType, ''), documentType_count) contract_implemetation_documentType_counts
-into tmp_contract_implementation_documents_aggregates
 from
     (select 
         id, documentType, count(*) documentType_count
@@ -162,10 +149,11 @@ create unique index tmp_contract_implementation_documents_aggregates_id on tmp_c
 
 
 drop table if exists tmp_contract_milestones_aggregates;
+create unlogged table tmp_contract_milestones_aggregates
+AS
 select 
     id, 
     jsonb_object_agg(coalesce(type, ''), milestoneType_count) contract_milestoneType_counts
-into tmp_contract_milestones_aggregates
 from
     (select 
         id, type, count(*) milestoneType_count
@@ -180,10 +168,12 @@ create unique index tmp_contract_milestones_aggregates_id on tmp_contract_milest
 
 
 drop table if exists tmp_contract_implementation_milestones_aggregates;
+
+create unlogged table tmp_contract_implementation_milestones_aggregates
+AS
 select 
     id, 
     jsonb_object_agg(coalesce(type, ''), milestoneType_count) contract_implementation_milestoneType_counts
-into tmp_contract_implementation_milestones_aggregates
 from
     (select 
         id, type, count(*) milestoneType_count
@@ -200,6 +190,8 @@ create unique index tmp_contract_implementation_milestones_aggregates_id on tmp_
 
 drop table if exists tmp_release_documents_aggregates;
 
+create unlogged table tmp_release_documents_aggregates
+AS
 with all_document_types as (
     select id, documentType from award_documents_summary 
     union all
@@ -215,7 +207,6 @@ select
     id, 
     jsonb_object_agg(coalesce(documentType, ''), documentType_count) total_documentType_counts,
     sum(documentType_count) total_documents
-into tmp_release_documents_aggregates
 from
     (select 
         id, documentType, count(*) documentType_count
@@ -231,6 +222,8 @@ create unique index tmp_release_documents_aggregates_id on tmp_release_documents
 
 drop table if exists tmp_release_milestones_aggregates;
 
+create unlogged table tmp_release_milestones_aggregates
+AS
 with all_milestone_types as (
     select id, type from contract_milestones_summary
     union all
@@ -244,7 +237,6 @@ select
     id, 
     jsonb_object_agg(coalesce(type, ''), milestoneType_count) milestoneType_counts,
     sum(milestoneType_count) total_milestones
-into tmp_release_milestones_aggregates
 from
     (select 
         id, type, count(*) milestoneType_count
@@ -260,9 +252,10 @@ create unique index tmp_release_milestones_aggregates_id on tmp_release_mileston
 
 drop table if exists release_summary;
 
+create unlogged table release_summary
+AS
 select
     *
-into release_summary
 from
     tmp_release_summary
 left join
@@ -300,6 +293,12 @@ left join
 using(id)
 ;
 
+create unique index release_summary_id on release_summary(id);
+create index release_summary_data_id on release_summary(data_id);
+create index release_summary_package_data_id on release_summary(package_data_id);
+create index release_summary_collection_id on release_summary(collection_id);
+
+select common_comments('release_summary');
 
 drop table if exists tmp_release_party_aggregates;
 drop table if exists tmp_release_awards_aggregates;
@@ -312,4 +311,5 @@ drop table if exists tmp_contract_milestones_aggregates;
 drop table if exists tmp_contract_implementation_milestones_aggregates;
 drop table if exists tmp_release_documents_aggregates;
 drop table if exists tmp_release_milestones_aggregates;
+
 

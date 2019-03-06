@@ -2,6 +2,9 @@ set search_path = views, public;
 
 
 drop table if exists tmp_contracts_summary;
+
+create unlogged table tmp_contracts_summary
+AS
 select
     r.id,
     contract_index,
@@ -12,8 +15,6 @@ select
     r.data_id,
     contract,
     contract ->> 'awardID' as award_id
-into
-    tmp_contracts_summary
 from
     (select 
         rs.*,
@@ -32,6 +33,8 @@ create index tmp_contracts_summary_award_id on tmp_contracts_summary(id, award_i
 
 
 drop table if exists contract_items_summary;
+create unlogged table contract_items_summary
+AS
 select
     r.id,
     contract_index,
@@ -55,8 +58,6 @@ select
         additional_classification ?& array['scheme', 'id']											   
     ) item_additionalIdentifiers_ids,
     jsonb_array_length(case when jsonb_typeof(item->'additionalClassifications') = 'array' then item->'additionalClassifications' else '[]'::jsonb end) as additional_classification_count
-into
-    contract_items_summary
 from
     (select 
         tas.*,
@@ -75,8 +76,11 @@ create unique index contract_items_summary_id on contract_items_summary(id, cont
 create index contract_items_summary_data_id on contract_items_summary(data_id);
 create index contract_items_summary_collection_id on contract_items_summary(collection_id);
 
+select common_comments('contract_items_summary');
 
 drop table if exists contract_documents_summary;
+create unlogged table contract_documents_summary
+AS
 select
     r.id,
     contract_index,
@@ -89,8 +93,6 @@ select
     document,
     document ->> 'documentType' as documentType,
     document ->> 'format' as format
-into
-    contract_documents_summary
 from
     (select 
         tas.*,
@@ -108,8 +110,11 @@ create unique index contract_documents_summary_id on contract_documents_summary(
 create index contract_documents_summary_data_id on contract_documents_summary(data_id);
 create index contract_documents_summary_collection_id on contract_documents_summary(collection_id);
 
+select common_comments('contract_documents_summary');
 
 drop table if exists contract_milestones_summary;
+create unlogged table contract_milestones_summary
+AS
 select
     r.id,
     contract_index,
@@ -123,8 +128,6 @@ select
     milestone ->> 'type' as type,
     milestone ->> 'code' as code,  
     milestone ->> 'status' as status
-into
-    contract_milestones_summary
 from
     (select 
         tps.*,
@@ -142,8 +145,11 @@ create unique index contract_milestones_summary_id on contract_milestones_summar
 create index contract_milestones_summary_data_id on contract_milestones_summary(data_id);
 create index contract_milestones_summary_collection_id on contract_milestones_summary(collection_id);
 
+select common_comments('contract_milestones_summary');
 
 drop table if exists contract_implementation_documents_summary;
+create unlogged table contract_implementation_documents_summary
+AS
 select
     r.id,
     contract_index,
@@ -156,8 +162,6 @@ select
     document,
     document ->> 'documentType' as documentType,
     document ->> 'format' as format
-into
-    contract_implementation_documents_summary
 from
     (select 
         tas.*,
@@ -175,8 +179,11 @@ create unique index contract_implementation_documents_summary_id on contract_imp
 create index contract_implementation_documents_summary_data_id on contract_implementation_documents_summary(data_id);
 create index contract_implementation_documents_summary_collection_id on contract_implementation_documents_summary(collection_id);
 
+select common_comments('contract_implementation_documents_summary');
 
 drop table if exists contract_implementation_milestones_summary;
+create unlogged table contract_implementation_milestones_summary
+AS
 select
     r.id,
     contract_index,
@@ -190,8 +197,6 @@ select
     milestone ->> 'type' as type,
     milestone ->> 'code' as code,  
     milestone ->> 'status' as status
-into
-    contract_implementation_milestones_summary
 from
     (select 
         tps.*,
@@ -209,9 +214,13 @@ create unique index contract_implementation_milestones_summary_id on contract_im
 create index contract_implementation_milestones_summary_data_id on contract_implementation_milestones_summary(data_id);
 create index contract_implementation_milestones_summary_collection_id on contract_implementation_milestones_summary(collection_id);
 
+select common_comments('contract_implementation_milestones_summary');
 
 
 drop table if exists contract_implementation_transactions_summary;
+
+create unlogged table contract_implementation_transactions_summary
+AS
 select
     r.id,
     contract_index,
@@ -223,8 +232,6 @@ select
     r.data_id,
     convert_to_numeric(coalesce(transaction -> 'value' ->> 'amount', transaction -> 'amount' ->> 'amount')) transaction_amount,
     coalesce(transaction -> 'amount' ->> 'currency', transaction -> 'value' ->> 'currency') transaction_currency
-into
-    contract_implementation_transactions_summary
 from
     (select 
         tps.*,
@@ -242,10 +249,13 @@ create unique index contract_implementation_transactions_summary_id on contract_
 create index contract_implementation_transactions_summary_data_id on contract_implementation_transactions_summary(data_id);
 create index contract_implementation_transactions_summary_collection_id on contract_implementation_transactions_summary(collection_id);
 
+select common_comments('contract_implementation_transactions_summary');
 
 
 
 drop table if exists contracts_summary;
+create unlogged table contracts_summary
+AS
 select
     distinct on (r.id, r.contract_index)
     r.id,
@@ -277,8 +287,6 @@ select
     implementation_documentType_counts,
     implementation_milestones_count,
     implementation_milestoneType_counts
-into
-    contracts_summary
 from
     tmp_contracts_summary r
 left join
@@ -371,6 +379,8 @@ left join
 create unique index contracts_summary_id on contracts_summary(id, contract_index);
 create index contracts_summary_data_id on contracts_summary(data_id);
 create index contracts_summary_collection_id on contracts_summary(collection_id);
-create index contracts_summary_award_id on tmp_contracts_summary(id, award_id);
+create index contracts_summary_award_id on contracts_summary(id, award_id);
+
+select common_comments('contracts_summary');
 
 drop table if exists tmp_contracts_summary;

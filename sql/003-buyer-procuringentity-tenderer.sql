@@ -2,6 +2,8 @@ set search_path = views, public;
 
 drop table if exists buyer_summary;
 
+create unlogged table buyer_summary
+AS
 with 
     r AS (
     select 
@@ -37,12 +39,13 @@ select
     case when ps.id is not null then 1 else 0 end link_to_parties,
     case when ps.id is not null and (ps.party -> 'roles') ? 'buyer' then 1 else 0 end link_with_role,
     ps.party_index
-into buyer_summary
 from r
 left join
     parties_summary ps on r.id = ps.id and (buyer ->> 'id') = ps.parties_id
 where buyer is not null
 ;
+
+select common_comments('buyer_summary');
 
 
 create unique index buyer_summary_id on buyer_summary(id);
@@ -52,6 +55,8 @@ create index buyer_summary_collection_id on buyer_summary(collection_id);
 
 drop table if exists procuringEntity_summary;
 
+create unlogged table procuringEntity_summary
+AS
 with 
 r AS (
     select 
@@ -86,7 +91,6 @@ select
     case when ps.id is not null then 1 else 0 end link_to_parties,
     case when ps.id is not null and (ps.party -> 'roles') ? 'procuringEntity' then 1 else 0 end link_with_role,
     ps.party_index
-into procuringEntity_summary
 from 
     r
 left join
@@ -98,9 +102,13 @@ create unique index procuringEntity_summary_id on procuringEntity_summary(id);
 create index procuringEntity_summary_data_id on procuringEntity_summary(data_id);
 create index procuringEntity_summary_collection_id on procuringEntity_summary(collection_id);
 
+select common_comments('procuringEntity_summary');
+
 
 drop table if exists tenderers_summary;
 
+create unlogged table tenderers_summary
+AS
 with 
 r AS (
     select 
@@ -141,7 +149,6 @@ select
     case when ps.id is not null then 1 else 0 end link_to_parties,
     case when ps.id is not null and (ps.party -> 'roles') ? 'tenderer' then 1 else 0 end link_with_role,
     ps.party_index
-    into tenderers_summary
 from 
     r
 left join
@@ -153,3 +160,5 @@ where tenderer is not null
 create unique index tenderers_summary_id on tenderers_summary(id, tenderer_index);
 create index tenderers_summary_data_id on tenderers_summary(data_id);
 create index tenderers_summary_collection_id on tenderers_summary(collection_id);
+
+select common_comments('tenderers_summary');

@@ -54,13 +54,7 @@ class DocsTableRefCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
             with open(script_path) as script_file:
                 script = script_file.read()
 
-            for table_name in re.findall(r'^into[\s]*([\S]*)$', script, flags=(re.M | re.I)):
-                if table_name.startswith('tmp_'):
-                    continue
-                all_tables.append(table_name)
-
-            for table_name in re.findall(r'^create unlogged table[\s]*([\S]*)\s', script, flags=(re.M | re.I)):
-                print(table_name)
+            for table_name in re.findall(r'^create (?:unlogged )?table[\s]*([\S]*)\s', script, flags=(re.M | re.I)):
                 if table_name.startswith('tmp_'):
                     continue
                 all_tables.append(table_name)

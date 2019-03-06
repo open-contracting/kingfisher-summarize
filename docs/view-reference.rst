@@ -23,6 +23,13 @@ procuringEntity_summary
    :widths: 10, 10, 40
    :file: view_definitions/procuringEntity_summary.csv
 
+tenderers_summary
+-----------------------------------------------
+.. csv-table::
+   :header-rows: 1
+   :widths: 10, 10, 40
+   :file: view_definitions/tenderers_summary.csv
+
 planning_documents_summary
 -----------------------------------------------
 .. csv-table::

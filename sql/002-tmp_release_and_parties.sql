@@ -1,9 +1,10 @@
 set search_path = views, public;
 
-
 drop view if exists tmp_release_summary_with_release_data;
 drop table if exists tmp_release_summary;
 
+create unlogged table tmp_release_summary
+AS
 select 
     r.id * 10 AS id,
     'release' AS release_type,
@@ -17,9 +18,6 @@ select
     convert_to_timestamp(d.data ->> 'date') release_date,
     d.data -> 'tag' release_tag,
     d.data ->> 'language' release_language
-
-into tmp_release_summary
-
 from 
     release_with_collection AS r
 join
@@ -76,6 +74,7 @@ where
     collection_id in (select id from selected_collections);
 
 
+
 create unique index tmp_release_summary_id on tmp_release_summary(id);
 create index tmp_release_summary_data_id on tmp_release_summary(data_id);
 create index tmp_release_summary_package_data_id on tmp_release_summary(package_data_id);
@@ -97,6 +96,8 @@ join
 
 drop table if exists parties_summary;
 
+create unlogged table parties_summary
+AS
 select 
     r.id,
     ordinality - 1 AS party_index,
@@ -122,7 +123,6 @@ select
         additional_identifier ?& array['scheme', 'id']											   
     ) parties_additionalIdentifiers_ids,
     jsonb_array_length(case when jsonb_typeof(value->'additionalIdentifiers') = 'array' then value->'additionalIdentifiers' else '[]'::jsonb end) parties_additionalIdentifiers_count
-into parties_summary
 from 
     tmp_release_summary_with_release_data AS r
 cross join
@@ -130,11 +130,13 @@ cross join
 where
     jsonb_typeof(data -> 'parties') = 'array';
 
+
+select common_comments('parties_summary');
+
+
 create unique index parties_summary_id on parties_summary(id, party_index);
 create index parties_summary_data_id on parties_summary(data_id);
 create index parties_summary_collection_id on parties_summary(collection_id);
 create index parties_summary_party_id on parties_summary(id, parties_id);
-
-select common_comments('parties_summary');
 
 Comment on column parties_summary.party_index IS 'Unique id representing a release, compiled_release or record';

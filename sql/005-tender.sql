@@ -2,6 +2,8 @@ set search_path = views, public;
 
 drop table if exists tmp_tender_summary;
 
+create unlogged table tmp_tender_summary
+AS
 select
     r.id,
     r.release_type,
@@ -10,8 +12,6 @@ select
     r.release_id,
     r.data_id,
     tender
-into 
-    tmp_tender_summary
 from
     (select 
         data -> 'tender' AS tender, 
@@ -26,6 +26,8 @@ create unique index tmp_tender_summary_id on tmp_tender_summary(id);
 
 drop table if exists tender_documents_summary;
 
+create unlogged table tender_documents_summary
+AS
 select
     r.id,
     document_index,
@@ -37,8 +39,6 @@ select
     document,
     document ->> 'documentType' as documentType,
     document ->> 'format' as format
-into
-    tender_documents_summary
 from
     (select 
         tps.*,
@@ -56,9 +56,12 @@ create unique index tender_documents_summary_id on tender_documents_summary(id, 
 create index tender_documents_summary_data_id on tender_documents_summary(data_id);
 create index tender_documents_summary_collection_id on tender_documents_summary(collection_id);
 
+select common_comments('tender_documents_summary');
 
 drop table if exists tender_milestones_summary;
 
+create unlogged table tender_milestones_summary
+AS
 select
     r.id,
     milestone_index,
@@ -71,8 +74,6 @@ select
     milestone ->> 'type' as type,
     milestone ->> 'code' as code,  
     milestone ->> 'status' as status
-into
-    tender_milestones_summary
 from
     (select 
         tps.*,
@@ -90,10 +91,13 @@ create unique index tender_milestones_summary_id on tender_milestones_summary(id
 create index tender_milestones_summary_data_id on tender_milestones_summary(data_id);
 create index tender_milestones_summary_collection_id on tender_milestones_summary(collection_id);
 
+select common_comments('tender_milestones_summary');
 
 
 drop table if exists tender_items_summary;
 
+create unlogged table tender_items_summary
+AS
 select
     r.id,
     item_index,
@@ -116,8 +120,6 @@ select
         additional_classification ?& array['scheme', 'id']											   
     ) item_additionalIdentifiers_ids,
     jsonb_array_length(case when jsonb_typeof(item->'additionalClassifications') = 'array' then item->'additionalClassifications' else '[]'::jsonb end) as additional_classification_count
-into
-    tender_items_summary
 from
     (select 
         tps.*,
@@ -137,9 +139,12 @@ create unique index tender_items_summary_id on tender_items_summary(id, item_ind
 create index tender_items_summary_data_id on tender_items_summary(data_id);
 create index tender_items_summary_collection_id on tender_items_summary(collection_id);
 
+select common_comments('tender_items_summary');
 
 drop table if exists tender_summary;
 
+create unlogged table tender_summary
+AS
 select
     r.id,
     r.release_type,
@@ -185,8 +190,6 @@ select
     milestones_count,
     milestoneType_counts,
     items_count
-into
-    tender_summary
 from
     tmp_tender_summary r
 left join
@@ -238,5 +241,7 @@ left join
 create unique index tender_summary_id on tender_summary(id);
 create index tender_summary_data_id on tender_summary(data_id);
 create index tender_summary_collection_id on tender_summary(collection_id);
+
+select common_comments('tender_summary');
 
 drop table if exists tmp_tender_summary;

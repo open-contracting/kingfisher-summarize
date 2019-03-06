@@ -61,7 +61,6 @@ def upgrade():
     op.execute('set search_path = views')
     op.execute(create_text)
 
-    
     with open(mapping_sheet) as f:
         reader = csv.DictReader(f)
         paths = set()
