@@ -43,6 +43,7 @@ def upgrade():
     mapping_sheet = os.path.join(mapping_sheet_dir, '1-1-3.csv')
     create_text = '''
        create table mapping_sheets(
+           id serial primary key,
            version text,
            extension text,
            section text,
@@ -60,14 +61,17 @@ def upgrade():
     op.execute('set search_path = views')
     op.execute(create_text)
 
+    
     with open(mapping_sheet) as f:
         reader = csv.DictReader(f)
-
+        paths = set()
         rows = []
         for row in reader:
             row['version'] = '1.1'
             row['extension'] = 'core'
-            rows.append(row)
+            if row['path'] not in paths:
+                rows.append(row)
+                paths.add(row['path'])
 
         op.bulk_insert(
             mapping_table,
