@@ -66,7 +66,7 @@ class FieldCountsCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
             connection.execute('drop table if exists field_counts_temp')
             connection.execute(
                 '''create table field_counts_temp(
-                       collection_id text, release_type text, path text, object_property bigint, array_count bigint, distinct_releases bigint
+                       collection_id bigint, release_type text, path text, object_property bigint, array_count bigint, distinct_releases bigint
                 )'''
             )
             selected_collections = [

@@ -1,5 +1,5 @@
 Column Name,Data Type,Description
-collection_id,text,
+collection_id,bigint,
 release_type,text,
 path,text,
 object_property,bigint,
