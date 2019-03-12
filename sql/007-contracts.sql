@@ -3,7 +3,7 @@ set search_path = views, public;
 
 drop table if exists tmp_contracts_summary;
 
-create unlogged table tmp_contracts_summary
+create table tmp_contracts_summary
 AS
 select
     r.id,
@@ -33,7 +33,7 @@ create index tmp_contracts_summary_award_id on tmp_contracts_summary(id, award_i
 
 
 drop table if exists contract_items_summary;
-create unlogged table contract_items_summary
+create table contract_items_summary
 AS
 select
     r.id,
@@ -79,7 +79,7 @@ create index contract_items_summary_collection_id on contract_items_summary(coll
 select common_comments('contract_items_summary');
 
 drop table if exists contract_documents_summary;
-create unlogged table contract_documents_summary
+create table contract_documents_summary
 AS
 select
     r.id,
@@ -113,7 +113,7 @@ create index contract_documents_summary_collection_id on contract_documents_summ
 select common_comments('contract_documents_summary');
 
 drop table if exists contract_milestones_summary;
-create unlogged table contract_milestones_summary
+create table contract_milestones_summary
 AS
 select
     r.id,
@@ -148,7 +148,7 @@ create index contract_milestones_summary_collection_id on contract_milestones_su
 select common_comments('contract_milestones_summary');
 
 drop table if exists contract_implementation_documents_summary;
-create unlogged table contract_implementation_documents_summary
+create table contract_implementation_documents_summary
 AS
 select
     r.id,
@@ -182,7 +182,7 @@ create index contract_implementation_documents_summary_collection_id on contract
 select common_comments('contract_implementation_documents_summary');
 
 drop table if exists contract_implementation_milestones_summary;
-create unlogged table contract_implementation_milestones_summary
+create table contract_implementation_milestones_summary
 AS
 select
     r.id,
@@ -219,7 +219,7 @@ select common_comments('contract_implementation_milestones_summary');
 
 drop table if exists contract_implementation_transactions_summary;
 
-create unlogged table contract_implementation_transactions_summary
+create table contract_implementation_transactions_summary
 AS
 select
     r.id,
@@ -254,7 +254,7 @@ select common_comments('contract_implementation_transactions_summary');
 
 
 drop table if exists contracts_summary;
-create unlogged table contracts_summary
+create table contracts_summary
 AS
 select
     distinct on (r.id, r.contract_index)

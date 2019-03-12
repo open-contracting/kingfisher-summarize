@@ -3,7 +3,7 @@ set search_path = views, public;
 drop view if exists tmp_release_summary_with_release_data;
 drop table if exists tmp_release_summary;
 
-create unlogged table tmp_release_summary
+create table tmp_release_summary
 AS
 select 
     r.id * 10 AS id,
@@ -96,7 +96,7 @@ join
 
 drop table if exists parties_summary;
 
-create unlogged table parties_summary
+create table parties_summary
 AS
 select 
     r.id,

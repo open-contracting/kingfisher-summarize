@@ -2,7 +2,7 @@ set search_path = views, public;
 
 drop table if exists tmp_awards_summary;
 
-create unlogged table tmp_awards_summary
+create table tmp_awards_summary
 AS
 select
     r.id,
@@ -32,7 +32,7 @@ create unique index tmp_awards_summary_id on tmp_awards_summary(id, award_index)
 
 drop table if exists award_suppliers_summary;
 
-create unlogged table award_suppliers_summary
+create table award_suppliers_summary
 AS
 select
     distinct on (r.id, award_index, supplier_index)
@@ -88,7 +88,7 @@ select common_comments('award_suppliers_summary');
 
 drop table if exists award_documents_summary;
 
-create unlogged table award_documents_summary
+create table award_documents_summary
 AS
 select
     r.id,
@@ -123,7 +123,7 @@ select common_comments('award_documents_summary');
 
 drop table if exists award_items_summary;
 
-create unlogged table award_items_summary
+create table award_items_summary
 AS
 select
     r.id,
@@ -170,7 +170,7 @@ select common_comments('award_items_summary');
 
 drop table if exists awards_summary;
 
-create unlogged table awards_summary
+create table awards_summary
 AS
 select
     r.id,
