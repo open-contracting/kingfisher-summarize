@@ -2,7 +2,7 @@ set search_path = views, public;
 
 drop table if exists tmp_planning_summary;
 
-create unlogged table tmp_planning_summary
+create table tmp_planning_summary
 AS
 select
     r.id,
@@ -25,7 +25,7 @@ create unique index tmp_planning_summary_id on tmp_planning_summary(id);
 
 
 drop table if exists planning_documents_summary;
-create unlogged table planning_documents_summary
+create table planning_documents_summary
 AS
 select
     r.id,
@@ -59,7 +59,7 @@ select common_comments('planning_documents_summary');
 
 drop table if exists planning_milestones_summary;
 
-create unlogged table planning_milestones_summary
+create table planning_milestones_summary
 AS
 select
     r.id,
@@ -95,7 +95,7 @@ select common_comments('planning_milestones_summary');
 
 drop table if exists planning_summary;
 
-create unlogged table planning_summary
+create table planning_summary
 AS
 select
     r.id,

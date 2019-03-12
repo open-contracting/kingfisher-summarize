@@ -2,7 +2,7 @@ set search_path = views, public;
 
 drop table if exists tmp_release_party_aggregates;
 
-create unlogged table tmp_release_party_aggregates
+create table tmp_release_party_aggregates
 AS
 select
     id,
@@ -32,7 +32,7 @@ create unique index tmp_release_party_aggregates_id on tmp_release_party_aggrega
 
 drop table if exists tmp_release_awards_aggregates;
 
-create unlogged table tmp_release_awards_aggregates
+create table tmp_release_awards_aggregates
 AS
 select
     id,
@@ -52,7 +52,7 @@ create unique index tmp_release_awards_aggregates_id on tmp_release_awards_aggre
 
 drop table if exists tmp_release_award_suppliers_aggregates;
 
-create unlogged table tmp_release_award_suppliers_aggregates
+create table tmp_release_award_suppliers_aggregates
 AS
 select 
     id, 
@@ -66,7 +66,7 @@ create unique index tmp_release_award_suppliers_aggregates_id on tmp_release_awa
 
 
 drop table if exists tmp_award_documents_aggregates;
-create unlogged table tmp_award_documents_aggregates
+create table tmp_award_documents_aggregates
 AS
 select 
     id, 
@@ -87,7 +87,7 @@ create unique index tmp_award_documents_aggregates_id on tmp_award_documents_agg
 
 drop table if exists tmp_release_contracts_aggregates;
 
-create unlogged table tmp_release_contracts_aggregates
+create table tmp_release_contracts_aggregates
 AS
 select
     id,
@@ -110,7 +110,7 @@ create unique index tmp_release_contracts_aggregates_id on tmp_release_contracts
 
 
 drop table if exists tmp_contract_documents_aggregates;
-create unlogged table tmp_contract_documents_aggregates
+create table tmp_contract_documents_aggregates
 AS
 select 
     id, 
@@ -130,7 +130,7 @@ create unique index tmp_contract_documents_aggregates_id on tmp_contract_documen
 
 drop table if exists tmp_contract_implementation_documents_aggregates;
 
-create unlogged table tmp_contract_implementation_documents_aggregates
+create table tmp_contract_implementation_documents_aggregates
 AS
 select 
     id, 
@@ -149,7 +149,7 @@ create unique index tmp_contract_implementation_documents_aggregates_id on tmp_c
 
 
 drop table if exists tmp_contract_milestones_aggregates;
-create unlogged table tmp_contract_milestones_aggregates
+create table tmp_contract_milestones_aggregates
 AS
 select 
     id, 
@@ -169,7 +169,7 @@ create unique index tmp_contract_milestones_aggregates_id on tmp_contract_milest
 
 drop table if exists tmp_contract_implementation_milestones_aggregates;
 
-create unlogged table tmp_contract_implementation_milestones_aggregates
+create table tmp_contract_implementation_milestones_aggregates
 AS
 select 
     id, 
@@ -190,7 +190,7 @@ create unique index tmp_contract_implementation_milestones_aggregates_id on tmp_
 
 drop table if exists tmp_release_documents_aggregates;
 
-create unlogged table tmp_release_documents_aggregates
+create table tmp_release_documents_aggregates
 AS
 with all_document_types as (
     select id, documentType from award_documents_summary 
@@ -222,7 +222,7 @@ create unique index tmp_release_documents_aggregates_id on tmp_release_documents
 
 drop table if exists tmp_release_milestones_aggregates;
 
-create unlogged table tmp_release_milestones_aggregates
+create table tmp_release_milestones_aggregates
 AS
 with all_milestone_types as (
     select id, type from contract_milestones_summary
@@ -252,7 +252,7 @@ create unique index tmp_release_milestones_aggregates_id on tmp_release_mileston
 
 drop table if exists release_summary;
 
-create unlogged table release_summary
+create table release_summary
 AS
 select
     *

@@ -2,7 +2,7 @@ set search_path = views, public;
 
 drop table if exists tmp_tender_summary;
 
-create unlogged table tmp_tender_summary
+create table tmp_tender_summary
 AS
 select
     r.id,
@@ -26,7 +26,7 @@ create unique index tmp_tender_summary_id on tmp_tender_summary(id);
 
 drop table if exists tender_documents_summary;
 
-create unlogged table tender_documents_summary
+create table tender_documents_summary
 AS
 select
     r.id,
@@ -60,7 +60,7 @@ select common_comments('tender_documents_summary');
 
 drop table if exists tender_milestones_summary;
 
-create unlogged table tender_milestones_summary
+create table tender_milestones_summary
 AS
 select
     r.id,
@@ -96,7 +96,7 @@ select common_comments('tender_milestones_summary');
 
 drop table if exists tender_items_summary;
 
-create unlogged table tender_items_summary
+create table tender_items_summary
 AS
 select
     r.id,
@@ -143,7 +143,7 @@ select common_comments('tender_items_summary');
 
 drop table if exists tender_summary;
 
-create unlogged table tender_summary
+create table tender_summary
 AS
 select
     r.id,

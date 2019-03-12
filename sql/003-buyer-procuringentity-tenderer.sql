@@ -2,7 +2,7 @@ set search_path = views, public;
 
 drop table if exists buyer_summary;
 
-create unlogged table buyer_summary
+create table buyer_summary
 AS
 with 
     r AS (
@@ -55,7 +55,7 @@ create index buyer_summary_collection_id on buyer_summary(collection_id);
 
 drop table if exists procuringEntity_summary;
 
-create unlogged table procuringEntity_summary
+create table procuringEntity_summary
 AS
 with 
 r AS (
@@ -107,7 +107,7 @@ select common_comments('procuringEntity_summary');
 
 drop table if exists tenderers_summary;
 
-create unlogged table tenderers_summary
+create table tenderers_summary
 AS
 with 
 r AS (

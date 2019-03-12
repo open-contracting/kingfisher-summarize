@@ -3,7 +3,7 @@ set search_path = views, public;
 drop view if exists tmp_release_summary_with_release_data;
 drop table if exists tmp_release_summary;
 
-create unlogged table tmp_release_summary
+create table tmp_release_summary
 AS
 select 
     r.id * 10 AS id,
@@ -20,7 +20,7 @@ select
     d.data ->> 'language' release_language
 from 
     release_with_collection AS r
-join
+left join
     package_data pd on pd.id = r.package_data_id
 join
     data d on d.id = r.data_id
@@ -44,7 +44,7 @@ select
     d.data -> 'compliedRelease' ->> 'language' release_language
 from 
     record_with_collection AS r
-join
+left join
     package_data pd on pd.id = r.package_data_id
 join
     data d on d.id = r.data_id
@@ -96,7 +96,7 @@ join
 
 drop table if exists parties_summary;
 
-create unlogged table parties_summary
+create table parties_summary
 AS
 select 
     r.id,
