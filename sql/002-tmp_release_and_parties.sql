@@ -20,7 +20,7 @@ select
     d.data ->> 'language' release_language
 from 
     release_with_collection AS r
-join
+left join
     package_data pd on pd.id = r.package_data_id
 join
     data d on d.id = r.data_id
@@ -44,7 +44,7 @@ select
     d.data -> 'compliedRelease' ->> 'language' release_language
 from 
     record_with_collection AS r
-join
+left join
     package_data pd on pd.id = r.package_data_id
 join
     data d on d.id = r.data_id
