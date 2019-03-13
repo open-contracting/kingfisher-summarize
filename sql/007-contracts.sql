@@ -252,9 +252,11 @@ create index contract_implementation_transactions_summary_collection_id on contr
 select common_comments('contract_implementation_transactions_summary');
 
 
-
 drop table if exists contracts_summary;
-create table contracts_summary
+drop view if exists contracts_summary;
+
+drop table if exists contracts_summary_no_data;
+create table contracts_summary_no_data
 AS
 select
     distinct on (r.id, r.contract_index)
@@ -265,7 +267,6 @@ select
     r.ocid,
     r.release_id,
     r.data_id,
-    r.contract,
     r.award_id,
     case when aws.award_id is not null then 1 else 0 end AS link_to_awards,
     contract ->> 'id' AS contract_id,
@@ -376,10 +377,21 @@ left join
     using (id, contract_index)
 ;
 
-create unique index contracts_summary_id on contracts_summary(id, contract_index);
-create index contracts_summary_data_id on contracts_summary(data_id);
-create index contracts_summary_collection_id on contracts_summary(collection_id);
-create index contracts_summary_award_id on contracts_summary(id, award_id);
+create unique index contracts_summary_id on contracts_summary_no_data(id, contract_index);
+create index contracts_summary_data_id on contracts_summary_no_data(data_id);
+create index contracts_summary_collection_id on contracts_summary_no_data(collection_id);
+create index contracts_summary_award_id on contracts_summary_no_data(id, award_id);
+
+
+create view contracts_summary
+AS
+select 
+    contracts_summary_no_data.*, 
+    data #> ARRAY['contracts', contract_index::text] as contract
+from 
+    contracts_summary_no_data
+join
+    data on data.id = data_id;
 
 select common_comments('contracts_summary');
 

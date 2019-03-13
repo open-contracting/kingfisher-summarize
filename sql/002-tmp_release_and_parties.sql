@@ -94,6 +94,8 @@ join
 
 
 
+drop view if exists parties_summary;
+drop table if exists parties_summary;
 drop table if exists parties_summary_no_data;
 
 create table parties_summary_no_data
@@ -138,7 +140,6 @@ create index parties_summary_collection_id on parties_summary_no_data(collection
 create index parties_summary_party_id on parties_summary_no_data(id, parties_id);
 
 
-drop view if exists parties_summary;
 
 create view parties_summary
 AS
