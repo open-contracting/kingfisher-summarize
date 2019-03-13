@@ -6,10 +6,10 @@ collection_id,integer,id from kingfisher collection table
 ocid,text,ocid from the data
 release_id,text,Release id from the data. Relevent for releases and not for compiled_releases or records
 data_id,integer,"id for the ""data"" table in kingfisher that holds the original JSON data."
-party,jsonb,
 parties_id,text,
 roles,jsonb,
 identifier,text,
 unique_identifier_attempt,text,
 parties_additionalidentifiers_ids,jsonb,
 parties_additionalidentifiers_count,integer,
+party,jsonb,
