@@ -252,7 +252,6 @@ create index contract_implementation_transactions_summary_collection_id on contr
 select common_comments('contract_implementation_transactions_summary');
 
 
-drop table if exists contracts_summary;
 drop view if exists contracts_summary;
 
 drop table if exists contracts_summary_no_data;

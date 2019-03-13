@@ -168,9 +168,10 @@ create index award_items_summary_collection_id on award_items_summary(collection
 
 select common_comments('award_items_summary');
 
-drop table if exists awards_summary;
+drop view if exists awards_summary;
+drop table if exists awards_summary_no_data;
 
-create table awards_summary
+create table awards_summary_no_data
 AS
 select
     r.id,
@@ -180,7 +181,6 @@ select
     r.ocid,
     r.release_id,
     r.data_id,
-    award,
     award ->> 'id' AS award_id,
     award ->> 'title' AS award_title,
     award ->> 'status' AS award_status,
@@ -229,9 +229,19 @@ left join
     using (id, award_index)
 ;
 
-create unique index awards_summary_id on awards_summary(id, award_index);
-create index awards_summary_data_id on awards_summary(data_id);
-create index awards_summary_collection_id on awards_summary(collection_id);
+create unique index awards_summary_id on awards_summary_no_data(id, award_index);
+create index awards_summary_data_id on awards_summary_no_data(data_id);
+create index awards_summary_collection_id on awards_summary_no_data(collection_id);
+
+create view awards_summary
+AS
+select 
+    awards_summary_no_data.*, 
+    data #> ARRAY['awards', award_index::text] as award
+from 
+    awards_summary_no_data
+join
+    data on data.id = data_id;
 
 select common_comments('awards_summary');
 
