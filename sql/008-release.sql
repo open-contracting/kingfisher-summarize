@@ -250,7 +250,7 @@ group by id;
 create unique index tmp_release_milestones_aggregates_id on tmp_release_milestones_aggregates(id);
 
 
-drop table if exists release_summary;
+drop table if exists release_summary cascade;
 
 create table release_summary
 AS
@@ -311,5 +311,65 @@ drop table if exists tmp_contract_milestones_aggregates;
 drop table if exists tmp_contract_implementation_milestones_aggregates;
 drop table if exists tmp_release_documents_aggregates;
 drop table if exists tmp_release_milestones_aggregates;
+
+drop view if exists release_summary_with_data;
+
+create view release_summary_with_data
+AS
+select 
+    rs.*, 
+    c.source_id,
+    c.data_version,
+    c.store_start_at,
+    c.store_end_at,
+    c.sample,
+    c.transform_type,
+    c.transform_from_collection_id,
+    c.deleted_at,
+    d.data,
+    pd.data as package_data
+from 
+    release_summary rs
+join 
+    data d on d.id = rs.data_id
+join 
+    collection c on c.id = rs.collection_id 
+left join 
+    package_data pd on pd.id = rs.package_data_id;
+
+
+drop view if exists release_summary_with_checks;
+
+create view release_summary_with_checks
+AS
+select 
+    rs.*, 
+    c.source_id,
+    c.data_version,
+    c.store_start_at,
+    c.store_end_at,
+    c.sample,
+    c.transform_type,
+    c.transform_from_collection_id,
+    c.deleted_at,
+    release_check.cove_output as release_check,
+    release_check11.cove_output as release_check11,
+    record_check.cove_output as record_check,
+    record_check11.cove_output as record_check11
+from 
+    release_summary rs
+join 
+    collection c on c.id = rs.collection_id 
+left join 
+    release_check on release_check.release_id = rs.table_id and release_check.override_schema_version is null and release_type = 'release'
+left join 
+    release_check release_check11 on release_check11.release_id = rs.table_id and release_check11.override_schema_version = '1.1' and release_type = 'release'
+left join 
+    record_check on record_check.record_id = rs.table_id and record_check.override_schema_version is null and release_type = 'record'
+left join 
+    record_check record_check11 on record_check11.record_id = rs.table_id and record_check11.override_schema_version  = '1.1' and release_type = 'record';
+
+
+
 
 
