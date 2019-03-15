@@ -5,7 +5,6 @@ collection_id,integer,id from kingfisher collection table
 ocid,text,ocid from the data
 release_id,text,Release id from the data. Relevent for releases and not for compiled_releases or records
 data_id,integer,"id for the ""data"" table in kingfisher that holds the original JSON data."
-planning,jsonb,
 planning_budget_amount,numeric,
 planning_budget_currency,text,
 planning_budget_projectid,text,

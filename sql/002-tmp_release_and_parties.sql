@@ -94,9 +94,11 @@ join
 
 
 
+drop view if exists parties_summary;
 drop table if exists parties_summary;
+drop table if exists parties_summary_no_data;
 
-create table parties_summary
+create table parties_summary_no_data
 AS
 select 
     r.id,
@@ -106,7 +108,6 @@ select
     ocid,
     release_id,
     data_id,
-    value AS party,   
     value ->> 'id' AS parties_id,   
     value -> 'roles' AS roles,   
 	(value -> 'identifier' ->> 'scheme') || '-' || (value -> 'identifier' ->> 'id') AS identifier,
@@ -131,12 +132,25 @@ where
     jsonb_typeof(data -> 'parties') = 'array';
 
 
+
+
+create unique index parties_summary_id on parties_summary_no_data(id, party_index);
+create index parties_summary_data_id on parties_summary_no_data(data_id);
+create index parties_summary_collection_id on parties_summary_no_data(collection_id);
+create index parties_summary_party_id on parties_summary_no_data(id, parties_id);
+
+
+
+create view parties_summary
+AS
+select 
+    parties_summary_no_data.*, 
+    data #> ARRAY['parties', party_index::text] as party
+from 
+    parties_summary_no_data
+join
+    data on data.id = data_id;
+
+
 select common_comments('parties_summary');
-
-
-create unique index parties_summary_id on parties_summary(id, party_index);
-create index parties_summary_data_id on parties_summary(data_id);
-create index parties_summary_collection_id on parties_summary(collection_id);
-create index parties_summary_party_id on parties_summary(id, parties_id);
-
 Comment on column parties_summary.party_index IS 'Unique id representing a release, compiled_release or record';

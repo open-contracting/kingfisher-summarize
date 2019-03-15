@@ -152,7 +152,6 @@ select
     r.ocid,
     r.release_id,
     r.data_id,
-    tender,
     tender ->> 'id' AS tender_id,
     tender ->> 'title' AS tender_title,
     tender ->> 'status' AS tender_status,

@@ -1,6 +1,7 @@
 set search_path = views, public;
 
-drop table if exists contracts_summary;
+drop view if exists contracts_summary;
+drop table if exists contracts_summary_no_data;
 drop table if exists contract_implementation_transactions_summary;
 drop table if exists contract_implementation_milestones_summary;
 drop table if exists contract_implementation_documents_summary;
