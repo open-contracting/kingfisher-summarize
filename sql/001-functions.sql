@@ -7,7 +7,7 @@ CREATE OR REPLACE FUNCTION convert_to_numeric(
     PARALLEL SAFE
 AS 
 $$
-    select to_number('0'||v_input, '999999999999999999.99');
+    select case when length(v_input) > 20 then 0 else to_number('0'||v_input, '99999999999999999999.99') end;
 $$;
 
 CREATE OR REPLACE FUNCTION convert_to_timestamp(

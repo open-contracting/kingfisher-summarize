@@ -104,7 +104,6 @@ select
     r.ocid,
     r.release_id,
     r.data_id,
-    planning,
     convert_to_numeric(planning -> 'budget' -> 'amount' ->> 'amount') planning_budget_amount,
     planning -> 'budget' -> 'amount' ->> 'currency' planning_budget_currency,
     planning -> 'budget' ->> 'projectID' planning_budget_projectID,
