@@ -326,7 +326,7 @@ select
     c.transform_type,
     c.transform_from_collection_id,
     c.deleted_at,
-    d.data,
+    case when release_type = 'record' then d.data -> 'compiledRelease' else d.data end AS data,
     pd.data as package_data
 from 
     release_summary rs
