@@ -28,11 +28,11 @@ from
 
 create unique index tmp_awards_summary_id on tmp_awards_summary(id, award_index);
 
+----
 
+drop table if exists staged_award_suppliers_summary;
 
-drop table if exists award_suppliers_summary;
-
-create table award_suppliers_summary
+create table staged_award_suppliers_summary
 AS
 select
     distinct on (r.id, award_index, supplier_index)
@@ -80,15 +80,28 @@ left join
 where supplier is not null
 ;
 
+----
+
+drop table if exists award_suppliers_summary;
+
+create table award_suppliers_summary
+AS
+select * from staged_award_suppliers_summary;
+
+drop table if exists staged_award_suppliers_summary;
+
+
 create unique index award_suppliers_summary_id on award_suppliers_summary(id, award_index, supplier_index);
 create index award_suppliers_summary_data_id on award_suppliers_summary(data_id);
 create index award_suppliers_summary_collection_id on award_suppliers_summary(collection_id);
 
 select common_comments('award_suppliers_summary');
 
-drop table if exists award_documents_summary;
+----
 
-create table award_documents_summary
+drop table if exists staged_award_documents_summary;
+
+create table staged_award_documents_summary
 AS
 select
     r.id,
@@ -115,15 +128,28 @@ from
     ) AS r
 ;
 
+----
+
+drop table if exists award_documents_summary;
+
+create table award_documents_summary
+AS
+select * from staged_award_documents_summary;
+
+drop table if exists staged_award_documents_summary;
+
+
 create unique index award_documents_summary_id on award_documents_summary(id, award_index, document_index);
 create index award_documents_summary_data_id on award_documents_summary(data_id);
 create index award_documents_summary_collection_id on award_documents_summary(collection_id);
 
 select common_comments('award_documents_summary');
 
-drop table if exists award_items_summary;
+----
 
-create table award_items_summary
+drop table if exists staged_award_items_summary;
+
+create table staged_award_items_summary
 AS
 select
     r.id,
@@ -162,16 +188,27 @@ from
     ) AS r
 ;
 
+----
+
+drop table if exists award_items_summary;
+
+create table award_items_summary
+AS
+select * from staged_award_items_summary;
+
+drop table if exists staged_award_items_summary;
+
 create unique index award_items_summary_id on award_items_summary(id, award_index, item_index);
 create index award_items_summary_data_id on award_items_summary(data_id);
 create index award_items_summary_collection_id on award_items_summary(collection_id);
 
 select common_comments('award_items_summary');
 
-drop view if exists awards_summary;
-drop table if exists awards_summary_no_data;
+----
 
-create table awards_summary_no_data
+drop table if exists staged_awards_summary_no_data;
+
+create table staged_awards_summary_no_data
 AS
 select
     r.id,
@@ -228,6 +265,18 @@ left join
     ) items_counts
     using (id, award_index)
 ;
+
+----
+
+drop view if exists awards_summary;
+
+drop table if exists awards_summary_no_data;
+
+create table awards_summary_no_data
+AS
+select * from staged_awards_summary_no_data;
+
+drop table if exists staged_awards_summary_no_data;
 
 create unique index awards_summary_id on awards_summary_no_data(id, award_index);
 create index awards_summary_data_id on awards_summary_no_data(data_id);

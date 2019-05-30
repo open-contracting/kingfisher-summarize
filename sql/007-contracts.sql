@@ -31,9 +31,10 @@ from
 create unique index tmp_contracts_summary_id on tmp_contracts_summary(id, contract_index);
 create index tmp_contracts_summary_award_id on tmp_contracts_summary(id, award_id);
 
+----
 
-drop table if exists contract_items_summary;
-create table contract_items_summary
+drop table if exists staged_contract_items_summary;
+create table staged_contract_items_summary
 AS
 select
     r.id,
@@ -72,14 +73,26 @@ from
     ) AS r
 ;
 
+----
+
+drop table if exists contract_items_summary;
+
+create table contract_items_summary
+AS
+select * from staged_contract_items_summary;
+
+drop table if exists staged_contract_items_summary;
+
 create unique index contract_items_summary_id on contract_items_summary(id, contract_index, item_index);
 create index contract_items_summary_data_id on contract_items_summary(data_id);
 create index contract_items_summary_collection_id on contract_items_summary(collection_id);
 
 select common_comments('contract_items_summary');
 
-drop table if exists contract_documents_summary;
-create table contract_documents_summary
+----
+
+drop table if exists staged_contract_documents_summary;
+create table staged_contract_documents_summary
 AS
 select
     r.id,
@@ -106,14 +119,26 @@ from
     ) AS r
 ;
 
+----
+
+drop table if exists contract_documents_summary;
+
+create table contract_documents_summary
+AS
+select * from staged_contract_documents_summary;
+
+drop table if exists staged_contract_documents_summary;
+
 create unique index contract_documents_summary_id on contract_documents_summary(id, contract_index, document_index);
 create index contract_documents_summary_data_id on contract_documents_summary(data_id);
 create index contract_documents_summary_collection_id on contract_documents_summary(collection_id);
 
 select common_comments('contract_documents_summary');
 
-drop table if exists contract_milestones_summary;
-create table contract_milestones_summary
+----
+
+drop table if exists staged_contract_milestones_summary;
+create table staged_contract_milestones_summary
 AS
 select
     r.id,
@@ -141,14 +166,26 @@ from
     ) AS r
 ;
 
+----
+
+drop table if exists contract_milestones_summary;
+
+create table contract_milestones_summary
+AS
+select * from staged_contract_milestones_summary;
+
+drop table if exists staged_contract_milestones_summary;
+
 create unique index contract_milestones_summary_id on contract_milestones_summary(id, contract_index, milestone_index);
 create index contract_milestones_summary_data_id on contract_milestones_summary(data_id);
 create index contract_milestones_summary_collection_id on contract_milestones_summary(collection_id);
 
 select common_comments('contract_milestones_summary');
 
-drop table if exists contract_implementation_documents_summary;
-create table contract_implementation_documents_summary
+----
+
+drop table if exists staged_contract_implementation_documents_summary;
+create table staged_contract_implementation_documents_summary
 AS
 select
     r.id,
@@ -175,14 +212,26 @@ from
     ) AS r
 ;
 
+----
+
+drop table if exists contract_implementation_documents_summary;
+
+create table contract_implementation_documents_summary
+AS
+select * from staged_contract_implementation_documents_summary;
+
+drop table if exists staged_contract_implementation_documents_summary;
+
 create unique index contract_implementation_documents_summary_id on contract_implementation_documents_summary(id, contract_index, document_index);
 create index contract_implementation_documents_summary_data_id on contract_implementation_documents_summary(data_id);
 create index contract_implementation_documents_summary_collection_id on contract_implementation_documents_summary(collection_id);
 
 select common_comments('contract_implementation_documents_summary');
 
-drop table if exists contract_implementation_milestones_summary;
-create table contract_implementation_milestones_summary
+----
+
+drop table if exists staged_contract_implementation_milestones_summary;
+create table staged_contract_implementation_milestones_summary
 AS
 select
     r.id,
@@ -210,16 +259,27 @@ from
     ) AS r
 ;
 
+----
+
+drop table if exists contract_implementation_milestones_summary;
+
+create table contract_implementation_milestones_summary
+AS
+select * from staged_contract_implementation_milestones_summary;
+
+drop table if exists staged_contract_implementation_milestones_summary;
+
 create unique index contract_implementation_milestones_summary_id on contract_implementation_milestones_summary(id, contract_index, milestone_index);
 create index contract_implementation_milestones_summary_data_id on contract_implementation_milestones_summary(data_id);
 create index contract_implementation_milestones_summary_collection_id on contract_implementation_milestones_summary(collection_id);
 
 select common_comments('contract_implementation_milestones_summary');
 
+----
 
-drop table if exists contract_implementation_transactions_summary;
+drop table if exists staged_contract_implementation_transactions_summary;
 
-create table contract_implementation_transactions_summary
+create table staged_contract_implementation_transactions_summary
 AS
 select
     r.id,
@@ -245,17 +305,26 @@ from
     ) AS r
 ;
 
+----
+
+drop table if exists contract_implementation_transactions_summary;
+
+create table contract_implementation_transactions_summary
+AS
+select * from staged_contract_implementation_transactions_summary;
+
+drop table if exists staged_contract_implementation_transactions_summary;
+
 create unique index contract_implementation_transactions_summary_id on contract_implementation_transactions_summary(id, contract_index, transaction_index);
 create index contract_implementation_transactions_summary_data_id on contract_implementation_transactions_summary(data_id);
 create index contract_implementation_transactions_summary_collection_id on contract_implementation_transactions_summary(collection_id);
 
 select common_comments('contract_implementation_transactions_summary');
 
+----
 
-drop view if exists contracts_summary;
-
-drop table if exists contracts_summary_no_data;
-create table contracts_summary_no_data
+drop table if exists staged_contracts_summary_no_data;
+create table staged_contracts_summary_no_data
 AS
 select
     distinct on (r.id, r.contract_index)
@@ -375,6 +444,18 @@ left join
     ) implementation_milestoneType_counts
     using (id, contract_index)
 ;
+
+----
+
+drop view if exists contracts_summary;
+
+drop table if exists contracts_summary_no_data;
+
+create table contracts_summary_no_data
+AS
+select * from staged_contracts_summary_no_data;
+
+drop table if exists staged_contracts_summary_no_data;
 
 create unique index contracts_summary_id on contracts_summary_no_data(id, contract_index);
 create index contracts_summary_data_id on contracts_summary_no_data(data_id);

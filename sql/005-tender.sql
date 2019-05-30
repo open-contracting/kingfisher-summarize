@@ -23,10 +23,11 @@ from
 
 create unique index tmp_tender_summary_id on tmp_tender_summary(id);
 
+----
 
-drop table if exists tender_documents_summary;
+drop table if exists staged_tender_documents_summary;
 
-create table tender_documents_summary
+create table staged_tender_documents_summary
 AS
 select
     r.id,
@@ -52,15 +53,27 @@ from
     ) AS r
 ;
 
+----
+
+drop table if exists tender_documents_summary;
+
+create table tender_documents_summary
+AS
+select * from staged_tender_documents_summary;
+
+drop table if exists staged_tender_documents_summary;
+
 create unique index tender_documents_summary_id on tender_documents_summary(id, document_index);
 create index tender_documents_summary_data_id on tender_documents_summary(data_id);
 create index tender_documents_summary_collection_id on tender_documents_summary(collection_id);
 
 select common_comments('tender_documents_summary');
 
-drop table if exists tender_milestones_summary;
+----
 
-create table tender_milestones_summary
+drop table if exists staged_tender_milestones_summary;
+
+create table staged_tender_milestones_summary
 AS
 select
     r.id,
@@ -87,16 +100,25 @@ from
     ) AS r
 ;
 
+----
+
+drop table if exists tender_milestones_summary;
+
+create table tender_milestones_summary
+AS
+select * from staged_tender_milestones_summary;
+
 create unique index tender_milestones_summary_id on tender_milestones_summary(id, milestone_index);
 create index tender_milestones_summary_data_id on tender_milestones_summary(data_id);
 create index tender_milestones_summary_collection_id on tender_milestones_summary(collection_id);
 
 select common_comments('tender_milestones_summary');
 
+----
 
-drop table if exists tender_items_summary;
+drop table if exists staged_tender_items_summary;
 
-create table tender_items_summary
+create table staged_tender_items_summary
 AS
 select
     r.id,
@@ -134,6 +156,13 @@ from
     ) AS r
 ;
 
+----
+
+drop table if exists tender_items_summary;
+
+create table tender_items_summary
+AS
+select * from staged_tender_items_summary;
 
 create unique index tender_items_summary_id on tender_items_summary(id, item_index);
 create index tender_items_summary_data_id on tender_items_summary(data_id);
@@ -141,9 +170,11 @@ create index tender_items_summary_collection_id on tender_items_summary(collecti
 
 select common_comments('tender_items_summary');
 
-drop table if exists tender_summary;
+----
 
-create table tender_summary
+drop table if exists staged_tender_summary;
+
+create table staged_tender_summary
 AS
 select
     r.id,
@@ -236,6 +267,16 @@ left join
     ) items_counts
     using (id)
 ;
+
+----
+
+drop table if exists tender_summary;
+
+create table tender_summary
+AS
+select * from staged_tender_summary;
+
+drop table if exists staged_tender_summary;
 
 create unique index tender_summary_id on tender_summary(id);
 create index tender_summary_data_id on tender_summary(data_id);

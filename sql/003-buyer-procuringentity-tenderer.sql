@@ -1,8 +1,8 @@
 set search_path = views, public;
 
-drop table if exists buyer_summary;
+drop table if exists staged_buyer_summary;
 
-create table buyer_summary
+create table staged_buyer_summary
 AS
 with 
     r AS (
@@ -45,17 +45,27 @@ left join
 where buyer is not null
 ;
 
-select common_comments('buyer_summary');
+----
 
+drop table if exists buyer_summary;
+
+create table buyer_summary
+AS
+select * from staged_buyer_summary;
+
+drop table if exists staged_buyer_summary;
+
+select common_comments('buyer_summary');
 
 create unique index buyer_summary_id on buyer_summary(id);
 create index buyer_summary_data_id on buyer_summary(data_id);
 create index buyer_summary_collection_id on buyer_summary(collection_id);
 
+----
 
-drop table if exists procuringEntity_summary;
+drop table if exists staged_procuringEntity_summary;
 
-create table procuringEntity_summary
+create table staged_procuringEntity_summary
 AS
 with 
 r AS (
@@ -98,16 +108,27 @@ left join
 where procuringEntity is not null
 ;
 
+----
+
+drop table if exists procuringEntity_summary;
+
+create table procuringEntity_summary
+AS
+select * from staged_procuringEntity_summary;
+
+drop table if exists staged_procuringEntity_summary;
+
 create unique index procuringEntity_summary_id on procuringEntity_summary(id);
 create index procuringEntity_summary_data_id on procuringEntity_summary(data_id);
 create index procuringEntity_summary_collection_id on procuringEntity_summary(collection_id);
 
 select common_comments('procuringEntity_summary');
 
+----
 
-drop table if exists tenderers_summary;
+drop table if exists staged_tenderers_summary;
 
-create table tenderers_summary
+create table staged_tenderers_summary
 AS
 with 
 r AS (
@@ -155,6 +176,17 @@ left join
     parties_summary ps on r.id = ps.id and (tenderer ->> 'id') = ps.parties_id
 where tenderer is not null
 ;
+
+----
+
+
+drop table if exists tenderers_summary;
+
+create table tenderers_summary
+AS
+select * from staged_tenderers_summary;
+
+drop table if exists staged_tenderers_summary;
 
 
 create unique index tenderers_summary_id on tenderers_summary(id, tenderer_index);

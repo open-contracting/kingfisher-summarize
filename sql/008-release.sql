@@ -28,7 +28,7 @@ using(id)
 
 create unique index tmp_release_party_aggregates_id on tmp_release_party_aggregates(id);
 
-
+----
 
 drop table if exists tmp_release_awards_aggregates;
 
@@ -249,10 +249,11 @@ group by id;
 
 create unique index tmp_release_milestones_aggregates_id on tmp_release_milestones_aggregates(id);
 
+----
 
-drop table if exists release_summary cascade;
+drop table if exists staged_release_summary cascade;
 
-create table release_summary
+create table staged_release_summary
 AS
 select
     *
@@ -293,13 +294,6 @@ left join
 using(id)
 ;
 
-create unique index release_summary_id on release_summary(id);
-create index release_summary_data_id on release_summary(data_id);
-create index release_summary_package_data_id on release_summary(package_data_id);
-create index release_summary_collection_id on release_summary(collection_id);
-
-select common_comments('release_summary');
-
 drop table if exists tmp_release_party_aggregates;
 drop table if exists tmp_release_awards_aggregates;
 drop table if exists tmp_release_award_suppliers_aggregates;
@@ -311,6 +305,25 @@ drop table if exists tmp_contract_milestones_aggregates;
 drop table if exists tmp_contract_implementation_milestones_aggregates;
 drop table if exists tmp_release_documents_aggregates;
 drop table if exists tmp_release_milestones_aggregates;
+
+----
+
+drop table if exists release_summary cascade;
+
+create table release_summary
+AS
+select * from staged_release_summary;
+
+drop table if exists staged_release_summary;
+
+
+create unique index release_summary_id on release_summary(id);
+create index release_summary_data_id on release_summary(data_id);
+create index release_summary_package_data_id on release_summary(package_data_id);
+create index release_summary_collection_id on release_summary(collection_id);
+
+select common_comments('release_summary');
+
 
 drop view if exists release_summary_with_data;
 
