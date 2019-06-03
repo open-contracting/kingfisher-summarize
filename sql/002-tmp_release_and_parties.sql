@@ -92,13 +92,11 @@ from
 join
     data d on d.id = r.data_id;
 
+----
 
+drop table if exists staged_parties_summary_no_data;
 
-drop view if exists parties_summary;
-drop table if exists parties_summary;
-drop table if exists parties_summary_no_data;
-
-create table parties_summary_no_data
+create table staged_parties_summary_no_data
 AS
 select 
     r.id,
@@ -131,8 +129,16 @@ cross join
 where
     jsonb_typeof(data -> 'parties') = 'array';
 
+----
 
+drop view if exists parties_summary;
+drop table if exists parties_summary_no_data;
 
+create table parties_summary_no_data
+AS
+select * from staged_parties_summary_no_data;
+
+drop table staged_parties_summary_no_data;
 
 create unique index parties_summary_id on parties_summary_no_data(id, party_index);
 create index parties_summary_data_id on parties_summary_no_data(data_id);

@@ -23,9 +23,10 @@ from
 
 create unique index tmp_planning_summary_id on tmp_planning_summary(id);
 
+----
 
-drop table if exists planning_documents_summary;
-create table planning_documents_summary
+drop table if exists staged_planning_documents_summary;
+create table staged_planning_documents_summary
 AS
 select
     r.id,
@@ -51,15 +52,27 @@ from
     ) AS r
 ;
 
+----
+
+drop table if exists planning_documents_summary;
+
+create table planning_documents_summary
+AS
+select * from staged_planning_documents_summary;
+
+drop table if exists staged_planning_documents_summary;
+
 create unique index planning_documents_summary_id on planning_documents_summary(id, document_index);
 create index planning_documents_summary_data_id on planning_documents_summary(data_id);
 create index planning_documents_summary_collection_id on planning_documents_summary(collection_id);
 
 select common_comments('planning_documents_summary');
 
-drop table if exists planning_milestones_summary;
+----
 
-create table planning_milestones_summary
+drop table if exists staged_planning_milestones_summary;
+
+create table staged_planning_milestones_summary
 AS
 select
     r.id,
@@ -86,16 +99,29 @@ from
     ) AS r
 ;
 
+----
+
+drop table if exists planning_milestones_summary;
+
+create table planning_milestones_summary
+AS
+select * from staged_planning_milestones_summary;
+
+drop table if exists staged_planning_milestones_summary;
+
+
 create unique index planning_milestones_summary_id on planning_milestones_summary(id, milestone_index);
 create index planning_milestones_summary_data_id on planning_milestones_summary(data_id);
 create index planning_milestones_summary_collection_id on planning_milestones_summary(collection_id);
 
 select common_comments('planning_milestones_summary');
 
+----
 
-drop table if exists planning_summary;
 
-create table planning_summary
+drop table if exists staged_planning_summary;
+
+create table staged_planning_summary
 AS
 select
     r.id,
@@ -148,6 +174,16 @@ left join
     ) milestoneType_counts
     using (id)
 ;
+
+----
+
+drop table if exists planning_summary;
+
+create table planning_summary
+AS
+select * from staged_planning_summary;
+
+drop table if exists staged_planning_summary;
 
 create unique index planning_summary_id on planning_summary(id);
 create index planning_summary_data_id on planning_summary(data_id);

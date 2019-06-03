@@ -66,11 +66,16 @@ class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
         start_all = timer()
 
         for statement_name, statement in statements.items():
-            with engine.begin() as connection:
-                connection.execute('set search_path = views, public;\n')
-                start = timer()
-                logger.info('running script: {}'.format(statement_name))
-                connection.execute(statement, tuple())
-                logger.info('running time: {}s'.format(timer() - start))
+            # special marker to split statements up.
+            statement_parts = statement.split('----')
+            start = timer()
+            logger.info('running script: {}'.format(statement_name))
+
+            for statement_part in statement_parts:
+                with engine.begin() as connection:
+                    connection.execute('set search_path = views, public;\n')
+                    connection.execute(statement_part, tuple())
+
+            logger.info('running time: {}s'.format(timer() - start))
 
         logger.info('total running time: {}s'.format(timer() - start_all))
