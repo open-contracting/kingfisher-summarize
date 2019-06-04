@@ -294,6 +294,7 @@ left join
 using(id)
 ;
 
+drop table if exists tmp_release_summary cascade;  --drop view as well
 drop table if exists tmp_release_party_aggregates;
 drop table if exists tmp_release_awards_aggregates;
 drop table if exists tmp_release_award_suppliers_aggregates;

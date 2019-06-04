@@ -164,6 +164,8 @@ create table tender_items_summary
 AS
 select * from staged_tender_items_summary;
 
+drop table if exists staged_tender_items_summary;
+
 create unique index tender_items_summary_id on tender_items_summary(id, item_index);
 create index tender_items_summary_data_id on tender_items_summary(data_id);
 create index tender_items_summary_collection_id on tender_items_summary(collection_id);
