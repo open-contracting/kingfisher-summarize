@@ -24,8 +24,12 @@ left join
     package_data pd on pd.id = r.package_data_id
 join
     data d on d.id = r.data_id
+join
+    collection c on c.id = r.collection_id
 where
     collection_id in (select id from selected_collections)
+    and not
+    ((pd.data ->> 'version') = '1.1' and c.transform_type = 'upgrade-1-0-to-1-1')
 
 union
 
@@ -48,8 +52,12 @@ left join
     package_data pd on pd.id = r.package_data_id
 join
     data d on d.id = r.data_id
+join
+    collection c on c.id = r.collection_id
 where
     collection_id in (select id from selected_collections)
+    and not
+    ((pd.data ->> 'version') = '1.1' and c.transform_type = 'upgrade-1-0-to-1-1')
 
 union
 
