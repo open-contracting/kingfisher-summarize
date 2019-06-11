@@ -18,11 +18,11 @@ field_count_query = '''
         sum(array_item) array_count,
         count(distinct id) distinct_releases
     from
-        tmp_release_summary_with_release_data
+        release_summary_with_data
     cross join
         flatten(data)
     where
-        tmp_release_summary_with_release_data.collection_id = %s
+        release_summary_with_data.collection_id = %s
     group by collection_id, release_type, path;
 '''
 
