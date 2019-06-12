@@ -29,7 +29,8 @@ join
 where
     collection_id in (select id from selected_collections)
     and not
-    ((pd.data ->> 'version') = '1.1' and c.transform_type = 'upgrade-1-0-to-1-1')
+    (coalesce((pd.data ->> 'version'), '1.0') = '1.1' and coalesce(c.transform_type, '') = 'upgrade-1-0-to-1-1')
+
 
 union
 
@@ -57,7 +58,7 @@ join
 where
     collection_id in (select id from selected_collections)
     and not
-    ((pd.data ->> 'version') = '1.1' and c.transform_type = 'upgrade-1-0-to-1-1')
+    (coalesce((pd.data ->> 'version'), '1.0') = '1.1' and coalesce(c.transform_type, '') = 'upgrade-1-0-to-1-1')
 
 union
 
