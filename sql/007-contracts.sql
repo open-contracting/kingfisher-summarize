@@ -342,7 +342,7 @@ select
     contract ->> 'status' AS contract_status,
     convert_to_numeric(contract -> 'value' ->> 'amount') AS contract_value_amount,
     contract -> 'value' ->> 'currency' AS contract_value_currency,
-    contract ->> 'dateSigned' AS dateSigned,
+    convert_to_timestamp(contract ->> 'dateSigned') AS dateSigned,
     convert_to_timestamp(contract -> 'period' ->> 'startDate') AS contract_period_startDate,
     convert_to_timestamp(contract -> 'period' ->> 'endDate') AS contract_period_endDate,
     convert_to_timestamp(contract -> 'period' ->> 'maxExtentDate') AS contract_period_maxExtentDate,
