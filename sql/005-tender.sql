@@ -108,6 +108,8 @@ create table tender_milestones_summary
 AS
 select * from staged_tender_milestones_summary;
 
+drop table if exists staged_tender_milestones_summary;
+
 create unique index tender_milestones_summary_id on tender_milestones_summary(id, milestone_index);
 create index tender_milestones_summary_data_id on tender_milestones_summary(data_id);
 create index tender_milestones_summary_collection_id on tender_milestones_summary(collection_id);
@@ -188,7 +190,7 @@ select
     tender ->> 'id' AS tender_id,
     tender ->> 'title' AS tender_title,
     tender ->> 'status' AS tender_status,
-    convert_to_timestamp(tender -> 'value' ->> 'amount') AS tender_value_amount,
+    convert_to_numeric(tender -> 'value' ->> 'amount') AS tender_value_amount,
     tender -> 'value' ->> 'currency' AS tender_value_currency,
     convert_to_numeric(tender -> 'minValue' ->> 'amount') AS tender_minValue_amount,
     tender -> 'minValue' ->> 'currency' AS tender_minValue_currency,
@@ -272,7 +274,7 @@ left join
 
 ----
 
-drop table if exists tender_summary;
+drop table if exists tender_summary cascade;
 
 create table tender_summary
 AS
@@ -286,4 +288,19 @@ create index tender_summary_collection_id on tender_summary(collection_id);
 
 select common_comments('tender_summary');
 
+drop view if exists tender_summary_with_data;
+
+create view tender_summary_with_data
+AS
+select 
+    ts.*, 
+    data -> 'tender' AS tender
+from 
+    tender_summary ts
+join 
+    data d on d.id = ts.data_id;
+
+select common_comments('tender_summary_with_data');
+
 drop table if exists tmp_tender_summary;
+

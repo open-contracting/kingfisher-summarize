@@ -33,10 +33,13 @@ VIEWS_TABLES = {
     "planning_summary",
     "procuringentity_summary",
     "release_summary",
+    "release_summary_with_data",
+    "release_summary_with_checks",
     "tender_documents_summary",
     "tender_items_summary",
     "tender_milestones_summary",
     "tender_summary",
+    "tender_summary_with_data",
     "tenderers_summary"
 }
 
