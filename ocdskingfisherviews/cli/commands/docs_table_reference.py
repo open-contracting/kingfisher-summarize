@@ -55,7 +55,7 @@ class DocsTableRefCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
                 script = script_file.read()
 
             for table_name in re.findall(r'^create (?:table|view)[\s]*([\S]*)\s', script, flags=(re.M | re.I)):
-                if table_name.startswith('tmp_') or table_name.endswith('_no_data'):
+                if table_name.startswith('tmp_') or table_name.startswith('staged_') or table_name.endswith('_no_data'):
                     continue
                 all_tables.append(table_name)
 

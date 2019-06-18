@@ -79,6 +79,13 @@ tender_summary
    :widths: 10, 10, 40
    :file: view_definitions/tender_summary.csv
 
+tender_summary_with_data
+-----------------------------------------------
+.. csv-table::
+   :header-rows: 1
+   :widths: 10, 10, 40
+   :file: view_definitions/tender_summary_with_data.csv
+
 award_suppliers_summary
 -----------------------------------------------
 .. csv-table::
@@ -162,6 +169,20 @@ release_summary
    :header-rows: 1
    :widths: 10, 10, 40
    :file: view_definitions/release_summary.csv
+
+release_summary_with_data
+-----------------------------------------------
+.. csv-table::
+   :header-rows: 1
+   :widths: 10, 10, 40
+   :file: view_definitions/release_summary_with_data.csv
+
+release_summary_with_checks
+-----------------------------------------------
+.. csv-table::
+   :header-rows: 1
+   :widths: 10, 10, 40
+   :file: view_definitions/release_summary_with_checks.csv
 
 field_counts
 -----------------------------------------------
