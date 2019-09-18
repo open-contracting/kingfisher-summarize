@@ -4,19 +4,11 @@ cache: pip
 python:
   - "3.6"
 addons:
-  chrome: stable
   postgresql: "10"
-  apt:
-    packages:
-      - postgresql-10
-      - postgresql-client-10
 env:
   global:
     - BASEDIR="https://raw.githubusercontent.com/open-contracting/standard-maintenance-scripts/master"
-    - PGPORT=5433
     - KINGFISHER_PROCESS_DB_URI="postgres:///travis_ci_test"
-services:
-  - postgresql
 install:
   - curl -s -S --retry 3 $BASEDIR/tests/install.sh | bash -
   - pip install .[test]
