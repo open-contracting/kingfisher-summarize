@@ -3,7 +3,6 @@ include pytest.ini
 recursive-include docs *.csv
 recursive-include docs *.py
 recursive-include docs *.rst
-recursive-include docs *.txt
 recursive-include fixtures *.json
 recursive-include mapping_sheets *.csv
 recursive-include ocdskingfisherviews *.ini
