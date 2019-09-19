@@ -23,3 +23,5 @@ before_script:
 script:
   - curl -s -S --retry 3 $BASEDIR/tests/script.sh | bash -
   - pytest --cov ocdskingfisherviews
+after_success:
+  coveralls

@@ -18,6 +18,7 @@ Set up a venv and install requirements::
     virtualenv -p python3 .ve
     source .ve/bin/activate
     pip install -e .
+    pip install -e git+https://github.com/open-contracting/kingfisher-process.git@master#egg=kingfisherprocess
 
 `Kingfisher Process database needs to be installed. <https://kingfisher-process.readthedocs.io/en/latest/requirements-install.html>`_
 
