@@ -4,6 +4,7 @@
 *~
 .ve
 *.pyc
+/*.egg-info
 __pycache__
 media
 .coverage

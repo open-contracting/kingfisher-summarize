@@ -29,9 +29,6 @@ mapping_table = table(
 )
 
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-mapping_sheet_dir = os.path.join(dir_path, '../../../mapping_sheets/')
-
 # revision identifiers, used by Alembic.
 revision = '8672a04d522b'
 down_revision = '947ad833b815'
@@ -40,7 +37,7 @@ depends_on = None
 
 
 def upgrade():
-    mapping_sheet = os.path.join(mapping_sheet_dir, '1-1-3.csv')
+    mapping_sheet = os.path.join(os.path.dirname(os.path.realpath(__file__)), '1-1-3.csv')
     create_text = '''
        create table mapping_sheets(
            id serial primary key,

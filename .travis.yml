@@ -1,29 +1,27 @@
 sudo: false
-addons:
-    chrome: stable
-    postgresql: "10"
-    apt:
-        packages:
-            - postgresql-10
-            - postgresql-client-10
-env:
-    global:
-        - PGPORT=5433
-        - KINGFISHER_PROCESS_DB_URI='postgres:///travis'
-services:
-    - postgresql
 language: python
+cache: pip
 python:
-    - "3.5"
+  - "3.6"
+addons:
+  postgresql: "10"
+env:
+  global:
+    - BASEDIR="https://raw.githubusercontent.com/open-contracting/standard-maintenance-scripts/master"
+    - KINGFISHER_PROCESS_DB_URI="postgresql:///travis_ci_test"
 install:
-    - "pip install -r requirements-dev.txt"
-    - "pip install -e ."
+  - curl -s -S --retry 3 $BASEDIR/tests/install.sh | bash -
+  - pip install .[test]
+  - pip install -e git+https://github.com/open-contracting/kingfisher-process.git@master#egg=kingfisherprocess
 before_script:
-    - "psql -c 'create schema views;' travis"
-    - "ocdskingfisher-process-cli upgrade-database"
-    - "ocdskingfisher-process-cli new-collection 'new' '2000-01-01 00:00:00'"
-    - "ocdskingfisher-process-cli local-load 1 fixtures release_package"
-    - "ocdskingfisher-views-cli upgrade-database"
+  - psql -c 'create database travis_ci_test;' -U postgres
+  - psql -c 'create schema views;' travis_ci_test -U postgres
+  - ocdskingfisher-process-cli upgrade-database
+  - ocdskingfisher-process-cli new-collection 'new' '2000-01-01 00:00:00'
+  - ocdskingfisher-process-cli local-load 1 fixtures release_package
+  - ocdskingfisher-views-cli upgrade-database
 script:
-    - "flake8"
-    - "pytest"
+  - curl -s -S --retry 3 $BASEDIR/tests/script.sh | bash -
+  - pytest --cov ocdskingfisherviews
+after_success:
+  coveralls

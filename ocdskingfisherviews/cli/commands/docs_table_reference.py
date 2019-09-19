@@ -12,7 +12,8 @@ column_info_query = '''
     SELECT
         isc.column_name,
         isc.data_type,
-        pg_catalog.col_description(format('%%s.%%s',isc.table_schema,isc.table_name)::regclass::oid,isc.ordinal_position) as column_description
+        pg_catalog.col_description(format('%%s.%%s',isc.table_schema,isc.table_name)::regclass::oid,
+                                   isc.ordinal_position) as column_description
     FROM
         information_schema.columns isc where table_schema='views' and lower(isc.table_name) = lower(%s);
 '''
@@ -55,7 +56,7 @@ class DocsTableRefCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
                 script = script_file.read()
 
             for table_name in re.findall(r'^create (?:table|view)[\s]*([\S]*)\s', script, flags=(re.M | re.I)):
-                if table_name.startswith('tmp_') or table_name.startswith('staged_') or table_name.endswith('_no_data'):
+                if table_name.startswith(('tmp_', 'staged_')) or table_name.endswith('_no_data'):
                     continue
                 all_tables.append(table_name)
 

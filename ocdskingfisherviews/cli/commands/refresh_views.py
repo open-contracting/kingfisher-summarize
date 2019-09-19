@@ -14,13 +14,12 @@ class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
 
     def configure_subparser(self, subparser):
         subparser.add_argument("--remove", help="remove all views", action='store_true')
-
-        subparser.add_argument("--start", help="Start at script. i.e 4 will start at 004-planning.sql", type=int, default=0)
-        subparser.add_argument("--end", help="End at script i.e 4 will end at 004-planning.sql", type=int, default=1000)
-
+        subparser.add_argument("--start", type=int, default=0,
+                               help="Start at script. i.e 4 will start at 004-planning.sql")
+        subparser.add_argument("--end", type=int, default=1000,
+                               help="End at script i.e 4 will end at 004-planning.sql")
         subparser.add_argument("--sql", help="Just output sql and do not run", action='store_true')
         subparser.add_argument("--sql-timing", help="Add psql timing to sql output", action='store_true')
-
         subparser.add_argument("--logfile", help="optional output logfile")
 
     def run_logged_command(self, args):
