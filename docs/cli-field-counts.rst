@@ -5,18 +5,18 @@ This tool will update the ``field_count`` table.
 
 .. code-block:: shell-session
 
-    python ocdskingfisher-process-cli field-counts
+    python ocdskingfisher-views-cli field-counts
 
 To remove the table run:
 
 .. code-block:: shell-session
 
-    python ocdskingfisher-process-cli field-counts --remove
+    python ocdskingfisher-views-cli field-counts --remove
 
 
 In order to make it run you faster you can define how many threads it runs with.
 
 .. code-block:: shell-session
 
-    python ocdskingfisher-process-cli field-counts --threads 5 
+    python ocdskingfisher-views-cli field-counts --threads 5 
 

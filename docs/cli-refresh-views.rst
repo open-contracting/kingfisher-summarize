@@ -5,13 +5,13 @@ This tool will refresh all the views in the views schema.
 
 .. code-block:: shell-session
 
-    python ocdskingfisher-process-cli refresh-views
+    python ocdskingfisher-views-cli refresh-views
 
 To remove all the views run:
 
 .. code-block:: shell-session
 
-    python ocdskingfisher-process-cli refresh-views --remove
+    python ocdskingfisher-views-cli refresh-views --remove
 
 
 It has several options to make modifying the views easier to work with.
@@ -22,7 +22,7 @@ You can set the start and end number (inclusive) of the SQL scripts that you wan
 
 .. code-block:: shell-session
 
-    python ocdskingfisher-process-cli refresh-views --start 4 --end 5
+    python ocdskingfisher-views-cli refresh-views --start 4 --end 5
 
 This will run scripts ``004-planning.sql`` and ``005-tender.sql``.  Without ``--start`` the scripts will run from the start and without ``--end`` they will run to the end```
 
@@ -30,5 +30,5 @@ If you want to see the output of what SQL will be run without actually executing
 
 .. code-block:: shell-session
 
-    python ocdskingfisher-process-cli refresh-views --sql
+    python ocdskingfisher-views-cli refresh-views --sql
 
