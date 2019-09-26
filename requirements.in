@@ -1,5 +1,8 @@
 # See https://github.com/open-contracting/kingfisher-views/issues/34
 -e git+https://github.com/open-contracting/kingfisher-process.git@master#egg=ocdskingfisher
+# See libcove, required by kingfisher-process
+jsonschema<2.7
+
 alembic
 logzero
 pgpasslib

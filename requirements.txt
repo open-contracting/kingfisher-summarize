@@ -1,5 +1,4 @@
 alembic==1.2.1
-attrs==19.1.0
 bleach==3.1.0
 blinker==1.4
 cached-property==1.5.1
@@ -20,7 +19,7 @@ jdcal==1.4.1
 Jinja2==2.10.1
 json-merge-patch==0.2
 jsonref==0.2
-jsonschema==3.0.2
+jsonschema==2.6.0
 libcove==0.10.0
 libcoveocds==0.7.3
 logzero==1.5.0
@@ -34,7 +33,6 @@ ocdsmerge==0.5.7
 openpyxl==3.0.0
 pgpasslib==1.1.0
 psycopg2==2.8.3
-pyrsistent==0.15.4
 python-dateutil==2.8.0
 python-editor==1.0.4
 pytz==2019.2
