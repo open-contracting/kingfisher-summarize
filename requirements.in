@@ -1,6 +1,6 @@
+# See https://github.com/open-contracting/kingfisher-views/issues/34
+-e git+https://github.com/open-contracting/kingfisher-process.git@master#egg=ocdskingfisher
 alembic
 logzero
 pgpasslib
 psycopg2
-# See https://github.com/open-contracting/kingfisher-views/issues/34
--e git+https://github.com/open-contracting/kingfisher-process.git@master#egg=kingfisherprocess
