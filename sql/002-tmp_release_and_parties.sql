@@ -150,17 +150,21 @@ create index parties_summary_collection_id on parties_summary_no_data(collection
 create index parties_summary_party_id on parties_summary_no_data(id, parties_id);
 
 
-
 create view parties_summary
 AS
 select 
     parties_summary_no_data.*, 
-    data #> ARRAY['parties', party_index::text] as party
+    case when
+        release_type = 'record'
+    then
+        data #> ARRAY['compiledRelease', 'parties', party_index::text]
+    else
+        data #> ARRAY['parties', party_index::text]
+    end as party
 from 
     parties_summary_no_data
 join
     data on data.id = data_id;
-
 
 select common_comments('parties_summary');
 Comment on column parties_summary.party_index IS 'Unique id representing a release, compiled_release or record';
