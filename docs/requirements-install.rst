@@ -21,6 +21,9 @@ Set up a venv and install requirements::
 
 `Kingfisher Process database needs to be installed. <https://kingfisher-process.readthedocs.io/en/latest/requirements-install.html>`_
 
+
+You need to configure the app: :doc:`config`
+
 A schema called ``views`` need to be set up in the Kingfisher Process database with the same owner as the database. 
 
 Then you need to create the base tables to make the views work see :doc:`cli-upgrade-database`::
@@ -31,7 +34,7 @@ Then you need to create the base tables to make the views work see :doc:`cli-upg
 Refreshing the views
 --------------------
 
-In order to populat the view use :doc:`cli-refresh-views`.
+In order to populate the view use :doc:`cli-refresh-views`.
 
 .. code-block:: shell-session
 
