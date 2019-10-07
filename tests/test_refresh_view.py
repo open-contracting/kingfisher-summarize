@@ -1,14 +1,14 @@
 import pytest
 import sqlalchemy as sa
 
-import ocdskingfisherprocess.config
+import ocdskingfisherviews.config
 
 from ocdskingfisherviews.cli import run_command
 
 
 @pytest.fixture(scope='module')
 def engine():
-    config = ocdskingfisherprocess.config.Config()
+    config = ocdskingfisherviews.config.Config()
     config.load_user_config()
     engine = sa.create_engine(config.database_uri)
     return engine
