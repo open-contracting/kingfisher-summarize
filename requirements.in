@@ -3,4 +3,4 @@ logzero
 pgpasslib
 psycopg2
 # Lock to 1.2 branch (1.3 branch has issues with an identifier being too long - this caused problems in process, until we are sure problems not in views too lock)
-SQLAlchemy==1.2.19
+SQLAlchemy<1.3
