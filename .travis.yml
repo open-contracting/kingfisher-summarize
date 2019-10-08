@@ -8,11 +8,13 @@ addons:
 env:
   global:
     - BASEDIR="https://raw.githubusercontent.com/open-contracting/standard-maintenance-scripts/master"
+    - KINGFISHER_VIEWS_DB_URI="postgresql:///travis_ci_test"
     - KINGFISHER_PROCESS_DB_URI="postgresql:///travis_ci_test"
 install:
   - curl -s -S --retry 3 $BASEDIR/tests/install.sh | bash -
   - pip install -r requirements.txt
   - pip install -r requirements-dev.txt
+  - pip install -e git+https://github.com/open-contracting/kingfisher-process.git@master#egg=ocdskingfisher
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
   - psql -c 'create schema views;' travis_ci_test -U postgres

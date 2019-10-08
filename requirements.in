@@ -1,9 +1,6 @@
-# See https://github.com/open-contracting/kingfisher-views/issues/34
--e git+https://github.com/open-contracting/kingfisher-process.git@master#egg=ocdskingfisher
-# See libcove, required by kingfisher-process
-jsonschema<2.7
-
 alembic
 logzero
 pgpasslib
 psycopg2
+# Lock to 1.2 branch (1.3 branch has issues with an identifier being too long - this caused problems in process, until we are sure problems not in views too lock)
+SQLAlchemy<1.3

@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 import argparse
 import ocdskingfisherviews.cli.util
-import ocdskingfisherprocess.config
+import ocdskingfisherviews.config
 
 
 def run_command(input_args=None):
-    config = ocdskingfisherprocess.config.Config()
+    config = ocdskingfisherviews.config.Config()
     config.load_user_config()
 
     parser = argparse.ArgumentParser()
