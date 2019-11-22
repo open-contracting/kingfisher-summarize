@@ -29,8 +29,6 @@ class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
         sql_scripts_path = os.path.join(dir_path, '../../../sql')
         all_scripts = glob.glob(sql_scripts_path + '/*.sql')
 
-        search_path_string = 'set search_path = views, public;\n'
-
         engine = sa.create_engine(self.config.database_uri)
 
         statements = OrderedDict()
@@ -48,7 +46,7 @@ class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
                 continue
 
             with open(script_path) as script_file:
-                script = search_path_string + script_file.read()
+                script = script_file.read()
 
             if script_name.endswith('_downgrade') and args.remove:
                 statements[script_name] = script
