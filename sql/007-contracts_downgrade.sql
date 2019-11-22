@@ -1,4 +1,3 @@
-set search_path = views, public;
 
 drop view if exists contracts_summary;
 drop table if exists contracts_summary_no_data;

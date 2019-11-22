@@ -1,4 +1,3 @@
-set search_path = views, public;
 
 drop view if exists parties_summary;
 drop table if exists parties_summary;
