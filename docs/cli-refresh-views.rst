@@ -32,3 +32,8 @@ If you want to see the output of what SQL will be run without actually executing
 
     python ocdskingfisher-views-cli refresh-views --sql
 
+By default, the command will run on the main "views" schema. If you have added extra views, and want it to run on those, pass the name as an option:
+
+.. code-block:: shell-session
+
+    python ocdskingfisher-views-cli refresh-views --viewname test1

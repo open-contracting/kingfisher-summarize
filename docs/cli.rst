@@ -7,6 +7,7 @@ You need to have configured your database connection in the same way as outlined
 
 .. toctree::
 
+   cli-add-view.rst
    cli-refresh-views.rst
    cli-field-counts.rst
    cli-upgrade-database.rst
