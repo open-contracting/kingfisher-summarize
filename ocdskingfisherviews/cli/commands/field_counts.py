@@ -86,6 +86,7 @@ class FieldCountsCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
                 continue
 
         with self.engine.begin() as connection:
+            connection.execute(search_path_string)
             connection.execute('drop table if exists field_counts')
             connection.execute('alter table field_counts_temp rename to field_counts')
 
