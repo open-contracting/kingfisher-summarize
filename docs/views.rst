@@ -16,11 +16,12 @@ Extra Views
 
 First, use the ``add-view`` command to add a view.
 
-Secondly, look at the ``selected_collections`` table in the new view you just created. It will be under the schema ``view_data_ + the name you set``.
+Look at the ``selected_collections`` table in the new view you just created.
+It will be under the schema ``view_data_ + the name you set``.
+Make sure the ID's of the collections you want in this view are correct in this table.
 
-Add to this table the ID's of the collections you want in this view.
-
-Then use the :doc:`cli-refresh-views`  and :doc:`cli-field-counts` to update data in the view. In both cases pass the optional view name parameter.
+Then use the :doc:`cli-refresh-views`  and :doc:`cli-field-counts` to update data in the view.
+In both cases pass the optional view name parameter.
 
 Querying
 --------
