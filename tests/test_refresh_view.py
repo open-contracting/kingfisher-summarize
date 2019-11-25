@@ -2,7 +2,6 @@ import pytest
 import sqlalchemy as sa
 
 import ocdskingfisherviews.config
-
 from ocdskingfisherviews.cli import run_command
 
 

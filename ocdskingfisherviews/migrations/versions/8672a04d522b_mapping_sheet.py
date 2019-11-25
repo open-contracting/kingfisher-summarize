@@ -6,11 +6,12 @@ Create Date: 2019-03-05 15:16:13.974050
 
 """
 
-import os
 import csv
+import os
+
 from alembic import op
 from sqlalchemy import String
-from sqlalchemy.sql import table, column
+from sqlalchemy.sql import column, table
 
 mapping_table = table(
     'mapping_sheets',

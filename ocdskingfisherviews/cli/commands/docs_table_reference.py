@@ -1,12 +1,11 @@
-import os
-import glob
-import re
 import csv
+import glob
+import os
+import re
 
 import sqlalchemy as sa
 
 import ocdskingfisherviews.cli.commands.base
-
 
 column_info_query = '''
     SELECT

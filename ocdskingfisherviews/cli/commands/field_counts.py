@@ -1,6 +1,7 @@
-import sqlalchemy as sa
-from timeit import default_timer as timer
 import concurrent.futures
+from timeit import default_timer as timer
+
+import sqlalchemy as sa
 from logzero import logger
 
 import ocdskingfisherviews.cli.commands.base
