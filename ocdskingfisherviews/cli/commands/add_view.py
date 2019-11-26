@@ -5,7 +5,7 @@ import sqlalchemy as sa
 import ocdskingfisherviews.cli.commands.base
 
 
-class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
+class AddViewCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
     command = 'add-view'
 
     def configure_subparser(self, subparser):
