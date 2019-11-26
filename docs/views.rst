@@ -23,6 +23,8 @@ Make sure the ID's of the collections you want in this view are correct in this 
 Then use the :doc:`cli-refresh-views`  and :doc:`cli-field-counts` to update data in the view.
 In both cases pass the optional view name parameter.
 
+Finally, run the :doc:`cli-correct-user-permissions` command so users have access to this new view.
+
 Querying
 --------
 

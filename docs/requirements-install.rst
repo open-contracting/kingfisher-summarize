@@ -32,6 +32,7 @@ Then you need to create the base schemas to make the views work see :doc:`cli-up
 
    sudo -u postgres psql ocdskingfisher -c 'CREATE SCHEMA views AUTHORIZATION ocdskingfisher' 
    sudo -u postgres psql ocdskingfisher -c 'CREATE SCHEMA view_info AUTHORIZATION ocdskingfisher'
+   sudo -u postgres psql ocdskingfisher -c 'CREATE SCHEMA view_meta AUTHORIZATION ocdskingfisher'
    python ocdskingfisher-views-cli upgrade-database
 
 Refreshing the views
