@@ -19,6 +19,8 @@ install:
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
   - psql -c 'create schema views;' travis_ci_test -U postgres
+  - psql -c 'create schema view_info;' travis_ci_test -U postgres
+  - psql -c 'create schema view_meta;' travis_ci_test -U postgres
   - python /tmp/kingfisher-process/ocdskingfisher-process-cli upgrade-database
   - python /tmp/kingfisher-process/ocdskingfisher-process-cli new-collection 'new' '2000-01-01 00:00:00'
   - python /tmp/kingfisher-process/ocdskingfisher-process-cli local-load 1 fixtures release_package

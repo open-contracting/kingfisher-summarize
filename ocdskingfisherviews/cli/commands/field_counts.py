@@ -27,8 +27,6 @@ field_count_query = '''
     group by collection_id, release_type, path;
 '''
 
-search_path_string = 'set search_path = views, public;'
-
 
 class FieldCountsCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
     command = 'field-counts'
@@ -38,12 +36,13 @@ class FieldCountsCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
         subparser.add_argument("--threads", help="Amount of threads to use", type=int, default=1)
 
         subparser.add_argument("--logfile", help="Add psql timing to sql output")
+        subparser.add_argument("--viewname", help="optional view name")
 
     def run_collection(self, collection):
 
         with self.engine.begin() as connection:
             start = timer()
-            connection.execute(search_path_string)
+            connection.execute(self.search_path_string)
             logger.info('processing collection: {}'.format(collection))
             results = tuple(connection.execute(field_count_query, collection))
             if results:
@@ -52,18 +51,25 @@ class FieldCountsCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
 
     def run_logged_command(self, args):
 
+        if args.viewname:
+            # Technically this is SQL injection opportunity,
+            # but as operators have access to the DB anyway we don't care.
+            self.search_path_string = 'set search_path = view_data_'+args.viewname+', public;'
+        else:
+            self.search_path_string = 'set search_path = views, public;'
+
         self.engine = sa.create_engine(self.config.database_uri)
         overall_start = timer()
 
         if args.remove:
             with self.engine.begin() as connection:
-                connection.execute(search_path_string)
+                connection.execute(self.search_path_string)
                 connection.execute('drop table if exists field_counts_temp;')
                 connection.execute('drop table if exists field_counts')
             return
 
         with self.engine.begin() as connection:
-            connection.execute(search_path_string)
+            connection.execute(self.search_path_string)
 
             connection.execute('drop table if exists field_counts_temp')
             connection.execute(
@@ -86,6 +92,7 @@ class FieldCountsCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
                 continue
 
         with self.engine.begin() as connection:
+            connection.execute(self.search_path_string)
             connection.execute('drop table if exists field_counts')
             connection.execute('alter table field_counts_temp rename to field_counts')
 

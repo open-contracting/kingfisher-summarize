@@ -21,6 +21,7 @@ class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
         subparser.add_argument("--sql", help="Just output sql and do not run", action='store_true')
         subparser.add_argument("--sql-timing", help="Add psql timing to sql output", action='store_true')
         subparser.add_argument("--logfile", help="optional output logfile")
+        subparser.add_argument("--viewname", help="optional view name")
 
     def run_logged_command(self, args):
 
@@ -28,8 +29,6 @@ class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
 
         sql_scripts_path = os.path.join(dir_path, '../../../sql')
         all_scripts = glob.glob(sql_scripts_path + '/*.sql')
-
-        search_path_string = 'set search_path = views, public;\n'
 
         engine = sa.create_engine(self.config.database_uri)
 
@@ -48,7 +47,7 @@ class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
                 continue
 
             with open(script_path) as script_file:
-                script = search_path_string + script_file.read()
+                script = script_file.read()
 
             if script_name.endswith('_downgrade') and args.remove:
                 statements[script_name] = script
@@ -72,7 +71,12 @@ class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
 
             for statement_part in statement_parts:
                 with engine.begin() as connection:
-                    connection.execute('set search_path = views, public;\n')
+                    if args.viewname:
+                        # Technically this is SQL injection opportunity,
+                        # but as operators have access to the DB anyway we don't care.
+                        connection.execute('set search_path = view_data_'+args.viewname+', public;\n')
+                    else:
+                        connection.execute('set search_path = views, public;\n')
                     connection.execute(statement_part, tuple())
 
             logger.info('running time: {}s'.format(timer() - start))

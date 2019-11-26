@@ -1,4 +1,3 @@
-set search_path = views, public;
 
 drop table if exists staged_buyer_summary;
 

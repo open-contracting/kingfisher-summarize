@@ -1,4 +1,3 @@
-set search_path = views, public;
 
 CREATE OR REPLACE FUNCTION convert_to_numeric(
 	v_input text)

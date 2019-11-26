@@ -1,4 +1,3 @@
-set search_path = views, public;
 
 drop table if exists tmp_tender_summary;
 

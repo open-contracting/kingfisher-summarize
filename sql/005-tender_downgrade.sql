@@ -1,4 +1,3 @@
-set search_path = views, public;
 
 drop view if exists tender_summary_with_data;
 drop table if exists tender_summary;
