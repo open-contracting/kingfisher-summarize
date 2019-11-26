@@ -7,6 +7,7 @@ Create Date: 2019-02-18 12:31:24.495009
 """
 
 import os
+
 from alembic import op
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

@@ -1,6 +1,8 @@
-import ocdskingfisherviews.cli.commands.base
-import alembic.config
 import os
+
+import alembic.config
+
+import ocdskingfisherviews.cli.commands.base
 
 
 class UpgradeDataBaseCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):

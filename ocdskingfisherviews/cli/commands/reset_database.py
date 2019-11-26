@@ -1,6 +1,8 @@
-import ocdskingfisherviews.cli.commands.base
-import alembic.config
 import os
+
+import alembic.config
+
+import ocdskingfisherviews.cli.commands.base
 
 
 class ResetDatabaseCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):

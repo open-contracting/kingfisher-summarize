@@ -1,7 +1,7 @@
-import os
-from timeit import default_timer as timer
 import glob
+import os
 from collections import OrderedDict
+from timeit import default_timer as timer
 
 import sqlalchemy as sa
 from logzero import logger

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import argparse
+
 import ocdskingfisherviews.cli.util
 import ocdskingfisherviews.config
 
