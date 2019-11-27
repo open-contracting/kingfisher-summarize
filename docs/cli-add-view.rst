@@ -1,5 +1,5 @@
-Command line tool - Field Counts
-===========================================
+Command line tool - Add View
+============================
 
 This tool will add a new view.
 
