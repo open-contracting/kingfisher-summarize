@@ -12,3 +12,13 @@ The view name must be something that is a valid Postgres schema name. We suggest
 You can pass a single collection ID, or multiple collection ID's separated by commas.
 
 Finally, pass a note. This will help people later understand if the data is still in use.
+
+By default, this will then go on to build the data for this view. It does this by effectively calling the following commands, with the default options.
+
+* :doc:`cli-correct-user-permissions`
+* :doc:`cli-refresh-views`
+* :doc:`cli-field-counts`
+
+If you don't want it do this you can pass the optional ``--dontbuild`` flag. You will then have to call the above commands yourself to get all the data.
+
+
