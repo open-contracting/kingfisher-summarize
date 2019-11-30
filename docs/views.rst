@@ -14,16 +14,14 @@ It also includes any extra collections you add to ``extra_collections`` table in
 Extra Views
 -----------
 
-First, use the ``add-view`` command to add a view.
+You can create extra views. Each one is in it's own Postgres schema and can contain data for 1 or more collections - you specify the exact ID's when creating the view.
 
-Look at the ``selected_collections`` table in the new view you just created.
-It will be under the schema ``view_data_ + the name you set``.
-Make sure the ID's of the collections you want in this view are correct in this table.
+The build process for extra views can happen totally independently for the build process for the default views, and thus it can be triggered as soon as a collection is ready.
 
-Then use the :doc:`cli-refresh-views`  and :doc:`cli-field-counts` to update data in the view.
-In both cases pass the optional view name parameter.
+Use the :doc:`cli-add-view`  command to add a view.
 
-Finally, run the :doc:`cli-correct-user-permissions` command so users have access to this new view.
+This may take a long time, and you may want to run it via ``tmux`` or similar.
+
 
 Querying
 --------
