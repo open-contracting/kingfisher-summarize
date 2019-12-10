@@ -9,8 +9,10 @@ You need to have configured your database connection in the same way as outlined
 
    cli-add-view.rst
    cli-correct-user-permissions.rst
+   cli-delete-view.rst
    cli-refresh-views.rst
    cli-field-counts.rst
+   cli-list-views.rst
    cli-upgrade-database.rst
    cli-reset-database.rst
    cli-development-commands.rst
