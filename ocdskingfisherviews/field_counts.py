@@ -42,14 +42,11 @@ class FieldCounts():
                 connection.execute('insert into field_counts_temp values (%s, %s, %s, %s, %s, %s)', *results)
             logger.info('running time for collection {}: {}s'.format(collection, timer() - start))
 
-    def run(self, viewname=None, remove=False, threads=1):
+    def run(self, viewname, remove=False, threads=1):
 
-        if viewname:
-            # Technically this is SQL injection opportunity,
-            # but as operators have access to the DB anyway we don't care.
-            self.search_path_string = 'set search_path = view_data_'+viewname+', public;'
-        else:
-            self.search_path_string = 'set search_path = views, public;'
+        # Technically this is SQL injection opportunity,
+        # but as operators have access to the DB anyway we don't care.
+        self.search_path_string = 'set search_path = view_data_'+viewname+', public;'
 
         overall_start = timer()
 

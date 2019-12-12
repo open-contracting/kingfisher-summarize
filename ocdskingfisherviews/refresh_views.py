@@ -6,7 +6,7 @@ from timeit import default_timer as timer
 from logzero import logger
 
 
-def refresh_views(engine, remove=False, start=0, end=1000, sql=False, sql_timing=False, viewname=None):
+def refresh_views(engine, viewname, remove=False, start=0, end=1000, sql=False, sql_timing=False):
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
     sql_scripts_path = os.path.join(dir_path, '../sql')
@@ -51,12 +51,9 @@ def refresh_views(engine, remove=False, start=0, end=1000, sql=False, sql_timing
 
         for statement_part in statement_parts:
             with engine.begin() as connection:
-                if viewname:
-                    # Technically this is SQL injection opportunity,
-                    # but as operators have access to the DB anyway we don't care.
-                    connection.execute('set search_path = view_data_' + viewname + ', public;\n')
-                else:
-                    connection.execute('set search_path = views, public;\n')
+                # Technically this is SQL injection opportunity,
+                # but as operators have access to the DB anyway we don't care.
+                connection.execute('set search_path = view_data_' + viewname + ', public;\n')
                 connection.execute(statement_part, tuple())
 
         logger.info('running time: {}s'.format(timer() - start))
