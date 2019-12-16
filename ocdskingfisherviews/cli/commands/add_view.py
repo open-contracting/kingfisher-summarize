@@ -42,12 +42,15 @@ class AddViewCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
 
         if not args.dontbuild:
 
-            logger.info("Correcting User Permissions after Creating View " + args.name)
-            correct_user_permissions(engine)
-
             logger.info("Refreshing Views after Creating View " + args.name)
             refresh_views(engine, viewname=args.name)
 
             logger.info("Updating Field Counts after Creating View " + args.name)
             field_counts = FieldCounts(engine=engine)
             field_counts.run(viewname=args.name)
+
+            # This must be done after table creation in refresh_views and FieldCounts
+            # as the users are granted access to tables that already exist.
+            # So if it's done before, the users won't be able to access some tables!
+            logger.info("Correcting User Permissions after Creating View " + args.name)
+            correct_user_permissions(engine)
