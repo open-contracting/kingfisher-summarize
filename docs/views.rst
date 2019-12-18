@@ -60,3 +60,15 @@ For a record the ``compiledRelease`` within it is used in the summary tables.
 
 
 
+Changing and rerunning Extra Views after creation
+-------------------------------------------------
+
+Every schema has a ``selected_collections`` table. After a view has been created, you can still change what collections it contains by editing the contents of this table directly.
+
+After you have done this, you will need to rebuild the view.
+
+(You may also want to rebuild an existing view if this software has been updated, and you want your view to have the results of the new build process.)
+
+To do this, run the :doc:`cli-refresh-views` then the :doc:`cli-field-counts` command on your view. This may take a long time, and you may want to run it via ``tmux`` or similar.
+
+
