@@ -24,9 +24,9 @@ Set up a venv and install requirements::
 
 You need to configure the app: :doc:`config`
 
-A schema called ``views`` need to be set up in the Kingfisher Process database with the same owner as the database.
+Schemas called ``views``, ``view_info`` and ``view_meta`` need to be set up in the Kingfisher Process database with the same owner as the database.
 
-To use extra views, the database user must be able to create schema's at will.
+The database user must be able to create schema's at will.
 
 Then you need to create the base schemas to make the views work see :doc:`cli-upgrade-database`::
 
