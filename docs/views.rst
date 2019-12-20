@@ -61,3 +61,18 @@ After you have done this, you will need to rebuild the view.
 To do this, run the :doc:`cli-refresh-views` then the :doc:`cli-field-counts` command on your view. This may take a long time, and you may want to run it via ``tmux`` or similar.
 
 
+Checking notes in a view
+------------------------
+
+When you create a view, you can specify a note.
+
+You can see all notes attached to a view when running the :doc:`cli-list-views` command.
+
+(You can also look in the schema for a particular view, and just look in the contents of the ``note`` table.)
+
+Deleting a view
+---------------
+
+Finally, please delete views when you have finished with them to save disk space. Use the :doc:`cli-delete-view` command.
+
+
