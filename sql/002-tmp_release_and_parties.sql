@@ -5,7 +5,7 @@ drop table if exists tmp_release_summary;
 create table tmp_release_summary
 AS
 select 
-    r.id * 10 AS id,
+    (r.id * 10)::bigint AS id,
     'release' AS release_type,
     r.id AS table_id,
     collection_id,
@@ -31,7 +31,7 @@ where
 union
 
 select 
-    r.id * 10 + 1 AS id,
+    (r.id * 10 + 1)::bigint AS id,
     'record' as release_type,
     r.id AS table_id, 
     collection_id,
@@ -57,7 +57,7 @@ where
 union
 
 select 
-    r.id * 10 + 2 AS id,
+    (r.id * 10 + 2)::bigint AS id,
     'compiled_release' as release_type,
     r.id AS table_id,
     collection_id,
