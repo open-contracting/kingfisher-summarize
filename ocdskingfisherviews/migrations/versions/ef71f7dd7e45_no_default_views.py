@@ -1,27 +1,37 @@
-"""select_collection_tables
+"""no-default-views
 
-Revision ID: 947ad833b815
-Revises:
-Create Date: 2019-02-18 12:31:24.495009
+Revision ID: ef71f7dd7e45
+Revises: cb9bf0366efa
+Create Date: 2019-12-12 12:38:06.730478
 
 """
 
 import os
-
 from alembic import op
 
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
-sql_dir = os.path.join(dir_path, '../../sql/')
+sql_dir = os.path.join(dir_path, '../../../sql/')
 
 # revision identifiers, used by Alembic.
-revision = '947ad833b815'
-down_revision = None
+revision = 'ef71f7dd7e45'
+down_revision = 'cb9bf0366efa'
 branch_labels = None
 depends_on = None
 
 
-# This is duplicated in ocdskingfisherviews/migrations/versions/ef71f7dd7e45_no_default_views.py
+# This is duplicated in ocdskingfisherviews/migrations/versions/947ad833b815_select_collection_tables.py
 def upgrade():
+    sql_text = '''
+    set search_path = views, public;
+    drop view selected_collections;
+    drop table extra_collections;
+    '''
+    op.execute(sql_text)
+
+
+# This is duplicated in ocdskingfisherviews/migrations/versions/947ad833b815_select_collection_tables.py
+def downgrade():
     sql_text = '''
     set search_path = views, public;
     create table extra_collections(collection_id integer primary key);
@@ -59,16 +69,5 @@ def upgrade():
     union
 
     select collection_id from extra_collections;
-    '''
-    op.execute(sql_text)
-
-
-# This is duplicated in ocdskingfisherviews/migrations/versions/ef71f7dd7e45_no_default_views.py
-def downgrade():
-
-    sql_text = '''
-    set search_path = views, public;
-    drop view selected_collections;
-    drop table extra_collections;
     '''
     op.execute(sql_text)
