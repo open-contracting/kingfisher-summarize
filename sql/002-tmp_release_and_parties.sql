@@ -18,7 +18,7 @@ select
     d.data -> 'tag' release_tag,
     d.data ->> 'language' release_language
 from 
-    release_with_collection AS r
+    release AS r
 left join
     package_data pd on pd.id = r.package_data_id
 join
@@ -44,7 +44,7 @@ select
     d.data -> 'compliedRelease' -> 'tag' release_tag,
     d.data -> 'compliedRelease' ->> 'language' release_language
 from 
-    record_with_collection AS r
+    record AS r
 left join
     package_data pd on pd.id = r.package_data_id
 join
@@ -70,7 +70,7 @@ select
     d.data -> 'tag' release_tag,
     d.data ->> 'language' release_language
 from 
-    compiled_release_with_collection AS r
+    compiled_release AS r
 join
     data d on d.id = r.data_id
 where
