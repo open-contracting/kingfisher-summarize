@@ -6,18 +6,30 @@ View supports the creation of read only users that have access to all views and 
 Adding
 ------
 
-To create a new user, firstly create the user as a postgres user yourself. Something like:
+To create a new user, firstly create the user as a Postgresql user yourself.
+
+On a Ubuntu Linux server, after connecting as root this would probably look like:
+
+.. code-block:: bash
+
+    # su postgres
+    $ psql template1
 
 .. code-block:: sql
 
     CREATE USER testreadonly with PASSWORD 'k1ngf1sher' NOCREATEDB NOSUPERUSER NOCREATEROLE;
 
-Then go to the database, and the ``view_meta`` schema, and the ``read_only_user`` table.
-Put the new username in as a entry in that table.
+Then go to the normal views database with your usual connection settings. Put the new username in as an entry in the ``read_only_user`` table in the ``view_meta`` schema.
+
+.. code-block:: sql
+
+    SET search_path = view_meta;
+    INSERT INTO read_only_user (username) VALUES ('testreadonly');
+
 
 Then run the :doc:`cli-correct-user-permissions` command - this will actually set the correct user permissions.
 
-Note the user the process connects as must be the owner of the database for this to work.
+Note the database user the :doc:`cli-correct-user-permissions` command connects as must be the owner of the database for this to work - but that is true of the views app generally.
 
 Removing
 --------
