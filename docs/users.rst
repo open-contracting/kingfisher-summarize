@@ -15,11 +15,13 @@ On a Ubuntu Linux server, after connecting as root this would probably look like
     # su postgres
     $ psql template1
 
+Generate a strong password using `passwordsgenerator.net <https://passwordsgenerator.net/>`__ or similiar.
+
 .. code-block:: sql
 
-    CREATE USER testreadonly with PASSWORD 'k1ngf1sher' NOCREATEDB NOSUPERUSER NOCREATEROLE;
+    CREATE USER testreadonly with PASSWORD 'insert-strong-password-here' NOCREATEDB NOSUPERUSER NOCREATEROLE;
 
-Then go to the normal views database with your usual connection settings. Put the new username in as an entry in the ``read_only_user`` table in the ``view_meta`` schema.
+Then go to the normal views database, using the normal username, password and other settings you use to access that. Put the new username in as an entry in the ``read_only_user`` table in the ``view_meta`` schema.
 
 .. code-block:: sql
 
