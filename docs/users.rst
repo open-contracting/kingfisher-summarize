@@ -1,35 +1,66 @@
-Read Only Users
+Read-Only Users
 ===============
 
-View supports the creation of read only users that have access to all views and the main process database.
+This how-to guide describes how to:
 
-Adding
-------
+-  Add a user
+-  Grant a user read-only access to all tables in all schemas created by Kingfisher Views
+-  Remove a user
 
-To create a new user, firstly create the user as a postgres user yourself. Something like:
+Add a user
+----------
 
-.. code-block:: sql
+#. Connect to the ``postgres`` database as the ``postgres`` user. For example, as the ``root`` user, run:
 
-    CREATE USER testreadonly with PASSWORD 'k1ngf1sher' NOCREATEDB NOSUPERUSER NOCREATEROLE;
+   .. code-block:: bash
 
-Then go to the database, and the ``view_meta`` schema, and the ``read_only_user`` table.
-Put the new username in as a entry in that table.
+      su postgres
+      psql
 
-Then run the :doc:`cli-correct-user-permissions` command - this will actually set the correct user permissions.
+#. Create the user. Replace ``the-username`` with a recognizable username (for example, the lowercase name of the person to whom you are giving access, like ``janedoe``) and ``the-password`` with a `strong password <https://www.lastpass.com/password-generator>`__, and run:
 
-Note the user the process connects as must be the owner of the database for this to work.
+   .. code-block:: sql
 
-Removing
---------
+      CREATE USER the-username WITH PASSWORD 'the-password';
 
-Go to the database, and the ``view_meta`` schema, and the ``read_only_user`` table.
-Remove the username as a entry in that table.
+Grant a user read-only access 
+-----------------------------
 
-At this point, the user will still have access.
+#. Connect to the database used by Kingfisher Views, using the connecting settings you :doc:`configured earlier<config>`. For example, run:
 
-Now remove the actual user.
+   .. code-block:: bash
 
+      psql ocdskingfisher -U ocdskingfisher
 
-.. code-block:: sql
+#. Insert the username into the ``view_meta.read_only_user`` table. For example, replace ``the-username``, and run:
 
-    DROP USER testreadonly;
+   .. code-block:: sql
+
+      INSERT INTO view_meta.read_only_user VALUES ('the-username');
+
+#. Run the :doc:`cli-correct-user-permissions` command to grant the user read-only access to all tables in all schemas created by Kingfisher Views:
+
+   .. code-block: bash
+
+      python ocdskingfisher-views-cli correct-user-permissions
+
+Remove a user
+-------------
+
+#. Connect to the database used by Kingfisher Views, using the connecting settings you :doc:`configured earlier<config>`. For example, run:
+
+   .. code-block:: bash
+
+      psql ocdskingfisher -U ocdskingfisher
+
+#. Delete the username from the ``view_meta.read_only_user`` table. For example, replace ``the-username``, and run:
+
+   .. code-block:: sql
+
+      DELETE FROM view_meta.read_only_user WHERE username = 'the-username';
+
+#. Drop the user. For example, replace ``the-username``, and run:
+
+   .. code-block:: sql
+
+      DROP USER the-username;
