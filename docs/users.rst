@@ -1,49 +1,66 @@
-Read Only Users
+Read-Only Users
 ===============
 
-View supports the creation of read only users that have access to all views and the main process database.
+This how-to guide describes how to:
 
-Adding
-------
+-  Add a user
+-  Grant a user read-only access to all tables in all schemas created by Kingfisher Views
+-  Remove a user
 
-To create a new user, firstly create the user as a Postgresql user yourself.
+Add a user
+----------
 
-On a Ubuntu Linux server, after connecting as root this would probably look like:
+#. Connect to the ``postgres`` database as the ``postgres`` user. For example, as the ``root`` user, run:
 
-.. code-block:: bash
+   .. code-block:: bash
 
-    # su postgres
-    $ psql template1
+      su postgres
+      psql
 
-Generate a strong password using `passwordsgenerator.net <https://passwordsgenerator.net/>`__ or similiar.
+#. Create the user. Replace ``the-username`` with a recognizable username (for example, the lowercase name of the person to whom you are giving access, like ``janedoe``) and ``the-password`` with a `strong password <https://www.lastpass.com/password-generator>`__, and run:
 
-.. code-block:: sql
+   .. code-block:: sql
 
-    CREATE USER testreadonly with PASSWORD 'insert-strong-password-here' NOCREATEDB NOSUPERUSER NOCREATEROLE;
+      CREATE USER the-username WITH PASSWORD 'the-password';
 
-Then go to the normal views database, using the normal username, password and other settings you use to access that. Put the new username in as an entry in the ``read_only_user`` table in the ``view_meta`` schema.
+Grant a user read-only access 
+-----------------------------
 
-.. code-block:: sql
+#. Connect to the database used by Kingfisher Views, using the connecting settings you :doc:`configured earlier<config>`. For example, run:
 
-    SET search_path = view_meta;
-    INSERT INTO read_only_user (username) VALUES ('testreadonly');
+   .. code-block:: bash
 
+      psql ocdskingfisher -U ocdskingfisher
 
-Then run the :doc:`cli-correct-user-permissions` command - this will actually set the correct user permissions.
+#. Insert the username into the ``view_meta.read_only_user`` table. For example, replace ``the-username``, and run:
 
-Note the database user the :doc:`cli-correct-user-permissions` command connects as must be the owner of the database for this to work - but that is true of the views app generally.
+   .. code-block:: sql
 
-Removing
---------
+      INSERT INTO view_meta.read_only_user VALUES ('the-username');
 
-Go to the database, and the ``view_meta`` schema, and the ``read_only_user`` table.
-Remove the username as a entry in that table.
+#. Run the :doc:`cli-correct-user-permissions` command to grant the user read-only access to all tables in all schemas created by Kingfisher Views:
 
-At this point, the user will still have access.
+   .. code-block: bash
 
-Now remove the actual user.
+      python ocdskingfisher-views-cli correct-user-permissions
 
+Remove a user
+-------------
 
-.. code-block:: sql
+#. Connect to the database used by Kingfisher Views, using the connecting settings you :doc:`configured earlier<config>`. For example, run:
 
-    DROP USER testreadonly;
+   .. code-block:: bash
+
+      psql ocdskingfisher -U ocdskingfisher
+
+#. Delete the username from the ``view_meta.read_only_user`` table. For example, replace ``the-username``, and run:
+
+   .. code-block:: sql
+
+      DELETE FROM view_meta.read_only_user WHERE username = 'the-username';
+
+#. Drop the user. For example, replace ``the-username``, and run:
+
+   .. code-block:: sql
+
+      DROP USER the-username;
