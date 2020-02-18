@@ -23,4 +23,4 @@ def upgrade():
 
 def downgrade():
     op.execute('set search_path = view_info')
-    op.execute("ALTER TABLE mapping_sheets SET SCHEMA view")
+    op.execute("ALTER TABLE mapping_sheets SET SCHEMA views")
