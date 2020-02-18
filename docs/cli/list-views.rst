@@ -1,4 +1,4 @@
-List Views
+list-views
 ==========
 
 This tool will list all the views, with notes.

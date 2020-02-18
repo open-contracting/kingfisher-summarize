@@ -1,4 +1,4 @@
-Upgrade Database
+upgrade-database
 ================
 
 This sets up from scratch or updates to the latest version the tables and structure in the Postgresql database.

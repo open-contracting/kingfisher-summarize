@@ -1,4 +1,4 @@
-Reset Database
+reset-database
 ==============
 
 This command will remove all the base tables from the views schema this can only be done if the all the views have also been to deleted.

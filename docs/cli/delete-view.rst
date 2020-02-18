@@ -1,4 +1,4 @@
-Delete View
+delete-view
 ===========
 
 This tool will delete a view.

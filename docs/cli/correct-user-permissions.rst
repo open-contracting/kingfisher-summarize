@@ -1,4 +1,4 @@
-Correct User Permissions
+correct-user-permissions
 ========================
 
 To setup correct user permissions for all specified users to all schemas, run:

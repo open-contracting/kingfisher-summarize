@@ -1,4 +1,4 @@
-Field Counts
+field-counts
 ============
 
 This tool will update the ``field_count`` table.

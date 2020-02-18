@@ -1,4 +1,4 @@
-Add View
+add-view
 ========
 
 This tool will add a new view.

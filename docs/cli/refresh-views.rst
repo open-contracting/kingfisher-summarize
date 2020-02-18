@@ -1,4 +1,4 @@
-Refresh Views
+refresh-views
 =============
 
 This tool will refresh all the views in the views schema.
