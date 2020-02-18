@@ -47,7 +47,7 @@ VIEWS_TABLES = {
 
 def test_refresh_runs(engine):
     viewname = 'viewname' + str(random.randint(1, 10000000))
-    run_command(['add-view', viewname, '1', 'Note'])
+    run_command(['add-view', '--name', viewname, '1', 'Note'])
     run_command(['refresh-views', viewname, '--remove'])
     run_command(['refresh-views', viewname])
     get_current_tables_query = "select table_name from information_schema.tables " + \
@@ -69,7 +69,7 @@ def test_refresh_runs(engine):
 
 def test_field_count_runs(engine):
     viewname = 'viewname' + str(random.randint(1, 10000000))
-    run_command(['add-view', viewname, '1', 'Note'])
+    run_command(['add-view', '--name', viewname, '1', 'Note'])
     run_command(['refresh-views', viewname, '--remove'])
     run_command(['field-counts', viewname, '--remove'])
     run_command(['refresh-views', viewname])
