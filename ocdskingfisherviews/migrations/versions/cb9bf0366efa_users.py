@@ -31,5 +31,5 @@ def upgrade():
 
 
 def downgrade():
-    op.execute('set search_path = view_mena')
-    op.execute('''drop table mapping_sheets''')
+    op.execute('set search_path = view_meta')
+    op.execute('drop table read_only_user')
