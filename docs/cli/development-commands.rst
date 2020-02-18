@@ -1,14 +1,16 @@
 Development Commands
 ====================
 
-To generate the table schema CSV files and generate a schema-reference.rst file run:
+``docs/reference/database.rst`` displays the CSV files in the ``docs/reference/definitions/`` directory. To create and/or update the CSV files, run:
 
-.. code-block:: shell-session
+.. code-block:: bash
 
    python ocdskingfisher-views-cli docs-table-ref
 
-To generate an alembic migration to upgrade the base tables run:
+Then, for each new CSV file, add a new sub-section to ``docs/reference/database.rst`` under an appropriate section.
 
-.. code-block:: shell-session
+To generate an Alembic migration to upgrade the base tables run:
+
+.. code-block:: bash
 
    python ocdskingfisher-views-cli make-migration

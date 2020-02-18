@@ -17,20 +17,6 @@ column_info_query = '''
         information_schema.columns isc where table_schema='views' and lower(isc.table_name) = lower(%s);
 '''
 
-output_rst_base = '''
-View Reference
-==============
-'''
-
-output_rst_table_template = '''
-{table_name}
------------------------------------------------
-.. csv-table::
-   :header-rows: 1
-   :widths: 10, 10, 40
-   :file: view_definitions/{table_name}.csv
-'''
-
 
 class DocsTableRefCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
     command = 'docs-table-ref'
@@ -41,7 +27,6 @@ class DocsTableRefCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
 
         docs_path = os.path.join(dir_path, '../../../docs')
         docs_csv = os.path.join(docs_path, 'view_definitions')
-        docs_view_reference = os.path.join(docs_path, 'view-reference.rst')
 
         sql_scripts_path = os.path.join(dir_path, '../../../sql')
         all_scripts = sorted(glob.glob(sql_scripts_path + '/*.sql'))
@@ -63,8 +48,6 @@ class DocsTableRefCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
 
         engine = sa.create_engine(self.config.database_uri)
 
-        output_rst = output_rst_base
-
         for table in all_tables:
             csv_file_name = os.path.join(docs_csv, table + '.csv')
             with engine.begin() as connection, open(csv_file_name, 'w+') as output:
@@ -78,8 +61,3 @@ class DocsTableRefCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
                     if 'timestamp' in result_dict['data_type']:
                         result_dict['data_type'] = 'timestamp'
                     writer.writerow(result_dict)
-
-            output_rst += output_rst_table_template.format(table_name=table)
-
-        with open(docs_view_reference, 'w+') as docs_view_reference_file:
-            docs_view_reference_file.write(output_rst)
