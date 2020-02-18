@@ -21,19 +21,19 @@ Views can be found in the postgres schema ``view_data_ + the name you set`` with
 
 .. code-block:: postgresql
 
-    select * from view_data_test.release_summary;
+   select * from view_data_test.release_summary;
 
 Alternatively you can run
 
 .. code-block:: postgresql
 
-    set search_path = view_data_test, public;
+   set search_path = view_data_test, public;
 
 at the start of your sql script meaning that Postgres will first look at the ``view_data_test`` schema then at kingfisher-process (which lives in the ``public`` schema) so that you can just do:
 
 .. code-block:: postgresql
 
-    select * from release_summary
+   select * from release_summary
 
 Structure
 ---------

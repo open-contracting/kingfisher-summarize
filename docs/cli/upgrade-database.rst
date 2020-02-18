@@ -5,5 +5,5 @@ This tool will setup from scratch or update to the latest versions the tables an
 
 .. code-block:: shell-session
 
-    python ocdskingfisher-views-cli upgrade-database
+   python ocdskingfisher-views-cli upgrade-database
 

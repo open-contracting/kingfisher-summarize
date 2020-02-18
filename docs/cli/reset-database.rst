@@ -6,5 +6,5 @@ So, to reset the whole of the view schema:
 
 .. code-block:: shell-session
 
-    python ocdskingfisher-views-cli refresh-views --remove
-    python ocdskingfisher-views-cli reset-database
+   python ocdskingfisher-views-cli refresh-views --remove
+   python ocdskingfisher-views-cli reset-database
