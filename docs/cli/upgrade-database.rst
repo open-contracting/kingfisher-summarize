@@ -1,7 +1,7 @@
 Upgrade Database
 ================
 
-This tool will setup from scratch or update to the latest versions the tables and structure in the Postgresql database.
+This sets up from scratch or updates to the latest version the tables and structure in the Postgresql database.
 
 .. code-block:: shell-session
 

@@ -10,12 +10,11 @@ This how-to guide describes how to:
 Add a user
 ----------
 
-#. Connect to the ``postgres`` database as the ``postgres`` user. For example, as the ``root`` user, run:
+#. Connect to the ``postgres`` database as the ``postgres`` user. For example, as a sudoer, run:
 
    .. code-block:: bash
 
-      su postgres
-      psql
+      sudo -u postgres psql
 
 #. Create the user. For example, replace ``the-username`` with a recognizable username (for example, the lowercase name of the person to whom you are giving access, like ``janedoe``) and ``the-password`` with a `strong password <https://www.lastpass.com/password-generator>`__, and run:
 
@@ -23,10 +22,12 @@ Add a user
 
       CREATE USER the-username WITH PASSWORD 'the-password';
 
+#. Close your PostgreSQL session and your sudo session.
+
 Grant a user read-only access
 -----------------------------
 
-#. Connect to the database used by Kingfisher Views, using the connecting settings you :doc:`configured earlier<config>`. For example, run:
+#. Connect to the database used by Kingfisher Views, using the connecting settings you :ref:`configured earlier<database-connection-settings>`. For example, run:
 
    .. code-block:: bash
 
@@ -38,6 +39,8 @@ Grant a user read-only access
 
       INSERT INTO view_meta.read_only_user VALUES ('the-username');
 
+#. Close your PostgreSQL session.
+
 #. Run the :doc:`cli/correct-user-permissions` command to grant the user read-only access to all tables in all schemas created by Kingfisher Views:
 
    .. code-block:: bash
@@ -47,7 +50,7 @@ Grant a user read-only access
 Remove a user
 -------------
 
-#. Connect to the database used by Kingfisher Views, using the connecting settings you :doc:`configured earlier<config>`. For example, run:
+#. Connect to the database used by Kingfisher Views, using the connecting settings you :ref:`configured earlier<database-connection-settings>`. For example, run:
 
    .. code-block:: bash
 
@@ -64,3 +67,5 @@ Remove a user
    .. code-block:: sql
 
       DROP USER the-username;
+
+#. Close your PostgreSQL session.
