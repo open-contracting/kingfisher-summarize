@@ -1,8 +1,0 @@
-Column Name,Data Type,Description
-collection_id,integer,
-path,text,
-unique_identifier_attempt,text,
-buyer_name,text,
-object_property,bigint,
-array_count,bigint,
-distinct_releases,bigint,
