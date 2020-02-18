@@ -1,5 +1,5 @@
-Command line tool - Field Counts
-===========================================
+Field Counts
+============
 
 This tool will update the ``field_count`` table.
 
@@ -21,4 +21,3 @@ In order to make it run you faster you can define how many threads it runs with.
 .. code-block:: shell-session
 
     python ocdskingfisher-views-cli field-counts viewname --threads 5
-

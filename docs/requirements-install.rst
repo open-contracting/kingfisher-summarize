@@ -28,9 +28,9 @@ Schemas called ``views``, ``view_info`` and ``view_meta`` need to be set up in t
 
 The database user must be able to create schema's at will.
 
-Then you need to create the base schemas to make the views work see :doc:`cli-upgrade-database`::
+Then you need to create the base schemas to make the views work see :doc:`cli/upgrade-database`::
 
-   sudo -u postgres psql ocdskingfisher -c 'CREATE SCHEMA views AUTHORIZATION ocdskingfisher' 
+   sudo -u postgres psql ocdskingfisher -c 'CREATE SCHEMA views AUTHORIZATION ocdskingfisher'
    sudo -u postgres psql ocdskingfisher -c 'CREATE SCHEMA view_info AUTHORIZATION ocdskingfisher'
    sudo -u postgres psql ocdskingfisher -c 'CREATE SCHEMA view_meta AUTHORIZATION ocdskingfisher'
    python ocdskingfisher-views-cli upgrade-database
@@ -38,7 +38,7 @@ Then you need to create the base schemas to make the views work see :doc:`cli-up
 Refreshing the views
 --------------------
 
-In order to populate the view use :doc:`cli-refresh-views`.
+In order to populate the view use :doc:`cli/refresh-views`.
 
 .. code-block:: shell-session
 

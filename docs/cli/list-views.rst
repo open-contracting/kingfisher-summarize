@@ -1,5 +1,5 @@
-Command line tool - List Views
-==============================
+List Views
+==========
 
 This tool will list all the views, with notes.
 

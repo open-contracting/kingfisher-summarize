@@ -1,5 +1,5 @@
-Command line tool - Delete View
-===============================
+Delete View
+===========
 
 This tool will delete a view.
 
@@ -14,5 +14,3 @@ For example,
     python ocdskingfisher-views-cli delete-view viewname
 
 There is no undo - be careful!
-
-

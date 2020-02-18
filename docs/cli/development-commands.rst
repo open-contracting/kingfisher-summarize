@@ -1,5 +1,5 @@
-Command line tool - Development Commands
-=========================================
+Development Commands
+====================
 
 To generate the table schema CSV files and generate a schema-reference.rst file run:
 

@@ -17,13 +17,13 @@ Add a user
       su postgres
       psql
 
-#. Create the user. Replace ``the-username`` with a recognizable username (for example, the lowercase name of the person to whom you are giving access, like ``janedoe``) and ``the-password`` with a `strong password <https://www.lastpass.com/password-generator>`__, and run:
+#. Create the user. For example, replace ``the-username`` with a recognizable username (for example, the lowercase name of the person to whom you are giving access, like ``janedoe``) and ``the-password`` with a `strong password <https://www.lastpass.com/password-generator>`__, and run:
 
    .. code-block:: sql
 
       CREATE USER the-username WITH PASSWORD 'the-password';
 
-Grant a user read-only access 
+Grant a user read-only access
 -----------------------------
 
 #. Connect to the database used by Kingfisher Views, using the connecting settings you :doc:`configured earlier<config>`. For example, run:
@@ -38,9 +38,9 @@ Grant a user read-only access
 
       INSERT INTO view_meta.read_only_user VALUES ('the-username');
 
-#. Run the :doc:`cli-correct-user-permissions` command to grant the user read-only access to all tables in all schemas created by Kingfisher Views:
+#. Run the :doc:`cli/correct-user-permissions` command to grant the user read-only access to all tables in all schemas created by Kingfisher Views:
 
-   .. code-block: bash
+   .. code-block:: bash
 
       python ocdskingfisher-views-cli correct-user-permissions
 
