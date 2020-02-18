@@ -22,7 +22,7 @@ before_script:
   - psql -c 'create schema view_meta;' travis_ci_test -U postgres
   - python /tmp/kingfisher-process/ocdskingfisher-process-cli upgrade-database
   - python /tmp/kingfisher-process/ocdskingfisher-process-cli new-collection 'new' '2000-01-01 00:00:00'
-  - python /tmp/kingfisher-process/ocdskingfisher-process-cli local-load 1 fixtures release_package
+  - python /tmp/kingfisher-process/ocdskingfisher-process-cli local-load 1 tests/fixtures release_package
   - python ocdskingfisher-views-cli upgrade-database
 script:
   - curl -s -S --retry 3 $BASEDIR/tests/script.sh | bash -
