@@ -9,7 +9,7 @@ class FieldCountsCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
 
     def configure_subparser(self, subparser):
         subparser.add_argument("viewname", help="Name Of View")
-        subparser.add_argument("--remove", help="Aemove field_count table", action='store_true')
+        subparser.add_argument("--remove", help="Remove the field_counts table", action='store_true')
         subparser.add_argument("--threads", help="Amount of threads to use", type=int, default=1)
 
         subparser.add_argument("--logfile", help="Add psql timing to sql output")
