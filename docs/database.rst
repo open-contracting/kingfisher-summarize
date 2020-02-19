@@ -1,12 +1,16 @@
-Database Tables Reference
+Database tables reference
 =========================
 
 Each collection-specific schema contains some or all of the tables below.
 
+Except for the tables in the :ref:`metadata` and :ref:`fields` sections, all tables are created and populated by the :ref:`refresh-views` command (or the :ref:`add-view` command if the ``--dontbuild`` flag isn't set).
+
+.. _metadata:
+
 Metadata
 --------
 
-These tables are created and populated by the :doc:`cli/add-view` command.
+These tables are created and populated by the :ref:`add-view` command.
 
 selected_collections
 ~~~~~~~~~~~~~~~~~~~~
@@ -28,8 +32,14 @@ This table contains the note that the user provided when creating the schema.
    :widths: 10, 10, 40
    :file: definitions/note.csv
 
+.. _fields:
+
 Fields
 ------
+
+These tables are created and populated by the :ref:`field-counts` command (or the :ref:`add-view` command if the ``--dontbuild`` flag isn't set).
+
+.. _field-counts-table:
 
 field_counts
 ~~~~~~~~~~~~
@@ -41,6 +51,8 @@ field_counts
 
 Releases
 --------
+
+These tables are created and populated by ``008-release.sql``.
 
 release_summary
 ~~~~~~~~~~~~~~~
@@ -68,6 +80,8 @@ release_summary_with_checks
 
 Parties
 -------
+
+These tables are created and populated by ``003-buyer-procuringentity-tenderer.sql``.
 
 parties_summary
 ~~~~~~~~~~~~~~~
@@ -104,6 +118,8 @@ tenderers_summary
 Planning section
 ----------------
 
+These tables are created and populated by ``004-planning.sql``.
+
 planning_summary
 ~~~~~~~~~~~~~~~~
 
@@ -130,6 +146,8 @@ planning_milestones_summary
 
 Tender section
 --------------
+
+These tables are created and populated by ``005-tender.sql``.
 
 tender_summary
 ~~~~~~~~~~~~~~
@@ -174,6 +192,8 @@ tender_milestones_summary
 Awards section
 --------------
 
+These tables are created and populated by ``006-awards.sql``.
+
 awards_summary
 ~~~~~~~~~~~~~~
 
@@ -209,6 +229,8 @@ award_documents_summary
 Contracts section
 -----------------
 
+These tables are created and populated by ``007-contracts.sql``.
+
 contracts_summary
 ~~~~~~~~~~~~~~~~~
 
@@ -243,6 +265,8 @@ contract_milestones_summary
 
 Contract implementation section
 -------------------------------
+
+These tables are created and populated by ``007-contracts.sql``.
 
 contract_implementation_transactions_summary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
