@@ -14,9 +14,7 @@ Creates and/or updates Kingfisher Views' configuration tables:
 
    python ocdskingfisher-views-cli upgrade-database
 
-.. note::
-
-   You must run this command whenever you update Kingfisher Views' source code.
+You must run this command whenever you update Kingfisher Views' source code.
 
 The tables are:
 

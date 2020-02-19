@@ -46,9 +46,9 @@ To customize the last part of the schema's name (for example, ``collection_123``
 
 .. code-block:: bash
 
-    python ocdskingfisher-views-cli add-view my_name "My note"
+    python ocdskingfisher-views-cli add-view the_name "The note"
 
-This creates a schema named ``view_data_my_name``.
+This creates a schema named ``view_data_the_name``.
 
 .. _summarize-many-collections:
 
@@ -121,7 +121,7 @@ To list the schemas only, Connect to the database used by Kingfisher Views, usin
 refresh-views
 -------------
 
-.. hint::
+.. note::
 
    You only need to learn this command if you used :ref:`add-view` with ``--dontbuild``.
 
@@ -159,11 +159,15 @@ This is equivalent to running the downgrade SQL files in the `sql directory <htt
 field-counts
 ------------
 
-.. hint::
+.. note::
 
    You only need to learn this command if you used :ref:`add-view` with ``--dontbuild``.
 
 Creates (or re-creates) the :ref:`field_counts table<field-counts-table>`.
+
+.. warning::
+
+   The :ref:`refresh-views` command must be run before this command.
 
 Replace ``NAME`` with the last part of a schema's name (the part after ``view_data_``), and run:
 
@@ -171,19 +175,18 @@ Replace ``NAME`` with the last part of a schema's name (the part after ``view_da
 
    python ocdskingfisher-views-cli field-counts NAME
 
+Improve performance
+~~~~~~~~~~~~~~~~~~~
+
 If you are :ref:`summarizing many collections<summarize-many-collections>`, then you can make this command run faster by setting the ``--threads`` argument. For example, if you are summarizing five collections, you can summarize each collection in a parallel thread:
 
 .. code-block:: bash
 
    python ocdskingfisher-views-cli field-counts NAME --threads 5
 
-.. note::
+There is no advantage to setting the ``--threads`` argument to a number that is greater than the number of collections to summarize.
 
-   There is no advantage to setting the ``--threads`` argument to a number that is greater than the number of collections to summarize.
-
-.. note::
-
-   Every computer has a maximum number of parallel threads. If the ``lscpu`` command is available, you can multiply the numbers for "Socket(s)", "Core(s) per socket" and "Thread(s) per core" to get the maximum number.
+Every computer has a maximum number of parallel threads. If the ``lscpu`` command is available, multiply its numbers for `Socket(s)`, `Core(s) per socket` and `Thread(s) per core` to get the maximum.
 
 Remove field_counts table
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -194,12 +197,18 @@ Set the ``--remove`` flag. For example:
 
    python ocdskingfisher-views-cli field-counts NAME --remove
 
+This is equivalent to:
+
+.. code-block:: sql
+
+  DROP TABLE field_counts;
+
 .. _correct-user-permissions:
 
 correct-user-permissions
 ------------------------
 
-.. hint::
+.. note::
 
    You only need to learn this command if you used :ref:`add-view` with ``--dontbuild``, or if you are :doc:`sharing access<../users>`.
 
@@ -209,9 +218,7 @@ correct-user-permissions
 
    python ocdskingfisher-views-cli correct-user-permissions
 
-.. note::
-
-   You must run this command whenever you create (or re-create) schemas or tables. In other words, run this command after using the :ref:`refresh-views` or :ref:`field-counts` command.
+You must run this command whenever you create (or re-create) schemas or tables. In other words, run this command after using the :ref:`refresh-views` or :ref:`field-counts` command.
 
 The schemas are:
 
