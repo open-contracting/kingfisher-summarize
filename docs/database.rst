@@ -1,5 +1,32 @@
-Database Tables
-===============
+Database Tables Reference
+=========================
+
+Each collection-specific schema contains some or all of the tables below.
+
+Metadata
+--------
+
+These tables are created and populated by the :doc:`cli/add-view` command.
+
+selected_collections
+~~~~~~~~~~~~~~~~~~~~
+
+This table contains the collection IDs that the user provided when creating the schema.
+
+.. csv-table::
+   :header-rows: 1
+   :widths: 10, 10, 40
+   :file: definitions/selected_collections.csv
+
+note
+~~~~
+
+This table contains the note that the user provided when creating the schema.
+
+.. csv-table::
+   :header-rows: 1
+   :widths: 10, 10, 40
+   :file: definitions/note.csv
 
 Fields
 ------

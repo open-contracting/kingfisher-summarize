@@ -1,6 +1,0 @@
-Reference
-=========
-
-.. toctree::
-
-   database

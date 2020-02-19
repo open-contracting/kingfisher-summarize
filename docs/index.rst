@@ -10,4 +10,4 @@ OCDS Kingfisher Views
    views
    users
    cli/index
-   reference/index
+   database
