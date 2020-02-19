@@ -6,9 +6,13 @@ Prerequisites
 
 To use Kingfisher Views, you need:
 
+-  Access to a `Unix-like shell <https://en.wikipedia.org/wiki/Shell_(computing)>`__ (some are available for Windows)
+-  `Git <https://git-scm.com>`__
 -  `Python <https://www.python.org/>`__ 3.6 or greater
 -  `PostgreSQL <https://www.postgresql.org>`__ 10 or greater
 -  `An OCDS Kingfisher Process database <https://kingfisher-process.readthedocs.io/en/latest/requirements-install.html>`__
+
+.. _install:
 
 Install Kingfisher Views
 ------------------------
@@ -17,7 +21,13 @@ Open a shell, and run:
 
 .. code-block:: bash
 
+   git clone https://github.com/open-contracting/kingfisher-views.git
+   cd kingfisher-views
    pip install -r requirements.txt
+
+All instructions in this documentation assume that you have changed to the ``kingfisher-views`` directory (the ``cd`` command above).
+
+.. _configure:
 
 Configure Kingfisher Views
 --------------------------
@@ -60,7 +70,7 @@ If you prefer not to store the password in ``config.ini``, you can use the `Post
 
       export KINGFISHER_VIEWS_DB_URI='postgresql://user:password@localhost:5432/dbname'
 
-The database user must have the `CREATE privilege <https://www.postgresql.org/docs/current/ddl-priv.html>`__ on the database used by Kingfisher Process. For example:
+The database user must have the `CREATE privilege <https://www.postgresql.org/docs/current/ddl-priv.html>`__ on the database used by Kingfisher Process. For example, for the default database connection settings:
 
 .. code-block:: sql
 
@@ -85,12 +95,10 @@ Setup PostgreSQL database
 
 #. Close your PostgreSQL session and your sudo session.
 
-#. :doc:`Create Kingfisher Views' configuration tables<cli/upgrade-database>`:
+#. Create Kingfisher Views' configuration tables using the :ref:`upgrade-database` command:
 
    .. code-block:: bash
 
       python ocdskingfisher-views-cli upgrade-database
 
-.. note::
-
-   The ``views`` schema is only used for the ``alembic_version`` table. The ``view_info`` schema is only used for the ``mapping_sheets`` table. The ``view_meta`` schema is only used for the ``read_only_user`` table.
+You're now ready to :doc:`use Kingfisher Views<cli/use>`.
