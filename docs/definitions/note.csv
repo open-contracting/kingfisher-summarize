@@ -1,4 +1,4 @@
 Column Name,Data Type,Description
-id,integer,"An auto-incrementing integer"
-note,text,"A user-assigned note"
-created_at,timestamp,"The UTC time at which the note was created"
+id,integer,An auto-incrementing integer
+note,text,A user-assigned note
+created_at,timestamp,The UTC time at which the note was created
