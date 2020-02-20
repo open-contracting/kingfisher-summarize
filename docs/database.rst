@@ -1,9 +1,22 @@
 Database tables reference
 =========================
 
-Each collection-specific schema contains some or all of the tables below.
+Introduction
+------------
 
-Except for the tables in the :ref:`metadata` and :ref:`fields` sections, all tables are created and populated by the :ref:`refresh-views` command (or the :ref:`add-view` command if the ``--dontbuild`` flag isn't set).
+How tables are created
+~~~~~~~~~~~~~~~~~~~~~~
+
+The :ref:`add-view` command *without* the ``--dontbuild`` flag creates all the tables below.
+
+Otherwise, the :ref:`add-view` command *with* the ``--dontbuild`` flag creates the :ref:`metadata` tables only, the :ref:`field-counts` command creates the :ref:`fields` tables, and the :ref:`refresh-views` command creates the rest.
+
+How tables are related
+~~~~~~~~~~~~~~~~~~~~~~
+
+All summary tables have an ``id`` column and a ``release_type`` column. This ``id`` column refers to the ``id`` column in the ``release_summary`` table. The ``table_id`` column in the ``release_summary`` table refers the ``id`` column in either Kingfisher Process' ``release``, ``record`` or ``compiled_release`` table; the table is indicated by the ``release_type`` column.
+
+Note that, in the case of Kingfisher Process' ``record`` table, the record's data's ``compiledRelease`` is used in summaries.
 
 .. _metadata:
 
@@ -16,6 +29,8 @@ selected_collections
 ~~~~~~~~~~~~~~~~~~~~
 
 This table contains the collection IDs that the user provided when creating the schema.
+
+If you need to change the collections to be summarized, delete the schema with the :ref:`delete-view` command and re-create it with the :ref:`add-view` command. This ensures that the schema's name reflects its contents. (It is possible to change the collections to be summarized by inserting and/or deleting rows in this table and then re-running the :ref:`refresh-views` and :ref:`field-counts` commands, but this will take the same time and might result in the schema having an incorrect name.)
 
 .. csv-table::
    :header-rows: 1
