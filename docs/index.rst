@@ -3,8 +3,8 @@ OCDS Kingfisher Views
 
 .. include:: ../README.rst
 
-What's a view?
---------------
+What's a "view"?
+----------------
 
 "Views" in *Kingfisher Views*' name and in its :doc:`commands' names<cli/index>` refers to `SQL schemas <https://www.postgresql.org/docs/current/ddl-schemas.html>`__. To avoid confusion with a `SQL view <https://en.wikipedia.org/wiki/View_(SQL)>`__, we use "schemas" instead of "views" in this documentation. A SQL schema is like a set of SQL tables in a common namespace. It is not like a set of constraints, like `XML schema <https://en.wikipedia.org/wiki/XML_schema>`__ or `JSON Schema <https://json-schema.org>`__.
 
@@ -13,7 +13,7 @@ How it works
 
 Kingfisher Views runs SQL statements to create schemas, containing tables and views, which summarize the OCDS data in specified collections from `Kingfisher Process <https://kingfisher-process.readthedocs.io/>`__.
 
-The schemas are created in the database used by Kingfisher Process, and the schemas' names start with ``view…``. (Note that the default ``public`` schema contains the tables created by Kingfisher Process.)
+The schemas are created in the database used by Kingfisher Process, and the schemas' names start with ``view``. (The default ``public`` schema contains the tables created by Kingfisher Process.)
 
 Typical usage
 -------------

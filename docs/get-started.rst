@@ -10,7 +10,7 @@ To use Kingfisher Views, you need:
 -  `Git <https://git-scm.com>`__
 -  `Python <https://www.python.org/>`__ 3.6 or greater
 -  `PostgreSQL <https://www.postgresql.org>`__ 10 or greater
--  `An OCDS Kingfisher Process database <https://kingfisher-process.readthedocs.io/en/latest/requirements-install.html>`__
+-  `A Kingfisher Process database <https://kingfisher-process.readthedocs.io/en/latest/requirements-install.html>`__
 
 .. _install:
 
