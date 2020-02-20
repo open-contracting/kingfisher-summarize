@@ -89,7 +89,7 @@ This is equivalent to:
 list-views
 ----------
 
-Lists the schemas, with notes.
+Lists the schemas, with collection IDs and creator's notes.
 
 .. code-block:: bash
 
@@ -123,7 +123,7 @@ refresh-views
 
 .. note::
 
-   You only need to learn this command if you used :ref:`add-view` with ``--dontbuild``.
+   You only need to learn this command if you used :ref:`add-view` with ``--dontbuild``, or if you're updating a schema after :ref:`upgrading Kingfisher Views<upgrade-app>`.
 
 Creates (or re-creates) the :doc:`summary tables<../database>`.
 
@@ -161,7 +161,7 @@ field-counts
 
 .. note::
 
-   You only need to learn this command if you used :ref:`add-view` with ``--dontbuild``.
+   You only need to learn this command if you used :ref:`add-view` with ``--dontbuild``, or if you're updating a schema after :ref:`upgrading Kingfisher Views<upgrade-app>`.
 
 Creates (or re-creates) the :ref:`field_counts table<field-counts-table>`.
 
@@ -210,7 +210,7 @@ correct-user-permissions
 
 .. note::
 
-   You only need to learn this command if you used :ref:`add-view` with ``--dontbuild``, or if you are :doc:`sharing access<../users>`.
+   You only need to learn this command if you used :ref:`add-view` with ``--dontbuild``, if you're updating a schema after :ref:`upgrading Kingfisher Views<upgrade-app>`, or if you are :doc:`sharing access<../users>`.
 
 `Grants <https://www.postgresql.org/docs/current/ddl-priv.html>`__ the users in the ``view_meta.read_only_user`` table the ``USAGE`` privilege on the schemas and the ``SELECT`` privilege on all existing tables in the schemas:
 
