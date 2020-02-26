@@ -216,7 +216,7 @@ select
     convert_to_timestamp(tender -> 'contractPeriod' ->> 'endDate') AS tender_contractPeriod_endDate,
     convert_to_timestamp(tender -> 'contractPeriod' ->> 'maxExtentDate') AS tender_contractPeriod_maxExtentDate,
     convert_to_numeric(tender -> 'contractPeriod' ->> 'durationInDays') AS tender_contractPeriod_durationInDays,
-    tender ->> 'numberOfTenderers' AS tender_numberOfTenderers,
+    convert_to_numeric(tender ->> 'numberOfTenderers') AS tender_numberOfTenderers,
     jsonb_array_length(case when jsonb_typeof(tender->'tenderers') = 'array' then tender->'tenderers' else '[]'::jsonb end) as tenderers_count,
     documents_count,
     documentType_counts,
