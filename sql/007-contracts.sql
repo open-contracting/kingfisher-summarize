@@ -44,7 +44,7 @@ select
     r.release_id,
     r.data_id,
     item,
-    item -> 'id' as item_id,
+    item ->> 'id' item_id,
     convert_to_numeric(item ->> 'quantity') quantity,
     convert_to_numeric(unit -> 'value' ->> 'amount') unit_amount,
     unit -> 'value' ->> 'currency' unit_currency,
