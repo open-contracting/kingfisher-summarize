@@ -41,8 +41,8 @@ select
     package_data_id,
     coalesce(pd.data ->> 'version', '1.0') AS package_version,
     convert_to_timestamp(d.data -> 'compiledRelease' ->> 'date') release_date,
-    d.data -> 'compliedRelease' -> 'tag' release_tag,
-    d.data -> 'compliedRelease' ->> 'language' release_language
+    d.data -> 'compiledRelease' -> 'tag' release_tag,
+    d.data -> 'compiledRelease' ->> 'language' release_language
 from 
     record AS r
 left join
