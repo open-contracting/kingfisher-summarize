@@ -1,5 +1,5 @@
 Column Name,Data Type,Description
-id,integer,
+id,bigint,
 release_type,text,
 table_id,integer,
 collection_id,integer,
