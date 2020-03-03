@@ -138,7 +138,7 @@ r AS (
     from 
         tmp_release_summary_with_release_data rs
     cross join
-        jsonb_array_elements(data -> 'tender' -> 'tenderers') with ordinality as tenderer 
+        jsonb_array_elements(data -> 'tender' -> 'tenderers') with ordinality
     where
         jsonb_typeof(data -> 'tender' -> 'tenderers') = 'array')
 select

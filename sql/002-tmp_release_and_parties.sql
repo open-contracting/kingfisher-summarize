@@ -128,7 +128,7 @@ select
 from 
     tmp_release_summary_with_release_data AS r
 cross join
-    jsonb_array_elements(data -> 'parties') with ordinality AS parties
+    jsonb_array_elements(data -> 'parties') with ordinality
 where
     jsonb_typeof(data -> 'parties') = 'array';
 

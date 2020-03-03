@@ -70,7 +70,7 @@ from
     from 
         tmp_awards_summary tas
     cross join
-        jsonb_array_elements(award -> 'suppliers') with ordinality as supplier 
+        jsonb_array_elements(award -> 'suppliers') with ordinality
     where
         jsonb_typeof(award -> 'suppliers') = 'array'
     ) AS r
