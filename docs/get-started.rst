@@ -72,9 +72,9 @@ If you prefer not to store the password in ``config.ini``, you can use the `Post
 
 The database user must have the `CREATE privilege <https://www.postgresql.org/docs/current/ddl-priv.html>`__ on the database used by Kingfisher Process. For example, for the default database connection settings:
 
-.. code-block:: sql
+.. code-block:: bash
 
-   GRANT CREATE ON DATABASE ocdskingfisher TO ocdskingfisher;
+   psql ocdskingfisher -U ocdskingfisher -c 'GRANT CREATE ON DATABASE ocdskingfisher TO ocdskingfisher;'
 
 Setup PostgreSQL database
 -------------------------
@@ -93,7 +93,7 @@ Setup PostgreSQL database
       CREATE SCHEMA view_info AUTHORIZATION ocdskingfisher;
       CREATE SCHEMA view_meta AUTHORIZATION ocdskingfisher;
 
-#. Close your PostgreSQL session and your sudo session.
+#. Close your PostgreSQL session and your sudo session, e.g. with ``Ctrl-D`` for both
 
 #. Create Kingfisher Views' configuration tables using the :ref:`upgrade-database` command:
 
