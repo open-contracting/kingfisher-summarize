@@ -46,7 +46,7 @@ To customize the last part of the schema's name (for example, ``collection_123``
 
 .. code-block:: bash
 
-    python ocdskingfisher-views-cli add-view the_name "The note"
+    python ocdskingfisher-views-cli add-view 123 "The note" --name the_name
 
 This creates a schema named ``view_data_the_name``.
 
