@@ -166,5 +166,3 @@ from
 join
     data on data.id = data_id;
 
-select common_comments('parties_summary');
-Comment on column parties_summary.party_index IS 'Unique id representing a release, compiled_release or record';

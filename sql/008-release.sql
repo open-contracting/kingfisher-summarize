@@ -322,8 +322,6 @@ create index release_summary_data_id on release_summary(data_id);
 create index release_summary_package_data_id on release_summary(package_data_id);
 create index release_summary_collection_id on release_summary(collection_id);
 
-select common_comments('release_summary');
-
 
 drop view if exists release_summary_with_data;
 
@@ -352,8 +350,6 @@ join
 left join
     package_data pd on pd.id = rs.package_data_id ;
 
-
-select common_comments('release_summary_with_data');
 
 
 drop view if exists release_summary_with_checks;
@@ -386,8 +382,6 @@ left join
     record_check on record_check.record_id = rs.table_id and record_check.override_schema_version is null and release_type = 'record'
 left join 
     record_check record_check11 on record_check11.record_id = rs.table_id and record_check11.override_schema_version  = '1.1' and release_type = 'record';
-
-select common_comments('release_summary_with_checks');
 
 
 

@@ -66,7 +66,6 @@ create unique index tender_documents_summary_id on tender_documents_summary(id, 
 create index tender_documents_summary_data_id on tender_documents_summary(data_id);
 create index tender_documents_summary_collection_id on tender_documents_summary(collection_id);
 
-select common_comments('tender_documents_summary');
 
 ----
 
@@ -113,7 +112,6 @@ create unique index tender_milestones_summary_id on tender_milestones_summary(id
 create index tender_milestones_summary_data_id on tender_milestones_summary(data_id);
 create index tender_milestones_summary_collection_id on tender_milestones_summary(collection_id);
 
-select common_comments('tender_milestones_summary');
 
 ----
 
@@ -171,7 +169,6 @@ create unique index tender_items_summary_id on tender_items_summary(id, item_ind
 create index tender_items_summary_data_id on tender_items_summary(data_id);
 create index tender_items_summary_collection_id on tender_items_summary(collection_id);
 
-select common_comments('tender_items_summary');
 
 ----
 
@@ -285,7 +282,6 @@ create unique index tender_summary_id on tender_summary(id);
 create index tender_summary_data_id on tender_summary(data_id);
 create index tender_summary_collection_id on tender_summary(collection_id);
 
-select common_comments('tender_summary');
 
 drop view if exists tender_summary_with_data;
 
@@ -299,7 +295,6 @@ from
 join 
     data d on d.id = ts.data_id;
 
-select common_comments('tender_summary_with_data');
 
 drop table if exists tmp_tender_summary;
 
