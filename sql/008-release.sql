@@ -353,6 +353,9 @@ left join
     package_data pd on pd.id = rs.package_data_id ;
 
 
+select common_comments('release_summary_with_data');
+
+
 drop view if exists release_summary_with_checks;
 
 create view release_summary_with_checks
@@ -384,6 +387,7 @@ left join
 left join 
     record_check record_check11 on record_check11.record_id = rs.table_id and record_check11.override_schema_version  = '1.1' and release_type = 'record';
 
+select common_comments('release_summary_with_checks');
 
 
 
