@@ -5,41 +5,41 @@ collection_id,integer,id from kingfisher collection table
 ocid,text,ocid from the data
 release_id,text,Release id from the data. Relevent for releases and not for compiled_releases or records
 data_id,integer,"id for the ""data"" table in kingfisher that holds the original JSON data."
-tender_id,text,
-tender_title,text,
-tender_status,text,
-tender_value_amount,numeric,
-tender_value_currency,text,
-tender_minvalue_amount,numeric,
-tender_minvalue_currency,text,
-tender_procurementmethod,text,
-tender_mainprocurementcategory,text,
-tender_additionalprocurementcategories,jsonb,
-tender_awardcriteria,text,
-tender_submissionmethod,text,
-tender_tenderperiod_startdate,timestamp,
-tender_tenderperiod_enddate,timestamp,
-tender_tenderperiod_maxextentdate,timestamp,
-tender_tenderperiod_durationindays,numeric,
-tender_enquiryperiod_startdate,timestamp,
-tender_enquiryperiod_enddate,timestamp,
-tender_enquiryperiod_maxextentdate,timestamp,
-tender_enquiryperiod_durationindays,numeric,
-tender_hasenquiries,text,
-tender_eligibilitycriteria,text,
-tender_awardperiod_startdate,timestamp,
-tender_awardperiod_enddate,timestamp,
-tender_awardperiod_maxextentdate,timestamp,
-tender_awardperiod_durationindays,numeric,
-tender_contractperiod_startdate,timestamp,
-tender_contractperiod_enddate,timestamp,
-tender_contractperiod_maxextentdate,timestamp,
-tender_contractperiod_durationindays,numeric,
-tender_numberoftenderers,numeric,
-tenderers_count,integer,
-documents_count,bigint,
-documenttype_counts,jsonb,
-milestones_count,bigint,
-milestonetype_counts,jsonb,
-items_count,bigint,
-tender,jsonb,
+tender_id,text,`id` from `tender` object
+tender_title,text,`title` from `tender` object
+tender_status,text,`status` from `tender` object
+tender_value_amount,numeric,`amount` from `value` object
+tender_value_currency,text,`currency` from `value` object
+tender_minvalue_amount,numeric,`amount` from `minValue` object
+tender_minvalue_currency,text,`currency` from `minValue` object
+tender_procurementmethod,jsonb,`procumentMethod` form `tender` object
+tender_mainprocurementcategory,text,`mainProcurementCategory` from tender object
+tender_additionalprocurementcategories,jsonb,`additionalProcurementCategories` from tender object
+tender_awardcriteria,text,`awardCriteria` from tender object
+tender_submissionmethod,text,`submissionMethod` from tender object
+tender_tenderperiod_startdate,timestamp,`startDate` from tenderPeriod object
+tender_tenderperiod_enddate,timestamp,`endDate` from tenderPeriod object
+tender_tenderperiod_maxextentdate,timestamp,`maxExtentDate` from tenderPeriod object
+tender_tenderperiod_durationindays,numeric,`durationInDays` from tenderPeriod object
+tender_enquiryperiod_startdate,timestamp,`startDate` from enquiryPeriod object
+tender_enquiryperiod_enddate,timestamp,`endDate` from enquiryPeriod object
+tender_enquiryperiod_maxextentdate,timestamp,`maxExtentDate` from enquiryPeriod object
+tender_enquiryperiod_durationindays,numeric,`durationInDays` from enquiryPeriod object
+tender_hasenquiries,text,`hasEnquiries` from tender object
+tender_eligibilitycriteria,text,`elegibilitycriteria from tender object
+tender_awardperiod_startdate,timestamp,`startDate` from awardPeriod object
+tender_awardperiod_enddate,timestamp,`endDate` from awardPeriod object
+tender_awardperiod_maxextentdate,timestamp,`maxExtentDate` from awardPeriod object
+tender_awardperiod_durationindays,numeric,`durationInDays` from awardPeriod object
+tender_contractperiod_startdate,timestamp,`startDate` from awardPeriod object
+tender_contractperiod_enddate,timestamp,`endDate` from awardPeriod object
+tender_contractperiod_maxextentdate,timestamp,`maxExtentDate` from awardPeriod object
+tender_contractperiod_durationindays,numeric,`durationInDays` from awardPeriod object
+tender_numberoftenderers,text,`numberOfTenderers` from tender object
+tenderers_count,integer,Count of amount of tenderers
+documents_count,bigint,Count of amount of tender documents
+documenttype_counts,jsonb,JSONB object with the keys as unique documentTypes and the values as count of the appearances of that `documentType` in the `documents` array
+milestones_count,bigint,Count of milestones
+milestonetype_counts,jsonb,JSONB object with the keys as unique milestoneTypes and the values as a count of the appearances of that `milestoneType` in the `milestones` array
+items_count,bigint,Count of items
+tender,jsonb,JSONB of tender object

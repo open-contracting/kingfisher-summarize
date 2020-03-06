@@ -5,10 +5,10 @@ collection_id,integer,id from kingfisher collection table
 ocid,text,ocid from the data
 release_id,text,Release id from the data. Relevent for releases and not for compiled_releases or records
 data_id,integer,"id for the ""data"" table in kingfisher that holds the original JSON data."
-planning_budget_amount,numeric,
-planning_budget_currency,text,
-planning_budget_projectid,text,
-documents_count,bigint,
-documenttype_counts,jsonb,
-milestones_count,bigint,
-milestonetype_counts,jsonb,
+planning_budget_amount,numeric,amount/amount from `budget` object
+planning_budget_currency,text,amount/currency from `budget` object
+planning_budget_projectid,text,`projectID` from `budget object
+documents_count,bigint,Number of documents in documents array
+documenttype_counts,jsonb,JSONB object with the keys as unique documentTypes and the values as count of the appearances of that `documentType` in the `documents` array
+milestones_count,bigint,Count of milestones
+milestonetype_counts,jsonb,JSONB object with the keys as unique milestoneTypes and the values as a count of the appearances of that `milestoneType` in the `milestones` array

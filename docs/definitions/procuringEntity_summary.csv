@@ -5,12 +5,12 @@ collection_id,integer,id from kingfisher collection table
 ocid,text,ocid from the data
 release_id,text,Release id from the data. Relevent for releases and not for compiled_releases or records
 data_id,integer,"id for the ""data"" table in kingfisher that holds the original JSON data."
-procuringentity,jsonb,
-procuringentity_parties_id,text,
-procuringentity_identifier,text,
-unique_identifier_attempt,text,
-procuringentity_additionalidentifiers_ids,jsonb,
-procuringentity_additionalidentifiers_count,integer,
-link_to_parties,integer,
-link_with_role,integer,
-party_index,bigint,
+procuringentity,jsonb,JSONB of procuringEntity object
+procuringentity_parties_id,text,`id` from procuringEntity object
+procuringentity_identifier,text,Concatenation from `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`
+unique_identifier_attempt,text,"The `id` from procuringEntity object if exists, otherwise the identifier described above if exists, otherwise the party name"
+procuringentity_additionalidentifiers_ids,jsonb,JSONB list of the concatonating scheme and id of all additionalidentifier objects
+procuringentity_additionalidentifiers_count,integer,Count of additional identifires
+link_to_parties,integer,"Does this procuringEntity link to a party in the parties array using the `id` field from buyer object linking to the `id` field in a party object If this is true then 1, otherwise 0"
+link_with_role,integer,If there is a link does the parties object have `buyer` it its roles list
+party_index,bigint,If there is a link what is the index of the party in the `parties` array This can be used for joining to the `parties_summary` table
