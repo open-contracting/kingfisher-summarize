@@ -19,6 +19,73 @@ $$
     END;
 $$;
 
+CREATE OR REPLACE FUNCTION common_milestone_comments(
+
+    table_name text)
+    RETURNS text
+    LANGUAGE 'plpgsql'
+AS
+$$
+    DECLARE stmt text;
+    BEGIN
+    stmt :=
+        'Comment on column %%1$s.milestone_index IS ''Position of milestone in milestone array''; '
+        'Comment on column %%1$s.milestone IS ''JSONB of milestone object''; '
+        'Comment on column %%1$s.type IS ''`type` from milestone object''; '
+        'Comment on column %%1$s.code IS ''`code` from milestone object''; '
+        'Comment on column %%1$s.status IS ''`status` from milestone object''; '
+        ;
+        execute format(stmt, table_name);
+        return 'Common milestone comments added';
+    END;
+$$;
+
+CREATE OR REPLACE FUNCTION common_item_comments(
+
+    table_name text)
+    RETURNS text
+    LANGUAGE 'plpgsql'
+AS
+$$
+    DECLARE stmt text;
+    BEGIN
+    stmt :=
+        'Comment on column %%1$s.item_index IS ''Position of the item in the items array''; '
+        'Comment on column %%1$s.item IS ''JSONB of item object''; '
+        'Comment on column %%1$s.item_id IS ''`id` field in item object''; '
+        'Comment on column %%1$s.quantity IS ''`quantity` from the item object''; '
+        'Comment on column %%1$s.unit_amount IS ''`amount` from the unit/value object''; '
+        'Comment on column %%1$s.unit_currency IS ''`currency` from the unit/value object''; '
+        'Comment on column %%1$s.item_classification IS ''Concatenation of classification/schema and classification/id''; '
+        'Comment on column %%1$s.item_additionalidentifiers_ids IS ''JSONB list of the concatenation of additionalClassification/schema and additionalClassification/id''; '
+        'Comment on column %%1$s.additional_classification_count IS ''Count of additional classifications''; '
+        ;
+        execute format(stmt, table_name);
+        return 'Common item comments added';
+    END;
+$$;
+
+CREATE OR REPLACE FUNCTION common_document_comments(
+
+    table_name text)
+    RETURNS text
+    LANGUAGE 'plpgsql'
+AS
+$$
+    DECLARE stmt text;
+    BEGIN
+    stmt :=
+        'Comment on column %%1$s.document_index IS ''Position of the document in the documents array''; '
+        'Comment on column %%1$s.document IS ''JSONB of the document''; '
+        'Comment on column %%1$s.documenttype IS ''`documentType` field from the document object''; '
+        'Comment on column %%1$s.format IS ''`format` field from the document object''; '
+        ;
+        execute format(stmt, table_name);
+        return 'Common document comments added';
+    END;
+$$;
+
+
 select common_comments('parties_summary');
 Comment on column parties_summary.party_index IS 'Position of the party in the parties array';
 Comment on column parties_summary.parties_id IS '`id` in party object';
@@ -64,17 +131,10 @@ Comment on column tenderers_summary.link_with_role IS 'If there is a link does t
 Comment on column tenderers_summary.party_index IS 'If there is a link what is the index of the party in the `parties` array This can be used for joining to the `parties_summary` table';
 
 select common_comments('planning_documents_summary');
-Comment on column planning_documents_summary.document_index IS 'Position of the document in the documents array';
-Comment on column planning_documents_summary.document IS 'JSONB of the document';
-Comment on column planning_documents_summary.documenttype IS '`documentType` field from the document object';
-Comment on column planning_documents_summary.format IS '`format` field from the document object';
+select common_document_comments('planning_documents_summary');
 
 select common_comments('planning_milestones_summary');
-Comment on column planning_milestones_summary.milestone_index IS 'Position of milestone in milestone array';
-Comment on column planning_milestones_summary.milestone IS 'JSONB of milestone object';
-Comment on column planning_milestones_summary.type IS '`type` from milestone object';
-Comment on column planning_milestones_summary.code IS '`code` from milestone object';
-Comment on column planning_milestones_summary.status IS '`status` from milestone object';
+select common_milestone_comments('planning_milestones_summary');
 
 select common_comments('planning_summary');
 Comment on column planning_summary.planning_budget_amount IS 'amount/amount from `budget` object';
@@ -87,28 +147,13 @@ Comment on column planning_summary.milestonetype_counts IS 'JSONB object with th
 
 select common_comments('tender_documents_summary');
 Comment on column tender_documents_summary.document_index IS 'Position of the document in the documents array';
-Comment on column tender_documents_summary.document IS 'JSONB of the document';
-Comment on column tender_documents_summary.documenttype IS '`documentType` field from the document object';
-Comment on column tender_documents_summary.format IS '`format` field from the document object';
-Comment on column tender_documents_summary.document_index IS 'Position of the document in the documents array';
+select common_document_comments('tender_documents_summary');
 
 select common_comments('tender_items_summary');
-Comment on column tender_items_summary.item_index IS 'Position of the item in the items array';
-Comment on column tender_items_summary.item IS 'JSONB of item object';
-Comment on column tender_items_summary.item_id IS '`id` field in item object';
-Comment on column tender_items_summary.quantity IS '`quantity` from the item object';
-Comment on column tender_items_summary.unit_amount IS '`amount` from the unit/value object';
-Comment on column tender_items_summary.unit_currency IS '`currency` from the unit/value object';
-Comment on column tender_items_summary.item_classification IS 'Concatenation of classification/schema and classification/id';
-Comment on column tender_items_summary.item_additionalidentifiers_ids IS 'JSONB list of the concatenation of additionalClassification/schema and additionalClassification/id';
-Comment on column tender_items_summary.additional_classification_count IS 'Count of additional classifications';
+select common_item_comments('tender_items_summary');
 
 select common_comments('tender_milestones_summary');
-Comment on column tender_milestones_summary.milestone_index IS 'Position of milestone in milestone array';
-Comment on column tender_milestones_summary.milestone IS 'JSONB of milestone object';
-Comment on column tender_milestones_summary.type IS '`type` from milestone object';
-Comment on column tender_milestones_summary.code IS '`code` from milestone object';
-Comment on column tender_milestones_summary.status IS '`status` from milestone object';
+select common_milestone_comments('tender_milestones_summary');
 
 DO
 $$
@@ -165,22 +210,11 @@ Comment on column tender_summary_with_data.tender IS 'JSONB of tender object';
 
 select common_comments('award_documents_summary');
 Comment on column award_documents_summary.award_index IS 'Position of the award in the awards array';
-Comment on column award_documents_summary.document_index IS 'Position of the document in the documents array';
-Comment on column award_documents_summary.document IS 'JSONB of the document';
-Comment on column award_documents_summary.documenttype IS '`documentType` field from the document object';
-Comment on column award_documents_summary.format IS '`format` field from the document object';
+select common_document_comments('award_documents_summary');
 
 select common_comments('award_items_summary');
+select common_item_comments('award_items_summary');
 Comment on column award_items_summary.award_index IS 'Position of the award in the awards array';
-Comment on column award_items_summary.item_index IS 'Position of the item in the items array';
-Comment on column award_items_summary.item IS 'JSONB of item object';
-Comment on column award_items_summary.item_id IS '`id` field in item object';
-Comment on column award_items_summary.quantity IS '`quantity` from the item object';
-Comment on column award_items_summary.unit_amount IS '`amount` from the unit/value object';
-Comment on column award_items_summary.unit_currency IS '`currency` from the unit/value object';
-Comment on column award_items_summary.item_classification IS 'Concatenation of classification/schema and classification/id';
-Comment on column award_items_summary.item_additionalidentifiers_ids IS 'JSONB list of the concatenation of additionalClassification/schema and additionalClassification/id';
-Comment on column award_items_summary.additional_classification_count IS 'Count of additional classifications';
 
 select common_comments('award_suppliers_summary');
 Comment on column award_suppliers_summary.award_index IS 'Position of the award in the awards array';
@@ -215,25 +249,15 @@ Comment on column awards_summary.award IS 'JSONB of award object';
 
 select common_comments('contract_documents_summary');
 Comment on column contract_documents_summary.contract_index IS 'Position of contract in contracts array';
-Comment on column contract_documents_summary.document_index IS 'Position of the document in the documents array';
-Comment on column contract_documents_summary.document IS 'JSONB of the document';
-Comment on column contract_documents_summary.documenttype IS '`documentType` field from the document object';
-Comment on column contract_documents_summary.format IS '`format` field from the document object';
+select common_document_comments('contract_documents_summary');
 
 select common_comments('contract_implementation_documents_summary');
 Comment on column contract_implementation_documents_summary.contract_index IS 'Position of contract in contracts array';
-Comment on column contract_implementation_documents_summary.document_index IS 'Position of the document in the documents array';
-Comment on column contract_implementation_documents_summary.document IS 'JSONB of the document';
-Comment on column contract_implementation_documents_summary.documenttype IS '`documentType` field from the document object';
-Comment on column contract_implementation_documents_summary.format IS '`format` field from the document object';
+select common_document_comments('contract_implementation_documents_summary');
 
 select common_comments('contract_implementation_milestones_summary');
+select common_milestone_comments('contract_implementation_milestones_summary');
 Comment on column contract_implementation_milestones_summary.contract_index IS 'Position of contract in contracts array';
-Comment on column contract_implementation_milestones_summary.milestone_index IS 'Position of milestone in milestone array';
-Comment on column contract_implementation_milestones_summary.milestone IS 'JSONB of milestone object';
-Comment on column contract_implementation_milestones_summary.type IS '`type` from milestone object';
-Comment on column contract_implementation_milestones_summary.code IS '`code` from milestone object';
-Comment on column contract_implementation_milestones_summary.status IS '`status` from milestone object';
 
 select common_comments('contract_implementation_transactions_summary');
 Comment on column contract_implementation_transactions_summary.contract_index IS 'Position of contract in contracts array';
@@ -243,23 +267,11 @@ Comment on column contract_implementation_transactions_summary.transaction_curre
 
 select common_comments('contract_items_summary');
 Comment on column contract_items_summary.contract_index IS 'Position of contract in contracts array';
-Comment on column contract_items_summary.item_index IS 'Position of item in items array';
-Comment on column contract_items_summary.item IS 'JSONB of item object';
-Comment on column contract_items_summary.item_id IS '`id` field in item object';
-Comment on column contract_items_summary.quantity IS '`quantity` from the item object';
-Comment on column contract_items_summary.unit_amount IS '`amount` from the unit/value object';
-Comment on column contract_items_summary.unit_currency IS '`currency` from the unit/value object';
-Comment on column contract_items_summary.item_classification IS 'Concatenation of classification/schema and classification/id';
-Comment on column contract_items_summary.item_additionalidentifiers_ids IS 'JSONB list of the concatenation of additionalClassification/schema and additionalClassification/id';
-Comment on column contract_items_summary.additional_classification_count IS 'Count of additional classifications';
+select common_item_comments('contract_items_summary');
 
 select common_comments('contract_milestones_summary');
+select common_milestone_comments('contract_milestones_summary');
 Comment on column contract_milestones_summary.contract_index IS 'Position of contract in contracts array';
-Comment on column contract_milestones_summary.milestone_index IS 'Position of milestone in milestone array';
-Comment on column contract_milestones_summary.milestone IS 'JSONB of milestone object';
-Comment on column contract_milestones_summary.type IS '`type` from milestone object';
-Comment on column contract_milestones_summary.code IS '`code` from milestone object';
-Comment on column contract_milestones_summary.status IS '`status` from milestone object';
 
 select common_comments('contracts_summary');
 Comment on column contracts_summary.contract_index IS 'Position of contract in contracts array';
