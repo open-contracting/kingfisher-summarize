@@ -1,4 +1,5 @@
 import os.path
+import re
 from configparser import NoOptionError, NoSectionError
 from unittest import TestCase
 from unittest.mock import patch
@@ -76,11 +77,14 @@ class NoEnv(TestCase):
         database_uri = get_database_uri()
 
         assert database_uri == 'postgresql://ocdskingfisher:secret@localhost:5432/ocdskingfisher'
+
+        message = r'^Skipping PostgreSQL Password File: Invalid Permissions for ' \
+                  r'tests/fixtures/pgpass-bad-permissions\.txt: 0o6\d4\.\nTry: chmod 600 ' \
+                  r'tests/fixtures/pgpass-bad-permissions\.txt$'
+
         assert len(self.caplog.records) == 1
         assert self.caplog.records[0].levelname == 'WARNING'
-        assert self.caplog.records[0].message == 'Skipping PostgreSQL Password File: Invalid Permissions for tests/' \
-                                                 'fixtures/pgpass-bad-permissions.txt: 0o644.\nTry: chmod 600 tests/' \
-                                                 'fixtures/pgpass-bad-permissions.txt'
+        assert re.search(message, self.caplog.records[0].message)
 
     @patch.dict('os.environ', {'PGPASSFILE': fixture('pgpass-bad-port.txt')})
     def test_pgpass_bad_port(self, ini):
@@ -89,10 +93,12 @@ class NoEnv(TestCase):
         database_uri = get_database_uri()
 
         assert database_uri == 'postgresql://ocdskingfisher:secret@localhost:5432/ocdskingfisher'
+
+        message = 'Skipping PostgreSQL Password File: Error validating port value "invalid"'
+
         assert len(self.caplog.records) == 1
         assert self.caplog.records[0].levelname == 'WARNING'
-        assert self.caplog.records[0].message == 'Skipping PostgreSQL Password File: Error validating port value ' \
-                                                 '"invalid"'
+        assert self.caplog.records[0].message == message
 
     def test_ini_nonexistent(self, ini):
         ini.return_value = 'nonexistent.ini'
