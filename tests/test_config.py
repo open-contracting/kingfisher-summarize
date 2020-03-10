@@ -116,3 +116,27 @@ class NoEnv(TestCase):
 
         with pytest.raises(NoOptionError):
             get_database_uri()
+
+    def test_ini_empty_dbname(self, ini):
+        ini.return_value = fixture('config-empty-dbname.ini')
+
+        database_uri = get_database_uri()
+
+        assert database_uri == 'postgresql://:@:invalid/'
+
+    def test_ini_bad_port(self, ini):
+        ini.return_value = fixture('config-bad-port.ini')
+
+        with pytest.raises(Exception) as excinfo:
+            get_database_uri()
+
+        assert str(excinfo.value) == "invalid literal for int() with base 10: 'invalid'"
+
+    @patch('getpass.getuser')
+    def test_ini_empty_options(self, user, ini):
+        user.return_value = 'morgan'
+        ini.return_value = fixture('config-empty-options.ini')
+
+        database_uri = get_database_uri()
+
+        assert database_uri == 'postgresql://:@:5432/ocdskingfisher'
