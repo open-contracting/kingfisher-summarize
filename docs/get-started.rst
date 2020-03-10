@@ -95,10 +95,10 @@ Setup PostgreSQL database
 
 #. Close your PostgreSQL session and your sudo session, e.g. with ``Ctrl-D`` for both
 
-#. Create Kingfisher Views' configuration tables using the :ref:`upgrade-database` command:
+#. Create Kingfisher Views' configuration tables using the :ref:`alembic-upgrade` command:
 
    .. code-block:: bash
 
-      python ocdskingfisher-views-cli upgrade-database
+      alembic --raiseerr --config ocdskingfisherviews/alembic.ini upgrade head
 
 You're now ready to :doc:`use Kingfisher Views<cli/use>`.

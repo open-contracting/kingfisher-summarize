@@ -1,9 +1,13 @@
 from __future__ import with_statement
 
+import os
+import sys
+
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from ocdskingfisherviews.config import get_database_uri
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))
+from ocdskingfisherviews.config import get_database_uri  # noqa
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

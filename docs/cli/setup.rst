@@ -3,16 +3,16 @@ Setup
 
 These commands are used to setup and upgrade Kingfisher Views.
 
-.. _upgrade-database:
+.. _alembic-upgrade:
 
-upgrade-database
-----------------
+Alembic upgrade
+---------------
 
 Creates and/or updates Kingfisher Views' configuration tables:
 
 .. code-block:: bash
 
-   python ocdskingfisher-views-cli upgrade-database
+   alembic --raiseerr --config ocdskingfisherviews/alembic.ini upgrade head
 
 The tables are:
 
