@@ -12,6 +12,8 @@ def fixture(filename):
     path = os.path.join('tests', 'fixtures', filename)
     if not os.path.isfile(path):
         raise Exception('fixture {} is missing'.format(path))
+    if 'pgpass' in filename and 'permissions' not in filename:
+        os.chmod(path, 0o600)
     return path
 
 
