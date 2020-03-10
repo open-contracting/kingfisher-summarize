@@ -1,13 +1,14 @@
 import configparser
+import logging
 import os
-import sys
 
 import pgpasslib
-
 
 """This holds configuration information for Kingfisher Views.
 Whatever tool is calling it - CLI or other code - should create one of these, set it up as required and pass it around.
 """
+
+logger = logging.getLogger('ocdskingfisherviews')
 
 
 class Config:
@@ -52,13 +53,11 @@ class Config:
         except pgpasslib.FileNotFound:
             # Fail silently when no files found.
             return
-        except pgpasslib.InvalidPermissions:
-            print(
-                "Your pgpass file has the wrong permissions, for your safety this file will be ignored. " +
-                "Please fix the permissions and try again.")
+        except pgpasslib.InvalidPermissions as e:
+            logger.warning('Skipping PostgreSQL Password File: {}.\nTry: chmod 600 {}'.format(e, e.args[0]))
             return
-        except pgpasslib.PgPassException:
-            print("Unexpected error:", sys.exc_info()[0])
+        except pgpasslib.PgPassException as e:
+            logger.warning('Skipping PostgreSQL Password File: {}'.format(e))
             return
 
     def _load_user_config_env(self):
