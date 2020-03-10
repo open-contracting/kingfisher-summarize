@@ -34,6 +34,7 @@ def get_database_uri():
         port = config.getint('DBHOST', 'PORT', fallback=5432)
     except ValueError as e:
         raise Exception('PORT is invalid in {}. ({})'.format(userpath, e))
+    # We don't use the default database name (that matches the user name) as this is rarely what the user intends.
     dbname = config.get('DBHOST', 'DBNAME')
 
     # Instead of setting the database URI to "postgresql://:@:5432/dbname" (which implicitly uses the default
