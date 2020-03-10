@@ -3,14 +3,14 @@ Develop
 
 These commands are used to author Kingfisher Views.
 
-make-migration
+Make migration
 --------------
 
 Creates a generic `Alembic <https://alembic.sqlalchemy.org/>`__ migration file in the `ocdskingfisherviews/migrations/versions/ <https://github.com/open-contracting/kingfisher-views/tree/master/ocdskingfisherviews/migrations/versions>`__ directory. Replace ``MESSAGE`` with a brief description of what the migration does, and run:
 
 .. code-block:: bash
 
-   python ocdskingfisher-views-cli make-migration 'MESSAGE'
+   alembic --raiseerr --config ocdskingfisherviews/alembic.ini revision -m 'MESSAGE'
 
 docs-table-ref
 --------------
@@ -23,13 +23,13 @@ docs-table-ref
 
 Then, for any new CSV file, manually add a new sub-section to ``docs/database.rst`` under an appropriate section.
 
-reset-database
+Reset database
 --------------
 
 Removes Kingfisher Views' configuration tables:
 
 .. code-block:: bash
 
-   python ocdskingfisher-views-cli reset-database
+   alembic --raiseerr --config ocdskingfisherviews/alembic.ini downgrade base
 
 See :ref:`refresh-views` and :ref:`field-counts` to remove collection-specific schemas.
