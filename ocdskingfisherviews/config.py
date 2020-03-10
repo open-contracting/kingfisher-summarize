@@ -5,7 +5,6 @@ import os
 
 import pgpasslib
 
-
 logger = logging.getLogger('ocdskingfisherviews')
 
 

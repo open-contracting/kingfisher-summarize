@@ -7,8 +7,8 @@ Create Date: 2019-12-12 12:38:06.730478
 """
 
 import os
-from alembic import op
 
+from alembic import op
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 sql_dir = os.path.join(dir_path, '../../../sql/')
