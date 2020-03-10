@@ -13,5 +13,5 @@ class CorrectUserPermissionsCLICommand(ocdskingfisherviews.cli.commands.base.CLI
 
     def run_command(self, args):
 
-        engine = sa.create_engine(self.config.database_uri)
+        engine = sa.create_engine(self.database_uri)
         correct_user_permissions(engine)

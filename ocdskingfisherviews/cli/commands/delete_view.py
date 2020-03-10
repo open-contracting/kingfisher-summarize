@@ -13,7 +13,7 @@ class DeleteViewCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
 
     def run_command(self, args):
 
-        engine = sa.create_engine(self.config.database_uri)
+        engine = sa.create_engine(self.database_uri)
 
         logger.info("Deleting View " + args.name)
         with engine.begin() as connection:

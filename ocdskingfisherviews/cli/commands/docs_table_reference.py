@@ -49,7 +49,7 @@ class DocsTableRefCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
 
         all_tables.append('field_counts')
 
-        engine = sa.create_engine(self.config.database_uri)
+        engine = sa.create_engine(self.database_uri)
 
         headers = {
             'column_name': 'Column Name',

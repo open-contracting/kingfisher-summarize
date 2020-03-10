@@ -3,16 +3,13 @@ from __future__ import with_statement
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from ocdskingfisherviews.config import Config
+from ocdskingfisherviews.config import get_database_uri
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-kingfisher_config = Config()
-kingfisher_config.load_user_config()
-
-config.set_main_option("sqlalchemy.url", kingfisher_config.database_uri)
+config.set_main_option("sqlalchemy.url", get_database_uri())
 
 # add your model's MetaData object here
 # for 'autogenerate' support

@@ -12,7 +12,7 @@ class ListViewCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
 
     def run_command(self, args):
 
-        engine = sa.create_engine(self.config.database_uri)
+        engine = sa.create_engine(self.database_uri)
 
         # Get list of views
         schemas = []

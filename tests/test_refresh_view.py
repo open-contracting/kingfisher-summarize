@@ -9,10 +9,7 @@ from ocdskingfisherviews.cli import run_command
 
 @pytest.fixture(scope='module')
 def engine():
-    config = ocdskingfisherviews.config.Config()
-    config.load_user_config()
-    engine = sa.create_engine(config.database_uri)
-    return engine
+    return sa.create_engine(ocdskingfisherviews.config.get_database_uri())
 
 
 VIEWS_TABLES = {

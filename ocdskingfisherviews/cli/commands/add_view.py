@@ -15,7 +15,7 @@ class AddViewCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
 
     def run_command(self, args):
 
-        engine = sa.create_engine(self.config.database_uri)
+        engine = sa.create_engine(self.database_uri)
 
         collections = []
         for collection_id in args.collections.split(','):

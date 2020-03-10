@@ -3,12 +3,14 @@ import os.path
 import logzero
 from logzero import logger
 
+from ocdskingfisherviews.config import get_database_uri
+
 
 class CLICommand:
     command = ''
 
-    def __init__(self, config=None):
-        self.config = config
+    def __init__(self):
+        self.database_uri = get_database_uri()
 
     def configure_subparser(self, subparser):
         pass

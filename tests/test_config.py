@@ -5,13 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from ocdskingfisherviews.config import Config
-
-
-def get_database_uri():
-    config = Config()
-    config.load_user_config()
-    return config.database_uri
+from ocdskingfisherviews.config import get_database_uri
 
 
 def fixture(filename):
@@ -101,9 +95,12 @@ class NoEnv(TestCase):
     def test_ini_nonexistent(self, ini):
         ini.return_value = 'nonexistent.ini'
 
-        database_uri = get_database_uri()
+        with pytest.raises(Exception) as excinfo:
+            get_database_uri()
 
-        assert database_uri == ''
+        assert str(excinfo.value) == 'You must either set the KINGFISHER_VIEWS_DB_URI environment variable or ' \
+                                     'create the ~/.config/ocdskingfisher-views/config.ini file.\nSee https://' \
+                                     'kingfisher-views.readthedocs.io/en/latest/get-started.html'
 
     def test_ini_empty_file(self, ini):
         ini.return_value = fixture('config-empty-file.ini')
@@ -120,9 +117,10 @@ class NoEnv(TestCase):
     def test_ini_empty_dbname(self, ini):
         ini.return_value = fixture('config-empty-dbname.ini')
 
-        database_uri = get_database_uri()
+        with pytest.raises(Exception) as excinfo:
+            get_database_uri()
 
-        assert database_uri == 'postgresql://:@:invalid/'
+        assert str(excinfo.value) == 'You must set DBNAME in ~/.config/ocdskingfisher-views/config.ini.'
 
     def test_ini_bad_port(self, ini):
         ini.return_value = fixture('config-bad-port.ini')
@@ -130,7 +128,8 @@ class NoEnv(TestCase):
         with pytest.raises(Exception) as excinfo:
             get_database_uri()
 
-        assert str(excinfo.value) == "invalid literal for int() with base 10: 'invalid'"
+        assert str(excinfo.value) == 'PORT is invalid in ~/.config/ocdskingfisher-views/config.ini. ' \
+                                     "(invalid literal for int() with base 10: 'invalid')"
 
     @patch('getpass.getuser')
     def test_ini_empty_options(self, user, ini):
@@ -139,4 +138,4 @@ class NoEnv(TestCase):
 
         database_uri = get_database_uri()
 
-        assert database_uri == 'postgresql://:@:5432/ocdskingfisher'
+        assert database_uri == 'postgresql://morgan:@localhost:5432/ocdskingfisher'

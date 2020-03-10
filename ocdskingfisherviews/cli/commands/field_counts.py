@@ -16,7 +16,7 @@ class FieldCountsCommand(ocdskingfisherviews.cli.commands.base.CLICommand):
 
     def run_logged_command(self, args):
 
-        engine = sa.create_engine(self.config.database_uri)
+        engine = sa.create_engine(self.database_uri)
 
         field_counts = FieldCounts(engine=engine)
         field_counts.run(args.viewname, remove=args.remove, threads=args.threads)

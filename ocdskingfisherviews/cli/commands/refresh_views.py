@@ -20,7 +20,7 @@ class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
 
     def run_logged_command(self, args):
 
-        engine = sa.create_engine(self.config.database_uri)
+        engine = sa.create_engine(self.database_uri)
 
         refresh_views(engine,
                       args.viewname,

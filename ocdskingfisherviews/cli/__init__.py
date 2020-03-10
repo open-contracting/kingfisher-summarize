@@ -2,18 +2,14 @@
 import argparse
 
 import ocdskingfisherviews.cli.util
-import ocdskingfisherviews.config
 
 
 def run_command(input_args=None):
-    config = ocdskingfisherviews.config.Config()
-    config.load_user_config()
-
     parser = argparse.ArgumentParser()
 
     subparsers = parser.add_subparsers(dest='subcommand')
 
-    commands = ocdskingfisherviews.cli.util.gather_cli_commands_instances(config=config)
+    commands = ocdskingfisherviews.cli.util.gather_cli_commands_instances()
 
     for command in commands.values():
         command.configure_subparser(subparsers.add_parser(command.command))
