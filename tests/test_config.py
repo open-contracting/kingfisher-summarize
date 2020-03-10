@@ -1,4 +1,5 @@
 import os.path
+from configparser import NoOptionError, NoSectionError
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -96,3 +97,22 @@ class NoEnv(TestCase):
         assert self.caplog.records[0].levelname == 'WARNING'
         assert self.caplog.records[0].message == 'Skipping PostgreSQL Password File: Error validating port value ' \
                                                  '"invalid"'
+
+    def test_ini_nonexistent(self, ini):
+        ini.return_value = 'nonexistent.ini'
+
+        database_uri = get_database_uri()
+
+        assert database_uri == ''
+
+    def test_ini_empty_file(self, ini):
+        ini.return_value = fixture('config-empty-file.ini')
+
+        with pytest.raises(NoSectionError):
+            get_database_uri()
+
+    def test_ini_empty_section(self, ini):
+        ini.return_value = fixture('config-empty-section.ini')
+
+        with pytest.raises(NoOptionError):
+            get_database_uri()
