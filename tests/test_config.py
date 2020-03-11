@@ -20,12 +20,13 @@ def fixture(filename):
 
 @patch.dict('os.environ', {'KINGFISHER_VIEWS_DB_URI': 'postgresql:///test', 'PGPASSFILE': fixture('pgpass.txt')})
 @patch('os.path.expanduser')
-def test_env(ini):
+def test_env(ini, caplog):
     ini.return_value = fixture('config.ini')
 
     database_uri = get_database_uri()
 
     assert database_uri == 'postgresql:///test'
+    assert len(caplog.records) == 0
 
 
 @patch.dict('os.environ', {'KINGFISHER_VIEWS_DB_URI': ''})
