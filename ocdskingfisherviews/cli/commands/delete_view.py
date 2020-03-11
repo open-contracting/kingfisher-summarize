@@ -17,6 +17,5 @@ class DeleteViewCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
 
         logger.info("Deleting View " + args.name)
         with engine.begin() as connection:
-            # Technically this is SQL injection opportunity,
-            # but as operators have access to the DB anyway we don't care.
-            connection.execute('DROP SCHEMA view_data_' + args.name + ' CASCADE;')
+            schema_name = engine.dialect.identifier_preparer.quote_schema('view_data_' + args.name)
+            connection.execute('DROP SCHEMA {} CASCADE;'.format(schema_name))

@@ -17,10 +17,9 @@ def add_view(engine, collections, name=None, note=None, dontbuild=False):
 
     logger.info("Creating View " + name)
     with engine.begin() as connection:
-        # Technically this is SQL injection opportunity,
-        # but as operators have access to the DB anyway we don't care.
-        connection.execute('CREATE SCHEMA view_data_' + name + ';')
-        connection.execute('SET search_path = view_data_' + name + ';')
+        schema_name = engine.dialect.identifier_preparer.quote_schema('view_data_' + name)
+        connection.execute('CREATE SCHEMA {};'.format(schema_name))
+        connection.execute('SET search_path = {};'.format(schema_name))
         # This could have a foreign key but as extra_collections doesn't, we won't for now.
         connection.execute('CREATE TABLE selected_collections(id INTEGER PRIMARY KEY);')
 

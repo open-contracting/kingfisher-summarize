@@ -43,10 +43,8 @@ class FieldCounts():
             logger.info('running time for collection {}: {}s'.format(collection, timer() - start))
 
     def run(self, viewname, remove=False, threads=1):
-
-        # Technically this is SQL injection opportunity,
-        # but as operators have access to the DB anyway we don't care.
-        self.search_path_string = 'set search_path = view_data_'+viewname+', public;'
+        schema_name = self.engine.dialect.identifier_preparer.quote_schema('view_data_' + viewname)
+        self.search_path_string = 'SET search_path = {}, public;'.format(schema_name)
 
         overall_start = timer()
 
