@@ -347,7 +347,7 @@ join
     data d on d.id = rs.data_id
 join 
     collection c on c.id = rs.collection_id 
-left join 
+join
     package_data pd on pd.id = rs.package_data_id;
 
 
