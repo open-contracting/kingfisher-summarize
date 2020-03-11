@@ -40,7 +40,7 @@ def refresh_views(engine, viewname, remove=False):
 
         for statement_part in statement_parts:
             with engine.begin() as connection:
-                schema_name = engine.dialect.identifier_preparer.quote_schema('view_data_' + viewname)
+                schema_name = engine.dialect.identifier_preparer.quote('view_data_' + viewname)
                 connection.execute('SET search_path = {}, public;'.format(schema_name))
                 connection.execute(statement_part, tuple())
 

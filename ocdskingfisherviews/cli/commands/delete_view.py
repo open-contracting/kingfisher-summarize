@@ -17,5 +17,5 @@ class DeleteViewCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
 
         logger.info("Deleting View " + args.name)
         with engine.begin() as connection:
-            schema_name = engine.dialect.identifier_preparer.quote_schema('view_data_' + args.name)
+            schema_name = engine.dialect.identifier_preparer.quote('view_data_' + args.name)
             connection.execute('DROP SCHEMA {} CASCADE;'.format(schema_name))
