@@ -133,11 +133,11 @@ Replace ``NAME`` with the last part of a schema's name (the part after ``view_da
 
    python ocdskingfisher-views-cli refresh-views NAME
 
-This is equivalent to running the non-downgrade SQL files in the `sql directory <https://github.com/open-contracting/kingfisher-views/tree/master/sql>`__ in numeric order. For example, using the :ref:`default database connection settings<database-connection-settings>`:
+This is equivalent to running the non-downgrade SQL files in the `sql directory <https://github.com/open-contracting/kingfisher-views/tree/master/sql>`__ in numeric order. For example, using the :ref:`default database connection settings<database-connection-settings>`, for the ``view_data_the_name`` schema:
 
 .. code-block:: bash
 
-   find sql -type f -not -name '*_downgrade.sql' -print0 | sort -nz | xargs -0 -I{} psql ocdskingfisher -U ocdskingfisher -f '{}'
+   find sql -type f -not -name '*_downgrade.sql' -print0 | sort -nz | xargs -0 -I{} psql 'dbname=ocdskingfisher options=--search-path=view_data_the_name' -U ocdskingfisher -f '{}'
 
 Remove summary tables
 ~~~~~~~~~~~~~~~~~~~~~
@@ -148,11 +148,11 @@ Set the ``--remove`` flag. For example:
 
    python ocdskingfisher-views-cli refresh-views NAME --remove
 
-This is equivalent to running the downgrade SQL files in the `sql directory <https://github.com/open-contracting/kingfisher-views/tree/master/sql>`__ in reverse numeric order. For example, using the :ref:`default database connection settings<database-connection-settings>`:
+This is equivalent to running the downgrade SQL files in the `sql directory <https://github.com/open-contracting/kingfisher-views/tree/master/sql>`__ in reverse numeric order. For example, using the :ref:`default database connection settings<database-connection-settings>`, for the ``view_data_the_name`` schema:
 
 .. code-block:: bash
 
-   find sql -type f -name '*_downgrade.sql' -print0 | sort -nrz | xargs -0 -I{} psql ocdskingfisher -U ocdskingfisher -f '{}'
+   find sql -type f -name '*_downgrade.sql' -print0 | sort -nrz | xargs -0 -I{} psql 'dbname=ocdskingfisher options=--search-path=view_data_the_name' -U ocdskingfisher -f '{}'
 
 .. _field-counts:
 

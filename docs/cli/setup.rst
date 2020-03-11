@@ -28,6 +28,6 @@ The tables are:
 Upgrade Kingfisher Views
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-You must run this command whenever you update Kingfisher Views' source code.
+You must run the above command whenever you update Kingfisher Views' source code.
 
 If the new version of Kingfisher Views makes changes to SQL statements, you might want to re-create the collection-specific schemas. For each schema, run the :ref:`refresh-views`, :ref:`field-counts` and :ref:`correct-user-permissions` commands, in that order.
