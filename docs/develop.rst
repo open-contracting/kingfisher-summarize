@@ -25,6 +25,15 @@ Note that (for brevity, SQL files are referred by their numeric prefix):
 
 In other words, to work on a file, you should first run the :ref:`refresh-views` command and then run the ``002`` file. You can then run the file you're working on as often as you want, without repeating the previous steps.
 
+Time SQL statements
+~~~~~~~~~~~~~~~~~~~
+
+Add ``-c '\timing'`` to a ``psql`` command, before any ``-f`` options. For example, for the command above:
+
+.. code-block:: bash
+
+   psql 'dbname=ocdskingfisher options=--search-path=view_data_the_name' -U ocdskingfisher -c '\timing' -f 004-planning.sql
+
 Documentation
 -------------
 

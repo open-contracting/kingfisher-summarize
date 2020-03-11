@@ -6,7 +6,7 @@ from timeit import default_timer as timer
 from logzero import logger
 
 
-def refresh_views(engine, viewname, remove=False, sql_timing=False):
+def refresh_views(engine, viewname, remove=False):
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
     sql_scripts_path = os.path.join(dir_path, '../sql')
