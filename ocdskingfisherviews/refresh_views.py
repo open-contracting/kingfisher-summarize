@@ -21,7 +21,6 @@ def refresh_views(engine, viewname, remove=False, sql=False, sql_timing=False):
 
     for script_path in all_scripts:
         script_name = script_path.split('/')[-1].split('.')[0]
-        script_number = int(script_name[:3])
 
         with open(script_path) as script_file:
             script = script_file.read()
