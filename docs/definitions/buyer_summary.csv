@@ -10,7 +10,7 @@ buyer_parties_id,text,`id` from buyer object
 buyer_identifier,text,Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`
 unique_identifier_attempt,text,"The `id` from buyer object if it exists, otherwise the identifier described above if it exists, otherwise the party name"
 buyer_additionalidentifiers_ids,jsonb,JSONB list of the concatenating scheme and id of all additionalidentifier objects
-buyer_additionalidentifiers_count,integer,Count of additional identifires
+buyer_additionalidentifiers_count,integer,Count of additional identifiers
 link_to_parties,integer,"Does this buyer link to a party in the parties array using the `id` field from buyer object linking to the `id` field in a party object? If this is true then 1, otherwise 0"
 link_with_role,integer,If there is a link does the parties object have `buyer` in its roles list? If it does then 1 otherwise 0
 party_index,bigint,If there is a link what is the index of the party in the `parties` array then this can be used for joining to the `parties_summary` table

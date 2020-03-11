@@ -10,7 +10,7 @@ tenderer,jsonb,JSONB of tenderer object
 tenderer_parties_id,text,`id` from tenderer object
 tenderer_identifier,text,Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`
 unique_identifier_attempt,text,"The `id` from tenderer object if it /xists, otherwise the identifier described above if it exists, otherwise the party name"
-tenderer_additionalidentifiers_ids,jsonb,JSONB list of concatonating the scheme and id of all additionalidentifier objects
+tenderer_additionalidentifiers_ids,jsonb,JSONB list of concatenating the scheme and id of all additionalidentifier objects
 tenderer_additionalidentifiers_count,integer,Count of additional identifiers
 link_to_parties,integer,"Does this tenderer link to a party in the parties array using the `id` field from buyer object linking to the `id` field in a party object? If this is true then 1, otherwise 0"
 link_with_role,integer,If there is a link does the parties object have `tenderers` in its roles list? If it does then 1 otherwise 0

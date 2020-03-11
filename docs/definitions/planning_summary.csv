@@ -7,7 +7,7 @@ release_id,text,Release id from the data. Relevant for releases and not for comp
 data_id,integer,"id for the ""data"" table in kingfisher that holds the original JSON data."
 planning_budget_amount,numeric,amount/amount from `budget` object
 planning_budget_currency,text,amount/currency from `budget` object
-planning_budget_projectid,text,`projectID` from `budget object
+planning_budget_projectid,text,`projectID` from `budget` object
 documents_count,bigint,Number of documents in documents array
 documenttype_counts,jsonb,JSONB object with the keys as unique documentTypes and the values as count of the appearances of that `documentType` in the `documents` array
 milestones_count,bigint,Count of milestones

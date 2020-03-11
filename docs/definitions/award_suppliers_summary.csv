@@ -8,7 +8,7 @@ ocid,text,ocid from the data
 release_id,text,Release id from the data. Relevant for releases and not for compiled_releases or records
 data_id,integer,"id for the ""data"" table in kingfisher that holds the original JSON data."
 supplier,jsonb,JSONB of supplier object
-supplier_parties_id,text,`id` from the supplier object
+supplier_parties_id,text,`id` from supplier object
 supplier_identifier,text,Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`
 unique_identifier_attempt,text,"The `id` from party object if it exists, otherwise the identifier described above if it exists, otherwise the party name"
 supplier_additionalidentifiers_ids,jsonb,JSONB list of the concatenating scheme and id of all additionalidentifier objects

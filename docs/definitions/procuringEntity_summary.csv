@@ -9,8 +9,8 @@ procuringentity,jsonb,JSONB of procuringEntity object
 procuringentity_parties_id,text,`id` from procuringEntity object
 procuringentity_identifier,text,Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`
 unique_identifier_attempt,text,"The `id` from procuringEntity object if it exists, otherwise the identifier described above if it exists, otherwise the party name"
-procuringentity_additionalidentifiers_ids,jsonb,JSONB list of concatonating the scheme and id of all additionalidentifier objects
-procuringentity_additionalidentifiers_count,integer,Count of additional identifires
+procuringentity_additionalidentifiers_ids,jsonb,JSONB list of concatenating the scheme and id of all additionalidentifier objects
+procuringentity_additionalidentifiers_count,integer,Count of additional identifiers
 link_to_parties,integer,"Does this procuringEntity link to a party in the parties array using the `id` field from buyer object linking to the `id` field in a party object? If this is true then 1, otherwise 0"
 link_with_role,integer,If there is a link does the parties object have `procuringEntity` in its roles list? If it does then 1 otherwise 0
 party_index,bigint,If there is a link what is the index of the party in the `parties` array then this can be used for joining to the `parties_summary` table

@@ -102,7 +102,7 @@ Comment on column buyer_summary.buyer_parties_id IS '`id` from buyer object';
 Comment on column buyer_summary.buyer_identifier IS 'Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`';
 Comment on column buyer_summary.unique_identifier_attempt IS 'The `id` from buyer object if it exists, otherwise the identifier described above if it exists, otherwise the party name';
 Comment on column buyer_summary.buyer_additionalidentifiers_ids IS 'JSONB list of the concatenating scheme and id of all additionalidentifier objects';
-Comment on column buyer_summary.buyer_additionalidentifiers_count IS 'Count of additional identifires';
+Comment on column buyer_summary.buyer_additionalidentifiers_count IS 'Count of additional identifiers';
 Comment on column buyer_summary.link_to_parties IS 'Does this buyer link to a party in the parties array using the `id` field from buyer object linking to the `id` field in a party object? If this is true then 1, otherwise 0';
 Comment on column buyer_summary.link_with_role IS 'If there is a link does the parties object have `buyer` in its roles list? If it does then 1 otherwise 0';
 Comment on column buyer_summary.party_index IS 'If there is a link what is the index of the party in the `parties` array then this can be used for joining to the `parties_summary` table';
@@ -112,8 +112,8 @@ Comment on column procuringentity_summary.procuringentity IS 'JSONB of procuring
 Comment on column procuringentity_summary.procuringentity_parties_id IS '`id` from procuringEntity object';
 Comment on column procuringentity_summary.procuringentity_identifier IS 'Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`';
 Comment on column procuringentity_summary.unique_identifier_attempt IS 'The `id` from procuringEntity object if it exists, otherwise the identifier described above if it exists, otherwise the party name';
-Comment on column procuringentity_summary.procuringentity_additionalidentifiers_ids IS 'JSONB list of concatonating the scheme and id of all additionalidentifier objects';
-Comment on column procuringentity_summary.procuringentity_additionalidentifiers_count IS 'Count of additional identifires';
+Comment on column procuringentity_summary.procuringentity_additionalidentifiers_ids IS 'JSONB list of concatenating the scheme and id of all additionalidentifier objects';
+Comment on column procuringentity_summary.procuringentity_additionalidentifiers_count IS 'Count of additional identifiers';
 Comment on column procuringentity_summary.link_to_parties IS 'Does this procuringEntity link to a party in the parties array using the `id` field from buyer object linking to the `id` field in a party object? If this is true then 1, otherwise 0';
 Comment on column procuringentity_summary.link_with_role IS 'If there is a link does the parties object have `procuringEntity` in its roles list? If it does then 1 otherwise 0';
 Comment on column procuringentity_summary.party_index IS 'If there is a link what is the index of the party in the `parties` array then this can be used for joining to the `parties_summary` table';
@@ -124,7 +124,7 @@ Comment on column tenderers_summary.tenderer IS 'JSONB of tenderer object';
 Comment on column tenderers_summary.tenderer_parties_id IS '`id` from tenderer object';
 Comment on column tenderers_summary.tenderer_identifier IS 'Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`';
 Comment on column tenderers_summary.unique_identifier_attempt IS 'The `id` from tenderer object if it /xists, otherwise the identifier described above if it exists, otherwise the party name';
-Comment on column tenderers_summary.tenderer_additionalidentifiers_ids IS 'JSONB list of concatonating the scheme and id of all additionalidentifier objects';
+Comment on column tenderers_summary.tenderer_additionalidentifiers_ids IS 'JSONB list of concatenating the scheme and id of all additionalidentifier objects';
 Comment on column tenderers_summary.tenderer_additionalidentifiers_count IS 'Count of additional identifiers';
 Comment on column tenderers_summary.link_to_parties IS 'Does this tenderer link to a party in the parties array using the `id` field from buyer object linking to the `id` field in a party object? If this is true then 1, otherwise 0';
 Comment on column tenderers_summary.link_with_role IS 'If there is a link does the parties object have `tenderers` in its roles list? If it does then 1 otherwise 0';
@@ -139,7 +139,7 @@ select common_milestone_comments('planning_milestones_summary');
 select common_comments('planning_summary');
 Comment on column planning_summary.planning_budget_amount IS 'amount/amount from `budget` object';
 Comment on column planning_summary.planning_budget_currency IS 'amount/currency from `budget` object';
-Comment on column planning_summary.planning_budget_projectid IS '`projectID` from `budget object';
+Comment on column planning_summary.planning_budget_projectid IS '`projectID` from `budget` object';
 Comment on column planning_summary.documents_count IS 'Number of documents in documents array';
 Comment on column planning_summary.documenttype_counts IS 'JSONB object with the keys as unique documentTypes and the values as count of the appearances of that `documentType` in the `documents` array';
 Comment on column planning_summary.milestones_count IS 'Count of milestones';
@@ -220,7 +220,7 @@ select common_comments('award_suppliers_summary');
 Comment on column award_suppliers_summary.award_index IS 'Position of the award in the awards array';
 Comment on column award_suppliers_summary.supplier_index IS 'Position of the supplier in the supplier array';
 Comment on column award_suppliers_summary.supplier IS 'JSONB of supplier object';
-Comment on column award_suppliers_summary.supplier_parties_id IS '`id` from the supplier object';
+Comment on column award_suppliers_summary.supplier_parties_id IS '`id` from supplier object';
 Comment on column award_suppliers_summary.supplier_identifier IS 'Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`';
 Comment on column award_suppliers_summary.unique_identifier_attempt IS 'The `id` from party object if it exists, otherwise the identifier described above if it exists, otherwise the party name';
 Comment on column award_suppliers_summary.supplier_additionalidentifiers_ids IS 'JSONB list of the concatenating scheme and id of all additionalidentifier objects';
@@ -305,7 +305,7 @@ DECLARE stmt text;
 
 BEGIN
     stmt :=
-    'Comment on column %%1$s.table_id IS ''`id` from the either release, compiled_release or release tables in kingfisher process where this row was generated from''; '
+    'Comment on column %%1$s.table_id IS ''`id` from either release, compiled_release or release tables in kingfisher process where this row was generated from''; '
     'Comment on column %%1$s.package_data_id IS ''`id` from package_data table''; '
     'Comment on column %%1$s.package_version IS ''OCDS version gathered from the `version` field in package''; '
     'Comment on column %%1$s.release_date IS ''`date` field from release''; '
@@ -324,7 +324,7 @@ BEGIN
     'Comment on column %%1$s.unique_award_suppliers IS ''A count of distinct suppliers for all awards for this release, based on the `unique_identifier_attempt` field''; '
     'Comment on column %%1$s.award_documenttype_counts IS ''JSONB object with the keys as unique awards/documents/documentType and the values as count of the appearances of those documentTypes''; '
     'Comment on column %%1$s.contract_count IS ''Count of contracts''; '
-    'Comment on column %%1$s.total_contract_link_to_awards IS ''Position of the party in the the parties array''; '
+    'Comment on column %%1$s.total_contract_link_to_awards IS ''Count of all contracts that have link to awards through awardID field''; '
     'Comment on column %%1$s.contract_amount IS ''Total of all value/amount across contracts NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway''; '
     'Comment on column %%1$s.first_contract_datesigned IS ''First `dateSigned` across all contracts''; '
     'Comment on column %%1$s.last_contract_datesigned IS ''Last `dateSigned` across all contracts''; '
