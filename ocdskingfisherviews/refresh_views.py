@@ -40,9 +40,8 @@ def refresh_views(engine, viewname, remove=False):
 
         for statement_part in statement_parts:
             with engine.begin() as connection:
-                # Technically this is SQL injection opportunity,
-                # but as operators have access to the DB anyway we don't care.
-                connection.execute('set search_path = view_data_' + viewname + ', public;\n')
+                schema_name = engine.dialect.identifier_preparer.quote('view_data_' + viewname)
+                connection.execute('SET search_path = {}, public;'.format(schema_name))
                 connection.execute(statement_part, tuple())
 
         logger.info('running time: {}s'.format(timer() - start))
