@@ -6,7 +6,7 @@ from timeit import default_timer as timer
 from logzero import logger
 
 
-def refresh_views(engine, viewname, remove=False, start=0, end=1000, sql=False, sql_timing=False):
+def refresh_views(engine, viewname, remove=False, sql=False, sql_timing=False):
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
     sql_scripts_path = os.path.join(dir_path, '../sql')
@@ -22,9 +22,6 @@ def refresh_views(engine, viewname, remove=False, start=0, end=1000, sql=False, 
     for script_path in all_scripts:
         script_name = script_path.split('/')[-1].split('.')[0]
         script_number = int(script_name[:3])
-
-        if script_number < start or script_number > end:
-            continue
 
         with open(script_path) as script_file:
             script = script_file.read()
