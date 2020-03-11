@@ -10,7 +10,6 @@ class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
     def configure_subparser(self, subparser):
         subparser.add_argument("viewname", help="Name Of View")
         subparser.add_argument("--remove", help="remove all views", action='store_true')
-        subparser.add_argument("--sql", help="Just output sql and do not run", action='store_true')
         subparser.add_argument("--sql-timing", help="Add psql timing to sql output", action='store_true')
         subparser.add_argument("--logfile", help="optional output logfile")
 
@@ -21,5 +20,4 @@ class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
         refresh_views(engine,
                       args.viewname,
                       remove=args.remove,
-                      sql=args.sql,
                       sql_timing=args.sql_timing)

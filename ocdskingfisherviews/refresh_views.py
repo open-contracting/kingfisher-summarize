@@ -6,7 +6,7 @@ from timeit import default_timer as timer
 from logzero import logger
 
 
-def refresh_views(engine, viewname, remove=False, sql=False, sql_timing=False):
+def refresh_views(engine, viewname, remove=False, sql_timing=False):
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
     sql_scripts_path = os.path.join(dir_path, '../sql')
@@ -29,13 +29,6 @@ def refresh_views(engine, viewname, remove=False, sql=False, sql_timing=False):
             statements[script_name] = script
         if not script_name.endswith('_downgrade') and not remove:
             statements[script_name] = script
-
-    if sql:
-        all_sql = ';\n'.join(statements.values())
-        if sql_timing:
-            all_sql = r'\timing' + '\n' + all_sql
-        print(all_sql)
-        return
 
     start_all = timer()
 
