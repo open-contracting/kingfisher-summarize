@@ -64,6 +64,7 @@ select
     ocid,
     null AS release_id,
     data_id,
+    --Kingfisher Process’ compiled_release table has no package_data_id column, so setting package_data_id to null.
     null AS package_data_id,
     null AS package_version,  -- this would be useful but hard to get
     convert_to_timestamp(d.data ->> 'date') release_date,

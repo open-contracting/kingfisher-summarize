@@ -347,8 +347,10 @@ join
     data d on d.id = rs.data_id
 join 
     collection c on c.id = rs.collection_id 
-join
-    package_data pd on pd.id = rs.package_data_id;
+--Kingfisher Process’ compiled_release table has no package_data_id column.
+--Therefore, any rows in release_summary sourced from that table will have a NULL package_data_id.
+left join
+    package_data pd on pd.id = rs.package_data_id ;
 
 
 drop view if exists release_summary_with_checks;
