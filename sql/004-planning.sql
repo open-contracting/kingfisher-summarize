@@ -65,7 +65,6 @@ create unique index planning_documents_summary_id on planning_documents_summary(
 create index planning_documents_summary_data_id on planning_documents_summary(data_id);
 create index planning_documents_summary_collection_id on planning_documents_summary(collection_id);
 
-select common_comments('planning_documents_summary');
 
 ----
 
@@ -113,7 +112,6 @@ create unique index planning_milestones_summary_id on planning_milestones_summar
 create index planning_milestones_summary_data_id on planning_milestones_summary(data_id);
 create index planning_milestones_summary_collection_id on planning_milestones_summary(collection_id);
 
-select common_comments('planning_milestones_summary');
 
 ----
 
@@ -188,6 +186,5 @@ create unique index planning_summary_id on planning_summary(id);
 create index planning_summary_data_id on planning_summary(data_id);
 create index planning_summary_collection_id on planning_summary(collection_id);
 
-select common_comments('planning_summary');
 
 drop table if exists tmp_planning_summary;

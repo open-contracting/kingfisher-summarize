@@ -54,7 +54,6 @@ select * from staged_buyer_summary;
 
 drop table if exists staged_buyer_summary;
 
-select common_comments('buyer_summary');
 
 create unique index buyer_summary_id on buyer_summary(id);
 create index buyer_summary_data_id on buyer_summary(data_id);
@@ -121,7 +120,6 @@ create unique index procuringEntity_summary_id on procuringEntity_summary(id);
 create index procuringEntity_summary_data_id on procuringEntity_summary(data_id);
 create index procuringEntity_summary_collection_id on procuringEntity_summary(collection_id);
 
-select common_comments('procuringEntity_summary');
 
 ----
 
@@ -192,4 +190,3 @@ create unique index tenderers_summary_id on tenderers_summary(id, tenderer_index
 create index tenderers_summary_data_id on tenderers_summary(data_id);
 create index tenderers_summary_collection_id on tenderers_summary(collection_id);
 
-select common_comments('tenderers_summary');

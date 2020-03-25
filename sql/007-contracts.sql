@@ -85,8 +85,6 @@ create unique index contract_items_summary_id on contract_items_summary(id, cont
 create index contract_items_summary_data_id on contract_items_summary(data_id);
 create index contract_items_summary_collection_id on contract_items_summary(collection_id);
 
-select common_comments('contract_items_summary');
-
 ----
 
 drop table if exists staged_contract_documents_summary;
@@ -130,8 +128,6 @@ drop table if exists staged_contract_documents_summary;
 create unique index contract_documents_summary_id on contract_documents_summary(id, contract_index, document_index);
 create index contract_documents_summary_data_id on contract_documents_summary(data_id);
 create index contract_documents_summary_collection_id on contract_documents_summary(collection_id);
-
-select common_comments('contract_documents_summary');
 
 ----
 
@@ -178,8 +174,6 @@ create unique index contract_milestones_summary_id on contract_milestones_summar
 create index contract_milestones_summary_data_id on contract_milestones_summary(data_id);
 create index contract_milestones_summary_collection_id on contract_milestones_summary(collection_id);
 
-select common_comments('contract_milestones_summary');
-
 ----
 
 drop table if exists staged_contract_implementation_documents_summary;
@@ -223,8 +217,6 @@ drop table if exists staged_contract_implementation_documents_summary;
 create unique index contract_implementation_documents_summary_id on contract_implementation_documents_summary(id, contract_index, document_index);
 create index contract_implementation_documents_summary_data_id on contract_implementation_documents_summary(data_id);
 create index contract_implementation_documents_summary_collection_id on contract_implementation_documents_summary(collection_id);
-
-select common_comments('contract_implementation_documents_summary');
 
 ----
 
@@ -271,8 +263,6 @@ create unique index contract_implementation_milestones_summary_id on contract_im
 create index contract_implementation_milestones_summary_data_id on contract_implementation_milestones_summary(data_id);
 create index contract_implementation_milestones_summary_collection_id on contract_implementation_milestones_summary(collection_id);
 
-select common_comments('contract_implementation_milestones_summary');
-
 ----
 
 drop table if exists staged_contract_implementation_transactions_summary;
@@ -316,8 +306,6 @@ drop table if exists staged_contract_implementation_transactions_summary;
 create unique index contract_implementation_transactions_summary_id on contract_implementation_transactions_summary(id, contract_index, transaction_index);
 create index contract_implementation_transactions_summary_data_id on contract_implementation_transactions_summary(data_id);
 create index contract_implementation_transactions_summary_collection_id on contract_implementation_transactions_summary(collection_id);
-
-select common_comments('contract_implementation_transactions_summary');
 
 ----
 
@@ -470,7 +458,5 @@ from
     contracts_summary_no_data
 join
     data on data.id = data_id;
-
-select common_comments('contracts_summary');
 
 drop table if exists tmp_contracts_summary;

@@ -94,8 +94,6 @@ create unique index award_suppliers_summary_id on award_suppliers_summary(id, aw
 create index award_suppliers_summary_data_id on award_suppliers_summary(data_id);
 create index award_suppliers_summary_collection_id on award_suppliers_summary(collection_id);
 
-select common_comments('award_suppliers_summary');
-
 ----
 
 drop table if exists staged_award_documents_summary;
@@ -141,8 +139,6 @@ drop table if exists staged_award_documents_summary;
 create unique index award_documents_summary_id on award_documents_summary(id, award_index, document_index);
 create index award_documents_summary_data_id on award_documents_summary(data_id);
 create index award_documents_summary_collection_id on award_documents_summary(collection_id);
-
-select common_comments('award_documents_summary');
 
 ----
 
@@ -200,8 +196,6 @@ drop table if exists staged_award_items_summary;
 create unique index award_items_summary_id on award_items_summary(id, award_index, item_index);
 create index award_items_summary_data_id on award_items_summary(data_id);
 create index award_items_summary_collection_id on award_items_summary(collection_id);
-
-select common_comments('award_items_summary');
 
 ----
 
@@ -290,7 +284,5 @@ from
     awards_summary_no_data
 join
     data on data.id = data_id;
-
-select common_comments('awards_summary');
 
 drop table if exists tmp_awards_summary;
