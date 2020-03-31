@@ -178,7 +178,7 @@ Querying other collections and fields
 
 Coverage of the OCDS schema varies by publisher.
 
-To identify the fields needed for your analysis and how to answer them, use the `OCDS schema documentation <https://standard.open-contracting.org/latest/en/schema/release/>`__ to understand the meaning, structure and format of the fields in OCDS.
+Use the `OCDS schema documentation <https://standard.open-contracting.org/latest/en/schema/release/>`__ to understand the meaning, structure and format of the fields in OCDS and to identify the fields needed for your analysis.
 
 To check whether the fields needed for your analysis are available for a particular collection, use the ``field_counts`` table.
 
