@@ -173,16 +173,14 @@ The following query calculates the top 10 buyers by award value for collection `
   limit
       10;
 
-Querying other collections and fields
--------------------------------------
-
-Coverage of the OCDS schema varies by publisher.
+Check which fields are available
+--------------------------------
 
 Use the `OCDS schema documentation <https://standard.open-contracting.org/latest/en/schema/release/>`__ to understand the meaning, structure and format of the fields in OCDS and to identify the fields needed for your analysis.
 
-To check whether the fields needed for your analysis are available for a particular collection, use the ``field_counts`` table.
+Coverage of the OCDS schema varies by publisher. Use the ``field_counts`` table to check whether the fields needed for your analysis are available.
 
-The following query lists the coverage of each field in collection ``1060``:
+The following query lists the coverage of each field in the current schema:
 
 .. code-block:: sql
 
@@ -190,8 +188,8 @@ The following query lists the coverage of each field in collection ``1060``:
     *
   from
     field_counts
-  where
-    collection_id = 1060
+
+For schemas with multiple collections, use the ``collection_id`` column to filter your results for a particular collection.
 
 You can also check the coverage of specific fields or groups of fields by filtering on the ``path`` column:
 
@@ -201,7 +199,5 @@ You can also check the coverage of specific fields or groups of fields by filter
     *
   from
     field_counts
-  where
-    collection_id = 1060
   and
     path in ('tender/value/amount', 'tender/procurementMethod')
