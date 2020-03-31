@@ -21,20 +21,14 @@ select
     r.data_id,
     buyer,
     buyer ->> 'id' AS buyer_parties_id,
-    (buyer -> 'identifier' ->> 'scheme') || '-' || (buyer -> 'identifier' ->> 'id') AS buyer_identifier,
+    ps.identifier AS buyer_identifier,
     coalesce(
         buyer ->> 'id',
         (buyer -> 'identifier' ->> 'scheme') || '-' || (buyer -> 'identifier' ->> 'id'),
         buyer ->> 'name'
     ) AS unique_identifier_attempt,
-    (select 
-        jsonb_agg((additional_identifier ->> 'scheme') || '-' || (additional_identifier ->> 'id'))
-    from
-        jsonb_array_elements(case when jsonb_typeof(buyer -> 'additionalIdentifiers') = 'array' then buyer -> 'additionalIdentifiers' else '[]'::jsonb end) additional_identifier
-    where
-        additional_identifier::jsonb ?& array['scheme', 'id']											   
-    ) buyer_additionalIdentifiers_ids,
-    jsonb_array_length(case when jsonb_typeof(buyer -> 'additionalIdentifiers') = 'array' then buyer -> 'additionalIdentifiers' else '[]'::jsonb end) buyer_additionalIdentifiers_count,
+    ps.parties_additionalIdentifiers_ids AS buyer_additionalIdentifiers_ids,
+    ps.parties_additionalIdentifiers_count AS buyer_additionalIdentifiers_count,
     case when ps.id is not null then 1 else 0 end link_to_parties,
     case when ps.id is not null and (ps.party -> 'roles') ? 'buyer' then 1 else 0 end link_with_role,
     ps.party_index
@@ -82,20 +76,14 @@ select
     r.data_id,
     procuringEntity,
     procuringEntity ->> 'id' AS procuringEntity_parties_id,
-    (procuringEntity -> 'identifier' ->> 'scheme') || '-' || (procuringEntity -> 'identifier' ->> 'id') AS procuringEntity_identifier,
+    ps.identifier AS procuringEntity_identifier,
     coalesce(
         procuringEntity ->> 'id',
         (procuringEntity -> 'identifier' ->> 'scheme') || '-' || (procuringEntity -> 'identifier' ->> 'id'),
         procuringEntity ->> 'name'
     ) AS unique_identifier_attempt,
-    (select 
-        jsonb_agg((additional_identifier ->> 'scheme') || '-' || (additional_identifier ->> 'id'))
-    from
-        jsonb_array_elements(case when jsonb_typeof(procuringEntity -> 'additionalIdentifiers') = 'array' then procuringEntity -> 'additionalIdentifiers' else '[]'::jsonb end) additional_identifier
-    where
-        additional_identifier::jsonb ?& array['scheme', 'id']											   
-    ) procuringEntity_additionalIdentifiers_ids,
-    jsonb_array_length(case when jsonb_typeof(procuringEntity -> 'additionalIdentifiers') = 'array' then procuringEntity -> 'additionalIdentifiers' else '[]'::jsonb end) procuringEntity_additionalIdentifiers_count,
+    ps.parties_additionalIdentifiers_ids AS procuringEntity_additionalIdentifiers_ids,
+    ps.parties_additionalIdentifiers_count AS procuringEntity_additionalIdentifiers_count,
     case when ps.id is not null then 1 else 0 end link_to_parties,
     case when ps.id is not null and (ps.party -> 'roles') ? 'procuringEntity' then 1 else 0 end link_with_role,
     ps.party_index
@@ -150,20 +138,14 @@ select
     r.data_id,
     tenderer,
     tenderer ->> 'id' AS tenderer_parties_id,
-	(tenderer -> 'identifier' ->> 'scheme') || '-' || (tenderer -> 'identifier' ->> 'id') AS tenderer_identifier,
+    ps.identifier AS tenderer_identifier,
     coalesce(
         tenderer ->> 'id',
         (tenderer -> 'identifier' ->> 'scheme') || '-' || (tenderer -> 'identifier' ->> 'id'),
         tenderer ->> 'name'
     ) AS unique_identifier_attempt,
-    (select 
-        jsonb_agg((additional_identifier ->> 'scheme') || '-' || (additional_identifier ->> 'id'))
-    from
-        jsonb_array_elements(case when jsonb_typeof(tenderer -> 'additionalIdentifiers') = 'array' then tenderer -> 'additionalIdentifiers' else '[]'::jsonb end) additional_identifier
-    where
-        additional_identifier::jsonb ?& array['scheme', 'id']											   
-    ) tenderer_additionalIdentifiers_ids,
-    jsonb_array_length(case when jsonb_typeof(tenderer -> 'additionalIdentifiers') = 'array' then tenderer -> 'additionalIdentifiers' else '[]'::jsonb end) tenderer_additionalIdentifiers_count,
+    ps.parties_additionalIdentifiers_ids AS tenderer_additionalIdentifiers_ids,
+    ps.parties_additionalIdentifiers_count AS tenderer_additionalIdentifiers_count,
     case when ps.id is not null then 1 else 0 end link_to_parties,
     case when ps.id is not null and (ps.party -> 'roles') ? 'tenderer' then 1 else 0 end link_with_role,
     ps.party_index

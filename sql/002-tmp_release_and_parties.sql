@@ -111,8 +111,8 @@ select
     release_id,
     data_id,
     value ->> 'id' AS parties_id,   
-    value -> 'roles' AS roles,   
-	(value -> 'identifier' ->> 'scheme') || '-' || (value -> 'identifier' ->> 'id') AS identifier,
+    value -> 'roles' AS roles,
+    (value -> 'identifier' ->> 'scheme') || '-' || (value -> 'identifier' ->> 'id') AS identifier,
     coalesce(
         value ->> 'id',
         (value -> 'identifier' ->> 'scheme') || '-' || (value -> 'identifier' ->> 'id'),
