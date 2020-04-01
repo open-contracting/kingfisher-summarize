@@ -45,20 +45,14 @@ select
     r.data_id,
     supplier,
     supplier ->> 'id' AS supplier_parties_id,
-	(supplier -> 'identifier' ->> 'scheme') || '-' || (supplier -> 'identifier' ->> 'id') AS supplier_identifier,
+    ps.identifier AS supplier_identifier,
     coalesce(
         supplier ->> 'id',
         (supplier -> 'identifier' ->> 'scheme') || '-' || (supplier -> 'identifier' ->> 'id'),
         supplier ->> 'name'
     ) AS unique_identifier_attempt,
-    (select 
-        jsonb_agg((additional_identifier ->> 'scheme') || '-' || (additional_identifier ->> 'id'))
-    from
-        jsonb_array_elements(case when jsonb_typeof(supplier -> 'additionalIdentifiers') = 'array' then supplier -> 'additionalIdentifiers' else '[]'::jsonb end) additional_identifier
-    where
-        additional_identifier::jsonb ?& array['scheme', 'id']											   
-    ) supplier_additionalIdentifiers_ids,
-    jsonb_array_length(case when jsonb_typeof(supplier -> 'additionalIdentifiers') = 'array' then supplier -> 'additionalIdentifiers' else '[]'::jsonb end) supplier_additionalIdentifiers_count,
+    ps.parties_additionalIdentifiers_ids AS supplier_additionalIdentifiers_ids,
+    ps.parties_additionalIdentifiers_count AS supplier_additionalIdentifiers_count,
     case when ps.id is not null then 1 else 0 end link_to_parties,
     case when ps.id is not null and (ps.party -> 'roles') ? 'supplier' then 1 else 0 end link_with_role,
     ps.party_index
