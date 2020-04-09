@@ -53,7 +53,8 @@ jobs:
         psql -c 'CREATE SCHEMA views;'
         psql -c 'CREATE SCHEMA view_info;'
         psql -c 'CREATE SCHEMA view_meta;'
-    - env:
+    - name: Test
+      env:
         KINGFISHER_VIEWS_DB_URI: postgresql://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres
       run: |
         alembic --raiseerr --config ocdskingfisherviews/alembic.ini upgrade head
