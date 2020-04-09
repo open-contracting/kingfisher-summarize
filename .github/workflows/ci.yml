@@ -46,11 +46,13 @@ jobs:
       env:
         PGUSER: postgres
         PGPASSWORD: postgres
+        PGHOST: localhost
         PGPORT: ${{ job.services.postgres.ports[5432] }}
+        PGDATABASE: postgres
       run: |
-        psql -c 'CREATE SCHEMA views;' postgres
-        psql -c 'CREATE SCHEMA view_info;' postgres
-        psql -c 'CREATE SCHEMA view_meta;' postgres
+        psql -c 'CREATE SCHEMA views;'
+        psql -c 'CREATE SCHEMA view_info;'
+        psql -c 'CREATE SCHEMA view_meta;'
     - env:
         KINGFISHER_VIEWS_DB_URI: postgresql://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres
       run: |
