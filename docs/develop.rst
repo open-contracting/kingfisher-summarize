@@ -34,8 +34,8 @@ Add ``-c '\timing'`` to a ``psql`` command, before any ``-f`` options. For examp
 
    psql 'dbname=ocdskingfisher options=--search-path=view_data_the_name' -U ocdskingfisher -c '\timing' -f 004-planning.sql
 
-Documentation
--------------
+Documentation files
+-------------------
 
 Update the database tables reference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
