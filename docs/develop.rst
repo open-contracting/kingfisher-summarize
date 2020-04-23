@@ -13,7 +13,7 @@ If you're working on a specific file, you can run it on its own, using the ``psq
 
 .. code-block:: bash
 
-   psql 'dbname=ocdskingfisher options=--search-path=view_data_the_name' -U ocdskingfisher -f 004-planning.sql
+   psql 'dbname=ocdskingfisher user=ocdskingfisher options=--search-path=view_data_the_name' -f 004-planning.sql
 
 Note that (for brevity, SQL files are referred by their numeric prefix):
 
@@ -32,7 +32,7 @@ Add ``-c '\timing'`` to a ``psql`` command, before any ``-f`` options. For examp
 
 .. code-block:: bash
 
-   psql 'dbname=ocdskingfisher options=--search-path=view_data_the_name' -U ocdskingfisher -c '\timing' -f 004-planning.sql
+   psql 'dbname=ocdskingfisher user=ocdskingfisher options=--search-path=view_data_the_name' -c '\timing' -f 004-planning.sql
 
 Documentation files
 -------------------
