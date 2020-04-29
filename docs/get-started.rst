@@ -102,3 +102,11 @@ Setup PostgreSQL database
       alembic --raiseerr --config ocdskingfisherviews/alembic.ini upgrade head
 
 You're now ready to :doc:`use Kingfisher Views<cli/use>`.
+
+.. note::
+
+   If you notice slow queries and are using solid-state drives, consider tuning PostgreSQL by decreasing ``random_page_cost``:
+
+   .. code-block:: bash
+
+      ALTER TABLESPACE pg_default SET (random_page_cost = 2.0);
