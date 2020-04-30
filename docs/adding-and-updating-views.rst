@@ -81,7 +81,7 @@ This example demonstrates how Kingfisher Views uses layers of queries and interm
   * Queries are in blocks beginning with :code:`drop table if exists` up to :code:`create unique index`.
   * Queries are grouped together roughly by the stages in the planning process, but there are no hard and fast rules. When you're adding new queries, just try to find a place for them that might make logical sense for the next person who comes along to edit this file - which may well be you.
 
-2. We need to add document counts for `planning` and `tender` objects. They already exist for `award` and `contract`, and the structure is the same, so we can copy one of the existing queries and change the field names, eg:
+2. We need to add document counts for the `planning` object. They already exist for `award` and `contract`, and the structure is the same, so we can copy one of the existing queries and change the field names, eg:
 
 .. code-block:: sql
 
