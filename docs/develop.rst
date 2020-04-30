@@ -82,7 +82,7 @@ If you're working on a specific file, you can run it on its own, using the ``psq
 
 .. code-block:: bash
 
-   psql 'dbname=ocdskingfisher options=--search-path=view_data_the_name' -U ocdskingfisher -f 004-planning.sql
+   psql 'dbname=ocdskingfisher user=ocdskingfisher options=--search-path=view_data_the_name' -f 004-planning.sql
 
 To work on a file, you should first run the :ref:`refresh-views` command and then run the ``002`` file. You can then run the file you're working on as often as you want, without repeating the previous steps.
 
@@ -93,10 +93,10 @@ Add ``-c '\timing'`` to a ``psql`` command, before any ``-f`` options. For examp
 
 .. code-block:: bash
 
-   psql 'dbname=ocdskingfisher options=--search-path=view_data_the_name' -U ocdskingfisher -c '\timing' -f 004-planning.sql
+   psql 'dbname=ocdskingfisher user=ocdskingfisher options=--search-path=view_data_the_name' -c '\timing' -f 004-planning.sql
 
-Documentation
--------------
+Documentation files
+-------------------
 
 Update the database tables reference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
