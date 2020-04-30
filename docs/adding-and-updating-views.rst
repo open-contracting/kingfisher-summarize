@@ -135,8 +135,8 @@ Testing your changes
 
 Test your update by comparing it to the initial view you made when :ref:`loading data<loadingdata>`.
 
-  * Either create a new view: :code:`python ocdskingfisher-views-cli add-view 1 "Test: view with descriptions"`
-  * or refresh your existing view: :code:`python ocdskingfisher-views-cli refresh-views collection_1`
+  * Either create a new view: :code:`python ocdskingfisher-views-cli add-view 1 "Test: view with descriptions" --name "{collection_name_changed}"`
+  * or refresh your existing view: :code:`python ocdskingfisher-views-cli refresh-views {collection_name}`
   * Verify that the data is what you expect it to be.
   * (If you're looking at the data in a postgres client, don't forget to refresh it.)
 
@@ -169,7 +169,7 @@ The tests won't pass if you don't document new fields!
   * Run :code:`refresh-views`, which will throw an error if you've made a typo.
   * Preview the docs in your postgres client by looking at the schema to check the new comment appears.
 
-3. Update the CSV files of the docs by running :code:`ocdskingfisher-views-cli docs-table-ref {collection}`
+3. Update the CSV files of the docs by running :code:`python ocdskingfisher-views-cli docs-table-ref {collection_name}`
   * If there is additional documentation about the fields in certain views, eg. notes for yourself or colleagues, this is a good time to update that as well.
 
 .. _deploy:

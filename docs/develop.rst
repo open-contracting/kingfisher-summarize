@@ -12,11 +12,7 @@ Locally, you will need a Postgres installation, as well as `Kingfisher Process <
 
 We recommend using the Vagrant setup though. `These instructions will get you started with Vagrant for Kingfisher <https://ocdskingfisher.readthedocs.io/en/latest/vagrant.html#>`__. When you are modifying SQL files or source code for Kingfisher Views, do this on your host machine, *not* in the Vagrant environment.
 
-You probably already have a preferred client for working with Postgres databases. The database name, user and password are all :code:`ocdskingfisher`.
-
-Notes on Postgres clients:
-  * To use `psql` inside the Vagrant box, solve permissions issues by running :code:`createuser -s vagrant`
-  * To use a client like pgadmin with Vagrant, connect on port 7070.
+You probably already have a preferred client for working with Postgres databases. The database name, user and password are all :code:`ocdskingfisher`. You can `read more about working with the database here <https://ocdskingfisher.readthedocs.io/en/latest/vagrant.html#working-with-the-database>`__.
 
 .. _loadingdata:
 
@@ -34,11 +30,11 @@ In order to test any changes you're going to make, you need to load some data. T
     // Set up database
     (vagrant) python ocdskingfisher-process-cli upgrade-database
     // Make a new collection
-    (vagrant) python ocdskingfisher-process-cli new-collection 'new' '2000-01-01 00:00:00'
+    (vagrant) python ocdskingfisher-process-cli new-collection '{collection_name}' '2000-01-01 00:00:00'
     // Populate database
     (vagrant) python ocdskingfisher-process-cli local-load 1 ../views/tests/fixtures release_package
 
-2. Make views on the data. Views tables are created in the general kingfisher database (:code:`ocdskingfisher`, tables :code:`view_data_{collection}`, :code:`view_info`, :code:`view_meta`): 
+2. Make views on the data. Views tables are created in the general kingfisher database (:code:`ocdskingfisher`, tables :code:`view_data_{collection_name}`, :code:`view_info`, :code:`view_meta`): 
 
 .. code-block:: bash
 
@@ -47,7 +43,7 @@ In order to test any changes you're going to make, you need to load some data. T
     (vagrant) python ocdskingfisher-views-cli add-view 1 "some note"
 
 3. Look at data that has been created, so you have something to compare to when you make changes.
-  * Select from :code:`view_data_{collection}` to see views data created so far
+  * Select from :code:`view_data_{collection_name}` to see views data created so far
   * Select from view :code:`release_summary_with_data`
 
 
@@ -74,6 +70,8 @@ File and query contents
 The SQL files are named after the parts of the OCDS data they concern.
 
 Queries in the files are typically grouped into blocks. A block usually starts with a :code:`drop table if exists...` query and ends with a :code:`create unique index`. This is useful to know if you are copying and pasting existing blocks of queries to add new data to views that is simiarly structured.
+
+In some cases :code:`----` blocks are used to break the files into sections; each section is executed in it's own transaction.
 
 In many cases views outputs are generated from multiple places. You'll see table names beginning with :code:`tmp_` or :code:`staged_` which are used as intermediate stores for data as it is aggregated, and dropped at the end of the file.
 
