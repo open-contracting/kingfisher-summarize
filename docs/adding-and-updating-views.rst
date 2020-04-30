@@ -75,7 +75,7 @@ In this example we're going to add a field to the `tender` and `awards` views. W
 Example: adding an aggregate
 ----------------------------
 
-This example demonstrates how Kingfisher Views uses layers of queries and intermediary (:code:`tmp`) tables to build up the final views. In the OCDS data model, various objects can have an array of `documents` attached to them. We're going to add an aggregate (the total number of `documents`) that is missing for one type of object.
+This example demonstrates how Kingfisher Views uses layers of queries and intermediary (:code:`tmp`) tables to build up the final views. In the OCDS data model, various objects can have an array of `documents` attached to them. We're going to add an aggregate (the total number of `documents`) for the planning object.
 
 1. We're going to be updating the `release summary` views, so we need the :code:`008-release.sql` file.
   * Queries are in blocks beginning with :code:`drop table if exists` up to :code:`create unique index`.
