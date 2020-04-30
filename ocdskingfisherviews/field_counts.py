@@ -1,7 +1,6 @@
 import concurrent.futures
+import logging
 from timeit import default_timer as timer
-
-from logzero import logger
 
 field_count_query = '''
     set parallel_tuple_cost=0.00001;
@@ -30,17 +29,18 @@ class FieldCounts():
     def __init__(self, engine):
         self.engine = engine
         self.search_path_string = None
+        self.logger = logging.getLogger('ocdskingfisher.views.field-counts')
 
     def _run_collection(self, collection):
 
         with self.engine.begin() as connection:
             start = timer()
             connection.execute(self.search_path_string)
-            logger.info('processing collection: {}'.format(collection))
+            self.logger.info('processing collection: {}'.format(collection))
             results = tuple(connection.execute(field_count_query, collection))
             if results:
                 connection.execute('insert into field_counts_temp values (%s, %s, %s, %s, %s, %s)', *results)
-            logger.info('running time for collection {}: {}s'.format(collection, timer() - start))
+            self.logger.info('running time for collection {}: {}s'.format(collection, timer() - start))
 
     def run(self, viewname, remove=False, threads=1):
         schema_name = self.engine.dialect.identifier_preparer.quote('view_data_' + viewname)
@@ -96,4 +96,4 @@ class FieldCounts():
             connection.execute("Comment on column field_counts.distinct_releases IS "
                                "'The total number of distinct releases in which the field at this path appears' ")
 
-            logger.info('total running time: {}s'.format(timer() - overall_start))
+            self.logger.info('total running time: {}s'.format(timer() - overall_start))

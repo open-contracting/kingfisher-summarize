@@ -73,4 +73,5 @@ That's it! Feel free to browse the documentation below.
    cli/index
    database
    users
+   logging
    develop

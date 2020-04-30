@@ -5,7 +5,7 @@ import os
 
 import pgpasslib
 
-logger = logging.getLogger('ocdskingfisherviews')
+logger = logging.getLogger('ocdskingfisher.views.config')
 
 
 def get_database_uri():

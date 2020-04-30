@@ -1,7 +1,7 @@
 import datetime
+import logging
 
 import sqlalchemy as sa
-from logzero import logger
 
 from ocdskingfisherviews.correct_user_permissions import correct_user_permissions
 from ocdskingfisherviews.field_counts import FieldCounts
@@ -9,6 +9,8 @@ from ocdskingfisherviews.refresh_views import refresh_views
 
 
 def add_view(engine, collections, name=None, note=None, dontbuild=False):
+
+    logger = logging.getLogger('ocdskingfisher.views.add-view')
 
     if not name:
         if len(collections) > 5:

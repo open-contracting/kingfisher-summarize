@@ -1,12 +1,13 @@
 import glob
+import logging
 import os
 from collections import OrderedDict
 from timeit import default_timer as timer
 
-from logzero import logger
-
 
 def refresh_views(engine, viewname, remove=False):
+    logger = logging.getLogger('ocdskingfisher.views.refresh-views')
+
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
     sql_scripts_path = os.path.join(dir_path, '../sql')
