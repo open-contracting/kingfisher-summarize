@@ -1,7 +1,6 @@
 import logging
 import sqlalchemy as sa
 
-
 import ocdskingfisherviews.cli.commands.base
 
 

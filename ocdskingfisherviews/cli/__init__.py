@@ -9,7 +9,6 @@ import ocdskingfisherviews.cli.util
 
 
 def run_command(input_args=None):
-
     logging_config_file_full_path = os.path.expanduser('~/.config/ocdskingfisher-views/logging.json')
     if os.path.isfile(logging_config_file_full_path):
         with open(logging_config_file_full_path) as f:
