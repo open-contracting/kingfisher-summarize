@@ -1,6 +1,5 @@
-
+import logging
 import sqlalchemy as sa
-from logzero import logger
 
 import ocdskingfisherviews.cli.commands.base
 
@@ -12,6 +11,7 @@ class DeleteViewCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
         subparser.add_argument("name", help="Name Of View")
 
     def run_command(self, args):
+        logger = logging.getLogger('ocdskingfisher.views.cli.delete-view')
 
         engine = sa.create_engine(self.database_uri)
 

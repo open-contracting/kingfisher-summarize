@@ -1,7 +1,5 @@
-import os.path
+import logging
 
-import logzero
-from logzero import logger
 
 from ocdskingfisherviews.config import get_database_uri
 
@@ -16,8 +14,7 @@ class CLICommand:
         pass
 
     def run_command(self, args):
-        if args.logfile:
-            logzero.logfile(os.path.expanduser(args.logfile))
+        logger = logging.getLogger('ocdskingfisher.views.cli')
 
         try:
             self.run_logged_command(args)
