@@ -3,6 +3,8 @@ import logging
 from timeit import default_timer as timer
 
 field_count_query = '''
+    /*kingfisher-views field-counts*/
+
     set parallel_tuple_cost=0.00001;
     set parallel_setup_cost=0.00001;
     set work_mem='10MB';

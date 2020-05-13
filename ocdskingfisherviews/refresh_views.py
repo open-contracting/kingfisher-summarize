@@ -4,6 +4,8 @@ import os
 from collections import OrderedDict
 from timeit import default_timer as timer
 
+COMMENT = '/*kingfisher-views refresh-views*/\n'
+
 
 def refresh_views(engine, viewname, remove=False):
     logger = logging.getLogger('ocdskingfisher.views.refresh-views')
@@ -43,7 +45,7 @@ def refresh_views(engine, viewname, remove=False):
             with engine.begin() as connection:
                 schema_name = engine.dialect.identifier_preparer.quote('view_data_' + viewname)
                 connection.execute('SET search_path = {}, public;'.format(schema_name))
-                connection.execute(statement_part, tuple())
+                connection.execute(COMMENT + statement_part, tuple())
 
         logger.info('running time: {}s'.format(timer() - start))
 
