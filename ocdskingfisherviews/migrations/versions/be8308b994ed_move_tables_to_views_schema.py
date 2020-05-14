@@ -6,9 +6,8 @@ Create Date: 2020-05-14 18:21:35.312191
 
 """
 
-import os 
+import os
 from alembic import op
-import sqlalchemy as sa
 
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
