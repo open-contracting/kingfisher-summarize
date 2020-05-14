@@ -29,7 +29,7 @@ def add_view(engine, collections, name=None, note=None, dontbuild=False):
             connection.execute(sa.sql.text('INSERT INTO selected_collections (id) VALUES (:collection_id)'),
                                {'collection_id': collection_id})
 
-        connection.execute('CREATE TABLE note(id SERIAL, ' +
+        connection.execute('CREATE TABLE note(id SERIAL, '
                            'note TEXT NOT NULL, created_at TIMESTAMP WITHOUT TIME ZONE);')
         if note:
             connection.execute(sa.sql.text('INSERT INTO  note (note, created_at) VALUES (:note, :at)'),

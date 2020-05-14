@@ -51,8 +51,6 @@ jobs:
         PGDATABASE: postgres
       run: |
         psql -c 'CREATE SCHEMA views;'
-        psql -c 'CREATE SCHEMA view_info;'
-        psql -c 'CREATE SCHEMA view_meta;'
     - name: Test
       env:
         KINGFISHER_VIEWS_DB_URI: postgresql://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres

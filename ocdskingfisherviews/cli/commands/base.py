@@ -1,6 +1,5 @@
 import logging
 
-
 from ocdskingfisherviews.config import get_database_uri
 
 

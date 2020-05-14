@@ -212,7 +212,7 @@ correct-user-permissions
 
    You only need to learn this command if you used :ref:`add-view` with ``--dontbuild``, if you're updating a schema after :ref:`upgrading Kingfisher Views<upgrade-app>`, or if you are :doc:`sharing access<../users>`.
 
-`Grants <https://www.postgresql.org/docs/current/ddl-priv.html>`__ the users in the ``view_meta.read_only_user`` table the ``USAGE`` privilege on the schemas and the ``SELECT`` privilege on all existing tables in the schemas:
+`Grants <https://www.postgresql.org/docs/current/ddl-priv.html>`__ the users in the ``views.read_only_user`` table the ``USAGE`` privilege on the schemas and the ``SELECT`` privilege on some tables in those schemas:
 
 .. code-block:: bash
 
@@ -220,13 +220,11 @@ correct-user-permissions
 
 You must run this command whenever you create (or re-create) schemas or tables. In other words, run this command after using the :ref:`refresh-views` or :ref:`field-counts` command.
 
-The schemas are:
+The tables to which access is granted are:
 
 ``public``
-   Contains all tables created by Kingfisher Process
+   All tables created by Kingfisher Process. See `Kingfisher Process documentation <https://kingfisher-process.readthedocs.io/en/latest/database-structure.html>`__.
 ``views``
-   Contains the ``alembic_version`` table
-``view_info``
-   Contains the ``mapping_sheets`` table
+   The ``mapping_sheets`` tables.
 Collection-specific schemas
-   Contain the :doc:`summary tables<../database>` about one or more collections, created by the :ref:`add-view`, :ref:`refresh-views` and :ref:`field-counts` commands
+   All tables about one or more collections, created by the :ref:`add-view`, :ref:`refresh-views` and :ref:`field-counts` commands. See :doc:`database`.
