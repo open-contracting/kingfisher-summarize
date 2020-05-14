@@ -27,7 +27,8 @@ class ListViewCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
             print("-----")
             print("VIEW: " + schema)
             with engine.begin() as connection:
-                connection.execute('set search_path = view_data_'+schema+';')
+                schema_name = engine.dialect.identifier_preparer.quote('view_data_' + schema)
+                connection.execute('SET search_path = {};'.format(schema_name))
                 for row in connection.execute('SELECT * FROM selected_collections'):
                     print("Collection Id: " + str(row['id']))
                 for row in connection.execute('SELECT * FROM note'):
