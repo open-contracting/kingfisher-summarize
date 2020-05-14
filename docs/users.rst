@@ -46,11 +46,11 @@ Grant a user read-only access to *all* tables
 
 #. Connect to the database used by Kingfisher Views, using the connecting settings you :ref:`configured earlier<database-connection-settings>`.
 
-#. Insert the username into the ``view_meta.read_only_user`` table. For example, replace ``the_username``, and run:
+#. Insert the username into the ``views.read_only_user`` table. For example, replace ``the_username``, and run:
 
    .. code-block:: sql
 
-      INSERT INTO view_meta.read_only_user VALUES ('the_username');
+      INSERT INTO views.read_only_user VALUES ('the_username');
 
 #. Close your PostgreSQL session.
 
@@ -65,11 +65,11 @@ Remove a user
 
 #. Connect to the database used by Kingfisher Views, using the connecting settings you :ref:`configured earlier<database-connection-settings>`.
 
-#. Delete the username from the ``view_meta.read_only_user`` table. For example, replace ``the_username``, and run:
+#. Delete the username from the ``views.read_only_user`` table. For example, replace ``the_username``, and run:
 
    .. code-block:: sql
 
-      DELETE FROM view_meta.read_only_user WHERE username = 'the_username';
+      DELETE FROM views.read_only_user WHERE username = 'the_username';
 
 #. Drop the user. For example, replace ``the_username``, and run:
 

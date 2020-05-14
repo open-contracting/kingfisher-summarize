@@ -101,13 +101,11 @@ Setup PostgreSQL database
 
       sudo -u postgres psql ocdskingfisher
 
-#. `Create <https://www.postgresql.org/docs/current/sql-createschema.html>`__ the ``views``, ``view_info`` and ``view_meta`` schemas, and set them to be owned by the database user configured above. For example, run:
+#. `Create <https://www.postgresql.org/docs/current/sql-createschema.html>`__ the ``views`` schema, and set it to be owned by the database user configured above. For example, run:
 
    .. code-block:: sql
 
       CREATE SCHEMA views AUTHORIZATION ocdskingfisher;
-      CREATE SCHEMA view_info AUTHORIZATION ocdskingfisher;
-      CREATE SCHEMA view_meta AUTHORIZATION ocdskingfisher;
 
 #. Close your PostgreSQL session and your sudo session, e.g. with ``Ctrl-D`` for both
 

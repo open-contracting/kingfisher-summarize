@@ -4,13 +4,12 @@ def correct_user_permissions(engine):
     # Get list of Users
     users = []
     with engine.begin() as connection:
-        connection.execute('set search_path=view_meta')
-        for row in connection.execute('select username from read_only_user'):
+        for row in connection.execute('SELECT username FROM views.read_only_user'):
             users.append(row['username'])
 
     # Get list of views
     schemas = []
-    sql = 'select schema_name from information_schema.schemata;'
+    sql = 'SELECT schema_name FROM information_schema.schemata;'
     with engine.begin() as connection:
         for row in connection.execute(sql):
             if row['schema_name'].startswith('view_data_'):
@@ -25,9 +24,9 @@ def correct_user_permissions(engine):
             connection.execute('GRANT USAGE ON SCHEMA public TO ' + user)
             connection.execute('GRANT SELECT ON ALL TABLES IN SCHEMA public TO ' + user)
 
-            # Grant access to the mapping_sheets table in the view_info schema.
-            connection.execute('GRANT USAGE ON SCHEMA view_info TO ' + user)
-            connection.execute('GRANT SELECT ON ALL TABLES IN SCHEMA view_info TO ' + user)
+            # Grant access to the mapping_sheets table in the views schema.
+            connection.execute('GRANT USAGE ON SCHEMA views TO ' + user)
+            connection.execute('GRANT SELECT ON mapping_sheets IN SCHEMA views TO ' + user)
 
             # Grant access to all tables in every schema created by Kingfisher Views.
             for schema in schemas:
