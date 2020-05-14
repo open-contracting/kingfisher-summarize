@@ -16,10 +16,17 @@ depends_on = None
 
 
 def upgrade():
-    op.execute('set search_path = views')
-    op.execute("ALTER TABLE mapping_sheets SET SCHEMA view_info")
+    conn = op.get_bind()
+    query = conn.execute("SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'view_info';")
+    if query.fetchall():
+        schema = 'view_info'
+    else:
+        schema = 'views'
+
+    op.execute('SET search_path = views')
+    op.execute('ALTER TABLE mapping_sheets SET SCHEMA {}'.format(schema))
 
 
 def downgrade():
-    op.execute('set search_path = view_info')
-    op.execute("ALTER TABLE mapping_sheets SET SCHEMA views")
+    op.execute('SET search_path = view_info')
+    op.execute('ALTER TABLE mapping_sheets SET SCHEMA views')

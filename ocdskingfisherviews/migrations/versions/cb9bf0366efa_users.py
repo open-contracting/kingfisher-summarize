@@ -6,12 +6,7 @@ Create Date: 2019-11-26 14:53:42.530850
 
 """
 
-import os
-
 from alembic import op
-
-dir_path = os.path.dirname(os.path.realpath(__file__))
-sql_dir = os.path.join(dir_path, '../../../sql/')
 
 # revision identifiers, used by Alembic.
 revision = 'cb9bf0366efa'
@@ -21,15 +16,17 @@ depends_on = None
 
 
 def upgrade():
-    create_text = '''
-       create table read_only_user(
-           username varchar(64) not null primary key
-       )
-    '''
-    op.execute('set search_path = view_meta')
-    op.execute(create_text)
+    conn = op.get_bind()
+    query = conn.execute("SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'view_meta';")
+    if query.fetchall():
+        schema = 'view_meta'
+    else:
+        schema = 'views'
+
+    op.execute('SET search_path = {}'.format(schema))
+    op.execute('CREATE TABLE read_only_user(username VARCHAR(64) NOT NULL PRIMARY KEY)')
 
 
 def downgrade():
-    op.execute('set search_path = view_meta')
-    op.execute('drop table read_only_user')
+    op.execute('SET search_path = view_meta')
+    op.execute('DROP TABLE read_only_user')
