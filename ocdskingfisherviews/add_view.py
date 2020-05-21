@@ -35,6 +35,8 @@ def add_view(engine, collections, name=None, note=None, dontbuild=False):
             connection.execute(sa.sql.text('INSERT INTO  note (note, created_at) VALUES (:note, :at)'),
                                {'note': note, 'at': datetime.datetime.utcnow()})
 
+        connection.execute('analyze selected_collections')
+
     if not dontbuild:
 
         logger.info("Refreshing Views after Creating View " + name)
