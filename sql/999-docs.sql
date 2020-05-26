@@ -272,8 +272,8 @@ Comment on column contract_implementation_milestones_summary.contract_index IS '
 select common_comments('contract_implementation_transactions_summary');
 Comment on column contract_implementation_transactions_summary.contract_index IS 'Position of the contract in the contracts array';
 Comment on column contract_implementation_transactions_summary.transaction_index IS 'Position of the transaction in the transaction array';
-Comment on column contract_implementation_transactions_summary.transaction_amount IS '`amount` field from either amount object or value object';
-Comment on column contract_implementation_transactions_summary.transaction_currency IS '`currency` field from either amount object or value object';
+Comment on column contract_implementation_transactions_summary.transaction_amount IS '`amount` field from the value object or the deprecated amount object';
+Comment on column contract_implementation_transactions_summary.transaction_currency IS '`currency` field from the value object or the deprecated amount object';
 
 select common_comments('contract_items_summary');
 Comment on column contract_items_summary.contract_index IS 'Position of the contract in the contracts array';

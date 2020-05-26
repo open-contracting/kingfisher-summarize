@@ -279,7 +279,7 @@ select
     r.release_id,
     r.data_id,
     convert_to_numeric(coalesce(transaction -> 'value' ->> 'amount', transaction -> 'amount' ->> 'amount')) transaction_amount,
-    coalesce(transaction -> 'amount' ->> 'currency', transaction -> 'value' ->> 'currency') transaction_currency
+    coalesce(transaction -> 'value' ->> 'currency', transaction -> 'amount' ->> 'currency') transaction_currency
 from
     (select 
         tps.*,
