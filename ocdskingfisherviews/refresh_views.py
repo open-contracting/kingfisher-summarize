@@ -1,8 +1,8 @@
 import glob
 import logging
 import os
-from collections import OrderedDict
 import re
+from collections import OrderedDict
 from timeit import default_timer as timer
 
 COMMENT = '/*kingfisher-views refresh-views*/\n'
