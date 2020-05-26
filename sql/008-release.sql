@@ -384,4 +384,30 @@ left join
 
 
 
+-- The following pgpsql makes indexes on release_summary_with_checks and release_summary_with_data,
+-- you will need to run --tables-only command line parameter to allow this to run. 
+DO
+$$
+DECLARE query text;
+
+BEGIN
+    query :=
+        $query$
+            create unique index release_summary_with_data_id on release_summary_with_data(id);
+            create index release_summary_with_data_data_id on release_summary_with_data(data_id);
+            create index release_summary_with_data_package_data_id on release_summary_with_data(package_data_id);
+            create index release_summary_with_data_collection_id on release_summary_with_data(collection_id);
+
+            create unique index release_summary_with_checks_id on release_summary_with_checks(id);
+            create index release_summary_with_checks_data_id on release_summary_with_checks(data_id);
+            create index release_summary_with_checks_package_data_id on release_summary_with_checks(package_data_id);
+            create index release_summary_with_checks_collection_id on release_summary_with_checks(collection_id);
+        $query$
+    ;
+    execute query;
+-- wrong_object_type is the specific exception when you try to add an index to a view.
+EXCEPTION 
+    WHEN wrong_object_type THEN null;
+END;
+$$;
 

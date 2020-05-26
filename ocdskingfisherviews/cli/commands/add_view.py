@@ -12,6 +12,9 @@ class AddViewCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
         subparser.add_argument("note", help="A Note")
         subparser.add_argument("--name", help="Name Of View")
         subparser.add_argument("--dontbuild", help="Don't Build the View, just create it.", action='store_true')
+        subparser.add_argument("--tables-only",
+                               help="Do not create db views, create persistant tables instead",
+                               action='store_true')
 
     def run_command(self, args):
 
@@ -22,4 +25,4 @@ class AddViewCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
             if collection_id and collection_id.isdigit():
                 collections.append(collection_id)
 
-        add_view(engine, collections, name=args.name, note=args.note, dontbuild=args.dontbuild)
+        add_view(engine, collections, name=args.name, note=args.note, dontbuild=args.dontbuild, tables_only=args.tables_only)

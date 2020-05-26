@@ -65,6 +65,17 @@ This creates a schema named ``view_data_collection_4_5_6``.
 
 If you need to summarize more than five collections, then you must :ref:`customize the schema's name<set-schema-name>`.
 
+.. _tables-only:
+
+Create persistant tables for all summary tables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default some summary tables are database views and not persistant tables in order to save space.  The ``--tables-only``  all tables to be real persistant tables.
+
+.. code-block:: bash
+
+    python ocdskingfisher-views-cli add-view 123 "The note" --name the_name --tables-only
+
 .. _delete-view:
 
 delete-view

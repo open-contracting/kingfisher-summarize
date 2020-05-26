@@ -60,17 +60,20 @@ where
         isc.ordinal_position) is null
 '''
 
+CURRENT_TABLES_QUERY = '''
+    select table_name from information_schema.tables 
+    where table_schema = 'view_data_{}'
+'''
+
 
 def test_refresh_runs(engine):
     viewname = 'viewname' + str(random.randint(1, 10000000))
     run_command(['add-view', '--name', viewname, '1', 'Note'])
     run_command(['refresh-views', viewname, '--remove'])
     run_command(['refresh-views', viewname])
-    get_current_tables_query = "select table_name from information_schema.tables " + \
-                               "where table_schema = 'view_data_" + viewname + "'"
 
     with engine.connect() as conn:
-        results = conn.execute(get_current_tables_query)
+        results = conn.execute(CURRENT_TABLES_QUERY.format(viewname))
         db_tables = {result['table_name'] for result in results}
         assert db_tables.issuperset(VIEWS_TABLES)
 
@@ -81,8 +84,32 @@ def test_refresh_runs(engine):
 
     run_command(['refresh-views', viewname, '--remove'])
     with engine.connect() as conn:
-        results = conn.execute(get_current_tables_query)
+        results = conn.execute(CURRENT_TABLES_QUERY.format(viewname))
         db_tables = {result['table_name'] for result in results}
+        assert db_tables.isdisjoint(VIEWS_TABLES)
+
+
+def test_refresh_runs_tables_only(engine):
+
+    viewname = 'viewname' + str(random.randint(1, 10000000))
+    run_command(['add-view', '--name', viewname, '1', 'Note', '--tables-only'])
+
+    with engine.connect() as conn:
+        results = conn.execute(CURRENT_TABLES_QUERY.format(viewname))
+        db_tables = {result['table_name'] for result in results}
+        assert db_tables.issuperset(VIEWS_TABLES)
+
+    run_command(['refresh-views', viewname, '--tables-only'])
+    with engine.connect() as conn:
+        results = conn.execute(CURRENT_TABLES_QUERY.format(viewname))
+        db_tables = {result['table_name'] for result in results}
+        assert db_tables.issuperset(VIEWS_TABLES)
+
+    run_command(['refresh-views', viewname, '--remove', '--tables-only'])
+    with engine.connect() as conn:
+        results = conn.execute(CURRENT_TABLES_QUERY.format(viewname))
+        db_tables = {result['table_name'] for result in results}
+        print(db_tables)
         assert db_tables.isdisjoint(VIEWS_TABLES)
 
     run_command(['delete-view', viewname])

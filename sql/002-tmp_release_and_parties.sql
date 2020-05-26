@@ -178,10 +178,10 @@ select * from staged_parties_summary_no_data;
 
 drop table staged_parties_summary_no_data;
 
-create unique index parties_summary_id on parties_summary_no_data(id, party_index);
-create index parties_summary_data_id on parties_summary_no_data(data_id);
-create index parties_summary_collection_id on parties_summary_no_data(collection_id);
-create index parties_summary_party_id on parties_summary_no_data(id, parties_id);
+create unique index parties_summary_no_data_id on parties_summary_no_data(id, party_index);
+create index parties_summary_no_data_data_id on parties_summary_no_data(data_id);
+create index parties_summary_no_data_collection_id on parties_summary_no_data(collection_id);
+create index parties_summary_no_data_party_id on parties_summary_no_data(id, parties_id);
 
 
 create view parties_summary
@@ -203,3 +203,26 @@ from
     parties_summary_no_data
 join
     data on data.id = data_id;
+
+
+-- The following pgpsql makes indexes on parties_summary only if it is a table and not a view,
+-- you will need to run --tables-only command line parameter to allow this to run. 
+
+DO
+$$
+DECLARE query text;
+
+BEGIN
+    query :=
+        $query$
+            create unique index parties_summary_id on parties_summary(id, party_index);
+            create index parties_summary_data_id on parties_summary(data_id);
+            create index parties_summary_collection_id on parties_summary(collection_id);
+            create index parties_summary_party_id on parties_summary(id, parties_id);
+        $query$
+    ;
+    execute query;
+EXCEPTION 
+    WHEN wrong_object_type THEN null;
+END;
+$$;
