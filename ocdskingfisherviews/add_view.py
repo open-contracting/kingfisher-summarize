@@ -8,7 +8,7 @@ from ocdskingfisherviews.field_counts import FieldCounts
 from ocdskingfisherviews.refresh_views import refresh_views
 
 
-def add_view(engine, collections, name=None, note=None, dontbuild=False):
+def add_view(engine, collections, name=None, note=None, dontbuild=False, tables_only=False):
 
     logger = logging.getLogger('ocdskingfisher.views.add-view')
 
@@ -40,7 +40,7 @@ def add_view(engine, collections, name=None, note=None, dontbuild=False):
     if not dontbuild:
 
         logger.info("Refreshing Views after Creating View " + name)
-        refresh_views(engine, name)
+        refresh_views(engine, name, tables_only=tables_only)
 
         logger.info("Updating Field Counts after Creating View " + name)
         field_counts = FieldCounts(engine=engine)

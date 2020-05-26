@@ -2,12 +2,13 @@ import glob
 import logging
 import os
 from collections import OrderedDict
+import re
 from timeit import default_timer as timer
 
 COMMENT = '/*kingfisher-views refresh-views*/\n'
 
 
-def refresh_views(engine, viewname, remove=False):
+def refresh_views(engine, viewname, remove=False, tables_only=False):
     logger = logging.getLogger('ocdskingfisher.views.refresh-views')
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -45,6 +46,11 @@ def refresh_views(engine, viewname, remove=False):
             with engine.begin() as connection:
                 schema_name = engine.dialect.identifier_preparer.quote('view_data_' + viewname)
                 connection.execute('SET search_path = {}, public;'.format(schema_name))
+
+                if tables_only:
+                    statement_part = re.sub('^create view', 'create table', statement_part, flags=re.M | re.I)
+                    statement_part = re.sub('^drop view', 'drop table', statement_part, flags=re.M | re.I)
+
                 connection.execute(COMMENT + statement_part, tuple())
 
         logger.info('running time: {}s'.format(timer() - start))

@@ -265,9 +265,9 @@ select * from staged_awards_summary_no_data;
 
 drop table if exists staged_awards_summary_no_data;
 
-create unique index awards_summary_id on awards_summary_no_data(id, award_index);
-create index awards_summary_data_id on awards_summary_no_data(data_id);
-create index awards_summary_collection_id on awards_summary_no_data(collection_id);
+create unique index awards_summary_no_data_id on awards_summary_no_data(id, award_index);
+create index awards_summary_data_no_data_id on awards_summary_no_data(data_id);
+create index awards_summary_no_data_collection_id on awards_summary_no_data(collection_id);
 
 create view awards_summary
 AS
@@ -279,4 +279,27 @@ from
 join
     data on data.id = data_id;
 
+
+-- The following pgpsql makes indexes on awards_summary only if it is a table and not a view,
+-- you will need to run --tables-only command line parameter to allow this to run. 
+DO
+$$
+DECLARE query text;
+
+BEGIN
+    query :=
+        $query$
+            create unique index awards_summary_id on awards_summary(id, award_index);
+            create index awards_summary_data_id on awards_summary(data_id);
+            create index awards_summary_collection_id on awards_summary(collection_id);
+        $query$
+    ;
+    execute query;
+EXCEPTION WHEN wrong_object_type THEN null;
+END;
+
+$$;
+
+
 drop table if exists tmp_awards_summary;
+

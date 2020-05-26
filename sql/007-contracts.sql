@@ -443,10 +443,10 @@ select * from staged_contracts_summary_no_data;
 
 drop table if exists staged_contracts_summary_no_data;
 
-create unique index contracts_summary_id on contracts_summary_no_data(id, contract_index);
-create index contracts_summary_data_id on contracts_summary_no_data(data_id);
-create index contracts_summary_collection_id on contracts_summary_no_data(collection_id);
-create index contracts_summary_award_id on contracts_summary_no_data(id, award_id);
+create unique index contracts_summary_no_data_id on contracts_summary_no_data(id, contract_index);
+create index contracts_summary_no_data_data_id on contracts_summary_no_data(data_id);
+create index contracts_summary_no_data_collection_id on contracts_summary_no_data(collection_id);
+create index contracts_summary_no_data_award_id on contracts_summary_no_data(id, award_id);
 
 
 create view contracts_summary
@@ -460,3 +460,27 @@ join
     data on data.id = data_id;
 
 drop table if exists tmp_contracts_summary;
+
+
+-- The following pgpsql makes indexes on contracts_summary only if it is a table and not a view,
+-- you will need to run --tables-only command line parameter to allow this to run. 
+
+DO
+$$
+DECLARE query text;
+
+BEGIN
+    query :=
+        $query$
+            create unique index contracts_summary_id on contracts_summary(id, contract_index);
+            create index contracts_summary_data_id on contracts_summary(data_id);
+            create index contracts_summary_collection_id on contracts_summary(collection_id);
+            create index contracts_summary_award_id on contracts_summary(id, award_id);
+        $query$
+    ;
+    execute query;
+EXCEPTION 
+    WHEN wrong_object_type THEN null;
+END;
+$$;
+
