@@ -70,7 +70,7 @@ If you need to summarize more than five collections, then you must :ref:`customi
 Create persistant tables for all summary tables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-By default some summary tables are database views and not persistant tables in order to save space.  The ``--tables-only``  all tables to be real persistant tables.
+By default some summary tables are database views and not persistant tables in order to save space.  The ``--tables-only`` option makes all tables real persistant ones.
 
 .. code-block:: bash
 

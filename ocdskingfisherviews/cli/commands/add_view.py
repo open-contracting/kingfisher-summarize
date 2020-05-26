@@ -25,4 +25,5 @@ class AddViewCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
             if collection_id and collection_id.isdigit():
                 collections.append(collection_id)
 
-        add_view(engine, collections, name=args.name, note=args.note, dontbuild=args.dontbuild, tables_only=args.tables_only)
+        add_view(engine, collections, name=args.name, note=args.note,
+                 dontbuild=args.dontbuild, tables_only=args.tables_only)

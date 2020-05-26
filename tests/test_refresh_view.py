@@ -61,7 +61,7 @@ where
 '''
 
 CURRENT_TABLES_QUERY = '''
-    select table_name from information_schema.tables 
+    select table_name from information_schema.tables
     where table_schema = 'view_data_{}'
 '''
 

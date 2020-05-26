@@ -48,6 +48,26 @@ Update the database tables reference
 
 Then, for any new CSV file, manually add a new sub-section to ``docs/database.rst`` under an appropriate section.
 
+Create Entity Relationship Diagram
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Follow the instructions to install schema spy in the `Kingfisher Process Docs <https://kingfisher-process.readthedocs.io/en/latest/development.html#updating-database-tables-graphic>`__.
+
+Add new view with ``tables-only`` option:
+
+.. code-block:: bash
+
+    python ocdskingfisher-views-cli add-view 123 "The note" --name <view_name> --tables-only
+
+Run schema generation with:
+
+.. code-block:: bash
+
+   java -jar /bin/schemaspy.jar -t pgsql -dp /bin/postgresql.jar -s view_data_<view_name> -db ocdskingfisher -u ocdskingfisher -p ocdskingfisher -host localhost -o /vagrant/schemaspy -norows
+
+In the folder of data that results, take the ``schemaspy/diagrams/summary/relationships.real.compact.png`` file. Copy it over to ``docs/_static/erd.png``.
+
+
 Configuration tables
 --------------------
 
@@ -70,3 +90,4 @@ Removes Kingfisher Views' :doc:`configuration tables<setup>`:
    alembic --raiseerr --config ocdskingfisherviews/alembic.ini downgrade base
 
 See :ref:`refresh-views` and :ref:`field-counts` to remove collection-specific schemas.
+
