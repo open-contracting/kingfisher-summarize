@@ -49,8 +49,6 @@ Download the sample configuration file to the configuration directory:
 Logging
 ~~~~~~~
 
-This tool uses the `Python logging module <https://docs.python.org/3/library/logging.html>`__. Loggers are in the ``ocdskingfisher.views`` namespace.
-
 Logging from the :doc:`cli/index` can be configured with a ``~/.config/ocdskingfisher-views/logging.json`` file. To download the default configuration::
 
     curl https://raw.githubusercontent.com/open-contracting/kingfisher-views/master/samples/logging.json -o ~/.config/ocdskingfisher-views/logging.json
@@ -59,6 +57,7 @@ To download a different configuration that includes debug messages::
 
     curl https://raw.githubusercontent.com/open-contracting/kingfisher-views/master/samples/logging-debug.json -o ~/.config/ocdskingfisher-views/logging.json
 
+Read more about :doc:`logging`.
 
 .. _database-connection-settings:
 

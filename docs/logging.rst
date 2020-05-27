@@ -1,5 +1,5 @@
-Logging
-=======
+Reading logs
+============
 
 If logging is configured using a :ref:`default configuration<config-logging>`, then log messages are written to ``info.log`` (and possibly ``debug.log``).
 
