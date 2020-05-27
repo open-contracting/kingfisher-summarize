@@ -47,7 +47,7 @@ Download the sample configuration file to the configuration directory:
 .. _config-logging:
 
 Logging
--------
+~~~~~~~
 
 This tool uses the `Python logging module <https://docs.python.org/3/library/logging.html>`__. Loggers are in the ``ocdskingfisher.views`` namespace.
 
