@@ -11,7 +11,7 @@ class RefreshCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
         subparser.add_argument("viewname", help="Name Of View")
         subparser.add_argument("--remove", help="Remove all views", action='store_true')
         subparser.add_argument("--tables-only",
-                               help="Do not create db views, create persistent tables instead",
+                               help="Do not create database views (use persistent tables only)",
                                action='store_true')
 
     def run_logged_command(self, args):

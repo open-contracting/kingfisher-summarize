@@ -13,7 +13,7 @@ class AddViewCLICommand(ocdskingfisherviews.cli.commands.base.CLICommand):
         subparser.add_argument("--name", help="Name Of View")
         subparser.add_argument("--dontbuild", help="Don't Build the View, just create it.", action='store_true')
         subparser.add_argument("--tables-only",
-                               help="Do not create db views, create persistant tables instead",
+                               help="Do not create database views (use persistent tables only)",
                                action='store_true')
 
     def run_command(self, args):
