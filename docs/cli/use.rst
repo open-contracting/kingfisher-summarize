@@ -67,10 +67,10 @@ If you need to summarize more than five collections, then you must :ref:`customi
 
 .. _tables-only:
 
-Create persistant tables for all summary tables
+Create persistent tables for all summary tables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-By default some summary tables are database views and not persistant tables in order to save space.  The ``--tables-only`` option makes all tables real persistant ones.
+By default, some summary tables are database `views <https://www.postgresql.org/docs/current/sql-createview.html>`__ and not persistent `tables <https://www.postgresql.org/docs/current/sql-createtable.html>`__, in order to save disk space.  Use the ``--tables-only`` option to make all summary tables into persistent tables.
 
 .. code-block:: bash
 

@@ -18,27 +18,30 @@ All summary tables have an ``id`` column and a ``release_type`` column. This ``i
 
 Note that, in the case of Kingfisher Process' ``record`` table, the record's data's ``compiledRelease`` is used in summaries.
 
-Foreign key relationships exist on all tables (but not db views) within the views schemas and this can also help with determining join conditions.
-
-The below image is a Entity Relationship Diagram of the tables that views creates, showing the foreign key relationships (click on image and zoom to see more clearly). 
+Foreign key relationships exist on all `tables <https://www.postgresql.org/docs/current/sql-createtable.html>`__ (but not `views <https://www.postgresql.org/docs/current/sql-createview.html>`__) within a schema, as shown in the Entity Relationship Diagram below (click on the image and zoom in to read more easily).
 
 .. image:: _static/erd.png
    :target: ../_static/erd.png
 
-All tables can be joined with ``release_summary``, ``release_summary_with_data`` and ``release_summary_with_data`` as the ``id`` column is referring the same field across the database.
+This diagram can help to identify JOIN conditions. For example, all tables can be joined with the ``release_summary``, ``release_summary_with_data`` and ``release_summary_with_data`` tables on the ``id`` column.
 
-Note that some tables have joint keys, these are shown with two lines running from one table to another in the above diagram.  To query across these joins use a query like the following:
+Some tables have composite foreign keys. These are shown as two lines from one table to another in the diagram. To join such tables:
+
+.. code-block:: sql
+
+   SELECT *
+   FROM awards_document_summary
+   JOIN awards_summary
+     ON awards_summary.id = awards_document_summary.id AND
+        awards_summary.award_index = awards_document_summary.award_index 
+
+Or, more briefly:
 
 .. code-block:: bash
 
-   select * from awards_document_summary join awards_summary on awards_summary.id = awards_document_summary.id and awards_summary.award_index = awards_document_summary.award_index 
-
-There is a postgresql sortcut to the above query as all join columns have the same name:
-
-.. code-block:: bash
-
-   select * from awards_document_summary join awards_summary using (id, award_index)
-
+   SELECT *
+   FROM awards_document_summary
+   JOIN awards_summary USING (id, award_index)
 
 .. _metadata:
 
