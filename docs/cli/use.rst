@@ -76,7 +76,10 @@ By default, some summary tables are database `views <https://www.postgresql.org/
 
     python ocdskingfisher-views-cli add-view 123 "The note" --name the_name --tables-only
 
+This option is useful if you want to create a schema that does not rely on data from the Kingfisher Process database.  This means that if you give users permissions to this schema only then they will have a useful subset of the data, without them needing to have permissions to all data within Kingfisher.
+
 .. _delete-view:
+
 
 delete-view
 -----------
