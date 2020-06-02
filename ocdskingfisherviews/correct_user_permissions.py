@@ -26,7 +26,7 @@ def correct_user_permissions(engine):
 
             # Grant access to the mapping_sheets table in the views schema.
             connection.execute('GRANT USAGE ON SCHEMA views TO ' + user)
-            connection.execute('GRANT SELECT ON mapping_sheets IN SCHEMA views TO ' + user)
+            connection.execute('GRANT SELECT ON views.mapping_sheets TO ' + user)
 
             # Grant access to all tables in every schema created by Kingfisher Views.
             for schema in schemas:
