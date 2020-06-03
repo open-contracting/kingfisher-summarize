@@ -48,6 +48,8 @@ Update the database tables reference
 
 Then, for any new CSV file, manually add a new sub-section to ``docs/database.rst`` under an appropriate section.
 
+.. _create_erd:
+
 Create Entity Relationship Diagram
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
