@@ -70,14 +70,45 @@ select
     convert_to_timestamp(d.data ->> 'date') release_date,
     d.data -> 'tag' release_tag,
     d.data ->> 'language' release_language
-from 
+from
     compiled_release AS r
 join
     data d on d.id = r.data_id
 where
-    collection_id in (select id from selected_collections);
+    collection_id in (select id from selected_collections)
 
+union
 
+select
+    (r.id::bigint * 1000000 + (ordinality - 1)) * 10 + 3 AS id,
+    'releases_within_records' as release_type,
+    r.id AS table_id,
+    collection_id,
+    ocid,
+    value ->> 'id' AS release_id,
+    data_id,
+    package_data_id,
+    coalesce(pd.data ->> 'version', '1.0') AS package_version,
+    convert_to_timestamp(value ->> 'date') release_date,
+    value -> 'tag' release_tag,
+    value ->> 'language' release_language
+from
+    record AS r
+join
+    package_data pd on pd.id = r.package_data_id
+join
+    data d on d.id = r.data_id
+join
+    collection c on c.id = r.collection_id
+cross join
+    jsonb_array_elements(d.data -> 'releases') with ordinality
+where
+    -- We only want embedded releases, not linked releases
+    (value -> 'id') is not null
+     and
+    collection_id in (select id from selected_collections)
+
+;
 
 create unique index tmp_release_summary_id on tmp_release_summary(id);
 create index tmp_release_summary_data_id on tmp_release_summary(data_id);
@@ -89,7 +120,10 @@ create index tmp_release_summary_collection_id on tmp_release_summary(collection
 create or replace view tmp_release_summary_with_release_data
 as
 select 
-    case when release_type = 'record' then d.data -> 'compiledRelease' else d.data end AS data,
+    case
+        when release_type = 'record' then d.data -> 'compiledRelease'
+        when release_type = 'releases_within_records' then d.data -> 'releases' -> (mod(r.id / 10, 1000000)::integer)
+        else d.data end AS data,
     r.*  
 from 
     tmp_release_summary AS r
@@ -158,6 +192,10 @@ select
         release_type = 'record'
     then
         data #> ARRAY['compiledRelease', 'parties', party_index::text]
+    when
+        release_type = 'releases_within_records'
+    then
+        data -> 'releases' -> (mod(parties_summary_no_data.id / 10, 1000000)::integer) -> 'parties' -> party_index::integer
     else
         data #> ARRAY['parties', party_index::text]
     end as party
@@ -165,4 +203,3 @@ from
     parties_summary_no_data
 join
     data on data.id = data_id;
-
