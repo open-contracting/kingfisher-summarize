@@ -3,93 +3,88 @@ Development
 
 .. _devenv:
 
-Development environment
------------------------
+Get started
+-----------
 
-You need to set up the appropriate development environment to modify Kingfisher Views. You can install the requirements locally, or use the preconfigured Vagrant setup.
+You can either install all requirements manually or use the `preconfigured Vagrant setup <https://kingfisher-vagrant.readthedocs.io/en/latest/>`__.
 
-Locally, you will need a Postgres installation, as well as `Kingfisher Process <https://kingfisher-process.readthedocs.io/en/latest/requirements-install.html>`__ and `Kingfisher Views <https://kingfisher-views.readthedocs.io/en/latest/get-started.html#install-kingfisher-views>`__ installed in a virtual environment.
+To install manually, follow the `Get Started <https://kingfisher-views.readthedocs.io/en/latest/get-started.html>`__ guide.
 
-We recommend using the Vagrant setup though. `These instructions will get you started with Vagrant for Kingfisher <https://ocdskingfisher.readthedocs.io/en/latest/vagrant.html#>`__. When you are modifying SQL files or source code for Kingfisher Views, do this on your host machine, *not* in the Vagrant environment.
-
-You probably already have a preferred client for working with Postgres databases. The database name, user and password are all :code:`ocdskingfisher`. You can `read more about working with the database here <https://ocdskingfisher.readthedocs.io/en/latest/vagrant.html#working-with-the-database>`__.
+When using Vagrant, remember to modify Kingfisher Views's SQL files and source code **on your host machine**, not in the Vagrant environment. See also how to `access the database <https://kingfisher-vagrant.readthedocs.io/en/latest/#working-with-the-database>`__ in Vagrant.
 
 .. _loadingdata:
 
-Loading data
-------------
+Load data
+---------
 
-In order to test any changes you're going to make, you need to load some data. The `test data <https://github.com/open-contracting/kingfisher-views/tree/master/tests/fixtures>`__ covers every field in the standard so you can load that, but you may also have some specific data of your own you want to work with.
+To test your changes, you need to load some data. The `test data <https://github.com/open-contracting/kingfisher-views/tree/master/tests/fixtures>`__ covers common fields, but you might have specific data that you want to test against.
 
-1. Set up Kingfisher Process:
+1. Set up Kingfisher Process' database, create a collection, and load the test data into it:
 
 .. code-block:: bash
 
     (vagrant) cd /vagrant/process
     (vagrant) source .ve/bin/activate
-    // Set up database
     (vagrant) python ocdskingfisher-process-cli upgrade-database
-    // Make a new collection
     (vagrant) python ocdskingfisher-process-cli new-collection '{collection_name}' '2000-01-01 00:00:00'
-    // Populate database
     (vagrant) python ocdskingfisher-process-cli local-load 1 ../views/tests/fixtures release_package
+    (vagrant) deactivate
 
-2. Make views on the data. Views tables are created in the general kingfisher database (:code:`ocdskingfisher`, tables :code:`view_data_{collection_name}`, :code:`view_info`, :code:`view_meta`): 
+2. Summarize collection 1 using Kingfisher Views:
 
 .. code-block:: bash
 
-    (vagrant) cd ../views
-    (vagrant) deactivate && source .ve/bin/activate
+    (vagrant) cd /vagrant/views
+    (vagrant) source .ve/bin/activate
     (vagrant) python ocdskingfisher-views-cli add-view 1 "some note"
 
-3. Look at data that has been created, so you have something to compare to when you make changes.
-  * Select from :code:`view_data_{collection_name}` to see views data created so far
-  * Select from view :code:`release_summary_with_data`
+3. Look at the data that has been created, so you have something to compare against when you make changes.
 
+   - Select from tables in the :code:`view_data_collection_1` schema
+   - Select from the table :code:`release_summary_with_data`
 
 SQL files
 ---------
 
-The queries that generate different views are arranged across an ordered series of SQL files in the `sql directory <https://github.com/open-contracting/kingfisher-views/tree/master/sql>`__. In the following documentation, for brevity, the SQL files are referred by their numeric prefix.
+The SQL statements that summarize data are stored in a sequence of SQL files in the `sql directory <https://github.com/open-contracting/kingfisher-views/tree/master/sql>`__. For brevity, the SQL files are referred here by their numeric prefix. The :ref:`refresh-views` command runs the SQL files.
 
-The SQL files are run by the :ref:`refresh-views` command.
+Dependencies
+~~~~~~~~~~~~
 
-Note that:
-
-* All SQL files depend on ``001``, which creates functions.
-* All SQL files depend on ``002``, which creates ``tmp_release_summary``.
-* ``007`` depends on ``006`` (contract summaries need to know about award summaries).
-* ``008`` depends on all SQL files (release summaries need to know about all others).
-* ``008`` drops ``tmp_release_summary``.
+- All SQL files depend on ``001``, which creates SQL functions.
+- All SQL files depend on ``002``, which creates ``tmp_release_summary``.
+- ``007`` depends on ``006`` (contract summaries need to know about award summaries).
+- ``008`` depends on all SQL files (release summaries need to know about all others).
+- ``008`` drops ``tmp_release_summary``.
 
 .. _sql-contents:
 
-File and query contents
-~~~~~~~~~~~~~~~~~~~~~~~
+Contents
+~~~~~~~~
 
-The SQL files are named after the parts of the OCDS data they concern.
+SQL files are named after the parts of the OCDS data they concern.
 
-Queries in the files are typically grouped into blocks. A block usually starts with a :code:`drop table if exists...` query and ends with a :code:`create unique index`. This is useful to know if you are copying and pasting existing blocks of queries to add new data to views that is simiarly structured.
+SQL statements are typically grouped into blocks. A block typically starts with a :code:`DROP TABLE IF EXISTS` and ends with a :code:`CREATE UNIQUE INDEX`. Make sure to copy-paste the entire block when adding a similar summary.
 
-In some cases :code:`----` blocks are used to break the files into sections; each section is executed in it's own transaction.
+In some cases, :code:`----` lines segment the files; each segment is executed in its own transaction.
 
-In many cases views outputs are generated from multiple places. You'll see table names beginning with :code:`tmp_` or :code:`staged_` which are used as intermediate stores for data as it is aggregated, and dropped at the end of the file.
+In many cases, the final tables are generated from many others. Table names starting with :code:`tmp_` or :code:`staged_` are temporary or intermediate tables that are typically dropped at the end of the file in which they are created.
 
-Run specific files
-~~~~~~~~~~~~~~~~~~
+Run a specific file
+~~~~~~~~~~~~~~~~~~~
 
-If you're working on a specific file, you can run it on its own, using the ``psql`` command. For example, to run the ``004-planning.sql`` file in the ``view_data_the_name`` schema, using the :ref:`default database connection settings<database-connection-settings>`:
+To run, for example, the ``004-planning.sql`` file in the ``view_data_the_name`` schema using the :ref:`default database connection settings<database-connection-settings>`:
 
 .. code-block:: bash
 
    psql 'dbname=ocdskingfisher user=ocdskingfisher options=--search-path=view_data_the_name' -f 004-planning.sql
 
-To work on a file, you should first run the :ref:`refresh-views` command and then run the ``002`` file. You can then run the file you're working on as often as you want, without repeating the previous steps.
+When working on a specific file, you can first run the :ref:`refresh-views` command and then run the ``002`` file as above. You can then run the specific file after each change to see the new results.
 
 Time SQL statements
 ~~~~~~~~~~~~~~~~~~~
 
-Add ``-c '\timing'`` to a ``psql`` command, before any ``-f`` options. For example, for the command above:
+Add the ``-c '\timing'`` option to a ``psql`` command, before any ``-f`` options. For example:
 
 .. code-block:: bash
 
