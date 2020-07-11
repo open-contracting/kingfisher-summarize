@@ -244,4 +244,4 @@ The tables to which access is granted are:
 ``views``
    The ``mapping_sheets`` tables.
 Collection-specific schemas
-   All tables about one or more collections, created by the :ref:`add-view`, :ref:`refresh-views` and :ref:`field-counts` commands. See :doc:`database`.
+   All tables about one or more collections, created by the :ref:`add-view`, :ref:`refresh-views` and :ref:`field-counts` commands. See :doc:`../database`.

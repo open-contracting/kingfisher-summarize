@@ -192,8 +192,8 @@ The tests won't pass if you don't document the new columns!
 
       -- For the "Add an aggregate" example
 
-      'Comment on column %%1$s.total_planning_documents IS ''Count of planning documents in this release''; '
-      'Comment on column %%1$s.planning_documenttype_counts IS ''JSONB object with the keys as unique planning/documents/documentType and the values as count of the appearances of those documentTypes''; '
+      Comment on column %%1$s.total_planning_documents IS 'Count of planning documents in this release';
+      Comment on column %%1$s.planning_documenttype_counts IS 'JSONB object with the keys as unique planning/documents/documentType and the values as count of the appearances of those documentTypes';
 
 #. Run the ``999-docs.sql`` file (:ref:`refresh-views` throws an error if you made a typo above):
 
