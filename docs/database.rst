@@ -89,6 +89,8 @@ field_counts
    :widths: 10, 10, 40
    :file: definitions/field_counts.csv
 
+.. _db-releases:
+
 Releases
 --------
 
@@ -117,6 +119,8 @@ release_summary_with_checks
    :header-rows: 1
    :widths: 10, 10, 40
    :file: definitions/release_summary_with_checks.csv
+
+.. _db-parties:
 
 Parties
 -------
@@ -155,6 +159,8 @@ tenderers_summary
    :widths: 10, 10, 40
    :file: definitions/tenderers_summary.csv
 
+.. _db-planning:
+
 Planning section
 ----------------
 
@@ -183,6 +189,8 @@ planning_milestones_summary
    :header-rows: 1
    :widths: 10, 10, 40
    :file: definitions/planning_milestones_summary.csv
+
+.. _db-tender:
 
 Tender section
 --------------
@@ -229,6 +237,8 @@ tender_milestones_summary
    :widths: 10, 10, 40
    :file: definitions/tender_milestones_summary.csv
 
+.. _db-awards:
+
 Awards section
 --------------
 
@@ -266,6 +276,8 @@ award_documents_summary
    :widths: 10, 10, 40
    :file: definitions/award_documents_summary.csv
 
+.. _db-contracts:
+
 Contracts section
 -----------------
 
@@ -302,6 +314,8 @@ contract_milestones_summary
    :header-rows: 1
    :widths: 10, 10, 40
    :file: definitions/contract_milestones_summary.csv
+
+.. _db-contract-implementation:
 
 Contract implementation section
 -------------------------------
