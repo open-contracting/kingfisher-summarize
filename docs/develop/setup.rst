@@ -1,10 +1,8 @@
-Development
-===========
+Setup
+=====
 
-.. _devenv:
-
-Get started
------------
+Prerequisites
+-------------
 
 You can either install all requirements manually or use the `preconfigured Vagrant setup <https://kingfisher-vagrant.readthedocs.io/en/latest/>`__.
 
@@ -12,36 +10,36 @@ To install manually, follow the `Get Started <https://kingfisher-views.readthedo
 
 When using Vagrant, remember to modify Kingfisher Views's SQL files and source code **on your host machine**, not in the Vagrant environment. See also how to `access the database <https://kingfisher-vagrant.readthedocs.io/en/latest/#working-with-the-database>`__ in Vagrant.
 
-.. _loadingdata:
+.. _load-data:
 
 Load data
 ---------
 
-To test your changes, you need to load some data. The `test data <https://github.com/open-contracting/kingfisher-views/tree/master/tests/fixtures>`__ covers common fields, but you might have specific data that you want to test against.
+To test your changes, you need to have some data loaded. The `test data <https://github.com/open-contracting/kingfisher-views/tree/master/tests/fixtures>`__ covers common fields, but you might have specific data that you want to test against.
 
-1. Set up Kingfisher Process' database, create a collection, and load the test data into it:
+#. Set up Kingfisher Process' database, create a collection, and load the test data into it:
 
-.. code-block:: bash
+   .. code-block:: bash
 
-    (vagrant) cd /vagrant/process
-    (vagrant) source .ve/bin/activate
-    (vagrant) python ocdskingfisher-process-cli upgrade-database
-    (vagrant) python ocdskingfisher-process-cli new-collection '{collection_name}' '2000-01-01 00:00:00'
-    (vagrant) python ocdskingfisher-process-cli local-load 1 ../views/tests/fixtures release_package
-    (vagrant) deactivate
+      (vagrant) cd /vagrant/process
+      (vagrant) source .ve/bin/activate
+      (vagrant) python ocdskingfisher-process-cli upgrade-database
+      (vagrant) python ocdskingfisher-process-cli new-collection '{collection_name}' '2000-01-01 00:00:00'
+      (vagrant) python ocdskingfisher-process-cli local-load 1 ../views/tests/fixtures release_package
+      (vagrant) deactivate
 
-2. Summarize collection 1 using Kingfisher Views:
+#. Summarize collection 1 using Kingfisher Views:
 
-.. code-block:: bash
+   .. code-block:: bash
 
-    (vagrant) cd /vagrant/views
-    (vagrant) source .ve/bin/activate
-    (vagrant) python ocdskingfisher-views-cli add-view 1 "some note"
+      (vagrant) cd /vagrant/views
+      (vagrant) source .ve/bin/activate
+      (vagrant) python ocdskingfisher-views-cli add-view 1 "some note"
 
-3. Look at the data that has been created, so you have something to compare against when you make changes.
+#. Look at the data that has been created, so you have something to compare against when you make changes.
 
-   - Select from tables in the :code:`view_data_collection_1` schema
-   - Select from the table :code:`release_summary_with_data`
+   -  Select from tables in the ``view_data_collection_1`` schema
+   -  Select from the table ``release_summary_with_data``
 
 SQL files
 ---------
@@ -51,24 +49,26 @@ The SQL statements that summarize data are stored in a sequence of SQL files in 
 Dependencies
 ~~~~~~~~~~~~
 
-- All SQL files depend on ``001``, which creates SQL functions.
-- All SQL files depend on ``002``, which creates ``tmp_release_summary``.
-- ``007`` depends on ``006`` (contract summaries need to know about award summaries).
-- ``008`` depends on all SQL files (release summaries need to know about all others).
-- ``008`` drops ``tmp_release_summary``.
+-  All SQL files depend on ``001``, which creates SQL functions.
+-  All SQL files depend on ``002``, which creates ``tmp_release_summary``.
+-  ``007`` depends on ``006`` (contract summaries need to know about award summaries).
+-  ``008`` depends on all SQL files (release summaries need to know about all others).
+-  ``008`` drops ``tmp_release_summary``.
 
 .. _sql-contents:
 
 Contents
 ~~~~~~~~
 
-SQL files are named after the parts of the OCDS data they concern.
+SQL files are named after the sections of the OCDS data that they summarize. The ``008-release.sql`` file summarizes the entire collection(s).
 
-SQL statements are typically grouped into blocks. A block typically starts with a :code:`DROP TABLE IF EXISTS` and ends with a :code:`CREATE UNIQUE INDEX`. Make sure to copy-paste the entire block when adding a similar summary.
+SQL statements are typically grouped into blocks. A block typically starts with ``drop table if exists`` and ends with ``create unique index``. Make sure to copy-paste the entire block when adding a similar summary.
 
-In some cases, :code:`----` lines segment the files; each segment is executed in its own transaction.
+In ``008-release.sql``, blocks are ordered in roughly the same order as the stages of a contracting process.
 
-In many cases, the final tables are generated from many others. Table names starting with :code:`tmp_` or :code:`staged_` are temporary or intermediate tables that are typically dropped at the end of the file in which they are created.
+In many cases, the final tables are generated from many others. Table names starting with ``tmp_`` or ``staged_`` are temporary or intermediate tables that are typically dropped at the end of the file in which they are created.
+
+In some cases, ``----`` lines break the files into segments, each of which are executed in a transaction.
 
 Run a specific file
 ~~~~~~~~~~~~~~~~~~~
@@ -90,6 +90,8 @@ Add the ``-c '\timing'`` option to a ``psql`` command, before any ``-f`` options
 
    psql 'dbname=ocdskingfisher user=ocdskingfisher options=--search-path=view_data_the_name' -c '\timing' -f 004-planning.sql
 
+.. _docs-files:
+
 Documentation files
 -------------------
 
@@ -100,7 +102,7 @@ Update the database tables reference
 
 .. code-block:: bash
 
-   python ocdskingfisher-views-cli docs-table-ref
+   python ocdskingfisher-views-cli docs-table-ref {collection_name}
 
 Then, for any new CSV file, manually add a new sub-section to ``docs/database.rst`` under an appropriate section.
 

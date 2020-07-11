@@ -74,5 +74,4 @@ That's it! Feel free to browse the documentation below.
    database
    logging
    users
-   develop
-   adding-and-updating-views
+   develop/index
