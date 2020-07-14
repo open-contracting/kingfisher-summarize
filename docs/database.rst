@@ -21,7 +21,7 @@ Note that, in the case of Kingfisher Process' ``record`` table, the record's dat
 Foreign key relationships exist on all `tables <https://www.postgresql.org/docs/current/sql-createtable.html>`__ (but not `views <https://www.postgresql.org/docs/current/sql-createview.html>`__) within a schema, as shown in the Entity Relationship Diagram below (click on the image and zoom in to read more easily).
 
 .. image:: _static/erd.png
-   :target: ../_static/erd.png
+   :target: _static/erd.png
 
 This diagram can help to identify JOIN conditions. For example, all tables can be joined with the ``release_summary``, ``release_summary_with_data`` and ``release_summary_with_data`` tables on the ``id`` column.
 

@@ -42,7 +42,7 @@ Download the sample configuration file to the configuration directory:
 
 .. code-block:: bash
 
-    curl -o ~/.config/ocdskingfisher-views/config.ini https://kingfisher-views.readthedocs.io/latest/en/_static/config.ini
+    curl -o ~/.config/ocdskingfisher-views/config.ini https://kingfisher-views.readthedocs.io/en/latest/_static/config.ini
 
 .. _config-logging:
 
