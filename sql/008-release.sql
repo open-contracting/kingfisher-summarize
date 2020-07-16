@@ -336,7 +336,9 @@ select
     c.transform_type,
     c.transform_from_collection_id,
     c.deleted_at,
-    d.data,
+    case
+        when release_type = 'embedded_release' then d.data -> 'releases' -> (mod(rs.id / 10, 1000000)::integer)
+        else d.data end AS data,
     pd.data as package_data
 from 
     release_summary rs

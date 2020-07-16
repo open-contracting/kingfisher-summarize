@@ -81,7 +81,7 @@ union
 
 select
     (r.id::bigint * 1000000 + (ordinality - 1)) * 10 + 3 AS id,
-    'releases_within_records' as release_type,
+    'embedded_release' as release_type,
     r.id AS table_id,
     collection_id,
     ocid,
@@ -122,7 +122,7 @@ as
 select 
     case
         when release_type = 'record' then d.data -> 'compiledRelease'
-        when release_type = 'releases_within_records' then d.data -> 'releases' -> (mod(r.id / 10, 1000000)::integer)
+        when release_type = 'embedded_release' then d.data -> 'releases' -> (mod(r.id / 10, 1000000)::integer)
         else d.data end AS data,
     r.*  
 from 
@@ -193,7 +193,7 @@ select
     then
         data #> ARRAY['compiledRelease', 'parties', party_index::text]
     when
-        release_type = 'releases_within_records'
+        release_type = 'embedded_release'
     then
         data -> 'releases' -> (mod(parties_summary_no_data.id / 10, 1000000)::integer) -> 'parties' -> party_index::integer
     else
