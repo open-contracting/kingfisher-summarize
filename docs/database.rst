@@ -14,9 +14,9 @@ Otherwise, the :ref:`add-view` command *with* the ``--dontbuild`` flag creates t
 How tables are related
 ~~~~~~~~~~~~~~~~~~~~~~
 
-All summary tables have an ``id`` column and a ``release_type`` column. This ``id`` column refers to the ``id`` column in the ``release_summary`` table. The ``table_id`` column in the ``release_summary`` table refers the ``id`` column in either Kingfisher Process' ``release``, ``record`` or ``compiled_release`` table; the table is indicated by the ``release_type`` column.
+All summary tables have an ``id`` column and a ``release_type`` column. This ``id`` column refers to the ``id`` column in the ``release_summary`` table. The ``table_id`` column in the ``release_summary`` table refers the ``id`` column in either Kingfisher Process' ``release``, ``record`` or ``compiled_release`` table; the table is indicated by the ``release_type`` column. A ``release_type`` of ``embedded_release`` is an exception, where ``table_id`` refers to the ``id`` column in the ``record`` table.
 
-Note that, in the case of Kingfisher Process' ``record`` table, the record's data's ``compiledRelease`` is used in summaries.
+Note that, in the case of Kingfisher Process' ``record`` table, the record's data's ``compiledRelease`` is used in summaries. In the case of ``embedded_release``, an item from the record's data's ``releases`` array is used in summaries.
 
 Foreign key relationships exist on all `tables <https://www.postgresql.org/docs/current/sql-createtable.html>`__ (but not `views <https://www.postgresql.org/docs/current/sql-createview.html>`__) within a schema, as shown in the Entity Relationship Diagram below (click on the image and zoom in to read more easily).
 
