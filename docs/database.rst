@@ -14,9 +14,11 @@ Otherwise, the :ref:`add-view` command *with* the ``--dontbuild`` flag creates t
 How tables are related
 ~~~~~~~~~~~~~~~~~~~~~~
 
-All summary tables have an ``id`` column and a ``release_type`` column. This ``id`` column refers to the ``id`` column in the ``release_summary`` table. The ``table_id`` column in the ``release_summary`` table refers the ``id`` column in either Kingfisher Process' ``release``, ``record`` or ``compiled_release`` table; the table is indicated by the ``release_type`` column. A ``release_type`` of ``embedded_release`` is an exception, where ``table_id`` refers to the ``id`` column in the ``record`` table.
+Each summary table has an ``id`` column and a ``release_type`` column. The ``id`` column in a summary table refers to the ``id`` column in the ``release_summary`` table. For a given ``id`` value, the ``release_type`` value is the same in all tables (in other words, the ``release_type`` column is `denormalized <https://en.wikipedia.org/wiki/Denormalization>`__).
 
-Note that, in the case of Kingfisher Process' ``record`` table, the record's data's ``compiledRelease`` is used in summaries. In the case of ``embedded_release``, an item from the record's data's ``releases`` array is used in summaries.
+The ``table_id`` column in the ``release_summary`` table refers to the ``id`` column in either Kingfisher Process' ``release``, ``record`` or ``compiled_release`` table. If the ``release_type`` is "embedded_release", the referred table is the ``record`` table. Otherwise, the referred table matches the value of the ``release_type`` column (either "release", "record" or "compiled_release").
+
+If the ``release_type`` is "record", then the record's ``compiledRelease`` field is used to generate summaries. If the ``release_type`` is "embedded_release", then the record's ``releases`` array is used to generate summaries.
 
 Foreign key relationships exist on all `tables <https://www.postgresql.org/docs/current/sql-createtable.html>`__ (but not `views <https://www.postgresql.org/docs/current/sql-createview.html>`__) within a schema, as shown in the Entity Relationship Diagram below (click on the image and zoom in to read more easily).
 
