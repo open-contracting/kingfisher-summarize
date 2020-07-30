@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import ocdskingfisherviews.cli
+from ocdskingfisherviews.cli import cli
 
 if __name__ == '__main__':
-    ocdskingfisherviews.cli.run_command()
+    cli()

@@ -1,16 +1,9 @@
 import random
 
-import pytest
-import sqlalchemy as sa
+from click.testing import CliRunner
 
-import ocdskingfisherviews.config
-from ocdskingfisherviews.cli import run_command
-
-
-@pytest.fixture(scope='module')
-def engine():
-    return sa.create_engine(ocdskingfisherviews.config.get_database_uri())
-
+from ocdskingfisherviews.cli import cli
+from ocdskingfisherviews.db import get_cursor, pluck
 
 VIEWS_TABLES = {
     "award_documents_summary",
@@ -41,8 +34,7 @@ VIEWS_TABLES = {
     "tenderers_summary"
 }
 
-
-NO_COMMENTS_QUERY = '''
+NO_COMMENTS_QUERY = """
 SELECT
     isc.table_name,
     isc.column_name,
@@ -50,7 +42,7 @@ SELECT
 FROM
     information_schema.columns isc
 where
-    isc.table_schema=%s
+    isc.table_schema=%(schema)s
     and lower(isc.table_name) !~ 'tmp_.*'
     and lower(isc.table_name) !~ 'staged_.*'
     and lower(isc.table_name) !~ '.*_no_data'
@@ -58,84 +50,99 @@ where
     and pg_catalog.col_description(
         format('%%s.%%s',isc.table_schema,isc.table_name)::regclass::oid,
         isc.ordinal_position) is null
-'''
-
-CURRENT_TABLES_QUERY = '''
-    select table_name from information_schema.tables
-    where table_schema = 'view_data_{}'
-'''
+"""
 
 
-def test_refresh_runs(engine):
-    viewname = 'viewname' + str(random.randint(1, 10000000))
-    run_command(['add-view', '--name', viewname, '1', 'Note'])
-    run_command(['refresh-views', viewname, '--remove'])
-    run_command(['refresh-views', viewname])
-
-    with engine.connect() as conn:
-        results = conn.execute(CURRENT_TABLES_QUERY.format(viewname))
-        db_tables = {result['table_name'] for result in results}
-        assert db_tables.issuperset(VIEWS_TABLES)
-
-    with engine.connect() as conn:
-        results = conn.execute(NO_COMMENTS_QUERY, 'view_data_' + viewname)
-        missing_comments = [result for result in results]
-        assert missing_comments == []
-
-    run_command(['refresh-views', viewname, '--remove'])
-    with engine.connect() as conn:
-        results = conn.execute(CURRENT_TABLES_QUERY.format(viewname))
-        db_tables = {result['table_name'] for result in results}
-        assert db_tables.isdisjoint(VIEWS_TABLES)
+def get_current_tables(schema):
+    return set(pluck('SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s',
+                     {'schema': schema}))
 
 
-def test_refresh_runs_tables_only(engine):
+def test_refresh_runs():
+    runner = CliRunner()
+    cursor = get_cursor()
 
-    viewname = 'viewname' + str(random.randint(1, 10000000))
-    run_command(['add-view', '--name', viewname, '1', 'Note', '--tables-only'])
+    name = 'viewname' + str(random.randint(1, 10000000))
+    schema = f'view_data_{name}'
 
-    with engine.connect() as conn:
-        results = conn.execute(CURRENT_TABLES_QUERY.format(viewname))
-        db_tables = {result['table_name'] for result in results}
-        assert db_tables.issuperset(VIEWS_TABLES)
+    result = runner.invoke(cli, ['add-view', '--name', name, '1', 'Note'])
+    assert result.exit_code == 0
 
-    run_command(['refresh-views', viewname, '--tables-only'])
-    with engine.connect() as conn:
-        results = conn.execute(CURRENT_TABLES_QUERY.format(viewname))
-        db_tables = {result['table_name'] for result in results}
-        assert db_tables.issuperset(VIEWS_TABLES)
+    assert get_current_tables(schema).issuperset(VIEWS_TABLES)
 
-    run_command(['refresh-views', viewname, '--remove', '--tables-only'])
-    with engine.connect() as conn:
-        results = conn.execute(CURRENT_TABLES_QUERY.format(viewname))
-        db_tables = {result['table_name'] for result in results}
-        print(db_tables)
-        assert db_tables.isdisjoint(VIEWS_TABLES)
+    result = runner.invoke(cli, ['refresh-views', name, '--remove'])
+    assert result.exit_code == 0
 
-    run_command(['delete-view', viewname])
+    assert get_current_tables(schema).isdisjoint(VIEWS_TABLES)
+
+    result = runner.invoke(cli, ['refresh-views', name])
+    assert result.exit_code == 0
+
+    assert get_current_tables(schema).issuperset(VIEWS_TABLES)
+
+    cursor.execute(NO_COMMENTS_QUERY, {'schema': schema})
+
+    assert not cursor.fetchall()
+
+    result = runner.invoke(cli, ['delete-view', name])
+    assert result.exit_code == 0
 
 
-def test_field_count_runs(engine):
-    viewname = 'viewname' + str(random.randint(1, 10000000))
-    run_command(['add-view', '--name', viewname, '1', 'Note'])
-    run_command(['refresh-views', viewname, '--remove'])
-    run_command(['field-counts', viewname, '--remove'])
-    run_command(['refresh-views', viewname])
-    run_command(['field-counts', viewname])
-    get_current_tables_query = "select table_name from information_schema.tables " + \
-                               "where table_schema = 'view_data_" + viewname + "'"
+def test_refresh_runs_tables_only():
+    runner = CliRunner()
 
-    with engine.connect() as conn:
-        results = conn.execute(get_current_tables_query)
-        db_tables = {result['table_name'] for result in results}
-        assert 'field_counts' in db_tables
+    name = 'viewname' + str(random.randint(1, 10000000))
+    schema = f'view_data_{name}'
 
-    run_command(['refresh-views', viewname, '--remove'])
-    run_command(['field-counts', viewname, '--remove'])
+    result = runner.invoke(cli, ['add-view', '--name', name, '1', 'Note', '--tables-only'])
+    assert result.exit_code == 0
 
-    with engine.connect() as conn:
-        results = conn.execute(get_current_tables_query)
-        db_tables = {result['table_name'] for result in results}
-        assert 'field_counts' not in db_tables
+    assert get_current_tables(schema).issuperset(VIEWS_TABLES)
 
-    run_command(['delete-view', viewname])
+    result = runner.invoke(cli, ['refresh-views', name, '--tables-only'])
+    assert result.exit_code == 0
+
+    assert get_current_tables(schema).issuperset(VIEWS_TABLES)
+
+    result = runner.invoke(cli, ['refresh-views', name, '--remove', '--tables-only'])
+    assert result.exit_code == 0
+
+    assert get_current_tables(schema).isdisjoint(VIEWS_TABLES)
+
+    result = runner.invoke(cli, ['delete-view', name])
+    assert result.exit_code == 0
+
+
+def test_field_count_runs():
+    runner = CliRunner()
+
+    name = 'viewname' + str(random.randint(1, 10000000))
+    schema = f'view_data_{name}'
+
+    result = runner.invoke(cli, ['add-view', '--name', name, '1', 'Note'])
+    assert result.exit_code == 0
+
+    result = runner.invoke(cli, ['refresh-views', name, '--remove'])
+    assert result.exit_code == 0
+
+    result = runner.invoke(cli, ['field-counts', name, '--remove'])
+    assert result.exit_code == 0
+
+    result = runner.invoke(cli, ['refresh-views', name])
+    assert result.exit_code == 0
+
+    result = runner.invoke(cli, ['field-counts', name])
+    assert result.exit_code == 0
+
+    assert 'field_counts' in get_current_tables(schema)
+
+    result = runner.invoke(cli, ['refresh-views', name, '--remove'])
+    assert result.exit_code == 0
+
+    result = runner.invoke(cli, ['field-counts', name, '--remove'])
+    assert result.exit_code == 0
+
+    assert 'field_counts' not in get_current_tables(schema)
+
+    result = runner.invoke(cli, ['delete-view', name])
+    assert result.exit_code == 0

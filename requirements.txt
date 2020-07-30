@@ -5,6 +5,7 @@
 #    pip-compile
 #
 alembic==1.4.0
+click==7.1.2
 mako==1.1.1               # via alembic
 markupsafe==1.1.1         # via mako
 pgpasslib==1.1.0

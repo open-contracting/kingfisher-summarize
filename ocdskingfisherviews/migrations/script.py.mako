@@ -8,7 +8,6 @@ Create Date: ${create_date}
 
 import os 
 from alembic import op
-import sqlalchemy as sa
 ${imports if imports else ""}
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

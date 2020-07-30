@@ -2,6 +2,7 @@ import configparser
 import getpass
 import logging
 import os
+from urllib.parse import urlparse
 
 import pgpasslib
 
@@ -9,9 +10,30 @@ logger = logging.getLogger('ocdskingfisher.views.config')
 
 
 def get_database_uri():
-    database_uri = os.getenv('KINGFISHER_VIEWS_DB_URI')
-    if database_uri:
-        return database_uri
+    """
+    Returns the database connection URL.
+    """
+    database_url = os.getenv('KINGFISHER_VIEWS_DB_URI')
+    if database_url:
+        return database_url
+
+    return 'postgresql://{user}:{password}@{host}:{port}/{dbname}'.format(**get_connection_parameters())
+
+
+def get_connection_parameters():
+    """
+    Returns the database connection parameters as a dict.
+    """
+    database_url = os.getenv('KINGFISHER_VIEWS_DB_URI')
+    if database_url:
+        parts = urlparse(database_url)
+        return {
+            'user': parts.username,
+            'password': parts.password,
+            'host': parts.hostname,
+            'port': parts.port,
+            'dbname': parts.path[1:],
+        }
 
     userpath = '~/.config/ocdskingfisher-views/config.ini'
     fullpath = os.path.expanduser(userpath)
@@ -36,7 +58,7 @@ def get_database_uri():
     # We don't use the default database name (that matches the user name) as this is rarely what the user intends.
     dbname = config.get('DBHOST', 'DBNAME')
 
-    # Instead of setting the database URI to "postgresql://:@:5432/dbname" (which implicitly uses the default
+    # Instead of setting the database URL to "postgresql://:@:5432/dbname" (which implicitly uses the default
     # username and default hostname), we set it to, for example, "postgresql://morgan:@localhost:5432/dbname".
     if not username:
         username = default_username
@@ -57,4 +79,10 @@ def get_database_uri():
     except pgpasslib.InvalidEntry as e:
         logger.warning('Skipping PostgreSQL Password File: {}'.format(e))
 
-    return 'postgresql://{}:{}@{}:{}/{}'.format(username, password, hostname, port, dbname)
+    return {
+        'user': username,
+        'password': password,
+        'host': hostname,
+        'port': port,
+        'dbname': dbname,
+    }
