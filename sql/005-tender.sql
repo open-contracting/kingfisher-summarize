@@ -289,7 +289,7 @@ create view tender_summary_with_data
 AS
 select 
     ts.*, 
-    data -> 'tender' AS tender
+    COALESCE(data -> 'tender', data -> 'compiledRelease'-> 'tender') AS tender
 from 
     tender_summary ts
 join 
