@@ -126,26 +126,3 @@ Run SchemaSpy with:
    java -jar /bin/schemaspy.jar -t pgsql -dp /bin/postgresql.jar -s view_data_<view_name> -db ocdskingfisher -u ocdskingfisher -p ocdskingfisher -host localhost -o /vagrant/schemaspy -norows
 
 In the directory that results, copy ``schemaspy/diagrams/summary/relationships.real.compact.png`` to ``docs/_static/erd.png``.
-
-Configuration tables
---------------------
-
-Add a migration
-~~~~~~~~~~~~~~~
-
-Creates a generic `Alembic <https://alembic.sqlalchemy.org/>`__ migration file in the `ocdskingfisherviews/migrations/versions/ <https://github.com/open-contracting/kingfisher-views/tree/master/ocdskingfisherviews/migrations/versions>`__ directory. Replace ``MESSAGE`` with a brief description of what the migration does, and run:
-
-.. code-block:: bash
-
-   alembic --raiseerr --config ocdskingfisherviews/alembic.ini revision -m 'MESSAGE'
-
-Remove the tables
-~~~~~~~~~~~~~~~~~
-
-Removes Kingfisher Views' :doc:`configuration tables<../cli/setup>`:
-
-.. code-block:: bash
-
-   alembic --raiseerr --config ocdskingfisherviews/alembic.ini downgrade base
-
-See :ref:`refresh-views` and :ref:`field-counts` to remove collection-specific schemas.

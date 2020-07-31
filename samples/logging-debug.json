@@ -51,26 +51,6 @@
         "debug_file_handler"
       ],
       "propagate": false
-    },
-    "sqlalchemy": {
-      "level": "WARN",
-      "handlers": [
-        "console",
-        "info_file_handler",
-        "error_file_handler",
-        "debug_file_handler"
-      ],
-      "propagate": false
-    },
-    "alembic": {
-      "level": "INFO",
-      "handlers": [
-        "console",
-        "info_file_handler",
-        "error_file_handler",
-        "debug_file_handler"
-      ],
-      "propagate": false
     }
   },
   "root": {

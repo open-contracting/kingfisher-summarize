@@ -57,7 +57,7 @@ jobs:
       env:
         KINGFISHER_VIEWS_DB_URI: postgresql://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres
       run: |
-        alembic --raiseerr --config ocdskingfisherviews/alembic.ini upgrade head
+        python ocdskingfisher-views-cli install
         pytest --cov ocdskingfisherviews
     - env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
