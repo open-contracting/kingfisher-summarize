@@ -2,23 +2,50 @@ import configparser
 import getpass
 import logging
 import os
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 
 import pgpasslib
 from click import UsageError
 
 logger = logging.getLogger('ocdskingfisher.views.config')
 
+def _add_pgpass_password(d):
+    # Use the password from the PostgreSQL Password File, if not provided.
+    if not d['password']:
+        # https://pgpasslib.readthedocs.io/en/latest/
+        try:
+            password_pgpass = pgpasslib.getpass(d['host'], d['port'] or 5432, d['dbname'], d['user'])
+            if password_pgpass is not None:
+                d['password'] = password_pgpass
+        except pgpasslib.FileNotFound:
+            pass
+        except pgpasslib.InvalidPermissions as e:
+            logger.warning('Skipping PostgreSQL Password File: {}.\nTry: chmod 600 {}'.format(e, e.args[0]))
+        except pgpasslib.InvalidEntry as e:
+            logger.warning('Skipping PostgreSQL Password File: {}'.format(e))
+
+    return d
+
 
 def get_database_uri():
     """
     Returns the database connection URL.
     """
-    database_url = os.getenv('KINGFISHER_VIEWS_DB_URI')
-    if database_url:
-        return database_url
+    params = get_connection_parameters()
 
-    return 'postgresql://{user}:{password}@{host}:{port}/{dbname}'.format(**get_connection_parameters())
+    netloc = ''
+    if params['user']:
+        netloc += params['user']
+    if params['password']:
+        netloc += f":{params['password']}"
+    if params['user'] or params['password']:
+        netloc += '@'
+    if params['host']:
+        netloc += params['host']
+    if params['port']:
+        netloc += f":{params['port']}"
+
+    return urlunparse(('postgresql', netloc, f"/{params['dbname']}", '', '', ''))
 
 
 def get_connection_parameters():
@@ -28,13 +55,14 @@ def get_connection_parameters():
     database_url = os.getenv('KINGFISHER_VIEWS_DB_URI')
     if database_url:
         parts = urlparse(database_url)
-        return {
+
+        return _add_pgpass_password({
             'user': parts.username,
             'password': parts.password,
             'host': parts.hostname,
             'port': parts.port,
             'dbname': parts.path[1:],
-        }
+        })
 
     userpath = '~/.config/ocdskingfisher-views/config.ini'
     fullpath = os.path.expanduser(userpath)
@@ -60,7 +88,7 @@ def get_connection_parameters():
     dbname = config.get('DBHOST', 'DBNAME')
 
     # Instead of setting the database URL to "postgresql://:@:5432/dbname" (which implicitly uses the default
-    # username and default hostname), we set it to, for example, "postgresql://morgan:@localhost:5432/dbname".
+    # username and default hostname), we set it to, for example, "postgresql://morgan@localhost:5432/dbname".
     if not username:
         username = default_username
     if not hostname:
@@ -68,22 +96,10 @@ def get_connection_parameters():
     if not dbname:
         raise UsageError('You must set DBNAME in {}.'.format(userpath))
 
-    # https://pgpasslib.readthedocs.io/en/latest/
-    try:
-        password_pgpass = pgpasslib.getpass(hostname, port, dbname, username)
-        if password_pgpass is not None:
-            password = password_pgpass
-    except pgpasslib.FileNotFound:
-        pass
-    except pgpasslib.InvalidPermissions as e:
-        logger.warning('Skipping PostgreSQL Password File: {}.\nTry: chmod 600 {}'.format(e, e.args[0]))
-    except pgpasslib.InvalidEntry as e:
-        logger.warning('Skipping PostgreSQL Password File: {}'.format(e))
-
-    return {
+    return _add_pgpass_password({
         'user': username,
         'password': password,
         'host': hostname,
         'port': port,
         'dbname': dbname,
-    }
+    })
