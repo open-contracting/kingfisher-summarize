@@ -293,11 +293,7 @@ def field_counts(name, remove, threads):
     with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
         futures = [executor.submit(_run_collection, collection) for collection in selected_collections]
         for future in concurrent.futures.as_completed(futures):
-            try:
-                future.result()
-            except Exception as e:
-                logger.exception(e)
-                raise
+            future.result()
 
     cursor.execute('DROP TABLE IF EXISTS field_counts')
     cursor.execute('ALTER TABLE field_counts_tmp RENAME TO field_counts')
