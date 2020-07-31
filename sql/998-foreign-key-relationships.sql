@@ -2,8 +2,8 @@ DO $$
 DECLARE
     query text;
 BEGIN
-    query := $query$ ALTER TABLE parties_summary % % 1$s
-        ADD CONSTRAINT parties_summary % % 1$s_release_summary_fk FOREIGN KEY (id) REFERENCES release_summary (id) NOT valid;
+    query := $query$ ALTER TABLE parties_summary%1$s
+        ADD CONSTRAINT parties_summary%1$s_release_summary_fk FOREIGN KEY (id) REFERENCES release_summary (id) NOT valid;
     ALTER TABLE planning_summary
         ADD CONSTRAINT planning_summary_release_summary_fk FOREIGN KEY (id) REFERENCES release_summary (id) NOT valid;
     ALTER TABLE planning_documents_summary
@@ -24,28 +24,28 @@ BEGIN
         ADD CONSTRAINT tender_milestones_summary_tender_summary_fk FOREIGN KEY (id) REFERENCES tender_summary (id) NOT valid;
     ALTER TABLE procuringentity_summary
         ADD CONSTRAINT procuringentity_summary_tender_summary_fk FOREIGN KEY (id) REFERENCES tender_summary (id) NOT valid;
-    ALTER TABLE contracts_summary % % 1$s
-        ADD CONSTRAINT contracts_summary % % 1$s_release_summary_fk FOREIGN KEY (id) REFERENCES release_summary (id) NOT valid;
+    ALTER TABLE contracts_summary%1$s
+        ADD CONSTRAINT contracts_summary%1$s_release_summary_fk FOREIGN KEY (id) REFERENCES release_summary (id) NOT valid;
     ALTER TABLE contract_documents_summary
-        ADD CONSTRAINT contract_documents_summary_contracts_summary % % 1$s_fk FOREIGN KEY (id, contract_index) REFERENCES contracts_summary % % 1$s (id, contract_index) NOT valid;
+        ADD CONSTRAINT contract_documents_summary_contracts_summary%1$s_fk FOREIGN KEY (id, contract_index) REFERENCES contracts_summary%1$s (id, contract_index) NOT valid;
     ALTER TABLE contract_implementation_milestones_summary
-        ADD CONSTRAINT contract_implementation_milestones_summary_contracts_summary % % 1$s_fk FOREIGN KEY (id, contract_index) REFERENCES contracts_summary % % 1$s (id, contract_index) NOT valid;
+        ADD CONSTRAINT contract_implementation_milestones_summary_contracts_summary%1$s_fk FOREIGN KEY (id, contract_index) REFERENCES contracts_summary%1$s (id, contract_index) NOT valid;
     ALTER TABLE contract_implementation_transactions_summary
-        ADD CONSTRAINT contract_implementation_transactions_summary_contracts_summary % % 1$s_fk FOREIGN KEY (id, contract_index) REFERENCES contracts_summary % % 1$s (id, contract_index) NOT valid;
+        ADD CONSTRAINT contract_implementation_transactions_summary_contracts_summary%1$s_fk FOREIGN KEY (id, contract_index) REFERENCES contracts_summary%1$s (id, contract_index) NOT valid;
     ALTER TABLE contract_implementation_documents_summary
-        ADD CONSTRAINT contract_implementation_documents_summary_contracts_summary % % 1$s_fk FOREIGN KEY (id, contract_index) REFERENCES contracts_summary % % 1$s (id, contract_index) NOT valid;
+        ADD CONSTRAINT contract_implementation_documents_summary_contracts_summary%1$s_fk FOREIGN KEY (id, contract_index) REFERENCES contracts_summary%1$s (id, contract_index) NOT valid;
     ALTER TABLE contract_items_summary
-        ADD CONSTRAINT contract_items_summary_contracts_summary % % 1$s_fk FOREIGN KEY (id, contract_index) REFERENCES contracts_summary % % 1$s (id, contract_index) NOT valid;
+        ADD CONSTRAINT contract_items_summary_contracts_summary%1$s_fk FOREIGN KEY (id, contract_index) REFERENCES contracts_summary%1$s (id, contract_index) NOT valid;
     ALTER TABLE contract_milestones_summary
-        ADD CONSTRAINT contract_milestones_summary_contracts_summary % % 1$s_fk FOREIGN KEY (id, contract_index) REFERENCES contracts_summary % % 1$s (id, contract_index) NOT valid;
-    ALTER TABLE awards_summary % % 1$s
-        ADD CONSTRAINT awards_summary % % 1$s_release_summary_fk FOREIGN KEY (id) REFERENCES release_summary (id) NOT valid;
+        ADD CONSTRAINT contract_milestones_summary_contracts_summary%1$s_fk FOREIGN KEY (id, contract_index) REFERENCES contracts_summary%1$s (id, contract_index) NOT valid;
+    ALTER TABLE awards_summary%1$s
+        ADD CONSTRAINT awards_summary%1$s_release_summary_fk FOREIGN KEY (id) REFERENCES release_summary (id) NOT valid;
     ALTER TABLE award_documents_summary
-        ADD CONSTRAINT award_documents_summary_awards_summary % % 1$s_fk FOREIGN KEY (id, award_index) REFERENCES awards_summary % % 1$s (id, award_index) NOT valid;
+        ADD CONSTRAINT award_documents_summary_awards_summary%1$s_fk FOREIGN KEY (id, award_index) REFERENCES awards_summary%1$s (id, award_index) NOT valid;
     ALTER TABLE award_items_summary
-        ADD CONSTRAINT award_items_summary_awards_summary % % 1$s_fk FOREIGN KEY (id, award_index) REFERENCES awards_summary % % 1$s (id, award_index) NOT valid;
+        ADD CONSTRAINT award_items_summary_awards_summary%1$s_fk FOREIGN KEY (id, award_index) REFERENCES awards_summary%1$s (id, award_index) NOT valid;
     ALTER TABLE award_suppliers_summary
-        ADD CONSTRAINT award_suppliers_summary_awards_summary % % 1$s_fk FOREIGN KEY (id, award_index) REFERENCES awards_summary % % 1$s (id, award_index) NOT valid;
+        ADD CONSTRAINT award_suppliers_summary_awards_summary%1$s_fk FOREIGN KEY (id, award_index) REFERENCES awards_summary%1$s (id, award_index) NOT valid;
     $query$;
     BEGIN
         EXECUTE format(query, '');

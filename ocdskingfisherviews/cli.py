@@ -208,7 +208,7 @@ def refresh_views(name, remove, tables_only):
             if tables_only:
                 part = re.sub('^CREATE VIEW', 'CREATE TABLE', part, flags=re.MULTILINE | re.IGNORECASE)
                 part = re.sub('^DROP VIEW', 'DROP TABLE', part, flags=re.MULTILINE | re.IGNORECASE)
-            cursor.execute('/* kingfisher-views refresh-views */\n' + part, tuple())
+            cursor.execute('/* kingfisher-views refresh-views */\n' + part)
             commit()
 
         logger.info(f'Time: {timer() - file_timer}s')
