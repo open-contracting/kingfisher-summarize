@@ -257,9 +257,9 @@ def field_counts(name, remove, threads):
                 collection_id,
                 release_type,
                 path,
-                SUM(object_property) object_property,
-                SUM(array_item) array_count,
-                COUNT(distinct id) distinct_releases
+                sum(object_property) object_property,
+                sum(array_item) array_count,
+                count(distinct id) distinct_releases
             FROM
                 release_summary_with_data
             CROSS JOIN
