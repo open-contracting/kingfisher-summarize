@@ -59,6 +59,13 @@ def pluck(statement, variables=None):
     return [row[0] for row in cursor.fetchall()]
 
 
+def get_schemas():
+    """
+    Returns a list of schema names that start with "view_data_".
+    """
+    return pluck("SELECT schema_name FROM information_schema.schemata WHERE schema_name LIKE 'view_data_%'")
+
+
 def commit():
     """
     Commits the transaction.

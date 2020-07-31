@@ -6,26 +6,26 @@ from psycopg2 import sql
 
 from ocdskingfisherviews.cli import cli
 from ocdskingfisherviews.db import commit, get_cursor
-from tests import assert_log_records, fixture
+from tests import assert_log_records, assert_log_running, fixture
+
+command = 'list-views'
 
 
 def test_command_none(caplog):
     runner = CliRunner()
 
-    result = runner.invoke(cli, ['list-views'])
+    result = runner.invoke(cli, [command])
 
     assert result.exit_code == 0
     assert result.output == ''
-    assert len(caplog.records) == 1
-    assert caplog.records[0].levelname == 'INFO'
-    assert caplog.records[0].message == 'Running list-views'
+    assert_log_running(caplog, command)
 
 
 def test_command(caplog):
     with fixture():
         runner = CliRunner()
 
-        result = runner.invoke(cli, ['list-views'])
+        result = runner.invoke(cli, [command])
 
         text = dedent(f"""\
         -----
@@ -36,7 +36,7 @@ def test_command(caplog):
 
         assert result.exit_code == 0
         assert result.output.startswith(text)
-        assert_log_records(caplog, 'list-views', [])
+        assert_log_records(caplog, command, [])
 
 
 def test_command_multiple(caplog):
@@ -49,7 +49,7 @@ def test_command_multiple(caplog):
         cursor.execute(statement, {'note': 'Another', 'created_at': datetime(2000, 1, 1)})
         commit()
 
-        result = runner.invoke(cli, ['list-views'])
+        result = runner.invoke(cli, [command])
 
         text = dedent(f"""\
         -----
@@ -62,4 +62,4 @@ def test_command_multiple(caplog):
 
         assert result.exit_code == 0
         assert result.output.startswith(text)
-        assert_log_records(caplog, 'list-views', [])
+        assert_log_records(caplog, command, [])

@@ -1,4 +1,6 @@
+import concurrent.futures
 import csv
+import glob
 import json
 import logging
 import logging.config
@@ -6,31 +8,32 @@ import os.path
 import re
 from contextlib import contextmanager
 from datetime import datetime
+from timeit import default_timer as timer
 
 import click
 from psycopg2 import sql
 from psycopg2.extras import execute_values
 
-from ocdskingfisherviews import (do_correct_user_permissions, do_field_counts, do_refresh_views, get_schemas,
-                                 read_sql_files)
-from ocdskingfisherviews.db import commit, get_connection, get_cursor, pluck, schema_exists, set_search_path
-
-logger = logging.getLogger('foo')
-logger.info('bar')
+from ocdskingfisherviews.db import (commit, get_connection, get_cursor, get_schemas, pluck, schema_exists,
+                                    set_search_path)
 
 
-@contextmanager
-def log_exception():
+def _read_sql_files(remove=False):
     """
-    Logs and re-raises any exceptions in the block.
-    """
-    logger = logging.getLogger('ocdskingfisher.views.cli')
+    Returns a dict in which keys are the basenames of SQL files and values are their contents.
 
-    try:
-        yield
-    except Exception as e:
-        logger.exception(e)
-        raise
+    :param bool remove: whether to read the *_downgrade.sql files
+    """
+    contents = {}
+
+    filenames = glob.glob(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'sql', '*.sql'))
+    for filename in sorted(filenames, reverse=remove):
+        basename = os.path.splitext(os.path.basename(filename))[0]
+        if not (basename.endswith('_downgrade') ^ remove):
+            with open(filename) as f:
+                contents[basename] = f.read()
+
+    return contents
 
 
 def validate_collections(ctx, param, value):
@@ -90,7 +93,8 @@ def cli(ctx):
 @click.option('--tables-only', is_flag=True, help='Create SQL tables instead of SQL views.')
 @click.option('--threads', type=int, default=1, help='The number of threads for the field-counts command to use '
                                                      '(up to the number of collections).')
-def add_view(collections, note, name, dontbuild, tables_only, threads):
+@click.pass_context
+def add_view(ctx, collections, note, name, dontbuild, tables_only, threads):
     """
     Creates a schema containing summary tables about one or more collections.
 
@@ -126,16 +130,16 @@ def add_view(collections, note, name, dontbuild, tables_only, threads):
         if tables_only:
             message.append(' --tables-only')
         logger.info(''.join(message))
-        do_refresh_views(cursor, schema, tables_only=tables_only)
+        ctx.invoke(refresh_views, name=schema, tables_only=tables_only)
 
         message = [f'Running field-counts {name}']
         if threads != 1:
             message.append(f' --threads {threads}')
         logger.info(''.join(message))
-        do_field_counts(cursor, schema, threads=threads)
+        ctx.invoke(field_counts, name=schema, threads=threads)
 
         logger.info('Running correct-user-permissions')
-        do_correct_user_permissions(cursor)
+        ctx.invoke(correct_user_permissions)
 
 
 @click.command()
@@ -146,7 +150,7 @@ def delete_view(name):
 
     NAME is the last part of a schema's name after "view_data_".
     """
-    logger = logging.getLogger('ocdskingfisher.views.cli.delete-view')
+    logger = logging.getLogger('ocdskingfisher.views.delete-view')
 
     # `CASCADE` drops all objects (tables, functions, etc.) in the schema.
     statement = sql.SQL('DROP SCHEMA {schema} CASCADE').format(schema=sql.Identifier(name))
@@ -185,8 +189,25 @@ def refresh_views(name, remove, tables_only):
 
     NAME is the last part of a schema's name after "view_data_".
     """
-    with log_exception():
-        do_refresh_views(cursor, name, remove=remove, tables_only=tables_only)
+    logger = logging.getLogger('ocdskingfisher.views.refresh-views')
+    set_search_path([name, 'public'])
+
+    command_timer = timer()
+
+    for basename, content in _read_sql_files(remove).items():
+        file_timer = timer()
+        logger.info(f'Running {basename}')
+
+        for part in content.split('----'):
+            if tables_only:
+                part = re.sub('^CREATE VIEW', 'CREATE TABLE', part, flags=re.MULTILINE | re.IGNORECASE)
+                part = re.sub('^DROP VIEW', 'DROP TABLE', part, flags=re.MULTILINE | re.IGNORECASE)
+            cursor.execute('/* kingfisher-views refresh-views */\n' + part, tuple())
+            commit()
+
+        logger.info(f'Time: {timer() - file_timer}s')
+
+    logger.info(f'Total time: {timer() - command_timer}s')
 
 
 @click.command()
@@ -204,8 +225,97 @@ def field_counts(name, remove, threads):
     if not cursor.fetchone():
         raise click.UsageError('release_summary_with_data table not found. Run refresh-views first.')
 
-    with log_exception():
-        do_field_counts(cursor, name, remove=remove, threads=threads)
+    logger = logging.getLogger('ocdskingfisher.views.field-counts')
+    set_search_path([name, 'public'])
+
+    if remove:
+        cursor.execute('DROP TABLE IF EXISTS field_counts_tmp')
+        cursor.execute('DROP TABLE IF EXISTS field_counts')
+        commit()
+
+        logger.info('Dropped tables field_counts and field_counts_tmp')
+        return
+
+    def _run_collection(collection):
+        logger.info(f'Processing collection ID {collection}')
+
+        collection_timer = timer()
+
+        cursor.execute('SET parallel_tuple_cost = 0.00001')
+        cursor.execute('SET parallel_setup_cost = 0.00001')
+        cursor.execute("SET work_mem = '10MB'")
+        cursor.execute("""
+            /* kingfisher-views field-counts */
+
+            SELECT
+                collection_id,
+                release_type,
+                path,
+                sum(object_property) object_property,
+                sum(array_item) array_count,
+                count(distinct id) distinct_releases
+            FROM
+                release_summary_with_data
+            CROSS JOIN
+                flatten(data)
+            WHERE
+                release_summary_with_data.collection_id = %(id)s
+            GROUP BY collection_id, release_type, path
+        """, {'id': collection})
+
+        values = cursor.fetchone()
+        if values:
+            cursor.execute('INSERT INTO field_counts_tmp VALUES %(values)s', {'values': values})
+            commit()
+        else:
+            logger.warning(f'No data for collection ID {collection}!')
+
+        logger.info(f'Time for collection ID {collection}: {timer() - collection_timer}s')
+
+    command_timer = timer()
+
+    with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'sql', 'extras', 'flatten.sql')) as f:
+        cursor.execute(f.read())
+    cursor.execute('DROP TABLE IF EXISTS field_counts_tmp')
+    cursor.execute("""
+        CREATE TABLE field_counts_tmp(
+            collection_id bigint,
+            release_type text,
+            path text,
+            object_property bigint,
+            array_count bigint,
+            distinct_releases bigint
+        )
+    """)
+    commit()
+
+    selected_collections = pluck('SELECT id FROM selected_collections')
+    with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
+        futures = [executor.submit(_run_collection, collection) for collection in selected_collections]
+        for future in concurrent.futures.as_completed(futures):
+            try:
+                future.result()
+            except Exception as e:
+                logger.exception(e)
+                raise
+
+    cursor.execute('DROP TABLE IF EXISTS field_counts')
+    cursor.execute('ALTER TABLE field_counts_tmp RENAME TO field_counts')
+    cursor.execute("COMMENT ON COLUMN field_counts.collection_id IS "
+                   "'id from the kingfisher collection table' ")
+    cursor.execute("COMMENT ON COLUMN field_counts.release_type IS "
+                   "'Either release, compiled_release or record. compiled_release are releases generated "
+                   "by kingfisher release compilation' ")
+    cursor.execute("COMMENT ON COLUMN field_counts.path IS 'JSON path of the field' ")
+    cursor.execute("COMMENT ON COLUMN field_counts.object_property IS "
+                   "'The total number of times the field at this path appears' ")
+    cursor.execute("COMMENT ON COLUMN field_counts.array_count IS "
+                   "'For arrays, the total number of items in this array across all releases' ")
+    cursor.execute("COMMENT ON COLUMN field_counts.distinct_releases IS "
+                   "'The total number of distinct releases in which the field at this path appears' ")
+    commit()
+
+    logger.info(f'Total time: {timer() - command_timer}s')
 
 
 @click.command()
@@ -214,7 +324,26 @@ def correct_user_permissions():
     Grants the users in the views.read_only_user table the USAGE privilege on the public, views and collection-specific
     schemas, and the SELECT privilege on public tables, the views.mapping_sheets table, and collection-specific tables.
     """
-    do_correct_user_permissions(cursor)
+    schemas = [sql.Identifier(schema) for schema in get_schemas()]
+
+    for user in pluck('SELECT username FROM views.read_only_user'):
+        user = sql.Identifier(user)
+
+        # Grant access to all tables in the public schema.
+        cursor.execute(sql.SQL('GRANT USAGE ON SCHEMA public TO {user}').format(user=user))
+        cursor.execute(sql.SQL('GRANT SELECT ON ALL TABLES IN SCHEMA public TO {user}').format(user=user))
+
+        # Grant access to the mapping_sheets table in the views schema.
+        cursor.execute(sql.SQL('GRANT USAGE ON SCHEMA views TO {user}').format(user=user))
+        cursor.execute(sql.SQL('GRANT SELECT ON views.mapping_sheets TO {user}').format(user=user))
+
+        # Grant access to all tables in every schema created by Kingfisher Views.
+        for schema in schemas:
+            cursor.execute(sql.SQL('GRANT USAGE ON SCHEMA {schema} TO {user}').format(schema=schema, user=user))
+            cursor.execute(sql.SQL('GRANT SELECT ON ALL TABLES IN SCHEMA {schema} TO {user}').format(
+                schema=schema, user=user))
+
+    commit()
 
 
 @click.command()
@@ -224,7 +353,7 @@ def docs_table_ref(name):
     Creates or updates the CSV files in docs/definitions.
     """
     tables = []
-    for basename, content in read_sql_files().items():
+    for basename, content in _read_sql_files().items():
         for table in re.findall(r'^CREATE\s+(?:TABLE|VIEW)\s+(\S+)', content, flags=re.MULTILINE | re.IGNORECASE):
             if not table.startswith(('tmp_', 'staged_')) and not table.endswith('_no_data'):
                 tables.append(table)
