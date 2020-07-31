@@ -14,6 +14,7 @@ This how-to guide will walk you through the steps of editing SQL files (if you h
 
       pytest
 
+#. :ref:`Format the SQL files<format-sql>`
 #. To merge your changes into Kingfisher Views, :ref:`push your changes to GitHub and make a pull request<merge>`
 
 Make changes
@@ -210,6 +211,23 @@ The tests won't pass if you don't document the new columns!
   .. code-block:: bash
 
      python ocdskingfisher-views-cli docs-table-ref {collection_name}
+
+.. _format-sql:
+
+Format SQL files
+----------------
+
+We use `pg_format <https://github.com/darold/pgFormatter>`__ to consistently format SQL files. On macOS, using `Homebrew <https://brew.sh>`__, install it with:
+
+.. code-block:: bash
+
+   brew install pgformatter
+
+Then, run:
+
+.. code-block:: bash
+
+   find . -name '*.sql' -exec pg_format -o {} {} \;
 
 .. _merge:
 

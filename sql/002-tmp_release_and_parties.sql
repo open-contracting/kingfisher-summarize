@@ -1,10 +1,9 @@
+DROP VIEW IF EXISTS tmp_release_summary_with_release_data;
 
-drop view if exists tmp_release_summary_with_release_data;
-drop table if exists tmp_release_summary;
+DROP TABLE IF EXISTS tmp_release_summary;
 
-create table tmp_release_summary
-AS
-select 
+CREATE TABLE tmp_release_summary AS
+SELECT
     r.id::bigint * 10 AS id,
     'release' AS release_type,
     r.id AS table_id,
@@ -14,74 +13,73 @@ select
     data_id,
     package_data_id,
     coalesce(pd.data ->> 'version', '1.0') AS package_version,
-    convert_to_timestamp(d.data ->> 'date') release_date,
+    convert_to_timestamp (d.data ->> 'date') release_date,
     d.data -> 'tag' release_tag,
     d.data ->> 'language' release_language
-from 
+FROM
     release AS r
-join
-    package_data pd on pd.id = r.package_data_id
-join
-    data d on d.id = r.data_id
-join
-    collection c on c.id = r.collection_id
-where
-    collection_id in (select id from selected_collections)
-
-union
-
-select 
+    JOIN package_data pd ON pd.id = r.package_data_id
+    JOIN data d ON d.id = r.data_id
+    JOIN collection c ON c.id = r.collection_id
+WHERE
+    collection_id IN (
+        SELECT
+            id
+        FROM
+            selected_collections)
+UNION
+SELECT
     r.id::bigint * 10 + 1 AS id,
-    'record' as release_type,
-    r.id AS table_id, 
-    collection_id,
-    ocid,
-    null AS release_id,
-    data_id,
-    package_data_id,
-    coalesce(pd.data ->> 'version', '1.0') AS package_version,
-    convert_to_timestamp(d.data -> 'compiledRelease' ->> 'date') release_date,
-    d.data -> 'compiledRelease' -> 'tag' release_tag,
-    d.data -> 'compiledRelease' ->> 'language' release_language
-from 
-    record AS r
-join
-    package_data pd on pd.id = r.package_data_id
-join
-    data d on d.id = r.data_id
-join
-    collection c on c.id = r.collection_id
-where
-    collection_id in (select id from selected_collections)
-
-union
-
-select 
-    r.id::bigint * 10 + 2 AS id,
-    'compiled_release' as release_type,
+    'record' AS release_type,
     r.id AS table_id,
     collection_id,
     ocid,
-    null AS release_id,
+    NULL AS release_id,
+    data_id,
+    package_data_id,
+    coalesce(pd.data ->> 'version', '1.0') AS package_version,
+    convert_to_timestamp (d.data -> 'compiledRelease' ->> 'date') release_date,
+    d.data -> 'compiledRelease' -> 'tag' release_tag,
+    d.data -> 'compiledRelease' ->> 'language' release_language
+FROM
+    record AS r
+    JOIN package_data pd ON pd.id = r.package_data_id
+    JOIN data d ON d.id = r.data_id
+    JOIN collection c ON c.id = r.collection_id
+WHERE
+    collection_id IN (
+        SELECT
+            id
+        FROM
+            selected_collections)
+UNION
+SELECT
+    r.id::bigint * 10 + 2 AS id,
+    'compiled_release' AS release_type,
+    r.id AS table_id,
+    collection_id,
+    ocid,
+    NULL AS release_id,
     data_id,
     --Kingfisher Process’ compiled_release table has no package_data_id column, so setting package_data_id to null.
-    null AS package_data_id,
-    null AS package_version,  -- this would be useful but hard to get
-    convert_to_timestamp(d.data ->> 'date') release_date,
+    NULL AS package_data_id,
+    NULL AS package_version, -- this would be useful but hard to get
+    convert_to_timestamp (d.data ->> 'date') release_date,
     d.data -> 'tag' release_tag,
     d.data ->> 'language' release_language
-from
+FROM
     compiled_release AS r
-join
-    data d on d.id = r.data_id
-where
-    collection_id in (select id from selected_collections)
-
-union
-
-select
-    (r.id::bigint * 1000000 + (ordinality - 1)) * 10 + 3 AS id,
-    'embedded_release' as release_type,
+    JOIN data d ON d.id = r.data_id
+WHERE
+    collection_id IN (
+        SELECT
+            id
+        FROM
+            selected_collections)
+UNION
+SELECT
+    (r.id::bigint * 1000000 + (ORDINALITY - 1)) * 10 + 3 AS id,
+    'embedded_release' AS release_type,
     r.id AS table_id,
     collection_id,
     ocid,
@@ -89,140 +87,140 @@ select
     data_id,
     package_data_id,
     coalesce(pd.data ->> 'version', '1.0') AS package_version,
-    convert_to_timestamp(value ->> 'date') release_date,
+    convert_to_timestamp (value ->> 'date') release_date,
     value -> 'tag' release_tag,
     value ->> 'language' release_language
-from
+FROM
     record AS r
-join
-    package_data pd on pd.id = r.package_data_id
-join
-    data d on d.id = r.data_id
-join
-    collection c on c.id = r.collection_id
-cross join
-    jsonb_array_elements(d.data -> 'releases') with ordinality
-where
+    JOIN package_data pd ON pd.id = r.package_data_id
+    JOIN data d ON d.id = r.data_id
+    JOIN collection c ON c.id = r.collection_id
+    CROSS JOIN jsonb_array_elements(d.data -> 'releases')
+    WITH ORDINALITY
+WHERE
     -- We only want embedded releases, not linked releases
-    (value -> 'id') is not null
-     and
-    collection_id in (select id from selected_collections)
+    (value -> 'id') IS NOT NULL
+    AND collection_id IN (
+        SELECT
+            id
+        FROM
+            selected_collections);
 
-;
+CREATE UNIQUE INDEX tmp_release_summary_id ON tmp_release_summary (id);
 
-create unique index tmp_release_summary_id on tmp_release_summary(id);
-create index tmp_release_summary_data_id on tmp_release_summary(data_id);
-create index tmp_release_summary_package_data_id on tmp_release_summary(package_data_id);
-create index tmp_release_summary_collection_id on tmp_release_summary(collection_id);
+CREATE INDEX tmp_release_summary_data_id ON tmp_release_summary (data_id);
 
+CREATE INDEX tmp_release_summary_package_data_id ON tmp_release_summary (package_data_id);
 
+CREATE INDEX tmp_release_summary_collection_id ON tmp_release_summary (collection_id);
 
-create or replace view tmp_release_summary_with_release_data
-as
-select 
-    case
-        when release_type = 'record' then d.data -> 'compiledRelease'
-        when release_type = 'embedded_release' then d.data -> 'releases' -> (mod(r.id / 10, 1000000)::integer)
-        else d.data end AS data,
-    r.*  
-from 
+CREATE OR REPLACE VIEW tmp_release_summary_with_release_data AS
+SELECT
+    CASE WHEN release_type = 'record' THEN
+        d.data -> 'compiledRelease'
+    WHEN release_type = 'embedded_release' THEN
+        d.data -> 'releases' -> (mod(r.id / 10, 1000000)::integer)
+    ELSE
+        d.data
+    END AS data,
+    r.*
+FROM
     tmp_release_summary AS r
-join
-    data d on d.id = r.data_id;
+    JOIN data d ON d.id = r.data_id;
 
 ----
+DROP TABLE IF EXISTS staged_parties_summary_no_data;
 
-drop table if exists staged_parties_summary_no_data;
-
-create table staged_parties_summary_no_data
-AS
-select 
+CREATE TABLE staged_parties_summary_no_data AS
+SELECT
     r.id,
-    ordinality - 1 AS party_index,
-	release_type,
+    ORDINALITY - 1 AS party_index,
+    release_type,
     collection_id,
     ocid,
     release_id,
     data_id,
-    value ->> 'id' AS parties_id,   
+    value ->> 'id' AS parties_id,
     value -> 'roles' AS roles,
     (value -> 'identifier' ->> 'scheme') || '-' || (value -> 'identifier' ->> 'id') AS identifier,
-    coalesce(
-        value ->> 'id',
-        (value -> 'identifier' ->> 'scheme') || '-' || (value -> 'identifier' ->> 'id'),
-        value ->> 'name'
-    ) AS unique_identifier_attempt,
-    (select 
-        jsonb_agg((additional_identifier ->> 'scheme') || '-' || (additional_identifier ->> 'id'))
-    from
-        jsonb_array_elements(case when jsonb_typeof(value->'additionalIdentifiers') = 'array' then value->'additionalIdentifiers' else '[]'::jsonb end) additional_identifier
-    where
-        additional_identifier ?& array['scheme', 'id']											   
-    ) parties_additionalIdentifiers_ids,
-    jsonb_array_length(case when jsonb_typeof(value->'additionalIdentifiers') = 'array' then value->'additionalIdentifiers' else '[]'::jsonb end) parties_additionalIdentifiers_count
-from 
+    coalesce(value ->> 'id', (value -> 'identifier' ->> 'scheme') || '-' || (value -> 'identifier' ->> 'id'), value ->> 'name') AS unique_identifier_attempt,
+    (
+        SELECT
+            jsonb_agg((additional_identifier ->> 'scheme') || '-' || (additional_identifier ->> 'id'))
+        FROM
+            jsonb_array_elements(
+                CASE WHEN jsonb_typeof(value -> 'additionalIdentifiers') = 'array' THEN
+                    value -> 'additionalIdentifiers'
+                ELSE
+                    '[]'::jsonb
+                END) additional_identifier
+        WHERE
+            additional_identifier ?& ARRAY['scheme', 'id']) parties_additionalIdentifiers_ids,
+    jsonb_array_length(
+        CASE WHEN jsonb_typeof(value -> 'additionalIdentifiers') = 'array' THEN
+            value -> 'additionalIdentifiers'
+        ELSE
+            '[]'::jsonb
+        END) parties_additionalIdentifiers_count
+FROM
     tmp_release_summary_with_release_data AS r
-cross join
-    jsonb_array_elements(data -> 'parties') with ordinality
-where
+    CROSS JOIN jsonb_array_elements(data -> 'parties')
+    WITH ORDINALITY
+WHERE
     jsonb_typeof(data -> 'parties') = 'array';
 
 ----
+DROP VIEW IF EXISTS parties_summary;
 
-drop view if exists parties_summary;
-drop table if exists parties_summary_no_data;
+DROP TABLE IF EXISTS parties_summary_no_data;
 
-create table parties_summary_no_data
-AS
-select * from staged_parties_summary_no_data;
+CREATE TABLE parties_summary_no_data AS
+SELECT
+    *
+FROM
+    staged_parties_summary_no_data;
 
-drop table staged_parties_summary_no_data;
+DROP TABLE staged_parties_summary_no_data;
 
-create unique index parties_summary_no_data_id on parties_summary_no_data(id, party_index);
-create index parties_summary_no_data_data_id on parties_summary_no_data(data_id);
-create index parties_summary_no_data_collection_id on parties_summary_no_data(collection_id);
-create index parties_summary_no_data_party_id on parties_summary_no_data(id, parties_id);
+CREATE UNIQUE INDEX parties_summary_no_data_id ON parties_summary_no_data (id, party_index);
 
+CREATE INDEX parties_summary_no_data_data_id ON parties_summary_no_data (data_id);
 
-create view parties_summary
-AS
-select 
-    parties_summary_no_data.*, 
-    case when
-        release_type = 'record'
-    then
+CREATE INDEX parties_summary_no_data_collection_id ON parties_summary_no_data (collection_id);
+
+CREATE INDEX parties_summary_no_data_party_id ON parties_summary_no_data (id, parties_id);
+
+CREATE VIEW parties_summary AS
+SELECT
+    parties_summary_no_data.*,
+    CASE WHEN release_type = 'record' THEN
         data #> ARRAY['compiledRelease', 'parties', party_index::text]
-    when
-        release_type = 'embedded_release'
-    then
+    WHEN release_type = 'embedded_release' THEN
         data -> 'releases' -> (mod(parties_summary_no_data.id / 10, 1000000)::integer) -> 'parties' -> party_index::integer
-    else
+    ELSE
         data #> ARRAY['parties', party_index::text]
-    end as party
-from 
+    END AS party
+FROM
     parties_summary_no_data
-join
-    data on data.id = data_id;
-
+    JOIN data ON data.id = data_id;
 
 -- The following pgpsql makes indexes on parties_summary only if it is a table and not a view,
--- you will need to run --tables-only command line parameter to allow this to run. 
+-- you will need to run --tables-only command line parameter to allow this to run.
 
-DO
-$$
-DECLARE query text;
-
+DO $$
+DECLARE
+    query text;
 BEGIN
-    query :=
-        $query$
-            create unique index parties_summary_id on parties_summary(id, party_index);
-            create index parties_summary_data_id on parties_summary(data_id);
-            create index parties_summary_collection_id on parties_summary(collection_id);
-            create index parties_summary_party_id on parties_summary(id, parties_id);
-        $query$
-    ;
-    execute query;
-EXCEPTION 
-    WHEN wrong_object_type THEN null;
+    query := $query$ CREATE UNIQUE INDEX parties_summary_id ON parties_summary (id, party_index);
+    CREATE INDEX parties_summary_data_id ON parties_summary (data_id);
+    CREATE INDEX parties_summary_collection_id ON parties_summary (collection_id);
+    CREATE INDEX parties_summary_party_id ON parties_summary (id, parties_id);
+    $query$;
+    EXECUTE query;
+EXCEPTION
+    WHEN wrong_object_type THEN
+        NULL;
 END;
+
 $$;
+

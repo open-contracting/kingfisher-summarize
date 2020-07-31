@@ -1,3 +1,6 @@
-drop view if exists release_summary_with_checks cascade;
-drop view if exists release_summary_with_data cascade;
-drop table if exists release_summary cascade;
+DROP VIEW IF EXISTS release_summary_with_checks CASCADE;
+
+DROP VIEW IF EXISTS release_summary_with_data CASCADE;
+
+DROP TABLE IF EXISTS release_summary CASCADE;
+

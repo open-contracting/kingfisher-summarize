@@ -1,6 +1,10 @@
+DROP VIEW IF EXISTS awards_summary CASCADE;
 
-drop view if exists awards_summary cascade;
-drop table if exists awards_summary_no_data cascade;
-drop table if exists award_items_summary;
-drop table if exists award_documents_summary;
-drop table if exists award_suppliers_summary;
+DROP TABLE IF EXISTS awards_summary_no_data CASCADE;
+
+DROP TABLE IF EXISTS award_items_summary;
+
+DROP TABLE IF EXISTS award_documents_summary;
+
+DROP TABLE IF EXISTS award_suppliers_summary;
+
