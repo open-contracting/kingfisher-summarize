@@ -2,8 +2,8 @@ from click.testing import CliRunner
 
 from ocdskingfisherviews.cli import cli
 from ocdskingfisherviews.db import schema_exists
-from tests import (ADD_VIEW_TABLES, REFRESH_VIEWS_TABLES, assert_log_records, assert_log_running, fetch_all, fixture,
-                   get_tables)
+from tests import (ADD_VIEW_TABLES, REFRESH_VIEWS_TABLES, assert_bad_argument, assert_log_records, assert_log_running,
+                   fetch_all, fixture, get_tables)
 
 command = 'add-view'
 
@@ -14,7 +14,7 @@ def test_validate_collections_noninteger(caplog):
     result = runner.invoke(cli, [command, 'a'])
 
     assert result.exit_code == 2
-    assert result.output.endswith("\nError: Invalid value for 'COLLECTIONS': Collection IDs must be integers\n")
+    assert_bad_argument(result, 'COLLECTIONS', 'Collection IDs must be integers')
     assert_log_running(caplog, command)
 
 
@@ -24,7 +24,7 @@ def test_validate_collections_nonexistent(caplog):
     result = runner.invoke(cli, [command, '1,10,100'])
 
     assert result.exit_code == 2
-    assert result.output.endswith("\nError: Invalid value for 'COLLECTIONS': Collection IDs {10, 100} not found\n")
+    assert_bad_argument(result, 'COLLECTIONS', 'Collection IDs {10, 100} not found')
     assert_log_running(caplog, command)
 
 

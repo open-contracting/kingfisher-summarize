@@ -13,7 +13,7 @@ def test_validate_name(caplog):
     result = runner.invoke(cli, [command, 'nonexistent'])
 
     assert result.exit_code == 2
-    assert result.output.endswith("Error: Invalid value for 'NAME': SQL schema \"view_data_nonexistent\" not found\n")
+    assert_bad_argument(result, 'NAME', 'SQL schema "view_data_nonexistent" not found')
     assert_log_running(caplog, command)
 
 

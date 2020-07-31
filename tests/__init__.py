@@ -1,3 +1,4 @@
+import re
 from contextlib import contextmanager
 
 from click.testing import CliRunner
@@ -76,6 +77,12 @@ def fixture(collections='1', dontbuild=True, name=None, tables_only=None, thread
         connection = get_connection()
         connection.rollback()
         runner.invoke(cli, ['delete-view', name])
+
+
+# Click seems to use different quoting on different platforms.
+def assert_bad_argument(result, argument, message):
+    expression = rf"""\nError: Invalid value for ['"']{argument}['"']: {message}\n$"""
+    assert re.search(expression, result.output)
 
 
 def assert_log_running(caplog, command):
