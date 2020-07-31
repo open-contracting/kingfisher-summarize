@@ -28,11 +28,9 @@ def test_command(caplog):
         result = runner.invoke(cli, [command])
 
         text = dedent(f"""\
-        -----
-        Name: collection_1
-        Schema: view_data_collection_1
-        Collection ID: 1
-        Note: Default ({datetime.utcnow().strftime('%Y-%m-%d')} """)
+        | Name         | Collections   | Note                          |
+        |--------------|---------------|-------------------------------|
+        | collection_1 | 1             | Default (2020-07-31 """)
 
         assert result.exit_code == 0
         assert result.output.startswith(text)
@@ -52,13 +50,10 @@ def test_command_multiple(caplog):
         result = runner.invoke(cli, [command])
 
         text = dedent(f"""\
-        -----
-        Name: collection_1_2
-        Schema: view_data_collection_1_2
-        Collection ID: 1
-        Collection ID: 2
-        Note: Another (2000-01-01 00:00:00)
-        Note: Default ({datetime.utcnow().strftime('%Y-%m-%d')} """)
+        | Name           | Collections   | Note                          |
+        |----------------|---------------|-------------------------------|
+        | collection_1_2 | 1, 2          | Another (2000-01-01 00:00:00) |
+        |                |               | Default (2020-07-31 """)
 
         assert result.exit_code == 0
         assert result.output.startswith(text)

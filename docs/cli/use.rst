@@ -116,18 +116,10 @@ Outputs:
 
 .. code-block:: none
 
-   -----
-   Name: collection_4_5_6
-   Schema: view_data_collection_4_5_6
-   Collection ID: 4
-   Collection ID: 5
-   Collection ID: 6
-   Note: Created by Morgan A. to compare field coverage (2020-01-02 03:04:05)
-   -----
-   Name: collection_123
-   Schema: view_data_collection_123
-   Collection ID: 1
-   Note: Created by Morgan A. to measure procurement indicators (2020-01-02 03:04:05)
+   | Name             |   Collections | Note                                                                         |
+   |------------------|---------------|------------------------------------------------------------------------------|
+   | collection_4_5_6 | 4, 5, 6       | Created by Morgan A. to compare field coverage (2020-07-31 14:53:38)         |
+   | collection_123   | 1             | Created by Morgan A. to measure procurement indicators (2020-01-02 03:04:05) |
 
 To list the schemas only, Connect to the database used by Kingfisher Views, using the connecting settings you :ref:`configured earlier<database-connection-settings>`, and run:
 

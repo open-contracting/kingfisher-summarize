@@ -12,6 +12,7 @@ from timeit import default_timer as timer
 import click
 from psycopg2 import sql
 from psycopg2.extras import execute_values
+from tabulate import tabulate
 
 from ocdskingfisherviews.db import (commit, get_connection, get_cursor, get_schemas, pluck, schema_exists,
                                     set_search_path)
@@ -165,18 +166,23 @@ def list_views():
     """
     Lists the schemas, with collection IDs and creator's notes.
     """
+    def format_note(note):
+        return f"{note[0]} ({note[1].strftime('%Y-%m-%d %H:%M:%S')})"
+
     for schema in get_schemas():
-        click.echo(f'-----\nName: {schema[10:]}\nSchema: {schema}')
+        set_search_path([schema])
 
-        cursor.execute(sql.SQL('SELECT id FROM {table} ORDER BY id').format(
-            table=sql.Identifier(schema, 'selected_collections')))
-        for row in cursor.fetchall():
-            click.echo(f"Collection ID: {row[0]}")
+        cursor.execute('SELECT id FROM selected_collections ORDER BY id')
+        collections = [str(row[0]) for row in cursor.fetchall()]
 
-        cursor.execute(sql.SQL('SELECT note, created_at FROM {table} ORDER BY created_at').format(
-            table=sql.Identifier(schema, 'note')))
-        for row in cursor.fetchall():
-            click.echo(f"Note: {row[0]} ({row[1].strftime('%Y-%m-%d %H:%M:%S')})")
+        cursor.execute('SELECT note, created_at FROM note ORDER BY created_at')
+        notes = cursor.fetchall()
+
+        table = [[schema[10:], ', '.join(collections), format_note(notes[0])]]
+        for note in notes[1:]:
+            table.append([None, None, format_note(note)])
+
+        click.echo(tabulate(table, headers=['Name', 'Collections', 'Note'], tablefmt='github', numalign='left'))
 
 
 @click.command()
