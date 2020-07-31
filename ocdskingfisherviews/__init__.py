@@ -53,7 +53,7 @@ def do_correct_user_permissions(cursor):
     commit()
 
 
-def do_refresh_views(cur, schema, remove=False, tables_only=False):
+def do_refresh_views(cursor, schema, remove=False, tables_only=False):
     logger = logging.getLogger('ocdskingfisher.views.refresh-views')
 
     command_timer = timer()
@@ -63,11 +63,11 @@ def do_refresh_views(cur, schema, remove=False, tables_only=False):
 
         # Special marker to split content up.
         for part in content.split('----'):
-            cur.execute(sql.SQL('SET search_path = {schema}, public').format(schema=sql.Identifier(schema)))
+            cursor.execute(sql.SQL('SET search_path = {schema}, public').format(schema=sql.Identifier(schema)))
             if tables_only:
                 part = re.sub('^CREATE VIEW', 'CREATE TABLE', part, flags=re.MULTILINE | re.IGNORECASE)
                 part = re.sub('^DROP VIEW', 'DROP TABLE', part, flags=re.MULTILINE | re.IGNORECASE)
-            cur.execute('/*kingfisher-views refresh-views*/\n' + part, tuple())
+            cursor.execute('/*kingfisher-views refresh-views*/\n' + part, tuple())
             commit()
 
         logger.info(f'Time: {timer() - file_timer}s')
@@ -75,18 +75,26 @@ def do_refresh_views(cur, schema, remove=False, tables_only=False):
     logger.info(f'Total time: {timer() - command_timer}s')
 
 
-class FieldCounts():
-    def __init__(self, cursor):
-        self.cursor = cursor
-        self.search_path_string = None
-        self.logger = logging.getLogger('ocdskingfisher.views.field-counts')
+def do_field_counts(cursor, schema, remove=False, threads=1):
+    logger = logging.getLogger('ocdskingfisher.views.field-counts')
 
-    def _run_collection(self, collection):
+    search_path_string = sql.SQL('SET search_path = {schema}, public').format(schema=sql.Identifier(schema))
+
+    if remove:
+        cursor.execute(search_path_string)
+        cursor.execute('DROP TABLE IF EXISTS field_counts_temp')
+        cursor.execute('DROP TABLE IF EXISTS field_counts')
+        commit()
+
+        logger.info('Dropped tables field_counts and field_counts_temp')
+        return
+
+    def _run_collection(collection):
         collection_timer = timer()
-        self.logger.info(f'Processing collection ID {collection}')
+        logger.info(f'Processing collection ID {collection}')
 
-        self.cursor.execute(self.search_path_string)
-        self.cursor.execute("""
+        cursor.execute(search_path_string)
+        cursor.execute("""
             /*kingfisher-views field-counts*/
 
             SET parallel_tuple_cost=0.00001;
@@ -109,64 +117,53 @@ class FieldCounts():
             GROUP BY collection_id, release_type, path;
         """, {'id': collection})
 
-        results = self.cursor.fetchone()
+        results = cursor.fetchone()
         if results:
-            self.cursor.execute('INSERT INTO field_counts_temp VALUES (%s, %s, %s, %s, %s, %s)', *results)
+            cursor.execute('INSERT INTO field_counts_temp VALUES (%s, %s, %s, %s, %s, %s)', *results)
             commit()
 
-            self.logger.info(f'Time for collection ID {collection}: {timer() - collection_timer}s')
+            logger.info(f'Time for collection ID {collection}: {timer() - collection_timer}s')
 
-    def run(self, schema, remove=False, threads=1):
-        self.search_path_string = sql.SQL('SET search_path = {schema}, public').format(schema=sql.Identifier(schema))
+    command_timer = timer()
 
-        if remove:
-            self.cursor.execute(self.search_path_string)
-            self.cursor.execute('DROP TABLE IF EXISTS field_counts_temp')
-            self.cursor.execute('DROP TABLE IF EXISTS field_counts')
-            self.logger.info('Dropped tables field_counts and field_counts_temp')
-            commit()
-            return
+    cursor.execute(search_path_string)
+    cursor.execute('DROP TABLE IF EXISTS field_counts_temp')
+    cursor.execute("""
+        CREATE TABLE field_counts_temp(
+            collection_id bigint,
+            release_type text,
+            path text,
+            object_property bigint,
+            array_count bigint,
+            distinct_releases bigint
+        )
+    """)
+    commit()
 
-        command_timer = timer()
+    selected_collections = pluck('SELECT id FROM selected_collections')
 
-        self.cursor.execute(self.search_path_string)
-        self.cursor.execute('DROP TABLE IF EXISTS field_counts_temp')
-        self.cursor.execute("""
-            CREATE TABLE field_counts_temp(
-                collection_id bigint,
-                release_type text,
-                path text,
-                object_property bigint,
-                array_count bigint,
-                distinct_releases bigint
-            )
-        """)
-        commit()
+    with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
+        futures = [executor.submit(_run_collection, collection) for collection in selected_collections]
 
-        selected_collections = pluck('SELECT id FROM selected_collections')
+        for future in concurrent.futures.as_completed(futures):
+            continue
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
-            futures = [executor.submit(self._run_collection, collection) for collection in selected_collections]
+    cursor.execute(search_path_string)
+    cursor.execute('DROP TABLE IF EXISTS field_counts')
+    cursor.execute('ALTER TABLE field_counts_temp RENAME TO field_counts')
 
-            for future in concurrent.futures.as_completed(futures):
-                continue
+    cursor.execute("COMMENT ON COLUMN field_counts.collection_id IS "
+                   "'id from the kingfisher collection table' ")
+    cursor.execute("COMMENT ON COLUMN field_counts.release_type IS "
+                   "'Either release, compiled_release or record. compiled_release are releases generated "
+                   "by kingfisher release compilation' ")
+    cursor.execute("COMMENT ON COLUMN field_counts.path IS 'JSON path of the field' ")
+    cursor.execute("COMMENT ON COLUMN field_counts.object_property IS "
+                   "'The total number of times the field at this path appears' ")
+    cursor.execute("COMMENT ON COLUMN field_counts.array_count IS "
+                   "'For arrays, the total number of items in this array across all releases' ")
+    cursor.execute("COMMENT ON COLUMN field_counts.distinct_releases IS "
+                   "'The total number of distinct releases in which the field at this path appears' ")
+    commit()
 
-        self.cursor.execute(self.search_path_string)
-        self.cursor.execute('DROP TABLE IF EXISTS field_counts')
-        self.cursor.execute('ALTER TABLE field_counts_temp RENAME TO field_counts')
-
-        self.cursor.execute("COMMENT ON COLUMN field_counts.collection_id IS "
-                            "'id from the kingfisher collection table' ")
-        self.cursor.execute("COMMENT ON COLUMN field_counts.release_type IS "
-                            "'Either release, compiled_release or record. compiled_release are releases generated "
-                            "by kingfisher release compilation' ")
-        self.cursor.execute("COMMENT ON COLUMN field_counts.path IS 'JSON path of the field' ")
-        self.cursor.execute("COMMENT ON COLUMN field_counts.object_property IS "
-                            "'The total number of times the field at this path appears' ")
-        self.cursor.execute("COMMENT ON COLUMN field_counts.array_count IS "
-                            "'For arrays, the total number of items in this array across all releases' ")
-        self.cursor.execute("COMMENT ON COLUMN field_counts.distinct_releases IS "
-                            "'The total number of distinct releases in which the field at this path appears' ")
-        commit()
-
-        self.logger.info(f'Total time: {timer() - command_timer}s')
+    logger.info(f'Total time: {timer() - command_timer}s')

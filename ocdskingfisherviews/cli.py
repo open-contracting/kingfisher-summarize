@@ -4,7 +4,6 @@ import logging
 import logging.config
 import os.path
 import re
-import sys
 from contextlib import contextmanager
 from datetime import datetime
 
@@ -12,19 +11,12 @@ import click
 from psycopg2 import sql
 from psycopg2.extras import execute_values
 
-from ocdskingfisherviews import FieldCounts, do_correct_user_permissions, do_refresh_views, get_schemas, read_sql_files
-from ocdskingfisherviews.db import commit, get_connection, get_cursor, pluck, pluckone
+from ocdskingfisherviews import (do_correct_user_permissions, do_field_counts, do_refresh_views, get_schemas,
+                                 read_sql_files)
+from ocdskingfisherviews.db import commit, get_connection, get_cursor, pluck, schema_exists
 
 logger = logging.getLogger('foo')
 logger.info('bar')
-
-
-def log_statement(statement, logger_name):
-    logger = logging.getLogger(logger_name)
-
-    cursor.execute(statement)
-    commit()
-    logger.info(statement.as_string(get_connection()))
 
 
 @contextmanager
@@ -60,14 +52,15 @@ def validate_name(ctx, param, value):
     """
     schema = 'view_data_' + value
 
-    if not pluckone('SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = %(schema)s)', {'schema': schema}):
+    if not schema_exists(schema):
         raise click.BadParameter(f'SQL schema "{schema}" not found')
 
     return schema
 
 
 @click.group()
-def cli():
+@click.pass_context
+def cli(ctx):
     path = os.path.expanduser('~/.config/ocdskingfisher-views/logging.json')
     if os.path.isfile(path):
         with open(path) as f:
@@ -76,7 +69,10 @@ def cli():
         logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
     logger = logging.getLogger('ocdskingfisher.views.cli')
-    logger.info(f"Running {' '.join(sys.argv[1:])}")
+    logger.info(f'Running {ctx.invoked_subcommand}')
+
+    global connection
+    connection = get_connection()
 
     global cursor
     cursor = get_cursor()
@@ -133,8 +129,7 @@ def add_view(collections, note, name, dontbuild, tables_only, threads):
         if threads != 1:
             message.append(f' --threads {threads}')
         logger.info(''.join(message))
-        field_counts = FieldCounts(cursor)
-        field_counts.run(schema_name, threads=threads)
+        do_field_counts(cursor, schema_name, threads=threads)
 
         logger.info('Running correct-user-permissions')
         do_correct_user_permissions(cursor)
@@ -148,9 +143,14 @@ def delete_view(name):
 
     NAME is the last part of a schema's name after "view_data_".
     """
+    logger = logging.getLogger('ocdskingfisher.views.cli.delete-view')
+
     # `CASCADE` drops all objects (tables, functions, etc.) in the schema.
     statement = sql.SQL('DROP SCHEMA {schema} CASCADE').format(schema=sql.Identifier(name))
-    log_statement(statement, 'ocdskingfisher.views.cli.delete-view')
+    cursor.execute(statement)
+    commit()
+
+    logger.info(statement.as_string(connection))
 
 
 @click.command()
@@ -161,13 +161,15 @@ def list_views():
     for schema in get_schemas():
         click.echo(f'-----\nName: {schema[10:]}\nSchema: {schema}')
 
-        cursor.execute(sql.SQL('SELECT id FROM {table}').format(table=sql.Identifier(schema, 'selected_collections')))
+        cursor.execute(sql.SQL('SELECT id FROM {table} ORDER BY id').format(
+            table=sql.Identifier(schema, 'selected_collections')))
         for row in cursor.fetchall():
             click.echo(f"Collection ID: {row[0]}")
 
-        cursor.execute(sql.SQL('SELECT note, created_at FROM {table}').format(table=sql.Identifier(schema, 'note')))
+        cursor.execute(sql.SQL('SELECT note, created_at FROM {table} ORDER BY created_at').format(
+            table=sql.Identifier(schema, 'note')))
         for row in cursor.fetchall():
-            click.echo(f"Note: {row[0]} ({row[1]})")
+            click.echo(f"Note: {row[0]} ({row[1].strftime('%Y-%m-%d %H:%M:%S')})")
 
 
 @click.command()
@@ -195,7 +197,7 @@ def field_counts(name, remove, threads):
     NAME is the last part of a schema's name after "view_data_".
     """
     with log_exception():
-        FieldCounts(cursor).run(name, remove=remove, threads=threads)
+        do_field_counts(cursor, name, remove=remove, threads=threads)
 
 
 @click.command()

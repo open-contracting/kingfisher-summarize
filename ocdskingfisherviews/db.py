@@ -53,6 +53,21 @@ def pluckone(statement, variables=None):
     return cursor.fetchone()[0]
 
 
+def fetchall(statement, variables=None):
+    """
+    Returns all the values from all the results.
+    """
+    cursor.execute(statement, variables)
+    return cursor.fetchall()
+
+
+def schema_exists(schema):
+    """
+    Returns whether a schema exists.
+    """
+    return pluckone('SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = %(schema)s)', {'schema': schema})
+
+
 def commit():
     """
     Commits the transaction.

@@ -122,12 +122,12 @@ Outputs:
    Collection ID: 4
    Collection ID: 5
    Collection ID: 6
-   Note: Created by Morgan A. to compare field coverage (2020-01-02 03:04:05.123456)
+   Note: Created by Morgan A. to compare field coverage (2020-01-02 03:04:05)
    -----
    Name: collection_123
    Schema: view_data_collection_123
    Collection ID: 1
-   Note: Created by Morgan A. to measure procurement indicators (2020-01-02 03:04:05.123456)
+   Note: Created by Morgan A. to measure procurement indicators (2020-01-02 03:04:05)
 
 To list the schemas only, Connect to the database used by Kingfisher Views, using the connecting settings you :ref:`configured earlier<database-connection-settings>`, and run:
 

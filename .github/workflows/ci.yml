@@ -40,8 +40,10 @@ jobs:
         KINGFISHER_PROCESS_DB_URI: postgresql://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres
       run: |
         python /tmp/kingfisher-process/ocdskingfisher-process-cli upgrade-database
-        python /tmp/kingfisher-process/ocdskingfisher-process-cli new-collection 'new' '2000-01-01 00:00:00'
+        python /tmp/kingfisher-process/ocdskingfisher-process-cli new-collection 'one' '2000-01-01 00:00:00'
+        python /tmp/kingfisher-process/ocdskingfisher-process-cli new-collection 'two' '2000-01-01 00:00:00'
         python /tmp/kingfisher-process/ocdskingfisher-process-cli local-load 1 tests/fixtures release_package
+        python /tmp/kingfisher-process/ocdskingfisher-process-cli local-load 2 tests/fixtures release_package
     - name: Setup Kingfisher Views database
       env:
         PGUSER: postgres
