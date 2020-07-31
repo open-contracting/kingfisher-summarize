@@ -86,6 +86,56 @@ def cli(ctx):
 
 
 @click.command()
+def install():
+    """
+    Creates the views schema and the read_only_user and mapping_sheets tables within it, if they don't exist.
+    """
+    logger = logging.getLogger('ocdskingfisher.views.install')
+
+    cursor.execute('CREATE TABLE IF NOT EXISTS views.read_only_user(username VARCHAR(64) NOT NULL PRIMARY KEY)')
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS views.mapping_sheets (
+            id serial primary key,
+            version text,
+            extension text,
+            section text,
+            path text,
+            title text,
+            description text,
+            type text,
+            range text,
+            values text,
+            links text,
+            deprecated text,
+            "deprecationNotes" text
+        )
+    """)
+
+    cursor.execute('SELECT id FROM views.mapping_sheets LIMIT 1')
+    if not cursor.fetchone():
+        filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'sql', 'extras', '1-1-3.csv')
+        with open(filename) as f:
+            reader = csv.DictReader(f)
+
+            paths = set()
+            values = []
+            for row in reader:
+                row['version'] = '1.1'
+                row['extension'] = 'core'
+                if row['path'] not in paths:
+                    paths.add(row['path'])
+                    values.append(tuple(row))
+
+        statement = sql.SQL('INSERT INTO views.mapping_sheets ({columns}, version, extension) VALUES %s').format(
+            columns=sql.SQL(', ').join(sql.Identifier(column) for column in reader.fieldnames))
+        execute_values(cursor, statement, values)
+
+    commit()
+
+    logger.info('Created tables')
+
+
+@click.command()
 @click.argument('collections', callback=validate_collections)
 @click.argument('note')
 @click.option('--name', help='A custom name for the SQL schema ("view_data_" will be prepended).')
@@ -114,10 +164,10 @@ def add_view(ctx, collections, note, name, dontbuild, tables_only, threads):
     cursor.execute(sql.SQL('CREATE SCHEMA {schema}').format(schema=sql.Identifier(schema)))
     set_search_path([schema])
 
-    cursor.execute('CREATE TABLE selected_collections(id INTEGER PRIMARY KEY)')
+    cursor.execute('CREATE TABLE selected_collections (id INTEGER PRIMARY KEY)')
     execute_values(cursor, 'INSERT INTO selected_collections (id) VALUES %s', [(_id,) for _id in collections])
 
-    cursor.execute('CREATE TABLE note(id SERIAL, note TEXT NOT NULL, created_at TIMESTAMP WITHOUT TIME ZONE)')
+    cursor.execute('CREATE TABLE note (id SERIAL, note TEXT NOT NULL, created_at TIMESTAMP WITHOUT TIME ZONE)')
     cursor.execute(sql.SQL('INSERT INTO note (note, created_at) VALUES (%(note)s, %(at)s)'),
                    {'note': note, 'at': datetime.utcnow()})
 
@@ -285,7 +335,7 @@ def field_counts(name, remove, threads):
         cursor.execute(f.read())
     cursor.execute('DROP TABLE IF EXISTS field_counts_tmp')
     cursor.execute("""
-        CREATE TABLE field_counts_tmp(
+        CREATE TABLE field_counts_tmp (
             collection_id bigint,
             release_type text,
             path text,
@@ -391,6 +441,7 @@ def docs_table_ref(name):
                 writer.writerow(row)
 
 
+cli.add_command(install)
 cli.add_command(add_view)
 cli.add_command(correct_user_permissions)
 cli.add_command(delete_view)
