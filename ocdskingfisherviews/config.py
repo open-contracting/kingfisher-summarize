@@ -5,6 +5,7 @@ import os
 from urllib.parse import urlparse
 
 import pgpasslib
+from click import UsageError
 
 logger = logging.getLogger('ocdskingfisher.views.config')
 
@@ -38,8 +39,8 @@ def get_connection_parameters():
     userpath = '~/.config/ocdskingfisher-views/config.ini'
     fullpath = os.path.expanduser(userpath)
     if not os.path.isfile(fullpath):
-        raise Exception('You must either set the KINGFISHER_VIEWS_DB_URI environment variable or create the {} file.\n'
-                        'See https://kingfisher-views.readthedocs.io/en/latest/get-started.html'.format(userpath))
+        raise UsageError('You must either set the KINGFISHER_VIEWS_DB_URI environment variable or create the {} file.'
+                         '\nSee https://kingfisher-views.readthedocs.io/en/latest/get-started.html'.format(userpath))
 
     # Same defaults as https://github.com/gmr/pgpasslib/blob/master/pgpasslib.py
     default_username = getpass.getuser()
@@ -54,7 +55,7 @@ def get_connection_parameters():
     try:
         port = config.getint('DBHOST', 'PORT', fallback=5432)
     except ValueError as e:
-        raise Exception('PORT is invalid in {}. ({})'.format(userpath, e))
+        raise UsageError('PORT is invalid in {}. ({})'.format(userpath, e))
     # We don't use the default database name (that matches the user name) as this is rarely what the user intends.
     dbname = config.get('DBHOST', 'DBNAME')
 
@@ -65,7 +66,7 @@ def get_connection_parameters():
     if not hostname:
         hostname = default_hostname
     if not dbname:
-        raise Exception('You must set DBNAME in {}.'.format(userpath))
+        raise UsageError('You must set DBNAME in {}.'.format(userpath))
 
     # https://pgpasslib.readthedocs.io/en/latest/
     try:

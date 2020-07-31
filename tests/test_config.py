@@ -5,6 +5,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 import pytest
+from click import UsageError
 
 from ocdskingfisherviews.config import get_database_uri
 
@@ -104,7 +105,7 @@ class NoEnv(TestCase):
     def test_ini_nonexistent(self, ini):
         ini.return_value = 'nonexistent.ini'
 
-        with pytest.raises(Exception) as excinfo:
+        with pytest.raises(UsageError) as excinfo:
             get_database_uri()
 
         assert str(excinfo.value) == 'You must either set the KINGFISHER_VIEWS_DB_URI environment variable or ' \
@@ -126,7 +127,7 @@ class NoEnv(TestCase):
     def test_ini_empty_dbname(self, ini):
         ini.return_value = fixture('config-empty-dbname.ini')
 
-        with pytest.raises(Exception) as excinfo:
+        with pytest.raises(UsageError) as excinfo:
             get_database_uri()
 
         assert str(excinfo.value) == 'You must set DBNAME in ~/.config/ocdskingfisher-views/config.ini.'
@@ -134,7 +135,7 @@ class NoEnv(TestCase):
     def test_ini_bad_port(self, ini):
         ini.return_value = fixture('config-bad-port.ini')
 
-        with pytest.raises(Exception) as excinfo:
+        with pytest.raises(UsageError) as excinfo:
             get_database_uri()
 
         assert str(excinfo.value) == 'PORT is invalid in ~/.config/ocdskingfisher-views/config.ini. ' \
