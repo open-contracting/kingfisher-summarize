@@ -1,8 +1,8 @@
 from click.testing import CliRunner
 
 from ocdskingfisherviews.cli import cli
-from tests import (ADD_VIEW_TABLES, REFRESH_VIEWS_TABLES, REFRESH_VIEWS_VIEWS, assert_log_running, fixture,
-                   get_columns_without_comments, get_tables, get_views)
+from tests import (ADD_VIEW_TABLES, REFRESH_VIEWS_TABLES, REFRESH_VIEWS_VIEWS, assert_bad_argument, assert_log_running,
+                   fixture, get_columns_without_comments, get_tables, get_views)
 
 command = 'refresh-views'
 
