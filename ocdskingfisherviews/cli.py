@@ -13,7 +13,7 @@ from psycopg2.extras import execute_values
 
 from ocdskingfisherviews import (do_correct_user_permissions, do_field_counts, do_refresh_views, get_schemas,
                                  read_sql_files)
-from ocdskingfisherviews.db import commit, get_connection, get_cursor, pluck, schema_exists
+from ocdskingfisherviews.db import commit, get_connection, get_cursor, pluck, schema_exists, set_search_path
 
 logger = logging.getLogger('foo')
 logger.info('bar')
@@ -21,6 +21,9 @@ logger.info('bar')
 
 @contextmanager
 def log_exception():
+    """
+    Logs and re-raises any exceptions in the block.
+    """
     logger = logging.getLogger('ocdskingfisher.views.cli')
 
     try:
@@ -50,7 +53,7 @@ def validate_name(ctx, param, value):
     """
     Returns a schema name. Raises an error if the schema isn't in the database.
     """
-    schema = 'view_data_' + value
+    schema = f'view_data_{value}'
 
     if not schema_exists(schema):
         raise click.BadParameter(f'SQL schema "{schema}" not found')
@@ -102,9 +105,9 @@ def add_view(collections, note, name, dontbuild, tables_only, threads):
             raise click.UsageError('--name is required for more than 5 collections')
         name = f"collection_{'_'.join(str(_id) for _id in sorted(collections))}"
 
-    schema_name = 'view_data_' + name
-    cursor.execute(sql.SQL('CREATE SCHEMA {schema}').format(schema=sql.Identifier(schema_name)))
-    cursor.execute(sql.SQL('SET search_path = {schema}').format(schema=sql.Identifier(schema_name)))
+    schema = f'view_data_{name}'
+    cursor.execute(sql.SQL('CREATE SCHEMA {schema}').format(schema=sql.Identifier(schema)))
+    set_search_path([schema])
 
     cursor.execute('CREATE TABLE selected_collections(id INTEGER PRIMARY KEY)')
     execute_values(cursor, 'INSERT INTO selected_collections (id) VALUES %s', [(_id,) for _id in collections])
@@ -123,13 +126,13 @@ def add_view(collections, note, name, dontbuild, tables_only, threads):
         if tables_only:
             message.append(' --tables-only')
         logger.info(''.join(message))
-        do_refresh_views(cursor, schema_name, tables_only=tables_only)
+        do_refresh_views(cursor, schema, tables_only=tables_only)
 
         message = [f'Running field-counts {name}']
         if threads != 1:
             message.append(f' --threads {threads}')
         logger.info(''.join(message))
-        do_field_counts(cursor, schema_name, threads=threads)
+        do_field_counts(cursor, schema, threads=threads)
 
         logger.info('Running correct-user-permissions')
         do_correct_user_permissions(cursor)
@@ -196,18 +199,30 @@ def field_counts(name, remove, threads):
 
     NAME is the last part of a schema's name after "view_data_".
     """
+    cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
+                   "AND table_name = 'release_summary_with_data'", {'schema': name})
+    if not cursor.fetchone():
+        raise click.UsageError('release_summary_with_data table not found. Run refresh-views first.')
+
     with log_exception():
         do_field_counts(cursor, name, remove=remove, threads=threads)
 
 
 @click.command()
 def correct_user_permissions():
+    """
+    Grants the users in the views.read_only_user table the USAGE privilege on the public, views and collection-specific
+    schemas, and the SELECT privilege on public tables, the views.mapping_sheets table, and collection-specific tables.
+    """
     do_correct_user_permissions(cursor)
 
 
 @click.command()
 @click.argument('name', callback=validate_name)
 def docs_table_ref(name):
+    """
+    Creates or updates the CSV files in docs/definitions.
+    """
     tables = []
     for basename, content in read_sql_files().items():
         for table in re.findall(r'^CREATE\s+(?:TABLE|VIEW)\s+(\S+)', content, flags=re.MULTILINE | re.IGNORECASE):
@@ -224,7 +239,9 @@ def docs_table_ref(name):
             pg_catalog.col_description(format('%%s.%%s', isc.table_schema,isc.table_name)::regclass::oid,
                                        isc.ordinal_position) AS column_description
         FROM
-            information_schema.columns isc where table_schema=%(schema)s AND lower(isc.table_name) = lower(%(table)s)
+            information_schema.columns isc
+        WHERE
+            table_schema = %(schema)s AND LOWER(isc.table_name) = LOWER(%(table)s)
     """
 
     filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'docs', 'definitions', '{}.csv')

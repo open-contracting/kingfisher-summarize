@@ -1,4 +1,5 @@
 import psycopg2
+from psycopg2 import sql
 
 from ocdskingfisherviews.config import get_connection_parameters
 
@@ -37,35 +38,25 @@ def get_cursor():
     return cursor
 
 
-def pluck(statement, variables=None):
-    """
-    Returns the first value from all the results.
-    """
-    cursor.execute(statement, variables)
-    return [row[0] for row in cursor.fetchall()]
-
-
-def pluckone(statement, variables=None):
-    """
-    Returns the first value from the first result.
-    """
-    cursor.execute(statement, variables)
-    return cursor.fetchone()[0]
-
-
-def fetchall(statement, variables=None):
-    """
-    Returns all the values from all the results.
-    """
-    cursor.execute(statement, variables)
-    return cursor.fetchall()
+def set_search_path(schemas):
+    cursor.execute(sql.SQL('SET search_path = {schemas}').format(schemas=sql.SQL(', ').join(
+        sql.Identifier(schema) for schema in schemas)))
 
 
 def schema_exists(schema):
     """
     Returns whether a schema exists.
     """
-    return pluckone('SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = %(schema)s)', {'schema': schema})
+    cursor.execute('SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = %(schema)s)', {'schema': schema})
+    return cursor.fetchone()[0]
+
+
+def pluck(statement, variables=None):
+    """
+    Returns the first value from all the results.
+    """
+    cursor.execute(statement, variables)
+    return [row[0] for row in cursor.fetchall()]
 
 
 def commit():

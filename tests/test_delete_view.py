@@ -2,7 +2,7 @@ from click.testing import CliRunner
 
 from ocdskingfisherviews.cli import cli
 from ocdskingfisherviews.db import schema_exists
-from tests import fixture
+from tests import assert_log_records, fixture
 
 
 def test_validate_name(caplog):
@@ -13,6 +13,7 @@ def test_validate_name(caplog):
     assert result.exit_code == 2
     assert result.output.endswith('\nError: Invalid value for "NAME": SQL schema "view_data_nonexistent" not found\n')
     assert len(caplog.records) == 1
+    assert caplog.records[0].levelname == 'INFO'
     assert caplog.records[0].message == 'Running delete-view'
 
 
@@ -30,5 +31,4 @@ def test_command(caplog):
 
         assert result.exit_code == 0
         assert result.output == ''
-        assert len(caplog.records[3:]) == 1
-        assert caplog.records[3].message == f'DROP SCHEMA "{schema}" CASCADE'
+        assert_log_records(caplog, 'delete-view', [f'DROP SCHEMA "{schema}" CASCADE'])

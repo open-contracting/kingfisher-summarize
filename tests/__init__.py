@@ -3,7 +3,7 @@ from contextlib import contextmanager
 from click.testing import CliRunner
 
 from ocdskingfisherviews.cli import cli
-from ocdskingfisherviews.db import pluck
+from ocdskingfisherviews.db import get_connection, get_cursor, pluck
 
 ADD_VIEW_TABLES = {
     'note',
@@ -42,6 +42,15 @@ REFRESH_VIEWS_TABLES = {
     'tenderers_summary',
 }
 
+REFRESH_VIEWS_VIEWS = {
+    'awards_summary',
+    'contracts_summary',
+    'parties_summary',
+    'release_summary_with_checks',
+    'release_summary_with_data',
+    'tender_summary_with_data',
+}
+
 
 @contextmanager
 def fixture(collections='1', dontbuild=True, name=None):
@@ -60,9 +69,49 @@ def fixture(collections='1', dontbuild=True, name=None):
     try:
         yield result
     finally:
+        connection = get_connection()
+        connection.rollback()
         runner.invoke(cli, ['delete-view', name])
+
+
+def assert_log_records(caplog, name, messages):
+    records = [record for record in caplog.records if record.name == f'ocdskingfisher.views.cli.{name}']
+
+    for i, record in enumerate(records):
+        assert record.levelname == 'INFO'
+        assert record.message == messages[i]
+
+    assert len(records) == len(messages)
+
+
+def fetch_all(statement, variables=None):
+    cursor = get_cursor()
+    cursor.execute(statement, variables)
+    return cursor.fetchall()
 
 
 def get_tables(schema):
     return set(pluck('SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s',
                      {'schema': schema}))
+
+
+def get_views(schema):
+    return set(pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
+                     "AND table_type = 'VIEW'", {'schema': schema}))
+
+
+def get_columns_without_comments(schema):
+    return fetch_all("""
+        SELECT
+            isc.table_name,
+            isc.column_name,
+            isc.data_type
+        FROM
+            information_schema.columns isc
+        WHERE
+            isc.table_schema = %(schema)s
+            AND LOWER(isc.table_name) NOT IN ('selected_collections', 'note', 'awards_summary_no_data',
+                                              'contracts_summary_no_data', 'parties_summary_no_data')
+            AND pg_catalog.col_description(format('%%s.%%s',isc.table_schema,isc.table_name)::regclass::oid,
+                                           isc.ordinal_position) IS NULL
+    """, {'schema': schema})

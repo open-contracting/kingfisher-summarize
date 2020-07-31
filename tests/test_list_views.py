@@ -6,7 +6,7 @@ from psycopg2 import sql
 
 from ocdskingfisherviews.cli import cli
 from ocdskingfisherviews.db import commit, get_cursor
-from tests import fixture
+from tests import assert_log_records, fixture
 
 
 def test_command_none(caplog):
@@ -17,6 +17,7 @@ def test_command_none(caplog):
     assert result.exit_code == 0
     assert result.output == ''
     assert len(caplog.records) == 1
+    assert caplog.records[0].levelname == 'INFO'
     assert caplog.records[0].message == 'Running list-views'
 
 
@@ -35,7 +36,7 @@ def test_command(caplog):
 
         assert result.exit_code == 0
         assert result.output.startswith(text)
-        assert len(caplog.records[3:]) == 0
+        assert_log_records(caplog, 'list-views', [])
 
 
 def test_command_multiple(caplog):
@@ -43,8 +44,9 @@ def test_command_multiple(caplog):
         runner = CliRunner()
 
         cursor = get_cursor()
-        cursor.execute(sql.SQL("INSERT INTO {table} (note, created_at) VALUES (%(note)s, %(created_at)s)").format(
-            table=sql.Identifier(f'view_data_collection_1_2', 'note')), {'note': 'Another', 'created_at': datetime(2000, 1, 1)})
+        statement = sql.SQL("INSERT INTO {table} (note, created_at) VALUES (%(note)s, %(created_at)s)").format(
+            table=sql.Identifier(f'view_data_collection_1_2', 'note'))
+        cursor.execute(statement, {'note': 'Another', 'created_at': datetime(2000, 1, 1)})
         commit()
 
         result = runner.invoke(cli, ['list-views'])
@@ -60,4 +62,4 @@ def test_command_multiple(caplog):
 
         assert result.exit_code == 0
         assert result.output.startswith(text)
-        assert len(caplog.records[3:]) == 0
+        assert_log_records(caplog, 'list-views', [])

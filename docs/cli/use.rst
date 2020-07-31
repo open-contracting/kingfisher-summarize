@@ -244,6 +244,6 @@ The tables to which access is granted are:
 ``public``
    All tables created by Kingfisher Process. See `Kingfisher Process documentation <https://kingfisher-process.readthedocs.io/en/latest/database-structure.html>`__.
 ``views``
-   The ``mapping_sheets`` tables.
+   The ``mapping_sheets`` table.
 Collection-specific schemas
    All tables about one or more collections, created by the :ref:`add-view`, :ref:`refresh-views` and :ref:`field-counts` commands. See :doc:`../database`.

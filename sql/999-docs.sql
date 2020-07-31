@@ -22,7 +22,6 @@ $$
 $$;
 
 CREATE OR REPLACE FUNCTION common_milestone_comments(
-
     table_name text)
     RETURNS text
     LANGUAGE 'plpgsql'
@@ -45,7 +44,6 @@ $$
 $$;
 
 CREATE OR REPLACE FUNCTION common_item_comments(
-
     table_name text)
     RETURNS text
     LANGUAGE 'plpgsql'
@@ -72,7 +70,6 @@ $$
 $$;
 
 CREATE OR REPLACE FUNCTION common_document_comments(
-
     table_name text)
     RETURNS text
     LANGUAGE 'plpgsql'
