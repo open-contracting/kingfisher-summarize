@@ -116,16 +116,10 @@ Outputs:
 
 .. code-block:: none
 
-   -----
-   VIEW: collection_4_5_6
-   Collection Id: 4
-   Collection Id: 5
-   Collection Id: 6
-   Note: Created by Morgan A. to compare field coverage (2020-01-02 03:04:05.123456)
-   -----
-   VIEW: collection_123
-   Collection Id: 1
-   Note: Created by Morgan A. to measure procurement indicators (2020-01-02 03:04:05.123456)
+   | Name             |   Collections | Note                                                                         |
+   |------------------|---------------|------------------------------------------------------------------------------|
+   | collection_4_5_6 | 4, 5, 6       | Created by Morgan A. to compare field coverage (2020-07-31 14:53:38)         |
+   | collection_123   | 1             | Created by Morgan A. to measure procurement indicators (2020-01-02 03:04:05) |
 
 To list the schemas only, Connect to the database used by Kingfisher Views, using the connecting settings you :ref:`configured earlier<database-connection-settings>`, and run:
 
@@ -242,6 +236,6 @@ The tables to which access is granted are:
 ``public``
    All tables created by Kingfisher Process. See `Kingfisher Process documentation <https://kingfisher-process.readthedocs.io/en/latest/database-structure.html>`__.
 ``views``
-   The ``mapping_sheets`` tables.
+   The ``mapping_sheets`` table.
 Collection-specific schemas
    All tables about one or more collections, created by the :ref:`add-view`, :ref:`refresh-views` and :ref:`field-counts` commands. See :doc:`../database`.
