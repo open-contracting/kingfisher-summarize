@@ -6,7 +6,6 @@ import logging
 import logging.config
 import os.path
 import re
-from contextlib import contextmanager
 from datetime import datetime
 from timeit import default_timer as timer
 
