@@ -9,6 +9,7 @@ from click import UsageError
 
 logger = logging.getLogger('ocdskingfisher.views.config')
 
+
 def _add_pgpass_password(d):
     # Use the password from the PostgreSQL Password File, if not provided.
     if not d['password']:

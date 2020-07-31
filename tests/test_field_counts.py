@@ -14,7 +14,7 @@ def test_validate_name(caplog):
     result = runner.invoke(cli, [command, 'nonexistent'])
 
     assert result.exit_code == 2
-    assert result.output.endswith("\nError: Invalid value for 'NAME': SQL schema \"view_data_nonexistent\" not found\n")
+    assert result.output.endswith("Error: Invalid value for 'NAME': SQL schema \"view_data_nonexistent\" not found\n")
     assert_log_running(caplog, command)
 
 
@@ -25,7 +25,7 @@ def test_command_error(caplog):
         result = runner.invoke(cli, [command, 'collection_1'])
 
         assert result.exit_code == 2
-        assert result.output.endswith('\nError: release_summary_with_data table not found. Run refresh-views first.\n')
+        assert result.output.endswith('Error: release_summary_with_data table not found. Run refresh-views first.\n')
         assert_log_records(caplog, command, [])
 
 
