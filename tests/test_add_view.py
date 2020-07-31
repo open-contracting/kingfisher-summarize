@@ -14,7 +14,7 @@ def test_validate_collections_noninteger(caplog):
     result = runner.invoke(cli, [command, 'a'])
 
     assert result.exit_code == 2
-    assert result.output.endswith('\nError: Invalid value for "COLLECTIONS": Collection IDs must be integers\n')
+    assert result.output.endswith("\nError: Invalid value for 'COLLECTIONS': Collection IDs must be integers\n")
     assert_log_running(caplog, command)
 
 
@@ -24,7 +24,7 @@ def test_validate_collections_nonexistent(caplog):
     result = runner.invoke(cli, [command, '1,10,100'])
 
     assert result.exit_code == 2
-    assert result.output.endswith('\nError: Invalid value for "COLLECTIONS": Collection IDs {10, 100} not found\n')
+    assert result.output.endswith("\nError: Invalid value for 'COLLECTIONS': Collection IDs {10, 100} not found\n")
     assert_log_running(caplog, command)
 
 
