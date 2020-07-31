@@ -70,6 +70,7 @@ def cli(ctx):
     if os.path.isfile(path):
         with open(path) as f:
             logging.config.dictConfig(json.load(f))
+    # Python's root logger only prints warning and above.
     else:
         logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
@@ -250,9 +251,9 @@ def field_counts(name, remove, threads):
                 collection_id,
                 release_type,
                 path,
-                sum(object_property) object_property,
-                sum(array_item) array_count,
-                count(distinct id) distinct_releases
+                SUM(object_property) object_property,
+                SUM(array_item) array_count,
+                COUNT(distinct id) distinct_releases
             FROM
                 release_summary_with_data
             CROSS JOIN
@@ -267,6 +268,7 @@ def field_counts(name, remove, threads):
             cursor.execute('INSERT INTO field_counts_tmp VALUES %(values)s', {'values': values})
             commit()
         else:
+            # It's not clear under what conditions this code is reached...
             logger.warning(f'No data for collection ID {collection}!')
 
         logger.info(f'Time for collection ID {collection}: {timer() - collection_timer}s')
@@ -297,17 +299,17 @@ def field_counts(name, remove, threads):
     cursor.execute('DROP TABLE IF EXISTS field_counts')
     cursor.execute('ALTER TABLE field_counts_tmp RENAME TO field_counts')
     cursor.execute("COMMENT ON COLUMN field_counts.collection_id IS "
-                   "'id from the kingfisher collection table' ")
+                   "'id from the kingfisher collection table'")
     cursor.execute("COMMENT ON COLUMN field_counts.release_type IS "
                    "'Either release, compiled_release or record. compiled_release are releases generated "
-                   "by kingfisher release compilation' ")
-    cursor.execute("COMMENT ON COLUMN field_counts.path IS 'JSON path of the field' ")
+                   "by kingfisher release compilation'")
+    cursor.execute("COMMENT ON COLUMN field_counts.path IS 'JSON path of the field'")
     cursor.execute("COMMENT ON COLUMN field_counts.object_property IS "
-                   "'The total number of times the field at this path appears' ")
+                   "'The total number of times the field at this path appears'")
     cursor.execute("COMMENT ON COLUMN field_counts.array_count IS "
-                   "'For arrays, the total number of items in this array across all releases' ")
+                   "'For arrays, the total number of items in this array across all releases'")
     cursor.execute("COMMENT ON COLUMN field_counts.distinct_releases IS "
-                   "'The total number of distinct releases in which the field at this path appears' ")
+                   "'The total number of distinct releases in which the field at this path appears'")
     commit()
 
     logger.info(f'Total time: {timer() - command_timer}s')
@@ -368,7 +370,7 @@ def docs_table_ref(name):
             table_schema = %(schema)s AND LOWER(isc.table_name) = LOWER(%(table)s)
     """
 
-    filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'docs', 'definitions', '{}.csv')
+    filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'docs', 'definitions', '{}.csv')
     for table in tables:
         with open(filename.format(table), 'w') as f:
             writer = csv.writer(f, lineterminator='\n')
@@ -376,7 +378,9 @@ def docs_table_ref(name):
 
             cursor.execute(statement, {'schema': name, 'table': table})
             for row in cursor.fetchall():
+                # Change "timestamp without time zone" (and  "timestamp with time zone") to "timestamp".
                 if 'timestamp' in row[1]:
+                    row = list(row)
                     row[1] = 'timestamp'
                 writer.writerow(row)
 
