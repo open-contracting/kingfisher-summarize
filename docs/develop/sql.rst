@@ -36,9 +36,8 @@ We want to add the ``description`` values of the ``Tender`` and ``Award`` object
 
    .. code-block:: sql
 
-       create table staged_tender_summary
-       AS
-       select
+       CREATE TABLE staged_tender_summary AS
+       SELECT
            r.id,
            r.release_type,
            r.collection_id,
@@ -80,23 +79,25 @@ This example demonstrates how Kingfisher Views uses temporary (``tmp_*``) and in
 
        -- Add this before the tmp_award_documents_aggregates block, using that block as a template.
 
-       drop table if exists tmp_planning_documents_aggregates;
-       create table tmp_planning_documents_aggregates
-       AS
-       select
+       DROP TABLE IF EXISTS tmp_planning_documents_aggregates;
+
+       CREATE TABLE tmp_planning_documents_aggregates AS
+       SELECT
            id,
            jsonb_object_agg(coalesce(documentType, ''), documentType_count) planning_documentType_counts
-       from
-           (select
-               id, documentType, count(*) documentType_count
-           from
+       FROM
+           (SELECT
+               id,
+               documentType,
+               count(*) documentType_count
+           FROM
                planning_documents_summary
-           group by
-               id, documentType
-           ) AS d
-       group by id;
+           GROUP BY
+               id, documentType) AS d
+       GROUP BY
+           id;
 
-       create unique index tmp_planning_documents_aggregates_id on tmp_planning_documents_aggregates(id);
+       CREATE UNIQUE INDEX tmp_planning_documents_aggregates_id ON tmp_planning_documents_aggregates(id);
 
 #. Do the same for the total documents.
 
@@ -107,17 +108,16 @@ This example demonstrates how Kingfisher Views uses temporary (``tmp_*``) and in
 
       -- Add this before the tmp_release_awards_aggregates block, using that block as a template.
 
-      drop table if exists tmp_release_planning_aggregates;
+      DROP TABLE IF EXISTS tmp_release_planning_aggregates;
 
-      create table tmp_release_planning_aggregates
-      AS
-      select
+      CREATE TABLE tmp_release_planning_aggregates AS
+      SELECT
           id,
           documents_count AS total_planning_documents
-      from
+      FROM
           planning_summary;
 
-      create unique index tmp_release_planning_aggregates_id on tmp_release_planning_aggregates(id);
+      CREATE UNIQUE INDEX tmp_release_planning_aggregates_id ON tmp_release_planning_aggregates(id);
 
 #. Find the SQL table to change.
 
@@ -132,12 +132,8 @@ This example demonstrates how Kingfisher Views uses temporary (``tmp_*``) and in
 
       -- Add this before the tmp_release_awards_aggregates JOIN.
 
-      left join
-          tmp_release_planning_aggregates
-      using(id)
-      left join
-          tmp_planning_documents_aggregates
-      using(id)
+      LEFT JOIN tmp_release_planning_aggregates USING (id)
+      LEFT JOIN tmp_planning_documents_aggregates USING (id)
 
 #. Drop our ``tmp_`` tables:
 
@@ -145,8 +141,8 @@ This example demonstrates how Kingfisher Views uses temporary (``tmp_*``) and in
 
       -- Add this before `drop table if exists tmp_release_awards_aggregates;`
 
-      drop table if exists tmp_release_planning_aggregates;
-      drop table if exists tmp_planning_documents_aggregates;
+      DROP TABLE IF EXISTS tmp_release_planning_aggregates;
+      DROP TABLE IF EXISTS tmp_planning_documents_aggregates;
 
 .. _review-changes:
 
@@ -185,16 +181,16 @@ The tests won't pass if you don't document the new columns!
       -- For the "Add a column" example
 
       ...
-      Comment on column %%1$s.tender_id IS '`id` from `tender` object';
-      Comment on column %%1$s.tender_title IS '`title` from `tender` object';
-      Comment on column %%1$s.tender_status IS '`status` from `tender` object';
-      Comment on column %%1$s.tender_description IS '`description` from `tender` object'; -- OUR ADDITION
+      COMMENT ON COLUMN %1$s.tender_id IS '`id` from `tender` object';
+      COMMENT ON COLUMN %1$s.tender_title IS '`title` from `tender` object';
+      COMMENT ON COLUMN %1$s.tender_status IS '`status` from `tender` object';
+      COMMENT ON COLUMN %1$s.tender_description IS '`description` from `tender` object'; -- OUR ADDITION
       ...
 
       -- For the "Add an aggregate" example
 
-      Comment on column %%1$s.total_planning_documents IS 'Count of planning documents in this release';
-      Comment on column %%1$s.planning_documenttype_counts IS 'JSONB object with the keys as unique planning/documents/documentType and the values as count of the appearances of those documentTypes';
+      COMMENT ON COLUMN %1$s.total_planning_documents IS 'Count of planning documents in this release';
+      COMMENT ON COLUMN %1$s.planning_documenttype_counts IS 'JSONB object with the keys as unique planning/documents/documentType and the values as count of the appearances of those documentTypes';
 
 #. Run the ``999-docs.sql`` file (:ref:`refresh-views` throws an error if you made a typo above):
 
