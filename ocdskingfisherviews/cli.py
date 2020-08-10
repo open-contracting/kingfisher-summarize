@@ -319,13 +319,8 @@ def field_counts(name, remove, threads):
             GROUP BY collection_id, release_type, path
         """, {'id': collection})
 
-        values = cursor.fetchone()
-        if values:
-            cursor.execute('INSERT INTO field_counts_tmp VALUES %(values)s', {'values': values})
-            commit()
-        else:
-            # It's not clear under what conditions this code is reached...
-            logger.warning(f'No data for collection ID {collection}!')
+        execute_values(cursor, 'INSERT INTO field_counts_tmp VALUES %s', cursor.fetchall())
+        commit()
 
         logger.info(f'Time for collection ID {collection}: {timer() - collection_timer}s')
 
