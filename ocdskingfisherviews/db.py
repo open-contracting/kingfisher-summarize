@@ -39,6 +39,9 @@ def get_cursor():
 
 
 def set_search_path(schemas):
+    """
+    Sets the search path to the given schemas.
+    """
     cursor.execute(sql.SQL('SET search_path = {schemas}').format(schemas=sql.SQL(', ').join(
         sql.Identifier(schema) for schema in schemas)))
 
