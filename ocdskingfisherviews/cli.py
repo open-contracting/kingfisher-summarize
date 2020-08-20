@@ -436,11 +436,11 @@ def docs_table_ref(name):
                 writer.writerow(row)
 
 
-cli.add_command(install)
 cli.add_command(add_view)
 cli.add_command(correct_user_permissions)
 cli.add_command(delete_view)
 cli.add_command(docs_table_ref)
 cli.add_command(field_counts)
+cli.add_command(install)
 cli.add_command(list_views)
 cli.add_command(refresh_views)
