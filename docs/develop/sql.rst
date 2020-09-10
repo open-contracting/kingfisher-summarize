@@ -122,11 +122,11 @@ This example demonstrates how Kingfisher Views uses temporary (``tmp_*``) and in
 #. Find the SQL table to change.
 
    -  The tables summarizing the entire collection are in the ``008-release.sql`` file.
-   -  The ``release_summary`` table is created by ``SELECT``ing from the ``staged_release_summary`` table, which in turn is created by ``JOIN``ing many ``tmp_*`` tables.
+   -  The ``release_summary`` table is created by ``SELECT`` ing from the ``staged_release_summary`` table, which in turn is created by ``JOIN`` ing many ``tmp_*`` tables.
 
-#. Add ``JOIN``s for the new blocks.
+#. Add ``JOIN`` s for the new blocks.
 
-   -  The order of the ``JOIN``s controls the order of the columns in the table.
+   -  The order of the ``JOIN`` s controls the order of the columns in the table.
 
    .. code-block:: sql
 
