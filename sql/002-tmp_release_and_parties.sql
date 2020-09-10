@@ -142,7 +142,7 @@ SELECT
     data_id,
     value ->> 'id' AS parties_id,
     value -> 'roles' AS roles,
-    (value -> 'identifier' ->> 'scheme') || '-' || (value -> 'identifier' ->> 'id') AS identifier,
+    concat_ws('-', value -> 'identifier' ->> 'scheme', value -> 'identifier' ->> 'id') AS identifier,
     coalesce(value ->> 'id', (value -> 'identifier' ->> 'scheme') || '-' || (value -> 'identifier' ->> 'id'), value ->> 'name') AS unique_identifier_attempt,
     (
         SELECT

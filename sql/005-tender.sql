@@ -126,7 +126,7 @@ SELECT
     convert_to_numeric (item ->> 'quantity') quantity,
     convert_to_numeric (unit -> 'value' ->> 'amount') unit_amount,
     unit -> 'value' ->> 'currency' unit_currency,
-    (item -> 'classification' ->> 'scheme') || '-' || (item -> 'classification' ->> 'id') AS item_classification,
+    concat_ws(' ', item -> 'classification' ->> 'scheme', item -> 'classification' ->> 'id') AS item_classification,
     (
         SELECT
             jsonb_agg((additional_classification ->> 'scheme') || '-' || (additional_classification ->> 'id'))
