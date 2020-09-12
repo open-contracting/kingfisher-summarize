@@ -17,14 +17,14 @@ Load data
 
 To test your changes, you need to have some data loaded. The `test data <https://github.com/open-contracting/kingfisher-views/tree/master/tests/fixtures>`__ covers common fields, but you might have specific data that you want to test against.
 
-#. Set up Kingfisher Process' database, create a collection, and load the test data into it:
+#. Set up Kingfisher Process' database, create a collection, and load the test data into it (replacing ``COLLECTION_NAME`` below):
 
    .. code-block:: bash
 
       (vagrant) cd /vagrant/process
       (vagrant) source .ve/bin/activate
       (vagrant) python ocdskingfisher-process-cli upgrade-database
-      (vagrant) python ocdskingfisher-process-cli new-collection '{collection_name}' '2000-01-01 00:00:00'
+      (vagrant) python ocdskingfisher-process-cli new-collection COLLECTION_NAME '2000-01-01 00:00:00'
       (vagrant) python ocdskingfisher-process-cli local-load 1 ../views/tests/fixtures release_package
       (vagrant) deactivate
 
@@ -98,11 +98,11 @@ Documentation files
 Update the database tables reference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:doc:`../database` displays the CSV files in the `docs/definitions/ <https://github.com/open-contracting/kingfisher-views/tree/master/docs/definitions>`__ directory. To create and/or update the CSV files, run:
+:doc:`../database` displays the CSV files in the `docs/definitions/ <https://github.com/open-contracting/kingfisher-views/tree/master/docs/definitions>`__ directory. To create and/or update the CSV files, run (replacing ``COLLECTION_NAME`` below):
 
 .. code-block:: bash
 
-   python ocdskingfisher-views-cli docs-table-ref {collection_name}
+   python ocdskingfisher-views-cli docs-table-ref COLLECTION_NAME
 
 Then, for any new CSV file, manually add a new sub-section to ``docs/database.rst`` under an appropriate section.
 

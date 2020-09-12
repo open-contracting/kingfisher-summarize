@@ -192,21 +192,21 @@ The tests won't pass if you don't document the new columns!
       COMMENT ON COLUMN %1$s.total_planning_documents IS 'Count of planning documents in this release';
       COMMENT ON COLUMN %1$s.planning_documenttype_counts IS 'JSONB object with the keys as unique planning/documents/documentType and the values as count of the appearances of those documentTypes';
 
-#. Run the ``999-docs.sql`` file (:ref:`refresh-views` throws an error if you made a typo above):
+#. Run the ``999-docs.sql`` file (:ref:`refresh-views` throws an error if you made a typo above) (replacing ``COLLECTION_NAME`` below):
 
    .. code-block:: bash
 
-      python ocdskingfisher-views-cli refresh-views {collection_name}
+      python ocdskingfisher-views-cli refresh-views COLLECTION_NAME
 
 #. Review your changes.
 
    -  In your PostgreSQL client, Look at relevant tables' schemas to check that new comments appear.
 
-#. :ref:`Update the documentation files<docs-files>`:
+#. :ref:`Update the documentation files<docs-files>` (replacing ``COLLECTION_NAME`` below):
 
   .. code-block:: bash
 
-     python ocdskingfisher-views-cli docs-table-ref {collection_name}
+     python ocdskingfisher-views-cli docs-table-ref COLLECTION_NAME
 
 .. _format-sql:
 
