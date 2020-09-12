@@ -149,7 +149,7 @@ This example demonstrates how Kingfisher Views uses temporary (``tmp_*``) and in
 Review changes
 --------------
 
-Review your changes by comparing to the initial summaries you created when :ref:`loading data<load-data>`. You can either:
+Review your changes by comparing to the initial summaries you created when :ref:`loading data<load-data>`. You can *either*:
 
 -  Create new summaries:
 
@@ -157,7 +157,7 @@ Review your changes by comparing to the initial summaries you created when :ref:
 
       python ocdskingfisher-views-cli add-view 1 "Review new column" --name review_new_column
 
--  Refresh existing summaries:
+-  Or, refresh existing summaries:
 
    .. code-block:: bash
 
