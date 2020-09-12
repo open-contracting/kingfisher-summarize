@@ -4,11 +4,9 @@ Setup
 Prerequisites
 -------------
 
-You can either install all requirements manually or use the `preconfigured Vagrant setup <https://kingfisher-vagrant.readthedocs.io/en/latest/>`__.
+You can either :doc:`install all requirements manually<../get-started>` or `use the preconfigured Vagrant setup <https://kingfisher-vagrant.readthedocs.io/en/latest/>`__.
 
-To install manually, follow the :doc:`../get-started` guide.
-
-When using Vagrant, remember to modify Kingfisher Views's SQL files and source code **on your host machine**, not in the Vagrant environment. See also how to `access the database <https://kingfisher-vagrant.readthedocs.io/en/latest/#working-with-the-database>`__ in Vagrant.
+If using Vagrant, remember to modify Kingfisher Views's SQL files and source code **on your host machine**, not in the Vagrant environment. See also how to `access the database <https://kingfisher-vagrant.readthedocs.io/en/latest/#working-with-the-database>`__ in Vagrant.
 
 .. _load-data:
 

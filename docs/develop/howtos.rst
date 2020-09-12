@@ -1,10 +1,10 @@
-How-To Guides
+How-to guides
 =============
 
 SQL files
 ---------
 
-The examples use the ``view_data_NAME`` schema and the :ref:`default database connection settings<database-connection-settings>`. Change these as needed.
+The examples below use the ``view_data_NAME`` schema and the :ref:`default database connection settings<database-connection-settings>`. Change these as needed.
 
 Run a specific file
 ~~~~~~~~~~~~~~~~~~~
@@ -15,7 +15,7 @@ To run, for example, the ``004-planning.sql`` file:
 
    psql 'dbname=ocdskingfisher user=ocdskingfisher options=--search-path=view_data_NAME' -f 004-planning.sql
 
-When working on a specific file, you can first run the :ref:`refresh-views` command and then run the ``002`` file (on which all SQL files depend) as above. You can then run the specific file after each change to see the new results.
+When working on a specific file, you can first run the :ref:`refresh-views` command and then run the ``002`` file (on which all SQL files depend) as above. You can then run the specific file after each of your changes to see the new results.
 
 Time SQL statements
 ~~~~~~~~~~~~~~~~~~~
