@@ -98,7 +98,7 @@ Setup PostgreSQL database
 
    .. code-block:: bash
 
-      sudo -u postgres psql ocdskingfisher
+      su - postgres -c 'psql ocdskingfisher'
 
 #. `Create <https://www.postgresql.org/docs/current/sql-createschema.html>`__ the ``views`` schema, and set it to be owned by the database user configured above. For example, run:
 
@@ -106,7 +106,7 @@ Setup PostgreSQL database
 
       CREATE SCHEMA views AUTHORIZATION ocdskingfisher;
 
-#. Close your PostgreSQL session and your sudo session, e.g. with ``Ctrl-D`` for both
+#. Close your PostgreSQL session, e.g. with ``Ctrl-D`` for both
 
 #. Create Kingfisher Views' configuration tables using the :ref:`install` command:
 

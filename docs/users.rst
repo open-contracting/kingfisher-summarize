@@ -15,7 +15,7 @@ Add a user
 
    .. code-block:: bash
 
-      sudo -u postgres psql
+      su - postgres -c psql
 
 #. Create the user. For example, replace ``the_password`` with a `strong password <https://www.lastpass.com/password-generator>`__ and ``the_username`` with a recognizable username (for example, the lowercase name of the person, like ``janedoe``, to whom you want to give access), and run:
 
@@ -23,7 +23,7 @@ Add a user
 
       CREATE USER the_username WITH PASSWORD 'the_password';
 
-#. Close your PostgreSQL session and your sudo session.
+#. Close your PostgreSQL session.
 
 Grant a user read-only access to *some* tables
 ----------------------------------------------
