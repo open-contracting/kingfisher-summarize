@@ -1,4 +1,6 @@
+DROP TABLE IF EXISTS tenderers_summary;
 
-drop table if exists tenderers_summary;
-drop table if exists procuringEntity_summary;
-drop table if exists buyer_summary;
+DROP TABLE IF EXISTS procuringEntity_summary;
+
+DROP TABLE IF EXISTS buyer_summary;
+

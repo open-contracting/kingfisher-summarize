@@ -65,6 +65,23 @@ This creates a schema named ``view_data_collection_4_5_6``.
 
 If you need to summarize more than five collections, then you must :ref:`customize the schema's name<set-schema-name>`.
 
+.. _tables-only:
+
+Create persistent tables for all summary tables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, some summary tables are database `views <https://www.postgresql.org/docs/current/sql-createview.html>`__ and not persistent `tables <https://www.postgresql.org/docs/current/sql-createtable.html>`__, in order to save disk space.  Use the ``--tables-only`` option to make all summary tables into persistent tables.
+
+.. code-block:: bash
+
+    python ocdskingfisher-views-cli add-view 123 "The note" --name the_name --tables-only
+
+Use this option if:
+
+-  You want to allow a user to access the schema's tables, but not Kingfisher Process' tables
+-  You want to make it easier for a user to discover the foreign key relationships between tables (for example, using ``\d <table>`` instead of ``\d+ <view>`` followed by ``\d <table>``)
+-  You are :ref:`creating the Entity Relationship Diagram<create_erd>`
+
 .. _delete-view:
 
 delete-view
@@ -99,16 +116,10 @@ Outputs:
 
 .. code-block:: none
 
-   -----
-   VIEW: collection_4_5_6
-   Collection Id: 4
-   Collection Id: 5
-   Collection Id: 6
-   Note: Created by Morgan A. to compare field coverage (2020-01-02 03:04:05.123456)
-   -----
-   VIEW: collection_123
-   Collection Id: 1
-   Note: Created by Morgan A. to measure procurement indicators (2020-01-02 03:04:05.123456)
+   | Name             |   Collections | Note                                                                         |
+   |------------------|---------------|------------------------------------------------------------------------------|
+   | collection_4_5_6 | 4, 5, 6       | Created by Morgan A. to compare field coverage (2020-07-31 14:53:38)         |
+   | collection_123   | 1             | Created by Morgan A. to measure procurement indicators (2020-01-02 03:04:05) |
 
 To list the schemas only, Connect to the database used by Kingfisher Views, using the connecting settings you :ref:`configured earlier<database-connection-settings>`, and run:
 
@@ -212,7 +223,7 @@ correct-user-permissions
 
    You only need to learn this command if you used :ref:`add-view` with ``--dontbuild``, if you're updating a schema after :ref:`upgrading Kingfisher Views<upgrade-app>`, or if you are :doc:`sharing access<../users>`.
 
-`Grants <https://www.postgresql.org/docs/current/ddl-priv.html>`__ the users in the ``view_meta.read_only_user`` table the ``USAGE`` privilege on the schemas and the ``SELECT`` privilege on all existing tables in the schemas:
+`Grants <https://www.postgresql.org/docs/current/ddl-priv.html>`__ the users in the ``views.read_only_user`` table the ``USAGE`` privilege on the schemas and the ``SELECT`` privilege on some tables in those schemas:
 
 .. code-block:: bash
 
@@ -220,13 +231,18 @@ correct-user-permissions
 
 You must run this command whenever you create (or re-create) schemas or tables. In other words, run this command after using the :ref:`refresh-views` or :ref:`field-counts` command.
 
-The schemas are:
+The tables to which access is granted are:
 
 ``public``
-   Contains all tables created by Kingfisher Process
+   All tables created by Kingfisher Process. See `Kingfisher Process documentation <https://kingfisher-process.readthedocs.io/en/latest/database-structure.html>`__.
 ``views``
-   Contains the ``alembic_version`` table
-``view_info``
-   Contains the ``mapping_sheets`` table
+   The ``mapping_sheets`` table.
 Collection-specific schemas
-   Contain the :doc:`summary tables<../database>` about one or more collections, created by the :ref:`add-view`, :ref:`refresh-views` and :ref:`field-counts` commands
+   All tables about one or more collections, created by the :ref:`add-view`, :ref:`refresh-views` and :ref:`field-counts` commands. See :doc:`../database`.
+
+.. _upgrade-app:
+
+Upgrade Kingfisher Views
+------------------------
+
+If the new version of Kingfisher Views makes changes to SQL statements, you might want to re-create the collection-specific schemas. For each schema, run the :ref:`refresh-views`, :ref:`field-counts` and :ref:`correct-user-permissions` commands, in that order.

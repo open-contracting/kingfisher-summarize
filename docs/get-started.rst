@@ -1,4 +1,4 @@
-Get Started
+Get started
 ===========
 
 Prerequisites
@@ -42,7 +42,22 @@ Download the sample configuration file to the configuration directory:
 
 .. code-block:: bash
 
-    curl -o ~/.config/ocdskingfisher-views/config.ini https://kingfisher-views.readthedocs.io/latest/en/_static/config.ini
+    curl -o ~/.config/ocdskingfisher-views/config.ini https://kingfisher-views.readthedocs.io/en/latest/_static/config.ini
+
+.. _config-logging:
+
+Logging
+~~~~~~~
+
+Logging from the :doc:`cli/index` can be configured with a ``~/.config/ocdskingfisher-views/logging.json`` file. To download the default configuration::
+
+    curl https://raw.githubusercontent.com/open-contracting/kingfisher-views/master/samples/logging.json -o ~/.config/ocdskingfisher-views/logging.json
+
+To download a different configuration that includes debug messages::
+
+    curl https://raw.githubusercontent.com/open-contracting/kingfisher-views/master/samples/logging-debug.json -o ~/.config/ocdskingfisher-views/logging.json
+
+Read more about :doc:`logging`.
 
 .. _database-connection-settings:
 
@@ -83,22 +98,28 @@ Setup PostgreSQL database
 
    .. code-block:: bash
 
-      sudo -u postgres psql ocdskingfisher
+      su - postgres -c 'psql ocdskingfisher'
 
-#. `Create <https://www.postgresql.org/docs/current/sql-createschema.html>`__ the ``views``, ``view_info`` and ``view_meta`` schemas, and set them to be owned by the database user configured above. For example, run:
+#. `Create <https://www.postgresql.org/docs/current/sql-createschema.html>`__ the ``views`` schema, and set it to be owned by the database user configured above. For example, run:
 
    .. code-block:: sql
 
       CREATE SCHEMA views AUTHORIZATION ocdskingfisher;
-      CREATE SCHEMA view_info AUTHORIZATION ocdskingfisher;
-      CREATE SCHEMA view_meta AUTHORIZATION ocdskingfisher;
 
-#. Close your PostgreSQL session and your sudo session, e.g. with ``Ctrl-D`` for both
+#. Close your PostgreSQL session, e.g. with ``Ctrl-D`` for both
 
-#. Create Kingfisher Views' configuration tables using the :ref:`alembic-upgrade` command:
+#. Create Kingfisher Views' configuration tables using the :ref:`install` command:
 
    .. code-block:: bash
 
-      alembic --raiseerr --config ocdskingfisherviews/alembic.ini upgrade head
+      python ocdskingfisher-views-cli install
 
 You're now ready to :doc:`use Kingfisher Views<cli/use>`.
+
+.. note::
+
+   If you notice slow queries and are using solid-state drives, consider tuning PostgreSQL by decreasing ``random_page_cost``:
+
+   .. code-block:: bash
+
+      ALTER TABLESPACE pg_default SET (random_page_cost = 2.0);

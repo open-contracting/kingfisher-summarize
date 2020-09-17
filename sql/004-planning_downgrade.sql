@@ -1,4 +1,6 @@
+DROP TABLE IF EXISTS planning_summary CASCADE;
 
-drop table if exists planning_summary;
-drop table if exists planning_milestones_summary;
-drop table if exists planning_documents_summary;
+DROP TABLE IF EXISTS planning_milestones_summary;
+
+DROP TABLE IF EXISTS planning_documents_summary;
+

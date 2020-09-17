@@ -14,9 +14,36 @@ Otherwise, the :ref:`add-view` command *with* the ``--dontbuild`` flag creates t
 How tables are related
 ~~~~~~~~~~~~~~~~~~~~~~
 
-All summary tables have an ``id`` column and a ``release_type`` column. This ``id`` column refers to the ``id`` column in the ``release_summary`` table. The ``table_id`` column in the ``release_summary`` table refers the ``id`` column in either Kingfisher Process' ``release``, ``record`` or ``compiled_release`` table; the table is indicated by the ``release_type`` column.
+Each summary table has an ``id`` column and a ``release_type`` column. The ``id`` column in a summary table refers to the ``id`` column in the ``release_summary`` table. For a given ``id`` value, the ``release_type`` value is the same in all tables (in other words, the ``release_type`` column is `denormalized <https://en.wikipedia.org/wiki/Denormalization>`__).
 
-Note that, in the case of Kingfisher Process' ``record`` table, the record's data's ``compiledRelease`` is used in summaries.
+The ``table_id`` column in the ``release_summary`` table refers to the ``id`` column in either Kingfisher Process' ``release``, ``record`` or ``compiled_release`` table. If the ``release_type`` is "embedded_release", the referred table is the ``record`` table. Otherwise, the referred table matches the value of the ``release_type`` column (either "release", "record" or "compiled_release").
+
+If the ``release_type`` is "record", then the record's ``compiledRelease`` field is used to generate summaries. If the ``release_type`` is "embedded_release", then the record's ``releases`` array is used to generate summaries.
+
+Foreign key relationships exist on all `tables <https://www.postgresql.org/docs/current/sql-createtable.html>`__ (but not `views <https://www.postgresql.org/docs/current/sql-createview.html>`__) within a schema, as shown in the Entity Relationship Diagram below (click on the image and zoom in to read more easily).
+
+.. image:: _static/erd.png
+   :target: _static/erd.png
+
+This diagram can help to identify JOIN conditions. For example, all tables can be joined with the ``release_summary``, ``release_summary_with_data`` and ``release_summary_with_data`` tables on the ``id`` column.
+
+Some tables have composite foreign keys. These are shown as two lines from one table to another in the diagram. To join such tables:
+
+.. code-block:: sql
+
+   SELECT *
+   FROM awards_document_summary
+   JOIN awards_summary
+     ON awards_summary.id = awards_document_summary.id AND
+        awards_summary.award_index = awards_document_summary.award_index 
+
+Or, more briefly:
+
+.. code-block:: bash
+
+   SELECT *
+   FROM awards_document_summary
+   JOIN awards_summary USING (id, award_index)
 
 .. _metadata:
 
@@ -64,6 +91,8 @@ field_counts
    :widths: 10, 10, 40
    :file: definitions/field_counts.csv
 
+.. _db-releases:
+
 Releases
 --------
 
@@ -92,6 +121,8 @@ release_summary_with_checks
    :header-rows: 1
    :widths: 10, 10, 40
    :file: definitions/release_summary_with_checks.csv
+
+.. _db-parties:
 
 Parties
 -------
@@ -130,6 +161,8 @@ tenderers_summary
    :widths: 10, 10, 40
    :file: definitions/tenderers_summary.csv
 
+.. _db-planning:
+
 Planning section
 ----------------
 
@@ -158,6 +191,8 @@ planning_milestones_summary
    :header-rows: 1
    :widths: 10, 10, 40
    :file: definitions/planning_milestones_summary.csv
+
+.. _db-tender:
 
 Tender section
 --------------
@@ -204,6 +239,8 @@ tender_milestones_summary
    :widths: 10, 10, 40
    :file: definitions/tender_milestones_summary.csv
 
+.. _db-awards:
+
 Awards section
 --------------
 
@@ -241,6 +278,8 @@ award_documents_summary
    :widths: 10, 10, 40
    :file: definitions/award_documents_summary.csv
 
+.. _db-contracts:
+
 Contracts section
 -----------------
 
@@ -277,6 +316,8 @@ contract_milestones_summary
    :header-rows: 1
    :widths: 10, 10, 40
    :file: definitions/contract_milestones_summary.csv
+
+.. _db-contract-implementation:
 
 Contract implementation section
 -------------------------------

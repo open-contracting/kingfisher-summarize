@@ -15,7 +15,7 @@ Add a user
 
    .. code-block:: bash
 
-      sudo -u postgres psql
+      su - postgres -c psql
 
 #. Create the user. For example, replace ``the_password`` with a `strong password <https://www.lastpass.com/password-generator>`__ and ``the_username`` with a recognizable username (for example, the lowercase name of the person, like ``janedoe``, to whom you want to give access), and run:
 
@@ -23,7 +23,7 @@ Add a user
 
       CREATE USER the_username WITH PASSWORD 'the_password';
 
-#. Close your PostgreSQL session and your sudo session.
+#. Close your PostgreSQL session.
 
 Grant a user read-only access to *some* tables
 ----------------------------------------------
@@ -46,11 +46,11 @@ Grant a user read-only access to *all* tables
 
 #. Connect to the database used by Kingfisher Views, using the connecting settings you :ref:`configured earlier<database-connection-settings>`.
 
-#. Insert the username into the ``view_meta.read_only_user`` table. For example, replace ``the_username``, and run:
+#. Insert the username into the ``views.read_only_user`` table. For example, replace ``the_username``, and run:
 
    .. code-block:: sql
 
-      INSERT INTO view_meta.read_only_user VALUES ('the_username');
+      INSERT INTO views.read_only_user VALUES ('the_username');
 
 #. Close your PostgreSQL session.
 
@@ -65,11 +65,11 @@ Remove a user
 
 #. Connect to the database used by Kingfisher Views, using the connecting settings you :ref:`configured earlier<database-connection-settings>`.
 
-#. Delete the username from the ``view_meta.read_only_user`` table. For example, replace ``the_username``, and run:
+#. Delete the username from the ``views.read_only_user`` table. For example, replace ``the_username``, and run:
 
    .. code-block:: sql
 
-      DELETE FROM view_meta.read_only_user WHERE username = 'the_username';
+      DELETE FROM views.read_only_user WHERE username = 'the_username';
 
 #. Drop the user. For example, replace ``the_username``, and run:
 

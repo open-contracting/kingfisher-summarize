@@ -1,96 +1,100 @@
+DROP TABLE IF EXISTS tmp_release_party_aggregates;
 
-drop table if exists tmp_release_party_aggregates;
-
-create table tmp_release_party_aggregates
-AS
-select
+CREATE TABLE tmp_release_party_aggregates AS
+SELECT
     id,
     role_counts,
     total_roles,
     total_parties
-from
-    (select id, count(*) total_parties from parties_summary group by id) parties_count
-left join
-    (select
-        id, sum(role_count) as total_roles, jsonb_object_agg(coalesce(role, ''), role_count) role_counts
-    from
-        (select
-            id, role, count(*) role_count
-        from
-            parties_summary
-        cross join
-            jsonb_array_elements_text(roles) as role
-        group by id, role) id_role
-    group by id) role_counts
-using(id)
-;
+FROM (
+    SELECT
+        id,
+        count(*) total_parties
+    FROM
+        parties_summary
+    GROUP BY
+        id) parties_count
+    LEFT JOIN (
+        SELECT
+            id,
+            sum(role_count) AS total_roles,
+            jsonb_object_agg(coalesce(ROLE, ''), role_count) role_counts
+        FROM (
+            SELECT
+                id,
+                ROLE,
+                count(*) role_count
+            FROM
+                parties_summary
+                CROSS JOIN jsonb_array_elements_text(roles) AS ROLE
+            GROUP BY
+                id,
+                ROLE) id_role
+        GROUP BY
+            id) role_counts USING (id);
 
-create unique index tmp_release_party_aggregates_id on tmp_release_party_aggregates(id);
+CREATE UNIQUE INDEX tmp_release_party_aggregates_id ON tmp_release_party_aggregates (id);
 
 ----
+DROP TABLE IF EXISTS tmp_release_awards_aggregates;
 
-drop table if exists tmp_release_awards_aggregates;
-
-create table tmp_release_awards_aggregates
-AS
-select
+CREATE TABLE tmp_release_awards_aggregates AS
+SELECT
     id,
-    count(*) as award_count,
+    count(*) AS award_count,
     min(award_date) AS first_award_date,
     max(award_date) AS last_award_date,
     sum(documents_count) AS total_award_documents,
     sum(items_count) AS total_award_items,
     sum(suppliers_count) AS total_award_suppliers,
     sum(award_value_amount) award_amount
-from
+FROM
     awards_summary
-group by id;
+GROUP BY
+    id;
 
-create unique index tmp_release_awards_aggregates_id on tmp_release_awards_aggregates(id);
+CREATE UNIQUE INDEX tmp_release_awards_aggregates_id ON tmp_release_awards_aggregates (id);
 
+DROP TABLE IF EXISTS tmp_release_award_suppliers_aggregates;
 
-drop table if exists tmp_release_award_suppliers_aggregates;
-
-create table tmp_release_award_suppliers_aggregates
-AS
-select 
-    id, 
-    count(distinct unique_identifier_attempt) AS unique_award_suppliers
-from
-    award_suppliers_summary
-group by id
-;
-
-create unique index tmp_release_award_suppliers_aggregates_id on tmp_release_award_suppliers_aggregates(id);
-
-
-drop table if exists tmp_award_documents_aggregates;
-create table tmp_award_documents_aggregates
-AS
-select 
-    id, 
-    jsonb_object_agg(coalesce(documentType, ''), documentType_count) award_documentType_counts
-from
-    (select 
-        id, documentType, count(*) documentType_count
-    from
-        award_documents_summary
-    group by
-        id, documentType
-    ) AS d
-group by id;
-
-create unique index tmp_award_documents_aggregates_id on tmp_award_documents_aggregates(id);
-
-
-
-drop table if exists tmp_release_contracts_aggregates;
-
-create table tmp_release_contracts_aggregates
-AS
-select
+CREATE TABLE tmp_release_award_suppliers_aggregates AS
+SELECT
     id,
-    count(*) as contract_count,
+    count(DISTINCT unique_identifier_attempt) AS unique_award_suppliers
+FROM
+    award_suppliers_summary
+GROUP BY
+    id;
+
+CREATE UNIQUE INDEX tmp_release_award_suppliers_aggregates_id ON tmp_release_award_suppliers_aggregates (id);
+
+DROP TABLE IF EXISTS tmp_award_documents_aggregates;
+
+CREATE TABLE tmp_award_documents_aggregates AS
+SELECT
+    id,
+    jsonb_object_agg(coalesce(documentType, ''), documentType_count) award_documentType_counts
+FROM (
+    SELECT
+        id,
+        documentType,
+        count(*) documentType_count
+    FROM
+        award_documents_summary
+    GROUP BY
+        id,
+        documentType) AS d
+GROUP BY
+    id;
+
+CREATE UNIQUE INDEX tmp_award_documents_aggregates_id ON tmp_award_documents_aggregates (id);
+
+DROP TABLE IF EXISTS tmp_release_contracts_aggregates;
+
+CREATE TABLE tmp_release_contracts_aggregates AS
+SELECT
+    id,
+    count(*) AS contract_count,
     sum(link_to_awards) total_contract_link_to_awards,
     sum(contract_value_amount) contract_amount,
     min(datesigned) AS first_contract_datesigned,
@@ -100,235 +104,265 @@ select
     sum(items_count) AS total_contract_items,
     sum(implementation_documents_count) AS total_contract_implementation_documents,
     sum(implementation_milestones_count) AS total_contract_implementation_milestones
-from
+FROM
     contracts_summary
-group by id;
+GROUP BY
+    id;
 
-create unique index tmp_release_contracts_aggregates_id on tmp_release_contracts_aggregates(id);
+CREATE UNIQUE INDEX tmp_release_contracts_aggregates_id ON tmp_release_contracts_aggregates (id);
 
+DROP TABLE IF EXISTS tmp_contract_documents_aggregates;
 
-
-drop table if exists tmp_contract_documents_aggregates;
-create table tmp_contract_documents_aggregates
-AS
-select 
-    id, 
+CREATE TABLE tmp_contract_documents_aggregates AS
+SELECT
+    id,
     jsonb_object_agg(coalesce(documentType, ''), documentType_count) contract_documentType_counts
-from
-    (select 
-        id, documentType, count(*) documentType_count
-    from
+FROM (
+    SELECT
+        id,
+        documentType,
+        count(*) documentType_count
+    FROM
         contract_documents_summary
-    group by
-        id, documentType
-    ) AS d
-group by id;
+    GROUP BY
+        id,
+        documentType) AS d
+GROUP BY
+    id;
 
-create unique index tmp_contract_documents_aggregates_id on tmp_contract_documents_aggregates(id);
+CREATE UNIQUE INDEX tmp_contract_documents_aggregates_id ON tmp_contract_documents_aggregates (id);
 
+DROP TABLE IF EXISTS tmp_contract_implementation_documents_aggregates;
 
-drop table if exists tmp_contract_implementation_documents_aggregates;
-
-create table tmp_contract_implementation_documents_aggregates
-AS
-select 
-    id, 
+CREATE TABLE tmp_contract_implementation_documents_aggregates AS
+SELECT
+    id,
     jsonb_object_agg(coalesce(documentType, ''), documentType_count) contract_implemetation_documentType_counts
-from
-    (select 
-        id, documentType, count(*) documentType_count
-    from
+FROM (
+    SELECT
+        id,
+        documentType,
+        count(*) documentType_count
+    FROM
         contract_implementation_documents_summary
-    group by
-        id, documentType
-    ) AS d
-group by id;
+    GROUP BY
+        id,
+        documentType) AS d
+GROUP BY
+    id;
 
-create unique index tmp_contract_implementation_documents_aggregates_id on tmp_contract_implementation_documents_aggregates(id);
+CREATE UNIQUE INDEX tmp_contract_implementation_documents_aggregates_id ON tmp_contract_implementation_documents_aggregates (id);
 
+DROP TABLE IF EXISTS tmp_contract_milestones_aggregates;
 
-drop table if exists tmp_contract_milestones_aggregates;
-create table tmp_contract_milestones_aggregates
-AS
-select 
-    id, 
-    jsonb_object_agg(coalesce(type, ''), milestoneType_count) contract_milestoneType_counts
-from
-    (select 
-        id, type, count(*) milestoneType_count
-    from
+CREATE TABLE tmp_contract_milestones_aggregates AS
+SELECT
+    id,
+    jsonb_object_agg(coalesce(TYPE, ''), milestoneType_count) contract_milestoneType_counts
+FROM (
+    SELECT
+        id,
+        TYPE,
+        count(*) milestoneType_count
+    FROM
         contract_milestones_summary
-    group by
-        id, type
-    ) AS d
-group by id;
+    GROUP BY
+        id,
+        TYPE) AS d
+GROUP BY
+    id;
 
-create unique index tmp_contract_milestones_aggregates_id on tmp_contract_milestones_aggregates(id);
+CREATE UNIQUE INDEX tmp_contract_milestones_aggregates_id ON tmp_contract_milestones_aggregates (id);
 
+DROP TABLE IF EXISTS tmp_contract_implementation_milestones_aggregates;
 
-drop table if exists tmp_contract_implementation_milestones_aggregates;
-
-create table tmp_contract_implementation_milestones_aggregates
-AS
-select 
-    id, 
-    jsonb_object_agg(coalesce(type, ''), milestoneType_count) contract_implementation_milestoneType_counts
-from
-    (select 
-        id, type, count(*) milestoneType_count
-    from
+CREATE TABLE tmp_contract_implementation_milestones_aggregates AS
+SELECT
+    id,
+    jsonb_object_agg(coalesce(TYPE, ''), milestoneType_count) contract_implementation_milestoneType_counts
+FROM (
+    SELECT
+        id,
+        TYPE,
+        count(*) milestoneType_count
+    FROM
         contract_implementation_milestones_summary
-    group by
-        id, type
-    ) AS d
-group by id;
+    GROUP BY
+        id,
+        TYPE) AS d
+GROUP BY
+    id;
 
-create unique index tmp_contract_implementation_milestones_aggregates_id on tmp_contract_implementation_milestones_aggregates(id);
+CREATE UNIQUE INDEX tmp_contract_implementation_milestones_aggregates_id ON tmp_contract_implementation_milestones_aggregates (id);
 
+DROP TABLE IF EXISTS tmp_release_documents_aggregates;
 
-
-drop table if exists tmp_release_documents_aggregates;
-
-create table tmp_release_documents_aggregates
-AS
-with all_document_types as (
-    select id, documentType from award_documents_summary 
-    union all
-    select id, documentType from contract_documents_summary
-    union all
-    select id, documentType from contract_implementation_documents_summary
-    union all
-    select id, documentType from planning_documents_summary
-    union all
-    select id, documentType from tender_documents_summary
+CREATE TABLE tmp_release_documents_aggregates AS
+WITH all_document_types AS (
+    SELECT
+        id,
+        documentType
+    FROM
+        award_documents_summary
+    UNION ALL
+    SELECT
+        id,
+        documentType
+    FROM
+        contract_documents_summary
+    UNION ALL
+    SELECT
+        id,
+        documentType
+    FROM
+        contract_implementation_documents_summary
+    UNION ALL
+    SELECT
+        id,
+        documentType
+    FROM
+        planning_documents_summary
+    UNION ALL
+    SELECT
+        id,
+        documentType
+    FROM
+        tender_documents_summary
 )
-select 
-    id, 
-    jsonb_object_agg(coalesce(documentType, ''), documentType_count) total_documentType_counts,
-    sum(documentType_count) total_documents
-from
-    (select 
-        id, documentType, count(*) documentType_count
-    from
+SELECT
+    id,
+    jsonb_object_agg( coalesce(documentType, ''), documentType_count) total_documentType_counts,
+    sum( documentType_count) total_documents
+FROM (
+    SELECT
+        id,
+        documentType,
+        count(*) documentType_count
+    FROM
         all_document_types
-    group by
-        id, documentType
-    ) AS d
-group by id;
+    GROUP BY
+        id,
+        documentType
+) AS d
+GROUP BY
+    id;
 
+CREATE UNIQUE INDEX tmp_release_documents_aggregates_id ON tmp_release_documents_aggregates (id);
 
-create unique index tmp_release_documents_aggregates_id on tmp_release_documents_aggregates(id);
+DROP TABLE IF EXISTS tmp_release_milestones_aggregates;
 
-drop table if exists tmp_release_milestones_aggregates;
-
-create table tmp_release_milestones_aggregates
-AS
-with all_milestone_types as (
-    select id, type from contract_milestones_summary
-    union all
-    select id, type from contract_implementation_milestones_summary
-    union all
-    select id, type from planning_milestones_summary
-    union all
-    select id, type from tender_milestones_summary
+CREATE TABLE tmp_release_milestones_aggregates AS
+WITH all_milestone_types AS (
+    SELECT
+        id,
+        TYPE
+    FROM
+        contract_milestones_summary
+    UNION ALL
+    SELECT
+        id,
+        TYPE
+    FROM
+        contract_implementation_milestones_summary
+    UNION ALL
+    SELECT
+        id,
+        TYPE
+    FROM
+        planning_milestones_summary
+    UNION ALL
+    SELECT
+        id,
+        TYPE
+    FROM
+        tender_milestones_summary
 )
-select 
-    id, 
-    jsonb_object_agg(coalesce(type, ''), milestoneType_count) milestoneType_counts,
-    sum(milestoneType_count) total_milestones
-from
-    (select 
-        id, type, count(*) milestoneType_count
-    from
+SELECT
+    id,
+    jsonb_object_agg( coalesce(TYPE, ''), milestoneType_count) milestoneType_counts,
+    sum( milestoneType_count) total_milestones
+FROM (
+    SELECT
+        id,
+        TYPE,
+        count(*) milestoneType_count
+    FROM
         all_milestone_types
-    group by
-        id, type
-    ) AS d
-group by id;
+    GROUP BY
+        id,
+        TYPE
+) AS d
+GROUP BY
+    id;
 
-create unique index tmp_release_milestones_aggregates_id on tmp_release_milestones_aggregates(id);
+CREATE UNIQUE INDEX tmp_release_milestones_aggregates_id ON tmp_release_milestones_aggregates (id);
 
 ----
+DROP TABLE IF EXISTS staged_release_summary CASCADE;
 
-drop table if exists staged_release_summary cascade;
-
-create table staged_release_summary
-AS
-select
+CREATE TABLE staged_release_summary AS
+SELECT
     *
-from
+FROM
     tmp_release_summary
-left join
-    tmp_release_party_aggregates
-using(id)
-left join
-    tmp_release_awards_aggregates
-using(id)
-left join
-    tmp_release_award_suppliers_aggregates
-using(id)
-left join
-    tmp_award_documents_aggregates
-using(id)
-left join
-    tmp_release_contracts_aggregates
-using(id)
-left join
-    tmp_contract_documents_aggregates
-using(id)
-left join
-    tmp_contract_implementation_documents_aggregates
-using(id)
-left join
-    tmp_contract_milestones_aggregates
-using(id)
-left join
-    tmp_contract_implementation_milestones_aggregates
-using(id)
-left join
-    tmp_release_documents_aggregates
-using(id)
-left join
-    tmp_release_milestones_aggregates
-using(id)
-;
+    LEFT JOIN tmp_release_party_aggregates USING (id)
+    LEFT JOIN tmp_release_awards_aggregates USING (id)
+    LEFT JOIN tmp_release_award_suppliers_aggregates USING (id)
+    LEFT JOIN tmp_award_documents_aggregates USING (id)
+    LEFT JOIN tmp_release_contracts_aggregates USING (id)
+    LEFT JOIN tmp_contract_documents_aggregates USING (id)
+    LEFT JOIN tmp_contract_implementation_documents_aggregates USING (id)
+    LEFT JOIN tmp_contract_milestones_aggregates USING (id)
+    LEFT JOIN tmp_contract_implementation_milestones_aggregates USING (id)
+    LEFT JOIN tmp_release_documents_aggregates USING (id)
+    LEFT JOIN tmp_release_milestones_aggregates USING (id);
 
-drop table if exists tmp_release_summary cascade;  --drop view as well
-drop table if exists tmp_release_party_aggregates;
-drop table if exists tmp_release_awards_aggregates;
-drop table if exists tmp_release_award_suppliers_aggregates;
-drop table if exists tmp_award_documents_aggregates;
-drop table if exists tmp_release_contracts_aggregates;
-drop table if exists tmp_contract_documents_aggregates;
-drop table if exists tmp_contract_implementation_documents_aggregates;
-drop table if exists tmp_contract_milestones_aggregates;
-drop table if exists tmp_contract_implementation_milestones_aggregates;
-drop table if exists tmp_release_documents_aggregates;
-drop table if exists tmp_release_milestones_aggregates;
+DROP TABLE IF EXISTS tmp_release_party_aggregates;
+
+DROP TABLE IF EXISTS tmp_release_awards_aggregates;
+
+DROP TABLE IF EXISTS tmp_release_award_suppliers_aggregates;
+
+DROP TABLE IF EXISTS tmp_award_documents_aggregates;
+
+DROP TABLE IF EXISTS tmp_release_contracts_aggregates;
+
+DROP TABLE IF EXISTS tmp_contract_documents_aggregates;
+
+DROP TABLE IF EXISTS tmp_contract_implementation_documents_aggregates;
+
+DROP TABLE IF EXISTS tmp_contract_milestones_aggregates;
+
+DROP TABLE IF EXISTS tmp_contract_implementation_milestones_aggregates;
+
+DROP TABLE IF EXISTS tmp_release_documents_aggregates;
+
+DROP TABLE IF EXISTS tmp_release_milestones_aggregates;
 
 ----
+DROP TABLE IF EXISTS release_summary CASCADE;
 
-drop table if exists release_summary cascade;
+CREATE TABLE release_summary AS
+SELECT
+    *
+FROM
+    staged_release_summary;
 
-create table release_summary
-AS
-select * from staged_release_summary;
+DROP TABLE IF EXISTS staged_release_summary;
 
-drop table if exists staged_release_summary;
+CREATE UNIQUE INDEX release_summary_id ON release_summary (id);
 
+CREATE INDEX release_summary_data_id ON release_summary (data_id);
 
-create unique index release_summary_id on release_summary(id);
-create index release_summary_data_id on release_summary(data_id);
-create index release_summary_package_data_id on release_summary(package_data_id);
-create index release_summary_collection_id on release_summary(collection_id);
+CREATE INDEX release_summary_package_data_id ON release_summary (package_data_id);
 
+CREATE INDEX release_summary_collection_id ON release_summary (collection_id);
 
-drop view if exists release_summary_with_data;
+DROP VIEW IF EXISTS release_summary_with_data;
 
-create view release_summary_with_data
-AS
-select 
-    rs.*, 
+CREATE VIEW release_summary_with_data AS
+SELECT
+    rs.*,
     c.source_id,
     c.data_version,
     c.store_start_at,
@@ -337,27 +371,25 @@ select
     c.transform_type,
     c.transform_from_collection_id,
     c.deleted_at,
-    d.data,
-    pd.data as package_data
-from 
+    CASE WHEN release_type = 'embedded_release' THEN
+        d.data -> 'releases' -> (mod(rs.id / 10, 1000000)::integer)
+    ELSE
+        d.data
+    END AS data,
+    pd.data AS package_data
+FROM
     release_summary rs
-join 
-    data d on d.id = rs.data_id
-join 
-    collection c on c.id = rs.collection_id 
---Kingfisher Process’ compiled_release table has no package_data_id column.
---Therefore, any rows in release_summary sourced from that table will have a NULL package_data_id.
-left join
-    package_data pd on pd.id = rs.package_data_id ;
+    JOIN data d ON d.id = rs.data_id
+    JOIN collection c ON c.id = rs.collection_id
+    --Kingfisher Process’ compiled_release table has no package_data_id column.
+    --Therefore, any rows in release_summary sourced from that table will have a NULL package_data_id.
+    LEFT JOIN package_data pd ON pd.id = rs.package_data_id;
 
+DROP VIEW IF EXISTS release_summary_with_checks;
 
-
-drop view if exists release_summary_with_checks;
-
-create view release_summary_with_checks
-AS
-select 
-    rs.*, 
+CREATE VIEW release_summary_with_checks AS
+SELECT
+    rs.*,
     c.source_id,
     c.data_version,
     c.store_start_at,
@@ -366,23 +398,48 @@ select
     c.transform_type,
     c.transform_from_collection_id,
     c.deleted_at,
-    release_check.cove_output as release_check,
-    release_check11.cove_output as release_check11,
-    record_check.cove_output as record_check,
-    record_check11.cove_output as record_check11
-from 
+    release_check.cove_output AS release_check,
+    release_check11.cove_output AS release_check11,
+    record_check.cove_output AS record_check,
+    record_check11.cove_output AS record_check11
+FROM
     release_summary rs
-join 
-    collection c on c.id = rs.collection_id 
-left join 
-    release_check on release_check.release_id = rs.table_id and release_check.override_schema_version is null and release_type = 'release'
-left join 
-    release_check release_check11 on release_check11.release_id = rs.table_id and release_check11.override_schema_version = '1.1' and release_type = 'release'
-left join 
-    record_check on record_check.record_id = rs.table_id and record_check.override_schema_version is null and release_type = 'record'
-left join 
-    record_check record_check11 on record_check11.record_id = rs.table_id and record_check11.override_schema_version  = '1.1' and release_type = 'record';
+    JOIN collection c ON c.id = rs.collection_id
+    LEFT JOIN release_check ON release_check.release_id = rs.table_id
+        AND release_check.override_schema_version IS NULL
+        AND release_type = 'release'
+    LEFT JOIN release_check release_check11 ON release_check11.release_id = rs.table_id
+        AND release_check11.override_schema_version = '1.1'
+        AND release_type = 'release'
+    LEFT JOIN record_check ON record_check.record_id = rs.table_id
+        AND record_check.override_schema_version IS NULL
+        AND release_type = 'record'
+    LEFT JOIN record_check record_check11 ON record_check11.record_id = rs.table_id
+        AND record_check11.override_schema_version = '1.1'
+        AND release_type = 'record';
 
+-- The following pgpsql makes indexes on release_summary_with_checks and release_summary_with_data,
+-- you will need to run --tables-only command line parameter to allow this to run.
 
+DO $$
+DECLARE
+    query text;
+BEGIN
+    query := $query$ CREATE UNIQUE INDEX release_summary_with_data_id ON release_summary_with_data (id);
+    CREATE INDEX release_summary_with_data_data_id ON release_summary_with_data (data_id);
+    CREATE INDEX release_summary_with_data_package_data_id ON release_summary_with_data (package_data_id);
+    CREATE INDEX release_summary_with_data_collection_id ON release_summary_with_data (collection_id);
+    CREATE UNIQUE INDEX release_summary_with_checks_id ON release_summary_with_checks (id);
+    CREATE INDEX release_summary_with_checks_data_id ON release_summary_with_checks (data_id);
+    CREATE INDEX release_summary_with_checks_package_data_id ON release_summary_with_checks (package_data_id);
+    CREATE INDEX release_summary_with_checks_collection_id ON release_summary_with_checks (collection_id);
+    $query$;
+    EXECUTE query;
+    -- wrong_object_type is the specific exception when you try to add an index to a view.
+EXCEPTION
+    WHEN wrong_object_type THEN
+        NULL;
+END;
 
+$$;
 

@@ -1,9 +1,7 @@
+DROP TABLE IF EXISTS tmp_awards_summary;
 
-drop table if exists tmp_awards_summary;
-
-create table tmp_awards_summary
-AS
-select
+CREATE TABLE tmp_awards_summary AS
+SELECT
     r.id,
     award_index,
     r.release_type,
@@ -12,95 +10,88 @@ select
     r.release_id,
     r.data_id,
     award
-from
-    (select 
+FROM (
+    SELECT
         rs.*,
-        ordinality - 1 AS award_index,
-        value as award
-    from 
-        tmp_release_summary_with_release_data rs 
-    cross join
-        jsonb_array_elements(data -> 'awards') with ordinality
-    where jsonb_typeof(data -> 'awards') = 'array'
-    ) AS r
-;
+        ORDINALITY - 1 AS award_index,
+        value AS award
+    FROM
+        tmp_release_summary_with_release_data rs
+    CROSS JOIN jsonb_array_elements(data -> 'awards')
+    WITH ORDINALITY
+WHERE
+    jsonb_typeof(data -> 'awards') = 'array') AS r;
 
-create unique index tmp_awards_summary_id on tmp_awards_summary(id, award_index);
+CREATE UNIQUE INDEX tmp_awards_summary_id ON tmp_awards_summary (id, award_index);
 
 ----
+DROP TABLE IF EXISTS staged_award_suppliers_summary;
 
-drop table if exists staged_award_suppliers_summary;
-
-create table staged_award_suppliers_summary
-AS
-select
-    distinct on (r.id, award_index, supplier_index)
+CREATE TABLE staged_award_suppliers_summary AS SELECT DISTINCT ON (r.id, award_index, supplier_index)
     r.id,
     award_index,
     supplier_index,
-	r.release_type,
+    r.release_type,
     r.collection_id,
     r.ocid,
     r.release_id,
     r.data_id,
     supplier,
     supplier ->> 'id' AS supplier_parties_id,
-	(supplier -> 'identifier' ->> 'scheme') || '-' || (supplier -> 'identifier' ->> 'id') AS supplier_identifier,
-    coalesce(
-        supplier ->> 'id',
-        (supplier -> 'identifier' ->> 'scheme') || '-' || (supplier -> 'identifier' ->> 'id'),
-        supplier ->> 'name'
-    ) AS unique_identifier_attempt,
-    (select 
-        jsonb_agg((additional_identifier ->> 'scheme') || '-' || (additional_identifier ->> 'id'))
-    from
-        jsonb_array_elements(case when jsonb_typeof(supplier -> 'additionalIdentifiers') = 'array' then supplier -> 'additionalIdentifiers' else '[]'::jsonb end) additional_identifier
-    where
-        additional_identifier::jsonb ?& array['scheme', 'id']											   
-    ) supplier_additionalIdentifiers_ids,
-    jsonb_array_length(case when jsonb_typeof(supplier -> 'additionalIdentifiers') = 'array' then supplier -> 'additionalIdentifiers' else '[]'::jsonb end) supplier_additionalIdentifiers_count,
-    case when ps.id is not null then 1 else 0 end link_to_parties,
-    case when ps.id is not null and (ps.party -> 'roles') ? 'supplier' then 1 else 0 end link_with_role,
+    ps.identifier AS supplier_identifier,
+    coalesce(supplier ->> 'id', (supplier -> 'identifier' ->> 'scheme') || '-' || (supplier -> 'identifier' ->> 'id'), supplier ->> 'name') AS unique_identifier_attempt,
+    ps.parties_additionalIdentifiers_ids AS supplier_additionalIdentifiers_ids,
+    ps.parties_additionalIdentifiers_count AS supplier_additionalIdentifiers_count,
+    CASE WHEN ps.id IS NOT NULL THEN
+        1
+    ELSE
+        0
+    END link_to_parties,
+    CASE WHEN ps.id IS NOT NULL
+        AND (ps.party -> 'roles') ? 'supplier' THEN
+        1
+    ELSE
+        0
+    END link_with_role,
     ps.party_index
-from 
-    (select 
+FROM (
+    SELECT
         tas.*,
-        value As supplier,
-        ordinality - 1 AS supplier_index
-    from 
+        value AS supplier,
+        ORDINALITY - 1 AS supplier_index
+    FROM
         tmp_awards_summary tas
-    cross join
-        jsonb_array_elements(award -> 'suppliers') with ordinality
-    where
-        jsonb_typeof(award -> 'suppliers') = 'array'
-    ) AS r
-left join
-    parties_summary ps on r.id = ps.id and (supplier ->> 'id') = ps.parties_id
-where supplier is not null
-;
+    CROSS JOIN jsonb_array_elements(award -> 'suppliers')
+    WITH ORDINALITY
+WHERE
+    jsonb_typeof(award -> 'suppliers') = 'array') AS r
+    LEFT JOIN parties_summary ps ON r.id = ps.id
+        AND (supplier ->> 'id') = ps.parties_id
+WHERE
+    supplier IS NOT NULL;
 
 ----
+DROP TABLE IF EXISTS award_suppliers_summary;
 
-drop table if exists award_suppliers_summary;
+CREATE TABLE award_suppliers_summary AS
+SELECT
+    *
+FROM
+    staged_award_suppliers_summary;
 
-create table award_suppliers_summary
-AS
-select * from staged_award_suppliers_summary;
+DROP TABLE IF EXISTS staged_award_suppliers_summary;
 
-drop table if exists staged_award_suppliers_summary;
+CREATE UNIQUE INDEX award_suppliers_summary_id ON award_suppliers_summary (id, award_index, supplier_index);
 
+CREATE INDEX award_suppliers_summary_data_id ON award_suppliers_summary (data_id);
 
-create unique index award_suppliers_summary_id on award_suppliers_summary(id, award_index, supplier_index);
-create index award_suppliers_summary_data_id on award_suppliers_summary(data_id);
-create index award_suppliers_summary_collection_id on award_suppliers_summary(collection_id);
+CREATE INDEX award_suppliers_summary_collection_id ON award_suppliers_summary (collection_id);
 
 ----
+DROP TABLE IF EXISTS staged_award_documents_summary;
 
-drop table if exists staged_award_documents_summary;
-
-create table staged_award_documents_summary
-AS
-select
+CREATE TABLE staged_award_documents_summary AS
+SELECT
     r.id,
     award_index,
     document_index,
@@ -110,43 +101,42 @@ select
     r.release_id,
     r.data_id,
     document,
-    document ->> 'documentType' as documentType,
-    document ->> 'format' as format
-from
-    (select 
+    document ->> 'documentType' AS documentType,
+    document ->> 'format' AS format
+FROM (
+    SELECT
         tas.*,
         value AS document,
-        ordinality -1 AS document_index 
-    from 
-        tmp_awards_summary tas 
-    cross join
-        jsonb_array_elements(award -> 'documents') with ordinality
-    where jsonb_typeof(award -> 'documents') = 'array'
-    ) AS r
-;
+        ORDINALITY - 1 AS document_index
+    FROM
+        tmp_awards_summary tas
+    CROSS JOIN jsonb_array_elements(award -> 'documents')
+    WITH ORDINALITY
+WHERE
+    jsonb_typeof(award -> 'documents') = 'array') AS r;
 
 ----
+DROP TABLE IF EXISTS award_documents_summary;
 
-drop table if exists award_documents_summary;
+CREATE TABLE award_documents_summary AS
+SELECT
+    *
+FROM
+    staged_award_documents_summary;
 
-create table award_documents_summary
-AS
-select * from staged_award_documents_summary;
+DROP TABLE IF EXISTS staged_award_documents_summary;
 
-drop table if exists staged_award_documents_summary;
+CREATE UNIQUE INDEX award_documents_summary_id ON award_documents_summary (id, award_index, document_index);
 
+CREATE INDEX award_documents_summary_data_id ON award_documents_summary (data_id);
 
-create unique index award_documents_summary_id on award_documents_summary(id, award_index, document_index);
-create index award_documents_summary_data_id on award_documents_summary(data_id);
-create index award_documents_summary_collection_id on award_documents_summary(collection_id);
+CREATE INDEX award_documents_summary_collection_id ON award_documents_summary (collection_id);
 
 ----
+DROP TABLE IF EXISTS staged_award_items_summary;
 
-drop table if exists staged_award_items_summary;
-
-create table staged_award_items_summary
-AS
-select
+CREATE TABLE staged_award_items_summary AS
+SELECT
     r.id,
     award_index,
     item_index,
@@ -157,53 +147,63 @@ select
     r.data_id,
     item,
     item ->> 'id' item_id,
-    convert_to_numeric(item ->> 'quantity') quantity,
-    convert_to_numeric(unit -> 'value' ->> 'amount') unit_amount,
+    convert_to_numeric (item ->> 'quantity') quantity,
+    convert_to_numeric (unit -> 'value' ->> 'amount') unit_amount,
     unit -> 'value' ->> 'currency' unit_currency,
-	(item -> 'classification' ->> 'scheme') || '-' || (item -> 'classification' ->> 'id') AS item_classification,
-    (select 
-        jsonb_agg((additional_classification ->> 'scheme') || '-' || (additional_classification ->> 'id'))
-    from
-        jsonb_array_elements(case when jsonb_typeof(item->'additionalClassifications') = 'array' then item->'additionalClassifications' else '[]'::jsonb end) additional_classification
-    where
-        additional_classification ?& array['scheme', 'id']											   
-    ) item_additionalIdentifiers_ids,
-    jsonb_array_length(case when jsonb_typeof(item->'additionalClassifications') = 'array' then item->'additionalClassifications' else '[]'::jsonb end) as additional_classification_count
-from
-    (select 
+    (item -> 'classification' ->> 'scheme') || '-' || (item -> 'classification' ->> 'id') AS item_classification,
+    (
+        SELECT
+            jsonb_agg((additional_classification ->> 'scheme') || '-' || (additional_classification ->> 'id'))
+        FROM
+            jsonb_array_elements(
+                CASE WHEN jsonb_typeof(item -> 'additionalClassifications') = 'array' THEN
+                    item -> 'additionalClassifications'
+                ELSE
+                    '[]'::jsonb
+                END) additional_classification
+        WHERE
+            additional_classification ?& ARRAY['scheme', 'id']) item_additionalIdentifiers_ids,
+    jsonb_array_length(
+        CASE WHEN jsonb_typeof(item -> 'additionalClassifications') = 'array' THEN
+            item -> 'additionalClassifications'
+        ELSE
+            '[]'::jsonb
+        END) AS additional_classification_count
+FROM (
+    SELECT
         tas.*,
         value AS item,
         value -> 'unit' AS unit,
-        ordinality -1 AS item_index 
-    from 
-        tmp_awards_summary tas 
-    cross join
-        jsonb_array_elements(award -> 'items') with ordinality
-    where jsonb_typeof(award -> 'items') = 'array'
-    ) AS r
-;
+        ORDINALITY - 1 AS item_index
+    FROM
+        tmp_awards_summary tas
+    CROSS JOIN jsonb_array_elements(award -> 'items')
+    WITH ORDINALITY
+WHERE
+    jsonb_typeof(award -> 'items') = 'array') AS r;
 
 ----
+DROP TABLE IF EXISTS award_items_summary;
 
-drop table if exists award_items_summary;
+CREATE TABLE award_items_summary AS
+SELECT
+    *
+FROM
+    staged_award_items_summary;
 
-create table award_items_summary
-AS
-select * from staged_award_items_summary;
+DROP TABLE IF EXISTS staged_award_items_summary;
 
-drop table if exists staged_award_items_summary;
+CREATE UNIQUE INDEX award_items_summary_id ON award_items_summary (id, award_index, item_index);
 
-create unique index award_items_summary_id on award_items_summary(id, award_index, item_index);
-create index award_items_summary_data_id on award_items_summary(data_id);
-create index award_items_summary_collection_id on award_items_summary(collection_id);
+CREATE INDEX award_items_summary_data_id ON award_items_summary (data_id);
+
+CREATE INDEX award_items_summary_collection_id ON award_items_summary (collection_id);
 
 ----
+DROP TABLE IF EXISTS staged_awards_summary_no_data;
 
-drop table if exists staged_awards_summary_no_data;
-
-create table staged_awards_summary_no_data
-AS
-select
+CREATE TABLE staged_awards_summary_no_data AS
+SELECT
     r.id,
     r.award_index,
     r.release_type,
@@ -214,75 +214,101 @@ select
     award ->> 'id' AS award_id,
     award ->> 'title' AS award_title,
     award ->> 'status' AS award_status,
-    convert_to_numeric(award -> 'value' ->> 'amount') AS award_value_amount,
+    convert_to_numeric (award -> 'value' ->> 'amount') AS award_value_amount,
     award -> 'value' ->> 'currency' AS award_value_currency,
-    convert_to_timestamp(award ->> 'date') AS award_date,
-
-    convert_to_timestamp(award -> 'contractPeriod' ->> 'startDate') AS award_contractPeriod_startDate,
-    convert_to_timestamp(award -> 'contractPeriod' ->> 'endDate') AS award_contractPeriod_endDate,
-    convert_to_timestamp(award -> 'contractPeriod' ->> 'maxExtentDate') AS award_contractPeriod_maxExtentDate,
-    convert_to_numeric(award -> 'contractPeriod' ->> 'durationInDays') AS award_contractPeriod_durationInDays,
-    jsonb_array_length(case when jsonb_typeof(award->'suppliers') = 'array' then award->'suppliers' else '[]'::jsonb end) as suppliers_count,
+    convert_to_timestamp (award ->> 'date') AS award_date,
+    convert_to_timestamp (award -> 'contractPeriod' ->> 'startDate') AS award_contractPeriod_startDate,
+    convert_to_timestamp (award -> 'contractPeriod' ->> 'endDate') AS award_contractPeriod_endDate,
+    convert_to_timestamp (award -> 'contractPeriod' ->> 'maxExtentDate') AS award_contractPeriod_maxExtentDate,
+    convert_to_numeric (award -> 'contractPeriod' ->> 'durationInDays') AS award_contractPeriod_durationInDays,
+    jsonb_array_length(
+        CASE WHEN jsonb_typeof(award -> 'suppliers') = 'array' THEN
+            award -> 'suppliers'
+        ELSE
+            '[]'::jsonb
+        END) AS suppliers_count,
     documents_count,
     documentType_counts,
     items_count
-from
+FROM
     tmp_awards_summary r
-left join
-    (
-    select 
-        id, 
-        award_index,
-        jsonb_object_agg(coalesce(documentType, ''), documentType_count) documentType_counts, 
-        count(*) documents_count
-    from
-        (select 
-            id, award_index, documentType, count(*) documentType_count
-        from
-            award_documents_summary
-        group by
-            id, award_index, documentType
-        ) AS d
-    group by id, award_index
-    ) documentType_counts
-    using (id, award_index)
-left join
-    (
-    select 
-        id, 
-        award_index,
-        count(*) items_count
-    from
-        award_items_summary
-    group by id, award_index
-    ) items_counts
-    using (id, award_index)
-;
+    LEFT JOIN (
+        SELECT
+            id,
+            award_index,
+            jsonb_object_agg(coalesce(documentType, ''), documentType_count) documentType_counts,
+            count(*) documents_count
+        FROM (
+            SELECT
+                id,
+                award_index,
+                documentType,
+                count(*) documentType_count
+            FROM
+                award_documents_summary
+            GROUP BY
+                id,
+                award_index,
+                documentType) AS d
+        GROUP BY
+            id,
+            award_index) documentType_counts USING (id, award_index)
+    LEFT JOIN (
+        SELECT
+            id,
+            award_index,
+            count(*) items_count
+        FROM
+            award_items_summary
+        GROUP BY
+            id,
+            award_index) items_counts USING (id, award_index);
 
 ----
+DROP VIEW IF EXISTS awards_summary;
 
-drop view if exists awards_summary;
+DROP TABLE IF EXISTS awards_summary_no_data;
 
-drop table if exists awards_summary_no_data;
+CREATE TABLE awards_summary_no_data AS
+SELECT
+    *
+FROM
+    staged_awards_summary_no_data;
 
-create table awards_summary_no_data
-AS
-select * from staged_awards_summary_no_data;
+DROP TABLE IF EXISTS staged_awards_summary_no_data;
 
-drop table if exists staged_awards_summary_no_data;
+CREATE UNIQUE INDEX awards_summary_no_data_id ON awards_summary_no_data (id, award_index);
 
-create unique index awards_summary_id on awards_summary_no_data(id, award_index);
-create index awards_summary_data_id on awards_summary_no_data(data_id);
-create index awards_summary_collection_id on awards_summary_no_data(collection_id);
+CREATE INDEX awards_summary_data_no_data_id ON awards_summary_no_data (data_id);
 
-create view awards_summary
-AS
-select 
-    awards_summary_no_data.*, 
-    data #> ARRAY['awards', award_index::text] as award
-from 
+CREATE INDEX awards_summary_no_data_collection_id ON awards_summary_no_data (collection_id);
+
+CREATE VIEW awards_summary AS
+SELECT
+    awards_summary_no_data.*,
+    data #> ARRAY['awards', award_index::text] AS award
+FROM
     awards_summary_no_data
-join
-    data on data.id = data_id;
+    JOIN data ON data.id = data_id;
 
-drop table if exists tmp_awards_summary;
+-- The following pgpsql makes indexes on awards_summary only if it is a table and not a view,
+-- you will need to run --tables-only command line parameter to allow this to run.
+
+DO $$
+DECLARE
+    query text;
+BEGIN
+    query := $query$ CREATE UNIQUE INDEX awards_summary_id ON awards_summary (id, award_index);
+    CREATE INDEX awards_summary_data_id ON awards_summary (data_id);
+    CREATE INDEX awards_summary_collection_id ON awards_summary (collection_id);
+    $query$;
+    EXECUTE query;
+EXCEPTION
+    WHEN wrong_object_type THEN
+        NULL;
+END;
+
+$$;
+
+DROP TABLE IF EXISTS tmp_awards_summary;
+

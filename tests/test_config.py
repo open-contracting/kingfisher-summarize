@@ -5,6 +5,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 import pytest
+from click import UsageError
 
 from ocdskingfisherviews.config import get_database_uri
 
@@ -25,7 +26,7 @@ def test_env(ini, caplog):
 
     database_uri = get_database_uri()
 
-    assert database_uri == 'postgresql:///test'
+    assert database_uri == 'postgresql:/test'
     assert len(caplog.records) == 0
 
 
@@ -45,8 +46,17 @@ class NoEnv(TestCase):
         assert len(self.caplog.records) == 0
 
     @patch.dict('os.environ', {'PGPASSFILE': fixture('pgpass.txt')})
-    def test_pgpass(self, ini):
+    def test_pgpass_password(self, ini):
         ini.return_value = fixture('config.ini')
+
+        database_uri = get_database_uri()
+
+        assert database_uri == 'postgresql://ocdskingfisher:secret@localhost:5432/ocdskingfisher'
+        assert len(self.caplog.records) == 0
+
+    @patch.dict('os.environ', {'PGPASSFILE': fixture('pgpass.txt')})
+    def test_pgpass_no_password(self, ini):
+        ini.return_value = fixture('config-empty-password.ini')
 
         database_uri = get_database_uri()
 
@@ -55,29 +65,29 @@ class NoEnv(TestCase):
 
     @patch.dict('os.environ', {'PGPASSFILE': fixture('pgpass-empty-file.txt')})
     def test_pgpass_empty_file(self, ini):
-        ini.return_value = fixture('config.ini')
+        ini.return_value = fixture('config-empty-password.ini')
 
         database_uri = get_database_uri()
 
-        assert database_uri == 'postgresql://ocdskingfisher:secret@localhost:5432/ocdskingfisher'
+        assert database_uri == 'postgresql://ocdskingfisher@localhost:5432/ocdskingfisher'
         assert len(self.caplog.records) == 0
 
     @patch.dict('os.environ', {'PGPASSFILE': fixture('pgpass-no-match.txt')})
     def test_pgpass_no_match(self, ini):
-        ini.return_value = fixture('config.ini')
+        ini.return_value = fixture('config-empty-password.ini')
 
         database_uri = get_database_uri()
 
-        assert database_uri == 'postgresql://ocdskingfisher:secret@localhost:5432/ocdskingfisher'
+        assert database_uri == 'postgresql://ocdskingfisher@localhost:5432/ocdskingfisher'
         assert len(self.caplog.records) == 0
 
     @patch.dict('os.environ', {'PGPASSFILE': fixture('pgpass-bad-permissions.txt')})
     def test_pgpass_bad_permissions(self, ini):
-        ini.return_value = fixture('config.ini')
+        ini.return_value = fixture('config-empty-password.ini')
 
         database_uri = get_database_uri()
 
-        assert database_uri == 'postgresql://ocdskingfisher:secret@localhost:5432/ocdskingfisher'
+        assert database_uri == 'postgresql://ocdskingfisher@localhost:5432/ocdskingfisher'
 
         message = r'^Skipping PostgreSQL Password File: Invalid Permissions for ' \
                   r'tests/fixtures/pgpass-bad-permissions\.txt: 0o6\d4\.\nTry: chmod 600 ' \
@@ -89,11 +99,11 @@ class NoEnv(TestCase):
 
     @patch.dict('os.environ', {'PGPASSFILE': fixture('pgpass-bad-port.txt')})
     def test_pgpass_bad_port(self, ini):
-        ini.return_value = fixture('config.ini')
+        ini.return_value = fixture('config-empty-password.ini')
 
         database_uri = get_database_uri()
 
-        assert database_uri == 'postgresql://ocdskingfisher:secret@localhost:5432/ocdskingfisher'
+        assert database_uri == 'postgresql://ocdskingfisher@localhost:5432/ocdskingfisher'
 
         message = 'Skipping PostgreSQL Password File: Error validating port value "invalid"'
 
@@ -104,7 +114,7 @@ class NoEnv(TestCase):
     def test_ini_nonexistent(self, ini):
         ini.return_value = 'nonexistent.ini'
 
-        with pytest.raises(Exception) as excinfo:
+        with pytest.raises(UsageError) as excinfo:
             get_database_uri()
 
         assert str(excinfo.value) == 'You must either set the KINGFISHER_VIEWS_DB_URI environment variable or ' \
@@ -126,7 +136,7 @@ class NoEnv(TestCase):
     def test_ini_empty_dbname(self, ini):
         ini.return_value = fixture('config-empty-dbname.ini')
 
-        with pytest.raises(Exception) as excinfo:
+        with pytest.raises(UsageError) as excinfo:
             get_database_uri()
 
         assert str(excinfo.value) == 'You must set DBNAME in ~/.config/ocdskingfisher-views/config.ini.'
@@ -134,7 +144,7 @@ class NoEnv(TestCase):
     def test_ini_bad_port(self, ini):
         ini.return_value = fixture('config-bad-port.ini')
 
-        with pytest.raises(Exception) as excinfo:
+        with pytest.raises(UsageError) as excinfo:
             get_database_uri()
 
         assert str(excinfo.value) == 'PORT is invalid in ~/.config/ocdskingfisher-views/config.ini. ' \
@@ -147,4 +157,4 @@ class NoEnv(TestCase):
 
         database_uri = get_database_uri()
 
-        assert database_uri == 'postgresql://morgan:@localhost:5432/ocdskingfisher'
+        assert database_uri == 'postgresql://morgan@localhost:5432/ocdskingfisher'

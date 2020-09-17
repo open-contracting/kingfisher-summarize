@@ -4,7 +4,6 @@ OCDS Kingfisher Views is used to create SQL tables that summarize the OCDS data 
 
 (If you are viewing this on GitHub, open the `full documentation <https://kingfisher-views.readthedocs.io/>`__ for additional details.)
 
-.. |Build Status| image:: https://secure.travis-ci.org/open-contracting/kingfisher-views.png
-   :target: https://travis-ci.org/open-contracting/kingfisher-views
+.. |Build Status| image:: https://github.com/open-contracting/kingfisher-views/workflows/CI/badge.svg
 .. |Coverage Status| image:: https://coveralls.io/repos/github/open-contracting/kingfisher-views/badge.png?branch=master
    :target: https://coveralls.io/github/open-contracting/kingfisher-views?branch=master

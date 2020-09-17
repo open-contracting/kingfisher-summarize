@@ -1,15 +1,14 @@
-*.sqlite3
+# Editor temporary files and local virtual environment.
 *.swp
-*.mo
 *~
-.ve
-*.pyc
+/.ve
+# Python caches.
 __pycache__
-media
-.coverage
-htmlcov
-docs/_build
-.cache/*
-.hypothesis/*
-.pytest_cache
-venv/
+/.pytest_cache
+# Coverage and documentation.
+/.coverage
+/htmlcov
+/docs/_build
+# Created by Kingfisher Process and/or Kingfisher Views.
+/error.log
+/info.log

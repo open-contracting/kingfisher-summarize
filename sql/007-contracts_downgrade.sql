@@ -1,9 +1,16 @@
+DROP VIEW IF EXISTS contracts_summary CASCADE;
 
-drop view if exists contracts_summary;
-drop table if exists contracts_summary_no_data;
-drop table if exists contract_implementation_transactions_summary;
-drop table if exists contract_implementation_milestones_summary;
-drop table if exists contract_implementation_documents_summary;
-drop table if exists contract_milestones_summary;
-drop table if exists contract_documents_summary;
-drop table if exists contract_items_summary;
+DROP TABLE IF EXISTS contracts_summary_no_data CASCADE;
+
+DROP TABLE IF EXISTS contract_implementation_transactions_summary;
+
+DROP TABLE IF EXISTS contract_implementation_milestones_summary;
+
+DROP TABLE IF EXISTS contract_implementation_documents_summary;
+
+DROP TABLE IF EXISTS contract_milestones_summary;
+
+DROP TABLE IF EXISTS contract_documents_summary;
+
+DROP TABLE IF EXISTS contract_items_summary;
+

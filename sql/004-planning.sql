@@ -1,9 +1,7 @@
+DROP TABLE IF EXISTS tmp_planning_summary;
 
-drop table if exists tmp_planning_summary;
-
-create table tmp_planning_summary
-AS
-select
+CREATE TABLE tmp_planning_summary AS
+SELECT
     r.id,
     r.release_type,
     r.collection_id,
@@ -11,23 +9,22 @@ select
     r.release_id,
     r.data_id,
     planning
-from
-    (select 
-        data -> 'planning' AS planning, 
-        rs.* 
-    from 
-        tmp_release_summary_with_release_data rs where data ? 'planning'
-    ) AS r
-;
+FROM (
+    SELECT
+        data -> 'planning' AS planning,
+        rs.*
+    FROM
+        tmp_release_summary_with_release_data rs
+    WHERE
+        data ? 'planning') AS r;
 
-create unique index tmp_planning_summary_id on tmp_planning_summary(id);
+CREATE UNIQUE INDEX tmp_planning_summary_id ON tmp_planning_summary (id);
 
 ----
+DROP TABLE IF EXISTS staged_planning_documents_summary;
 
-drop table if exists staged_planning_documents_summary;
-create table staged_planning_documents_summary
-AS
-select
+CREATE TABLE staged_planning_documents_summary AS
+SELECT
     r.id,
     document_index,
     r.release_type,
@@ -36,43 +33,42 @@ select
     r.release_id,
     r.data_id,
     document,
-    document ->> 'documentType' as documentType,
-    document ->> 'format' as format
-from
-    (select 
+    document ->> 'documentType' AS documentType,
+    document ->> 'format' AS format
+FROM (
+    SELECT
         tps.*,
         value AS document,
-        ordinality -1 AS document_index 
-    from 
-        tmp_planning_summary tps 
-    cross join
-        jsonb_array_elements(planning -> 'documents') with ordinality
-    where jsonb_typeof(planning -> 'documents') = 'array'
-    ) AS r
-;
+        ORDINALITY - 1 AS document_index
+    FROM
+        tmp_planning_summary tps
+    CROSS JOIN jsonb_array_elements(planning -> 'documents')
+    WITH ORDINALITY
+WHERE
+    jsonb_typeof(planning -> 'documents') = 'array') AS r;
 
 ----
+DROP TABLE IF EXISTS planning_documents_summary;
 
-drop table if exists planning_documents_summary;
+CREATE TABLE planning_documents_summary AS
+SELECT
+    *
+FROM
+    staged_planning_documents_summary;
 
-create table planning_documents_summary
-AS
-select * from staged_planning_documents_summary;
+DROP TABLE IF EXISTS staged_planning_documents_summary;
 
-drop table if exists staged_planning_documents_summary;
+CREATE UNIQUE INDEX planning_documents_summary_id ON planning_documents_summary (id, document_index);
 
-create unique index planning_documents_summary_id on planning_documents_summary(id, document_index);
-create index planning_documents_summary_data_id on planning_documents_summary(data_id);
-create index planning_documents_summary_collection_id on planning_documents_summary(collection_id);
+CREATE INDEX planning_documents_summary_data_id ON planning_documents_summary (data_id);
 
+CREATE INDEX planning_documents_summary_collection_id ON planning_documents_summary (collection_id);
 
 ----
+DROP TABLE IF EXISTS staged_planning_milestones_summary;
 
-drop table if exists staged_planning_milestones_summary;
-
-create table staged_planning_milestones_summary
-AS
-select
+CREATE TABLE staged_planning_milestones_summary AS
+SELECT
     r.id,
     milestone_index,
     r.release_type,
@@ -81,110 +77,109 @@ select
     r.release_id,
     r.data_id,
     milestone,
-    milestone ->> 'type' as type,
-    milestone ->> 'code' as code,  
-    milestone ->> 'status' as status
-from
-    (select 
+    milestone ->> 'type' AS TYPE,
+    milestone ->> 'code' AS code,
+    milestone ->> 'status' AS status
+FROM (
+    SELECT
         tps.*,
         value AS milestone,
-        ordinality -1 AS milestone_index 
-    from 
-        tmp_planning_summary tps 
-    cross join
-        jsonb_array_elements(planning -> 'milestones') with ordinality
-    where jsonb_typeof(planning -> 'milestones') = 'array'
-    ) AS r
-;
+        ORDINALITY - 1 AS milestone_index
+    FROM
+        tmp_planning_summary tps
+    CROSS JOIN jsonb_array_elements(planning -> 'milestones')
+    WITH ORDINALITY
+WHERE
+    jsonb_typeof(planning -> 'milestones') = 'array') AS r;
 
 ----
+DROP TABLE IF EXISTS planning_milestones_summary;
 
-drop table if exists planning_milestones_summary;
+CREATE TABLE planning_milestones_summary AS
+SELECT
+    *
+FROM
+    staged_planning_milestones_summary;
 
-create table planning_milestones_summary
-AS
-select * from staged_planning_milestones_summary;
+DROP TABLE IF EXISTS staged_planning_milestones_summary;
 
-drop table if exists staged_planning_milestones_summary;
+CREATE UNIQUE INDEX planning_milestones_summary_id ON planning_milestones_summary (id, milestone_index);
 
+CREATE INDEX planning_milestones_summary_data_id ON planning_milestones_summary (data_id);
 
-create unique index planning_milestones_summary_id on planning_milestones_summary(id, milestone_index);
-create index planning_milestones_summary_data_id on planning_milestones_summary(data_id);
-create index planning_milestones_summary_collection_id on planning_milestones_summary(collection_id);
-
+CREATE INDEX planning_milestones_summary_collection_id ON planning_milestones_summary (collection_id);
 
 ----
+DROP TABLE IF EXISTS staged_planning_summary;
 
-
-drop table if exists staged_planning_summary;
-
-create table staged_planning_summary
-AS
-select
+CREATE TABLE staged_planning_summary AS
+SELECT
     r.id,
     r.release_type,
     r.collection_id,
     r.ocid,
     r.release_id,
     r.data_id,
-    convert_to_numeric(planning -> 'budget' -> 'amount' ->> 'amount') planning_budget_amount,
+    convert_to_numeric (planning -> 'budget' -> 'amount' ->> 'amount') planning_budget_amount,
     planning -> 'budget' -> 'amount' ->> 'currency' planning_budget_currency,
     planning -> 'budget' ->> 'projectID' planning_budget_projectID,
     documents_count,
     documentType_counts,
     milestones_count,
     milestoneType_counts
-from
+FROM
     tmp_planning_summary r
-left join
-    (
-    select 
-        id, 
-        jsonb_object_agg(coalesce(documentType, ''), documentType_count) documentType_counts, 
-        count(*) documents_count
-    from
-        (select 
-            id, documentType, count(*) documentType_count
-        from
-            planning_documents_summary
-        group by
-            id, documentType
-        ) AS d
-    group by id
-    ) documentType_counts
-    using (id)
-left join
-    (
-    select 
-        id, 
-        jsonb_object_agg(coalesce(type, ''), milestoneType_count) milestoneType_counts, 
-        count(*) milestones_count
-    from
-        (select 
-            id, type, count(*) milestoneType_count
-        from
-            planning_milestones_summary
-        group by
-            id, type
-        ) AS d
-    group by id
-    ) milestoneType_counts
-    using (id)
-;
+    LEFT JOIN (
+        SELECT
+            id,
+            jsonb_object_agg(coalesce(documentType, ''), documentType_count) documentType_counts,
+            count(*) documents_count
+        FROM (
+            SELECT
+                id,
+                documentType,
+                count(*) documentType_count
+            FROM
+                planning_documents_summary
+            GROUP BY
+                id,
+                documentType) AS d
+        GROUP BY
+            id) documentType_counts USING (id)
+    LEFT JOIN (
+        SELECT
+            id,
+            jsonb_object_agg(coalesce(TYPE, ''), milestoneType_count) milestoneType_counts,
+            count(*) milestones_count
+        FROM (
+            SELECT
+                id,
+                TYPE,
+                count(*) milestoneType_count
+            FROM
+                planning_milestones_summary
+            GROUP BY
+                id,
+                TYPE) AS d
+        GROUP BY
+            id) milestoneType_counts USING (id);
 
 ----
+DROP TABLE IF EXISTS planning_summary;
 
-drop table if exists planning_summary;
+CREATE TABLE planning_summary AS
+SELECT
+    *
+FROM
+    staged_planning_summary;
 
-create table planning_summary
-AS
-select * from staged_planning_summary;
+DROP TABLE IF EXISTS staged_planning_summary;
 
-drop table if exists staged_planning_summary;
+CREATE UNIQUE INDEX planning_summary_id ON planning_summary (id);
 
-create unique index planning_summary_id on planning_summary(id);
-create index planning_summary_data_id on planning_summary(data_id);
-create index planning_summary_collection_id on planning_summary(collection_id);
+CREATE INDEX planning_summary_data_id ON planning_summary (data_id);
 
+CREATE INDEX planning_summary_collection_id ON planning_summary (collection_id);
 
-drop table if exists tmp_planning_summary;
+DROP TABLE IF EXISTS tmp_planning_summary;
+
