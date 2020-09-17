@@ -11,6 +11,7 @@ The :ref:`add-view` command *without* the ``--dontbuild`` flag creates all the t
 
 Otherwise, the :ref:`add-view` command *with* the ``--dontbuild`` flag creates the :ref:`metadata` tables only, the :ref:`field-counts` command creates the :ref:`fields` tables, and the :ref:`refresh-views` command creates the rest.
 
+.. _relationships:
 How tables are related
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -35,7 +36,7 @@ Some tables have composite foreign keys. These are shown as two lines from one t
    FROM awards_document_summary
    JOIN awards_summary
      ON awards_summary.id = awards_document_summary.id AND
-        awards_summary.award_index = awards_document_summary.award_index 
+        awards_summary.award_index = awards_document_summary.award_index
 
 Or, more briefly:
 
@@ -98,6 +99,7 @@ Releases
 
 These tables are created and populated by ``008-release.sql``.
 
+.. _release_summary:
 release_summary
 ~~~~~~~~~~~~~~~
 
@@ -199,6 +201,7 @@ Tender section
 
 These tables are created and populated by ``005-tender.sql``.
 
+.. _tender_summary:
 tender_summary
 ~~~~~~~~~~~~~~
 
