@@ -189,6 +189,7 @@ SELECT
     tender ->> 'id' AS tender_id,
     tender ->> 'title' AS tender_title,
     tender ->> 'status' AS tender_status,
+    tender ->> 'description' AS tender_description,
     convert_to_numeric (tender -> 'value' ->> 'amount') AS tender_value_amount,
     tender -> 'value' ->> 'currency' AS tender_value_currency,
     convert_to_numeric (tender -> 'minValue' ->> 'amount') AS tender_minValue_amount,

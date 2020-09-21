@@ -214,6 +214,7 @@ BEGIN
     TEMPLATE := $template$ COMMENT ON COLUMN %1$s.tender_id IS '`id` from `tender` object';
     COMMENT ON COLUMN %1$s.tender_title IS '`title` from `tender` object';
     COMMENT ON COLUMN %1$s.tender_status IS '`status` from `tender` object';
+    COMMENT ON COLUMN %1$s.tender_description IS '`description` from `tender` object';
     COMMENT ON COLUMN %1$s.tender_value_amount IS '`amount` from `value` object';
     COMMENT ON COLUMN %1$s.tender_value_currency IS '`currency` from `value` object';
     COMMENT ON COLUMN %1$s.tender_minvalue_amount IS '`amount` from `minValue` object';
@@ -314,6 +315,8 @@ COMMENT ON COLUMN awards_summary.award_title IS '`title` field from award object
 
 COMMENT ON COLUMN awards_summary.award_status IS '`status` field from award object';
 
+COMMENT ON COLUMN awards_summary.award_description IS '`description` field from award object';
+
 COMMENT ON COLUMN awards_summary.award_value_amount IS '`value` field from award/amount object';
 
 COMMENT ON COLUMN awards_summary.award_value_currency IS '`currency` field from award/amount object';
@@ -403,6 +406,8 @@ COMMENT ON COLUMN contracts_summary.contract_id IS '`id` field from contract obj
 COMMENT ON COLUMN contracts_summary.contract_title IS '`title` field from contract object';
 
 COMMENT ON COLUMN contracts_summary.contract_status IS '`status` field from contract object';
+
+COMMENT ON COLUMN contracts_summary.contract_description IS '`description` field from contract object';
 
 COMMENT ON COLUMN contracts_summary.contract_value_amount IS '`amount` field from value object';
 

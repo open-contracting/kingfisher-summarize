@@ -8,6 +8,7 @@ data_id,integer,"id for the ""data"" table in Kingfisher that holds the original
 tender_id,text,`id` from `tender` object
 tender_title,text,`title` from `tender` object
 tender_status,text,`status` from `tender` object
+tender_description,text,`description` from `tender` object
 tender_value_amount,numeric,`amount` from `value` object
 tender_value_currency,text,`currency` from `value` object
 tender_minvalue_amount,numeric,`amount` from `minValue` object
