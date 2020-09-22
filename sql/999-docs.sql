@@ -451,6 +451,10 @@ BEGIN
     COMMENT ON COLUMN %1$s.role_counts IS 'JSONB object with the keys as unique `roles` and the values as count of the appearances of those `roles`';
     COMMENT ON COLUMN %1$s.total_roles IS 'Total amount of roles specified across all parties';
     COMMENT ON COLUMN %1$s.total_parties IS 'Count of parties';
+    COMMENT ON COLUMN %1$s.total_planning_documents IS 'Count of planning documents';
+    COMMENT ON COLUMN %1$s.planning_documenttype_counts IS 'Count of planning document types';
+    COMMENT ON COLUMN %1$s.total_tender_documents IS 'Count of tender documents';
+    COMMENT ON COLUMN %1$s.tender_documenttype_counts IS 'Count of tender document types';
     COMMENT ON COLUMN %1$s.award_count IS 'Count of awards';
     COMMENT ON COLUMN %1$s.first_award_date IS 'Earliest `date` in all award objects';
     COMMENT ON COLUMN %1$s.last_award_date IS 'Latest `date` in all award objects';
