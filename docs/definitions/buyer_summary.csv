@@ -7,6 +7,7 @@ release_id,text,Release id from the data. Relevant for releases and not for comp
 data_id,integer,"id for the ""data"" table in Kingfisher that holds the original JSON data."
 buyer,jsonb,JSONB of buyer object
 buyer_parties_id,text,`id` from buyer object
+buyer_name,text,`name` from buyer object
 buyer_identifier,text,Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`
 unique_identifier_attempt,text,"The `id` from buyer object if it exists, otherwise the identifier described above if it exists, otherwise the party name"
 buyer_additionalidentifiers_ids,jsonb,JSONB list of the concatenation of scheme and id of all additionalIdentifier objects

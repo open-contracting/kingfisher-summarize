@@ -100,6 +100,8 @@ COMMENT ON COLUMN buyer_summary.buyer IS 'JSONB of buyer object';
 
 COMMENT ON COLUMN buyer_summary.buyer_parties_id IS '`id` from buyer object';
 
+COMMENT ON COLUMN buyer_summary.buyer_name IS '`name` from buyer object';
+
 COMMENT ON COLUMN buyer_summary.buyer_identifier IS 'Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`';
 
 COMMENT ON COLUMN buyer_summary.unique_identifier_attempt IS 'The `id` from buyer object if it exists, otherwise the identifier described above if it exists, otherwise the party name';
