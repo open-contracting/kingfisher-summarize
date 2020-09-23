@@ -14,6 +14,10 @@ release_language,text,`language` field from release object
 role_counts,jsonb,JSONB object with the keys as unique `roles` and the values as count of the appearances of those `roles`
 total_roles,numeric,Total amount of roles specified across all parties
 total_parties,bigint,Count of parties
+total_planning_documents,bigint,Count of planning documents
+planning_documenttype_counts,jsonb,Count of planning document types
+total_tender_documents,bigint,Count of tender documents
+tender_documenttype_counts,jsonb,Count of tender document types
 award_count,bigint,Count of awards
 first_award_date,timestamp,Earliest `date` in all award objects
 last_award_date,timestamp,Latest `date` in all award objects

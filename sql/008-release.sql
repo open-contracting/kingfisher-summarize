@@ -35,6 +35,52 @@ FROM (
 
 CREATE UNIQUE INDEX tmp_release_party_aggregates_id ON tmp_release_party_aggregates (id);
 
+--- Adding planning document counts by document_type
+DROP TABLE IF EXISTS tmp_planning_documents_aggregates;
+
+CREATE TABLE tmp_planning_documents_aggregates AS
+SELECT
+    id,
+    jsonb_object_agg(coalesce(documentType, ''), documentType_count) planning_documentType_counts
+FROM (
+    SELECT
+        id,
+        documentType,
+        count(*) documentType_count
+    FROM
+        planning_documents_summary
+    GROUP BY
+        id,
+        documentType) AS d
+GROUP BY
+    id;
+
+CREATE UNIQUE INDEX tmp_planning_documents_aggregates_id ON tmp_planning_documents_aggregates (id);
+
+-- end of adding planning document counts
+--- Adding tender document counts by document_type
+DROP TABLE IF EXISTS tmp_tender_documents_aggregates;
+
+CREATE TABLE tmp_tender_documents_aggregates AS
+SELECT
+    id,
+    jsonb_object_agg(coalesce(documentType, ''), documentType_count) tender_documentType_counts
+FROM (
+    SELECT
+        id,
+        documentType,
+        count(*) documentType_count
+    FROM
+        tender_documents_summary
+    GROUP BY
+        id,
+        documentType) AS d
+GROUP BY
+    id;
+
+CREATE UNIQUE INDEX tmp_tender_documents_aggregates_id ON tmp_tender_documents_aggregates (id);
+
+-- end of adding tender document counts
 ----
 DROP TABLE IF EXISTS tmp_release_awards_aggregates;
 
@@ -231,8 +277,11 @@ WITH all_document_types AS (
 )
 SELECT
     id,
-    jsonb_object_agg( coalesce(documentType, ''), documentType_count) total_documentType_counts,
-    sum( documentType_count) total_documents
+    jsonb_object_agg (
+coalesce(documentType, ''),
+        documentType_count) total_documentType_counts,
+    sum (
+        documentType_count) total_documents
 FROM (
     SELECT
         id,
@@ -279,8 +328,11 @@ WITH all_milestone_types AS (
 )
 SELECT
     id,
-    jsonb_object_agg( coalesce(TYPE, ''), milestoneType_count) milestoneType_counts,
-    sum( milestoneType_count) total_milestones
+    jsonb_object_agg (
+coalesce(TYPE, ''),
+        milestoneType_count) milestoneType_counts,
+    sum (
+        milestoneType_count) total_milestones
 FROM (
     SELECT
         id,
@@ -306,6 +358,20 @@ SELECT
 FROM
     tmp_release_summary
     LEFT JOIN tmp_release_party_aggregates USING (id)
+    LEFT JOIN (
+        SELECT
+            id,
+            documents_count AS total_planning_documents
+        FROM
+            planning_summary) AS planning_summary USING (id)
+    LEFT JOIN tmp_planning_documents_aggregates USING (id)
+    LEFT JOIN (
+        SELECT
+            id,
+            documents_count AS total_tender_documents
+        FROM
+            tender_summary) AS tender_summary USING (id)
+    LEFT JOIN tmp_tender_documents_aggregates USING (id)
     LEFT JOIN tmp_release_awards_aggregates USING (id)
     LEFT JOIN tmp_release_award_suppliers_aggregates USING (id)
     LEFT JOIN tmp_award_documents_aggregates USING (id)
@@ -324,6 +390,10 @@ DROP TABLE IF EXISTS tmp_release_awards_aggregates;
 DROP TABLE IF EXISTS tmp_release_award_suppliers_aggregates;
 
 DROP TABLE IF EXISTS tmp_award_documents_aggregates;
+
+DROP TABLE IF EXISTS tmp_tender_documents_aggregates;
+
+DROP TABLE IF EXISTS tmp_planning_documents_aggregates;
 
 DROP TABLE IF EXISTS tmp_release_contracts_aggregates;
 
@@ -420,7 +490,6 @@ FROM
 
 -- The following pgpsql makes indexes on release_summary_with_checks and release_summary_with_data,
 -- you will need to run --tables-only command line parameter to allow this to run.
-
 DO $$
 DECLARE
     query text;
