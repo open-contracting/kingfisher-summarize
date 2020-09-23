@@ -214,6 +214,7 @@ SELECT
     award ->> 'id' AS award_id,
     award ->> 'title' AS award_title,
     award ->> 'status' AS award_status,
+    award ->> 'description' AS award_description,
     convert_to_numeric (award -> 'value' ->> 'amount') AS award_value_amount,
     award -> 'value' ->> 'currency' AS award_value_currency,
     convert_to_timestamp (award ->> 'date') AS award_date,

@@ -340,6 +340,7 @@ CREATE TABLE staged_contracts_summary_no_data AS SELECT DISTINCT ON (r.id, r.con
     contract ->> 'id' AS contract_id,
     contract ->> 'title' AS contract_title,
     contract ->> 'status' AS contract_status,
+    contract ->> 'description' AS contract_description,
     convert_to_numeric (contract -> 'value' ->> 'amount') AS contract_value_amount,
     contract -> 'value' ->> 'currency' AS contract_value_currency,
     convert_to_timestamp (contract ->> 'dateSigned') AS dateSigned,

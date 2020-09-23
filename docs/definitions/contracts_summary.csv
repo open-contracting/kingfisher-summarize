@@ -11,6 +11,7 @@ link_to_awards,integer,If there is an award with the above `awardID` then 1 othe
 contract_id,text,`id` field from contract object
 contract_title,text,`title` field from contract object
 contract_status,text,`status` field from contract object
+contract_description,text,`description` field from contract object
 contract_value_amount,numeric,`amount` field from value object
 contract_value_currency,text,`currency` field from value object
 datesigned,timestamp,`dateSigned` from contract object
