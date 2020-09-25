@@ -38,8 +38,8 @@ REFRESH_VIEWS_TABLES = {
     'tender_documents_summary',
     'tender_items_summary',
     'tender_milestones_summary',
+    'tender_summary_no_data',
     'tender_summary',
-    'tender_summary_with_data',
     'tenderers_summary',
 }
 
@@ -49,7 +49,7 @@ REFRESH_VIEWS_VIEWS = {
     'parties_summary',
     'release_summary_with_checks',
     'release_summary_with_data',
-    'tender_summary_with_data',
+    'tender_summary',
 }
 
 

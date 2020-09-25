@@ -12,18 +12,18 @@ BEGIN
         ADD CONSTRAINT planning_milestones_summary_planning_summary_fk FOREIGN KEY (id) REFERENCES planning_summary (id) NOT valid;
     ALTER TABLE buyer_summary
         ADD CONSTRAINT buyer_summary_release_summary_fk FOREIGN KEY (id) REFERENCES release_summary (id) NOT valid;
-    ALTER TABLE tender_summary
-        ADD CONSTRAINT tender_summary_release_summary_fk FOREIGN KEY (id) REFERENCES release_summary (id) NOT valid;
+    ALTER TABLE tender_summary%1$s
+        ADD CONSTRAINT tender_summary%1$s_release_summary_fk FOREIGN KEY (id) REFERENCES release_summary (id) NOT valid;
     ALTER TABLE tenderers_summary
-        ADD CONSTRAINT tenderers_summary_tender_summary_fk FOREIGN KEY (id) REFERENCES tender_summary (id) NOT valid;
+        ADD CONSTRAINT tenderers_summary_tender_summary%1$s_fk FOREIGN KEY (id) REFERENCES tender_summary%1$s (id) NOT valid;
     ALTER TABLE tender_documents_summary
-        ADD CONSTRAINT tender_documents_summary_tender_summary_fk FOREIGN KEY (id) REFERENCES tender_summary (id) NOT valid;
+        ADD CONSTRAINT tender_documents_summary_tender_summary%1$s_fk FOREIGN KEY (id) REFERENCES tender_summary%1$s (id) NOT valid;
     ALTER TABLE tender_items_summary
-        ADD CONSTRAINT tender_items_summary_tender_summary_fk FOREIGN KEY (id) REFERENCES tender_summary (id) NOT valid;
+        ADD CONSTRAINT tender_items_summary_tender_summary%1$s_fk FOREIGN KEY (id) REFERENCES tender_summary%1$s (id) NOT valid;
     ALTER TABLE tender_milestones_summary
-        ADD CONSTRAINT tender_milestones_summary_tender_summary_fk FOREIGN KEY (id) REFERENCES tender_summary (id) NOT valid;
+        ADD CONSTRAINT tender_milestones_summary_tender_summary%1$s_fk FOREIGN KEY (id) REFERENCES tender_summary%1$s (id) NOT valid;
     ALTER TABLE procuringentity_summary
-        ADD CONSTRAINT procuringentity_summary_tender_summary_fk FOREIGN KEY (id) REFERENCES tender_summary (id) NOT valid;
+        ADD CONSTRAINT procuringentity_summary_tender_summary%1$s_fk FOREIGN KEY (id) REFERENCES tender_summary%1$s (id) NOT valid;
     ALTER TABLE contracts_summary%1$s
         ADD CONSTRAINT contracts_summary%1$s_release_summary_fk FOREIGN KEY (id) REFERENCES release_summary (id) NOT valid;
     ALTER TABLE contract_documents_summary

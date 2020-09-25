@@ -250,18 +250,18 @@ BEGIN
     COMMENT ON COLUMN %1$s.milestonetype_counts IS 'JSONB object with the keys as unique milestoneTypes and the values as a count of the appearances of that `milestoneType` in the `milestones` array';
     COMMENT ON COLUMN %1$s.items_count IS 'Count of items';
     $template$;
+    EXECUTE format(TEMPLATE, 'tender_summary_no_data');
     EXECUTE format(TEMPLATE, 'tender_summary');
-    EXECUTE format(TEMPLATE, 'tender_summary_with_data');
 END;
 $$;
 
 SELECT
-    common_comments ('tender_summary');
+    common_comments ('tender_summary_no_data');
 
 SELECT
-    common_comments ('tender_summary_with_data');
+    common_comments ('tender_summary');
 
-COMMENT ON COLUMN tender_summary_with_data.tender IS 'JSONB of tender object';
+COMMENT ON COLUMN tender_summary.tender IS 'JSONB of tender object';
 
 SELECT
     common_comments ('award_documents_summary');

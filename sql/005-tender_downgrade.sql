@@ -1,6 +1,6 @@
-DROP VIEW IF EXISTS tender_summary_with_data CASCADE;
+DROP VIEW IF EXISTS tender_summary CASCADE;
 
-DROP TABLE IF EXISTS tender_summary CASCADE;
+DROP TABLE IF EXISTS tender_summary_no_data CASCADE;
 
 DROP TABLE IF EXISTS tender_items_summary;
 

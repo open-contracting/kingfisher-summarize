@@ -28,15 +28,15 @@ We want to add the ``description`` values of the ``Tender`` and ``Award`` object
 #. Find the SQL table to change.
 
    -  The tables summarizing the ``Tender`` object are in the ``005-tender.sql`` file.
-   -  The ``tender_summary`` table is created from the ``staged_tender_summary`` table.
+   -  The ``tender_summary_no_data`` table is created from the ``staged_tender_summary_no_data`` table.
 
-#. Add the ``description`` field to the ``SELECT`` clause for the ``staged_tender_summary`` table.
+#. Add the ``description`` field to the ``SELECT`` clause for the ``staged_tender_summary_no_data`` table.
 
    -  You can see the other OCDS fields in the statement. Add it alongside those:
 
    .. code-block:: sql
 
-       CREATE TABLE staged_tender_summary AS
+       CREATE TABLE staged_tender_summary_no_data AS
        SELECT
            r.id,
            r.release_type,

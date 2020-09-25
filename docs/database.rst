@@ -207,14 +207,6 @@ tender_summary
    :widths: 10, 10, 40
    :file: definitions/tender_summary.csv
 
-tender_summary_with_data
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. csv-table::
-   :header-rows: 1
-   :widths: 10, 10, 40
-   :file: definitions/tender_summary_with_data.csv
-
 tender_items_summary
 ~~~~~~~~~~~~~~~~~~~~
 
