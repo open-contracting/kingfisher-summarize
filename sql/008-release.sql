@@ -446,34 +446,14 @@ SELECT
     ELSE
         d.data
     END AS release,
-    pd.data AS package_data
-FROM
-    release_summary_no_data rs
-    JOIN data d ON d.id = rs.data_id
-    JOIN collection c ON c.id = rs.collection_id
-    --Kingfisher Process’ compiled_release table has no package_data_id column.
-    --Therefore, any rows in release_summary_no_data sourced from that table will have a NULL package_data_id.
-    LEFT JOIN package_data pd ON pd.id = rs.package_data_id;
-
-DROP VIEW IF EXISTS release_summary_with_checks;
-
-CREATE VIEW release_summary_with_checks AS
-SELECT
-    rs.*,
-    c.source_id,
-    c.data_version,
-    c.store_start_at,
-    c.store_end_at,
-    c.sample,
-    c.transform_type,
-    c.transform_from_collection_id,
-    c.deleted_at,
+    pd.data AS package_data,
     release_check.cove_output AS release_check,
     release_check11.cove_output AS release_check11,
     record_check.cove_output AS record_check,
     record_check11.cove_output AS record_check11
 FROM
     release_summary_no_data rs
+    JOIN data d ON d.id = rs.data_id
     JOIN collection c ON c.id = rs.collection_id
     LEFT JOIN release_check ON release_check.release_id = rs.table_id
         AND release_check.override_schema_version IS NULL
@@ -486,9 +466,12 @@ FROM
         AND release_type = 'record'
     LEFT JOIN record_check record_check11 ON record_check11.record_id = rs.table_id
         AND record_check11.override_schema_version = '1.1'
-        AND release_type = 'record';
+        AND release_type = 'record'
+    --Kingfisher Process’ compiled_release table has no package_data_id column.
+    --Therefore, any rows in release_summary_no_data sourced from that table will have a NULL package_data_id.
+    LEFT JOIN package_data pd ON pd.id = rs.package_data_id;
 
--- The following pgpsql makes indexes on release_summary_with_checks and release_summary,
+-- The following pgpsql makes indexes on release_summary,
 -- you will need to run --tables-only command line parameter to allow this to run.
 DO $$
 DECLARE
@@ -498,10 +481,6 @@ BEGIN
     CREATE INDEX release_summary_data_id ON release_summary (data_id);
     CREATE INDEX release_summary_package_data_id ON release_summary (package_data_id);
     CREATE INDEX release_summary_collection_id ON release_summary (collection_id);
-    CREATE UNIQUE INDEX release_summary_with_checks_id ON release_summary_with_checks (id);
-    CREATE INDEX release_summary_with_checks_data_id ON release_summary_with_checks (data_id);
-    CREATE INDEX release_summary_with_checks_package_data_id ON release_summary_with_checks (package_data_id);
-    CREATE INDEX release_summary_with_checks_collection_id ON release_summary_with_checks (collection_id);
     $query$;
     EXECUTE query;
     -- wrong_object_type is the specific exception when you try to add an index to a view.

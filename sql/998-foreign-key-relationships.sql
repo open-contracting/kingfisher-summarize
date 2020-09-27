@@ -62,8 +62,6 @@ DECLARE
     query text;
 BEGIN
     query := $query$ ALTER TABLE release_summary_no_data
-        ADD CONSTRAINT release_summary_no_data_release_summary_with_checks_fk FOREIGN KEY (id) REFERENCES release_summary_with_checks (id) NOT valid;
-    ALTER TABLE release_summary_no_data
         ADD CONSTRAINT release_summary_no_data_release_summary_fk FOREIGN KEY (id) REFERENCES release_summary (id) NOT valid;
     $query$;
     EXECUTE query;

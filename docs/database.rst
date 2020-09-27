@@ -106,14 +106,6 @@ release_summary
    :widths: 10, 10, 40
    :file: definitions/release_summary.csv
 
-release_summary_with_checks
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. csv-table::
-   :header-rows: 1
-   :widths: 10, 10, 40
-   :file: definitions/release_summary_with_checks.csv
-
 .. _db-parties:
 
 Parties
