@@ -350,9 +350,9 @@ GROUP BY
 CREATE UNIQUE INDEX tmp_release_milestones_aggregates_id ON tmp_release_milestones_aggregates (id);
 
 ----
-DROP TABLE IF EXISTS staged_release_summary CASCADE;
+DROP TABLE IF EXISTS staged_release_summary_no_data CASCADE;
 
-CREATE TABLE staged_release_summary AS
+CREATE TABLE staged_release_summary_no_data AS
 SELECT
     *
 FROM
@@ -410,27 +410,27 @@ DROP TABLE IF EXISTS tmp_release_documents_aggregates;
 DROP TABLE IF EXISTS tmp_release_milestones_aggregates;
 
 ----
-DROP TABLE IF EXISTS release_summary CASCADE;
+DROP TABLE IF EXISTS release_summary_no_data CASCADE;
 
-CREATE TABLE release_summary AS
+CREATE TABLE release_summary_no_data AS
 SELECT
     *
 FROM
-    staged_release_summary;
+    staged_release_summary_no_data;
 
-DROP TABLE IF EXISTS staged_release_summary;
+DROP TABLE IF EXISTS staged_release_summary_no_data;
 
-CREATE UNIQUE INDEX release_summary_id ON release_summary (id);
+CREATE UNIQUE INDEX release_summary_no_data_id ON release_summary_no_data (id);
 
-CREATE INDEX release_summary_data_id ON release_summary (data_id);
+CREATE INDEX release_summary_no_data_data_id ON release_summary_no_data (data_id);
 
-CREATE INDEX release_summary_package_data_id ON release_summary (package_data_id);
+CREATE INDEX release_summary_no_data_package_data_id ON release_summary_no_data (package_data_id);
 
-CREATE INDEX release_summary_collection_id ON release_summary (collection_id);
+CREATE INDEX release_summary_no_data_collection_id ON release_summary_no_data (collection_id);
 
-DROP VIEW IF EXISTS release_summary_with_data;
+DROP VIEW IF EXISTS release_summary;
 
-CREATE VIEW release_summary_with_data AS
+CREATE VIEW release_summary AS
 SELECT
     rs.*,
     c.source_id,
@@ -448,11 +448,11 @@ SELECT
     END AS data,
     pd.data AS package_data
 FROM
-    release_summary rs
+    release_summary_no_data rs
     JOIN data d ON d.id = rs.data_id
     JOIN collection c ON c.id = rs.collection_id
     --Kingfisher Process’ compiled_release table has no package_data_id column.
-    --Therefore, any rows in release_summary sourced from that table will have a NULL package_data_id.
+    --Therefore, any rows in release_summary_no_data sourced from that table will have a NULL package_data_id.
     LEFT JOIN package_data pd ON pd.id = rs.package_data_id;
 
 DROP VIEW IF EXISTS release_summary_with_checks;
@@ -473,7 +473,7 @@ SELECT
     record_check.cove_output AS record_check,
     record_check11.cove_output AS record_check11
 FROM
-    release_summary rs
+    release_summary_no_data rs
     JOIN collection c ON c.id = rs.collection_id
     LEFT JOIN release_check ON release_check.release_id = rs.table_id
         AND release_check.override_schema_version IS NULL
@@ -488,16 +488,16 @@ FROM
         AND record_check11.override_schema_version = '1.1'
         AND release_type = 'record';
 
--- The following pgpsql makes indexes on release_summary_with_checks and release_summary_with_data,
+-- The following pgpsql makes indexes on release_summary_with_checks and release_summary,
 -- you will need to run --tables-only command line parameter to allow this to run.
 DO $$
 DECLARE
     query text;
 BEGIN
-    query := $query$ CREATE UNIQUE INDEX release_summary_with_data_id ON release_summary_with_data (id);
-    CREATE INDEX release_summary_with_data_data_id ON release_summary_with_data (data_id);
-    CREATE INDEX release_summary_with_data_package_data_id ON release_summary_with_data (package_data_id);
-    CREATE INDEX release_summary_with_data_collection_id ON release_summary_with_data (collection_id);
+    query := $query$ CREATE UNIQUE INDEX release_summary_id ON release_summary (id);
+    CREATE INDEX release_summary_data_id ON release_summary (data_id);
+    CREATE INDEX release_summary_package_data_id ON release_summary (package_data_id);
+    CREATE INDEX release_summary_collection_id ON release_summary (collection_id);
     CREATE UNIQUE INDEX release_summary_with_checks_id ON release_summary_with_checks (id);
     CREATE INDEX release_summary_with_checks_data_id ON release_summary_with_checks (data_id);
     CREATE INDEX release_summary_with_checks_package_data_id ON release_summary_with_checks (package_data_id);
