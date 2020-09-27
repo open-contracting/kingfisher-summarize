@@ -313,7 +313,7 @@ def field_counts(name, remove, threads):
             FROM
                 release_summary
             CROSS JOIN
-                flatten(data)
+                flatten(release)
             WHERE
                 release_summary.collection_id = %(id)s
             GROUP BY collection_id, release_type, path

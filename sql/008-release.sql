@@ -445,7 +445,7 @@ SELECT
         d.data -> 'releases' -> (mod(rs.id / 10, 1000000)::integer)
     ELSE
         d.data
-    END AS data,
+    END AS release,
     pd.data AS package_data
 FROM
     release_summary_no_data rs
