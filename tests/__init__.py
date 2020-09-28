@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from click.testing import CliRunner
 
 from ocdskingfisherviews.cli import cli
-from ocdskingfisherviews.db import get_connection, get_cursor, pluck
+from ocdskingfisherviews.db import get_connection, get_cursor, pluck, schema_exists
 
 ADD_VIEW_TABLES = {
     'note',
@@ -122,6 +122,8 @@ def get_views(schema):
 
 
 def get_columns_without_comments(schema):
+    assert schema_exists(schema)
+
     return fetch_all("""
         SELECT
             isc.table_name,

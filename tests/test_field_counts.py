@@ -56,7 +56,7 @@ def test_command(caplog):
             caplog.clear()
 
         # All columns have comments.
-        assert not get_columns_without_comments('collection_1')
+        assert not get_columns_without_comments('view_data_collection_1')
 
         # The command can be reversed.
         result = runner.invoke(cli, [command, 'collection_1', '--remove'])
