@@ -142,7 +142,11 @@ SELECT
     data_id,
     value ->> 'id' AS parties_id,
     value -> 'roles' AS roles,
-    concat_ws('-', value -> 'identifier' ->> 'scheme', value -> 'identifier' ->> 'id') AS identifier,
+    CASE WHEN value -> 'identifier' ->> 'scheme' is null and value -> 'identifier' ->> 'id' is null THEN
+        null
+    ELSE
+        concat_ws('-', value -> 'identifier' ->> 'scheme', value -> 'identifier' ->> 'id')
+    END AS identifier,
     coalesce(value ->> 'id', (value -> 'identifier' ->> 'scheme') || '-' || (value -> 'identifier' ->> 'id'), value ->> 'name') AS unique_identifier_attempt,
     (
         SELECT
