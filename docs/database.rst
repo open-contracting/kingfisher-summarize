@@ -25,7 +25,7 @@ Foreign key relationships exist on all `tables <https://www.postgresql.org/docs/
 .. image:: _static/erd.png
    :target: _static/erd.png
 
-This diagram can help to identify JOIN conditions. For example, all tables can be joined with the ``release_summary_no_data``, ``release_summary`` and ``release_summary_with_checks`` tables on the ``id`` column.
+This diagram can help to identify JOIN conditions. For example, all tables can be joined with the ``release_summary_no_data`` and ``release_summary`` tables on the ``id`` column.
 
 Some tables have composite foreign keys. These are shown as two lines from one table to another in the diagram. To join such tables:
 
@@ -105,6 +105,14 @@ release_summary
    :header-rows: 1
    :widths: 10, 10, 40
    :file: definitions/release_summary.csv
+
+release_summary_no_data
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. csv-table::
+   :header-rows: 1
+   :widths: 10, 10, 40
+   :file: definitions/release_summary_no_data.csv
 
 .. _db-parties:
 
@@ -190,6 +198,14 @@ tender_summary
    :header-rows: 1
    :widths: 10, 10, 40
    :file: definitions/tender_summary.csv
+
+tender_summary_no_data
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. csv-table::
+   :header-rows: 1
+   :widths: 10, 10, 40
+   :file: definitions/tender_summary_no-data.csv
 
 tender_items_summary
 ~~~~~~~~~~~~~~~~~~~~

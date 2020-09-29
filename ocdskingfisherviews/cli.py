@@ -403,7 +403,7 @@ def docs_table_ref(name):
     tables = []
     for basename, content in _read_sql_files().items():
         for table in re.findall(r'^CREATE\s+(?:TABLE|VIEW)\s+(\S+)', content, flags=re.MULTILINE | re.IGNORECASE):
-            if not table.startswith(('tmp_', 'staged_')) and not table.endswith('_no_data'):
+            if not table.startswith(('tmp_', 'staged_')):
                 tables.append(table)
     tables.append('field_counts')
 
