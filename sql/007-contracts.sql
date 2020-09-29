@@ -45,7 +45,11 @@ SELECT
     convert_to_numeric (item ->> 'quantity') quantity,
     convert_to_numeric (unit -> 'value' ->> 'amount') unit_amount,
     unit -> 'value' ->> 'currency' unit_currency,
-    (item -> 'classification' ->> 'scheme') || '-' || (item -> 'classification' ->> 'id') AS item_classification,
+    CASE WHEN item -> 'classification' ->> 'scheme' is null and item -> 'classification' ->> 'id' is null THEN
+        null
+    ELSE
+        concat_ws('-', item -> 'classification' ->> 'scheme', item -> 'classification' ->> 'id')
+    END AS item_classification,
     (
         SELECT
             jsonb_agg((additional_classification ->> 'scheme') || '-' || (additional_classification ->> 'id'))
