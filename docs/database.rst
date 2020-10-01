@@ -14,9 +14,9 @@ Otherwise, the :ref:`add-view` command *with* the ``--dontbuild`` flag creates t
 How tables are related
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Each summary table has an ``id`` column and a ``release_type`` column. The ``id`` column in a summary table refers to the ``id`` column in the ``release_summary`` table. For a given ``id`` value, the ``release_type`` value is the same in all tables (in other words, the ``release_type`` column is `denormalized <https://en.wikipedia.org/wiki/Denormalization>`__).
+Each summary table has an ``id`` column and a ``release_type`` column. The ``id`` column in a summary table refers to the ``id`` column in the ``release_summary_no_data`` table. For a given ``id`` value, the ``release_type`` value is the same in all tables (in other words, the ``release_type`` column is `denormalized <https://en.wikipedia.org/wiki/Denormalization>`__).
 
-The ``table_id`` column in the ``release_summary`` table refers to the ``id`` column in either Kingfisher Process' ``release``, ``record`` or ``compiled_release`` table. If the ``release_type`` is "embedded_release", the referred table is the ``record`` table. Otherwise, the referred table matches the value of the ``release_type`` column (either "release", "record" or "compiled_release").
+The ``table_id`` column in the ``release_summary_no_data`` table refers to the ``id`` column in either Kingfisher Process' ``release``, ``record`` or ``compiled_release`` table. If the ``release_type`` is "embedded_release", the referred table is the ``record`` table. Otherwise, the referred table matches the value of the ``release_type`` column (either "release", "record" or "compiled_release").
 
 If the ``release_type`` is "record", then the record's ``compiledRelease`` field is used to generate summaries. If the ``release_type`` is "embedded_release", then the record's ``releases`` array is used to generate summaries.
 
@@ -25,7 +25,7 @@ Foreign key relationships exist on all `tables <https://www.postgresql.org/docs/
 .. image:: _static/erd.png
    :target: _static/erd.png
 
-This diagram can help to identify JOIN conditions. For example, all tables can be joined with the ``release_summary``, ``release_summary_with_data`` and ``release_summary_with_data`` tables on the ``id`` column.
+This diagram can help to identify JOIN conditions. For example, all tables can be joined with the ``release_summary_no_data`` and ``release_summary`` tables on the ``id`` column.
 
 Some tables have composite foreign keys. These are shown as two lines from one table to another in the diagram. To join such tables:
 
@@ -106,21 +106,13 @@ release_summary
    :widths: 10, 10, 40
    :file: definitions/release_summary.csv
 
-release_summary_with_data
-~~~~~~~~~~~~~~~~~~~~~~~~~
+release_summary_no_data
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. csv-table::
    :header-rows: 1
    :widths: 10, 10, 40
-   :file: definitions/release_summary_with_data.csv
-
-release_summary_with_checks
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. csv-table::
-   :header-rows: 1
-   :widths: 10, 10, 40
-   :file: definitions/release_summary_with_checks.csv
+   :file: definitions/release_summary_no_data.csv
 
 .. _db-parties:
 
@@ -207,13 +199,13 @@ tender_summary
    :widths: 10, 10, 40
    :file: definitions/tender_summary.csv
 
-tender_summary_with_data
-~~~~~~~~~~~~~~~~~~~~~~~~
+tender_summary_no_data
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. csv-table::
    :header-rows: 1
    :widths: 10, 10, 40
-   :file: definitions/tender_summary_with_data.csv
+   :file: definitions/tender_summary_no-data.csv
 
 tender_items_summary
 ~~~~~~~~~~~~~~~~~~~~

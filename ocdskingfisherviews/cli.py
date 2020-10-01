@@ -277,9 +277,9 @@ def field_counts(name, remove, threads):
     NAME is the last part of a schema's name after "view_data_".
     """
     cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
-                   "AND table_name = 'release_summary_with_data'", {'schema': name})
+                   "AND table_name = 'release_summary'", {'schema': name})
     if not cursor.fetchone():
-        raise click.UsageError('release_summary_with_data table not found. Run refresh-views first.')
+        raise click.UsageError('release_summary table not found. Run refresh-views first.')
 
     logger = logging.getLogger('ocdskingfisher.views.field-counts')
     set_search_path([name, 'public'])
@@ -311,11 +311,11 @@ def field_counts(name, remove, threads):
                 sum(array_item) array_count,
                 count(distinct id) distinct_releases
             FROM
-                release_summary_with_data
+                release_summary
             CROSS JOIN
-                flatten(data)
+                flatten(release)
             WHERE
-                release_summary_with_data.collection_id = %(id)s
+                release_summary.collection_id = %(id)s
             GROUP BY collection_id, release_type, path
         """, {'id': collection})
 
@@ -403,7 +403,7 @@ def docs_table_ref(name):
     tables = []
     for basename, content in _read_sql_files().items():
         for table in re.findall(r'^CREATE\s+(?:TABLE|VIEW)\s+(\S+)', content, flags=re.MULTILINE | re.IGNORECASE):
-            if not table.startswith(('tmp_', 'staged_')) and not table.endswith('_no_data'):
+            if not table.startswith(('tmp_', 'staged_')):
                 tables.append(table)
     tables.append('field_counts')
 

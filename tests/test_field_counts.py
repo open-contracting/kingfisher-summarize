@@ -26,7 +26,7 @@ def test_command_error(caplog):
         result = runner.invoke(cli, [command, 'collection_1'])
 
         assert result.exit_code == 2
-        assert result.output.endswith('Error: release_summary_with_data table not found. Run refresh-views first.\n')
+        assert result.output.endswith('Error: release_summary table not found. Run refresh-views first.\n')
         assert_log_records(caplog, command, [])
 
 

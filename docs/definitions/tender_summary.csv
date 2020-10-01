@@ -43,3 +43,4 @@ documenttype_counts,jsonb,JSONB object with the keys as unique documentTypes and
 milestones_count,bigint,Count of milestones
 milestonetype_counts,jsonb,JSONB object with the keys as unique milestoneTypes and the values as a count of the appearances of that `milestoneType` in the `milestones` array
 items_count,bigint,Count of items
+tender,jsonb,JSONB of tender object
