@@ -15,52 +15,50 @@ Since most analysis is much easier to perform on compiled releases, we recommend
 List all schemas in the database
 --------------------------------
 
-Kingfisher Views creates database schemes to store summary data.
+Kingfisher Views creates database schemas to store summary data.
 
 The following query returns a list of schemas in the database:
 
 .. code-block:: sql
 
-  select
+  SELECT
     schema_name
-  from
+  FROM
     information_schema.schemata;
 
 Set the schema to query
 -----------------------
 
-The following command sets the current schema to ``view_data_collection_1257_1259`` by making it the first item in the search path:
+The following query sets the ``view_data_collection_1257_1259`` schema as the first item in the search path:
 
 .. code-block:: sql
 
-  set
+  SET
     search_path
-  to
+  TO
     view_data_collection_1257_1259, public;
 
 .. note::
 
-  Depending on the tool used to query the database, you may need to include the above command at the start of each query you run.
+  Depending on the tool you use to query the database, you might need to run the above query before each other query.
 
 List the collections in the current schema
 ------------------------------------------
 
-The following query lists the collections in the current schema, with the name of the data source and the type of data summarised:
+The following query lists the collections in the current schema, with the name of the data source and the type of data summarized:
 
 .. code-block:: sql
 
-  select distinct
+  SELECT DISTINCT
       collection_id,
       source_id,
       release_type
-  from
+  FROM
       release_summary
-  join
-      collection
-  on
-      release_summary.collection_id = collection.id
-  order by
-      collection_id desc;
+  JOIN
+      collection ON release_summary.collection_id = collection.id
+  ORDER BY
+      collection_id DESC;
 
 The ``release_type`` column indicates the type of data stored in the collection:
 
@@ -71,47 +69,47 @@ The ``release_type`` column indicates the type of data stored in the collection:
 Get a top-level summary of contracting processes
 ------------------------------------------------
 
-The ``release_summary`` table contains data summarised at the top level of an OCDS release.
+Top-level summary data is stored in the ``release_summary`` table.
 
-Use one of the ``collection_id`` returned by the previous query to filter your results to a single collection. To get a summary of a whole contracting process rather choose a ``compiled_release`` or ``record`` collection.
+Use one of the ``collection_id`` values returned by the previous query to filter your results to a single collection. To get summaries of individual releases, use a ``release`` collection. To get summaries of entire contracting processes, use a ``compiled_release`` or ``record`` collection.
 
-The following query returns a top-level summary of the first 3 contracting processes in collection ``1259``.
+The following query returns a top-level summary of the first 3 contracting processes in collection ``1259``, which is a ``compiled_release`` collection.
 
 .. code-block:: sql
 
-  select
+  SELECT
       *
-  from
+  FROM
       release_summary
-  where
+  WHERE
       collection_id = 1259
-  limit 3;
+  LIMIT 3;
 
 To learn more about the summaries and aggregates in the ``release_summary`` table, refer to the :ref:`release_summary` documentation.
 
-To get data from a different collection, change the ``collection_id`` parameter.
+To get data from a different collection, change the ``collection_id`` condition.
 
 Calculate the total value of tenders in a collection
 ----------------------------------------------------
 
-Summary data on tenders is stored in the ``tender_summary`` table.
+Summary data about tenders is stored in the ``tender_summary`` table.
 
 The following query calculates the total value of tenders disaggregated by currency and tender status in collection ``1259``.
 
 .. code-block:: sql
 
-  select
-    tender_value_currency, --return the currency of the tender value, values in OCDS have an amount and a currency, as datasets may contain values in multiple currencies
+  SELECT
+    tender_value_currency, -- return the currency of the tender value, values in OCDS have an amount and a currency, as datasets may contain values in multiple currencies
     tender_status,
     sum(tender_value_amount)
-  from
+  FROM
     tender_summary
-  where
+  WHERE
     collection_id = 1259
-  group by
+  GROUP BY
     tender_value_currency,
     tender_status
-  order by
+  ORDER BY
     tender_value_currency,
     tender_status;
 
@@ -119,52 +117,51 @@ To learn more about the summaries and aggregates in the ``tender_summary`` table
 
 .. tip::
 
-  The ``tender``, ``award`` and ``contract`` objects in OCDS all have a ``.status`` property.
+  The ``tender``, ``awards`` and ``contracts`` objects in OCDS all have a ``.status`` field.
 
-  Kingfisher Views exposes these status properties in ``tender_summary.tender_status``, ``awards_summary.award_status`` and ``contracts_summary.contract_status``.
+  Kingfisher Views stores these status fields in the ``tender_summary.tender_status``, ``awards_summary.award_status`` and ``contracts_summary.contract_status`` columns.
 
-  Consider which statuses you want to include or exclude from your analysis, for example you might wish to exclude pending and cancelled contracts when calculating the total value of contracts for each buyer.
+  Consider which statuses you want to include or exclude from your analysis; for example, you might want to exclude pending and cancelled contracts when calculating the total value of contracts for each buyer.
 
   The `OCDS codelist documentation <https://standard.open-contracting.org/latest/en/schema/codelists/#>`__ describes the meaning of the statuses for each object.
 
 Calculate the top 10 buyers by award value
 ------------------------------------------
 
-Summary data on buyers is stored in the ``buyer_summary`` table and summary data on awards is stored in the ``award_summary`` table.
+Summary data about buyers is stored in the ``buyer_summary`` table, and summary data about awards is stored in the ``award_summary`` table.
 
-To join summary tables, use the ``id`` column, which uniquely identifies a release. To learn more about the relationships between tables refer to the :ref:`relationships` documentation.
+To join summary tables, use the ``id`` column, which uniquely identifies a release. To learn more about the relationships between tables, refer to the :ref:`relationships` documentation.
 
-The ``buyer_summary`` table doesn't include the buyer's name, however the ``buyer`` column contains a jsonb blob of the buyer  for each contracting process, which this can be extracted from.
+The ``buyer_summary`` table doesn't include the buyer's name; however, the ``buyer`` column contains a JSONB blob of the buyer for each contracting process, from which the buyer's name can be queried.
 
-Most summary tables in Kingfisher Views include a column containing jsonb blobs of the object the summary relates to.
+Most summary tables include a column containing JSONB blobs of the object to which the summary relates.
 
-The following query calculates the top 10 buyers by award value for collection ``1259``, disaggregated by currency and counting 'active' awards only:
+The following query calculates the top 10 buyers by award value for collection ``1259``, disaggregated by currency, and counting 'active' awards only:
 
 .. code-block:: sql
 
-  select
+  SELECT
       buyer_identifier,
-      buyer -> 'name' as buyer_name, --extract the buyer name from the JSON
+      buyer -> 'name' AS buyer_name, -- extract the buyer name from the JSON
       award_value_currency,
-      sum(award_value_amount) as award_amount
-  from
+      sum(award_value_amount) AS award_amount
+  FROM
       awards_summary
-  join
-      buyer_summary on awards_summary.id = buyer_summary.id
-  where
+  JOIN
+      buyer_summary ON awards_summary.id = buyer_summary.id
+  WHERE
       awards_summary.collection_id = 1259
-  and
-      awards_summary.award_value_amount > 0 --filter out awards with no value
-  and
+  AND
+      awards_summary.award_value_amount > 0 -- filter out awards with no value
+  AND
       awards_summary.award_status = 'active'
-  group by
+  GROUP BY
       buyer_identifier,
       buyer_name,
       award_value_currency
-  order by
-      award_amount desc
-  limit
-      10;
+  ORDER BY
+      award_amount DESC
+  LIMIT 10;
 
 Check which fields are available
 --------------------------------
@@ -177,10 +174,10 @@ The following query lists the coverage of each field in the current schema:
 
 .. code-block:: sql
 
-  select
+  SELECT
     *
-  from
-    field_counts
+  FROM
+    field_counts;
 
 For schemas with multiple collections, use the ``collection_id`` column to filter your results for a particular collection.
 
@@ -188,9 +185,9 @@ You can also check the coverage of specific fields or groups of fields by filter
 
 .. code-block:: sql
 
-  select
+  SELECT
     *
-  from
+  FROM
     field_counts
-  where
-    path in ('tender/value/amount', 'tender/procurementMethod')
+  WHERE
+    path IN ('tender/value/amount', 'tender/procurementMethod');
