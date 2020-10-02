@@ -72,6 +72,7 @@ That's it! Feel free to browse the documentation below.
    get-started
    cli/index
    database
+   querying-data
    logging
    users
    develop/index
