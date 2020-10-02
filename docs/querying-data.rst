@@ -134,7 +134,7 @@ To join summary tables, use the ``id`` column, which uniquely identifies a relea
 
 The ``buyer_summary`` table doesn't include the buyer's name; however, the ``buyer`` column contains a JSONB blob of the buyer for each contracting process, from which the buyer's name can be queried.
 
-Most summary tables include a column containing JSONB blobs of the object to which the summary relates.
+Most summary tables include a column that contains a JSONB blob of the object to which the summary relates. For example, the ``award`` column in ``awards_summary`` and the ``tender`` column in ``tender_summary``.
 
 The following query calculates the top 10 buyers by award value for collection ``1259``, disaggregated by currency, and counting 'active' awards only:
 
