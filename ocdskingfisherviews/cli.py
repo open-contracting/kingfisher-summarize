@@ -76,7 +76,7 @@ def cli(ctx):
         logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
     logger = logging.getLogger('ocdskingfisher.views.cli')
-    logger.info(f'Running {ctx.invoked_subcommand}')
+    logger.info('Running %s', ctx.invoked_subcommand)
 
     global connection
     connection = get_connection()
@@ -174,7 +174,7 @@ def add_view(ctx, collections, note, name, dontbuild, tables_only, threads):
     cursor.execute('ANALYZE selected_collections')
     commit()
 
-    logger.info(f'Added {name}')
+    logger.info('Added %s', name)
 
     if not dontbuild:
         message = [f'Running refresh-views {name}']
@@ -252,7 +252,7 @@ def refresh_views(name, remove, tables_only):
 
     for basename, content in _read_sql_files(remove).items():
         file_timer = timer()
-        logger.info(f'Running {basename}')
+        logger.info('Running %s', basename)
 
         for part in content.split('----'):
             if tables_only:
@@ -261,9 +261,9 @@ def refresh_views(name, remove, tables_only):
             cursor.execute('/* kingfisher-views refresh-views */\n' + part)
             commit()
 
-        logger.info(f'Time: {timer() - file_timer}s')
+        logger.info('Time: %ss', timer() - file_timer)
 
-    logger.info(f'Total time: {timer() - command_timer}s')
+    logger.info('Total time: %ss', timer() - command_timer)
 
 
 @click.command()
@@ -293,7 +293,7 @@ def field_counts(name, remove, threads):
         return
 
     def _run_collection(collection):
-        logger.info(f'Processing collection ID {collection}')
+        logger.info('Processing collection ID %s', collection)
 
         collection_timer = timer()
 
@@ -322,7 +322,7 @@ def field_counts(name, remove, threads):
         execute_values(cursor, 'INSERT INTO field_counts_tmp VALUES %s', cursor.fetchall())
         commit()
 
-        logger.info(f'Time for collection ID {collection}: {timer() - collection_timer}s')
+        logger.info('Time for collection ID %s: %ss', collection, timer() - collection_timer)
 
     command_timer = timer()
 
@@ -363,7 +363,7 @@ def field_counts(name, remove, threads):
                    "'The total number of distinct releases in which the field at this path appears'")
     commit()
 
-    logger.info(f'Total time: {timer() - command_timer}s')
+    logger.info('Total time: %ss', timer() - command_timer)
 
 
 @click.command()
