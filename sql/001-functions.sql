@@ -18,11 +18,12 @@ CREATE OR REPLACE FUNCTION convert_to_timestamp (v_input text)
     PARALLEL SAFE
     AS $$
     SELECT
-        CASE WHEN v_input ~ '^\d{4}-\d\d-\d\d[Tt ]\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|[Zz])?$' THEN
+        CASE WHEN v_input ~ '^0000'
+            THEN
+            NULL
+        WHEN v_input ~ '^\d{4}-\d\d-\d\d[Tt ]\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|[Zz])?$' THEN
             v_input::timestamp
         ELSE
             NULL
         END;
-
 $$;
-
