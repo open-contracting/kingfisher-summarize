@@ -11,6 +11,14 @@ The :ref:`add-view` command *without* the ``--dontbuild`` flag creates all the t
 
 Otherwise, the :ref:`add-view` command *with* the ``--dontbuild`` flag creates the :ref:`metadata` tables only, the :ref:`field-counts` command creates the :ref:`fields` tables, and the :ref:`refresh-views` command creates the rest.
 
+How the table fields are made.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Most fields are extracted from the OCSD JSON data as strings. This is the case even if the field within the JSON is a different type e.g if an ``id`` field is expressed as a number in JSON this will be converted to a string in the views tables. However, there are two other type conversion that happen:
+
+* ISO datetimes are converted to postgres ``timestamp`` fields.  **Warning:** If the ISO datetime appears invalid or starts with a ``0000`` year, these will be converted to ``null``.
+* numbers are converted to postgres ``numeric``.  **Warning:** if the number is a string within the JSON and contains any non numeric characters, these will be converted to ``null``.
+
 .. _relationships:
 
 How tables are related
