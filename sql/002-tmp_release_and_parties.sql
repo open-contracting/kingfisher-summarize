@@ -144,8 +144,9 @@ SELECT
     data_id,
     value ->> 'id' AS parties_id,
     value -> 'roles' AS roles,
-    CASE WHEN value -> 'identifier' ->> 'scheme' is null and value -> 'identifier' ->> 'id' is null THEN
-        null
+    CASE WHEN value -> 'identifier' ->> 'scheme' IS NULL
+        AND value -> 'identifier' ->> 'id' IS NULL THEN
+        NULL
     ELSE
         concat_ws('-', value -> 'identifier' ->> 'scheme', value -> 'identifier' ->> 'id')
     END AS identifier,

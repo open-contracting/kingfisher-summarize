@@ -63,7 +63,7 @@ DECLARE
 BEGIN
     query := $query$ ALTER TABLE release_summary_no_data
         ADD CONSTRAINT release_summary_no_data_release_summary_fk FOREIGN KEY (id) REFERENCES release_summary (id) NOT valid;
-        ALTER TABLE tender_summary_no_data
+    ALTER TABLE tender_summary_no_data
         ADD CONSTRAINT tender_summary_no_data_tender_summary_fk FOREIGN KEY (id) REFERENCES tender_summary (id) NOT valid;
     $query$;
     EXECUTE query;

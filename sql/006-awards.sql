@@ -130,8 +130,9 @@ SELECT
     convert_to_numeric (item ->> 'quantity') quantity,
     convert_to_numeric (unit -> 'value' ->> 'amount') unit_amount,
     unit -> 'value' ->> 'currency' unit_currency,
-    CASE WHEN item -> 'classification' ->> 'scheme' is null and item -> 'classification' ->> 'id' is null THEN
-        null
+    CASE WHEN item -> 'classification' ->> 'scheme' IS NULL
+        AND item -> 'classification' ->> 'id' IS NULL THEN
+        NULL
     ELSE
         concat_ws('-', item -> 'classification' ->> 'scheme', item -> 'classification' ->> 'id')
     END AS item_classification,
