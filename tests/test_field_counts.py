@@ -27,7 +27,9 @@ def test_command_error(caplog):
 
         assert result.exit_code == 2
         assert result.output.endswith('Error: release_summary table not found. Run refresh-views first.\n')
-        assert_log_records(caplog, command, [])
+        assert_log_records(caplog, command, [
+            'Arguments: name=view_data_collection_1 remove=False threads=1',
+        ])
 
 
 def test_command(caplog):
@@ -45,6 +47,7 @@ def test_command(caplog):
             assert result.exit_code == 0
             assert result.output == ''
             assert_log_records(caplog, command, [
+                'Arguments: name=view_data_collection_1 remove=False threads=1',
                 'Processing collection ID 1',
                 re.compile(r'^Time for collection ID 1: \d+\.\d+s$'),
                 re.compile(r'^Total time: \d+\.\d+s$'),
@@ -65,5 +68,6 @@ def test_command(caplog):
         assert result.exit_code == 0
         assert result.output == ''
         assert_log_records(caplog, command, [
+            'Arguments: name=view_data_collection_1 remove=False threads=1',
             'Dropped tables field_counts and field_counts_tmp',
         ])

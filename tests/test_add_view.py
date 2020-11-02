@@ -37,6 +37,7 @@ def test_command(caplog):
         assert result.exit_code == 0
         assert result.output == ''
         assert_log_records(caplog, command, [
+            'Arguments: collections=(1,) note=Default name=None dontbuild=True tables_only=False threads=1',
             'Added collection_1',
         ])
 
@@ -50,6 +51,7 @@ def test_command_multiple(caplog):
         assert result.exit_code == 0
         assert result.output == ''
         assert_log_records(caplog, command, [
+            'Arguments: collections=(1, 2) note=Default name=None dontbuild=True tables_only=False threads=1',
             'Added collection_1_2',
         ])
 
@@ -61,9 +63,10 @@ def test_command_build(caplog):
         assert result.exit_code == 0
         assert result.output == ''
         assert_log_records(caplog, command, [
+            'Arguments: collections=(1,) note=Default name=None dontbuild=False tables_only=True threads=2',
             'Added collection_1',
-            'Running refresh-views collection_1 --tables-only',
-            'Running field-counts collection_1 --threads 2',
+            'Running refresh-views',
+            'Running field-counts',
             'Running correct-user-permissions',
         ])
 
@@ -75,5 +78,6 @@ def test_command_name(caplog):
         assert result.exit_code == 0
         assert result.output == ''
         assert_log_records(caplog, command, [
+            'Arguments: collections=(1,) note=Default name=custom dontbuild=True tables_only=False threads=1',
             'Added custom',
         ])

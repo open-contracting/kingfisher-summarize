@@ -32,5 +32,6 @@ def test_command(caplog):
         assert result.exit_code == 0
         assert result.output == ''
         assert_log_records(caplog, command, [
+            'Arguments: name=view_data_collection_1',
             f'DROP SCHEMA "{schema}" CASCADE',
         ])

@@ -154,6 +154,8 @@ def add_view(ctx, collections, note, name, dontbuild, tables_only, threads):
     NOTE is your name and a description of your purpose
     """
     logger = logging.getLogger('ocdskingfisher.views.add-view')
+    logger.info('Arguments: collections=%s note=%s name=%s dontbuild=%s tables_only=%s threads=%s',
+                collections, note, name, dontbuild, tables_only, threads)
 
     if not name:
         if len(collections) > 5:
@@ -177,16 +179,10 @@ def add_view(ctx, collections, note, name, dontbuild, tables_only, threads):
     logger.info('Added %s', name)
 
     if not dontbuild:
-        message = [f'Running refresh-views {name}']
-        if tables_only:
-            message.append(' --tables-only')
-        logger.info(''.join(message))
+        logger.info('Running refresh-views')
         ctx.invoke(refresh_views, name=schema, tables_only=tables_only)
 
-        message = [f'Running field-counts {name}']
-        if threads != 1:
-            message.append(f' --threads {threads}')
-        logger.info(''.join(message))
+        logger.info('Running field-counts')
         ctx.invoke(field_counts, name=schema, threads=threads)
 
         logger.info('Running correct-user-permissions')
@@ -202,6 +198,7 @@ def delete_view(name):
     NAME is the last part of a schema's name after "view_data_".
     """
     logger = logging.getLogger('ocdskingfisher.views.delete-view')
+    logger.info('Arguments: name=%s', name)
 
     # `CASCADE` drops all objects (tables, functions, etc.) in the schema.
     statement = sql.SQL('DROP SCHEMA {schema} CASCADE').format(schema=sql.Identifier(name))
@@ -246,6 +243,8 @@ def refresh_views(name, remove, tables_only):
     NAME is the last part of a schema's name after "view_data_".
     """
     logger = logging.getLogger('ocdskingfisher.views.refresh-views')
+    logger.info('Arguments: name=%s remove=%s tables_only=%s', name, remove, tables_only)
+
     set_search_path([name, 'public'])
 
     command_timer = timer()
@@ -276,12 +275,14 @@ def field_counts(name, remove, threads):
 
     NAME is the last part of a schema's name after "view_data_".
     """
+    logger = logging.getLogger('ocdskingfisher.views.field-counts')
+    logger.info('Arguments: name=%s remove=%s threads=%s', name, remove, threads)
+
     cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
                    "AND table_name = 'release_summary'", {'schema': name})
     if not cursor.fetchone():
         raise click.UsageError('release_summary table not found. Run refresh-views first.')
 
-    logger = logging.getLogger('ocdskingfisher.views.field-counts')
     set_search_path([name, 'public'])
 
     if remove:
