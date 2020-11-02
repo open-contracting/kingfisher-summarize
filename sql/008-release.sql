@@ -350,9 +350,11 @@ GROUP BY
 CREATE UNIQUE INDEX tmp_release_milestones_aggregates_id ON tmp_release_milestones_aggregates (id);
 
 ----
-DROP TABLE IF EXISTS staged_release_summary_no_data CASCADE;
+DROP VIEW IF EXISTS release_summary;
 
-CREATE TABLE staged_release_summary_no_data AS
+DROP TABLE IF EXISTS release_summary_no_data CASCADE;
+
+CREATE TABLE release_summary_no_data AS
 SELECT
     *
 FROM
@@ -410,16 +412,6 @@ DROP TABLE IF EXISTS tmp_release_documents_aggregates;
 DROP TABLE IF EXISTS tmp_release_milestones_aggregates;
 
 ----
-DROP TABLE IF EXISTS release_summary_no_data CASCADE;
-
-CREATE TABLE release_summary_no_data AS
-SELECT
-    *
-FROM
-    staged_release_summary_no_data;
-
-DROP TABLE IF EXISTS staged_release_summary_no_data;
-
 CREATE UNIQUE INDEX release_summary_no_data_id ON release_summary_no_data (id);
 
 CREATE INDEX release_summary_no_data_data_id ON release_summary_no_data (data_id);
@@ -427,8 +419,6 @@ CREATE INDEX release_summary_no_data_data_id ON release_summary_no_data (data_id
 CREATE INDEX release_summary_no_data_package_data_id ON release_summary_no_data (package_data_id);
 
 CREATE INDEX release_summary_no_data_collection_id ON release_summary_no_data (collection_id);
-
-DROP VIEW IF EXISTS release_summary;
 
 CREATE VIEW release_summary AS
 SELECT

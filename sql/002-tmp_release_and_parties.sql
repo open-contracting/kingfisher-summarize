@@ -114,7 +114,7 @@ CREATE INDEX tmp_release_summary_package_data_id ON tmp_release_summary (package
 
 CREATE INDEX tmp_release_summary_collection_id ON tmp_release_summary (collection_id);
 
-CREATE OR REPLACE VIEW tmp_release_summary_with_release_data AS
+CREATE VIEW tmp_release_summary_with_release_data AS
 SELECT
     CASE WHEN release_type = 'record' THEN
         d.data -> 'compiledRelease'
@@ -129,9 +129,11 @@ FROM
     JOIN data d ON d.id = r.data_id;
 
 ----
-DROP TABLE IF EXISTS staged_parties_summary_no_data;
+DROP VIEW IF EXISTS parties_summary;
 
-CREATE TABLE staged_parties_summary_no_data AS
+DROP TABLE IF EXISTS parties_summary_no_data;
+
+CREATE TABLE parties_summary_no_data AS
 SELECT
     r.id,
     ORDINALITY - 1 AS party_index,
@@ -174,18 +176,6 @@ WHERE
     jsonb_typeof(data -> 'parties') = 'array';
 
 ----
-DROP VIEW IF EXISTS parties_summary;
-
-DROP TABLE IF EXISTS parties_summary_no_data;
-
-CREATE TABLE parties_summary_no_data AS
-SELECT
-    *
-FROM
-    staged_parties_summary_no_data;
-
-DROP TABLE staged_parties_summary_no_data;
-
 CREATE UNIQUE INDEX parties_summary_no_data_id ON parties_summary_no_data (id, party_index);
 
 CREATE INDEX parties_summary_no_data_data_id ON parties_summary_no_data (data_id);

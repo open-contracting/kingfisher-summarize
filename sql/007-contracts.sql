@@ -28,9 +28,9 @@ CREATE UNIQUE INDEX tmp_contracts_summary_id ON tmp_contracts_summary (id, contr
 CREATE INDEX tmp_contracts_summary_award_id ON tmp_contracts_summary (id, award_id);
 
 ----
-DROP TABLE IF EXISTS staged_contract_items_summary;
+DROP TABLE IF EXISTS contract_items_summary;
 
-CREATE TABLE staged_contract_items_summary AS
+CREATE TABLE contract_items_summary AS
 SELECT
     r.id,
     contract_index,
@@ -82,16 +82,6 @@ WHERE
     jsonb_typeof(contract -> 'items') = 'array') AS r;
 
 ----
-DROP TABLE IF EXISTS contract_items_summary;
-
-CREATE TABLE contract_items_summary AS
-SELECT
-    *
-FROM
-    staged_contract_items_summary;
-
-DROP TABLE IF EXISTS staged_contract_items_summary;
-
 CREATE UNIQUE INDEX contract_items_summary_id ON contract_items_summary (id, contract_index, item_index);
 
 CREATE INDEX contract_items_summary_data_id ON contract_items_summary (data_id);
@@ -99,9 +89,9 @@ CREATE INDEX contract_items_summary_data_id ON contract_items_summary (data_id);
 CREATE INDEX contract_items_summary_collection_id ON contract_items_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS staged_contract_documents_summary;
+DROP TABLE IF EXISTS contract_documents_summary;
 
-CREATE TABLE staged_contract_documents_summary AS
+CREATE TABLE contract_documents_summary AS
 SELECT
     r.id,
     contract_index,
@@ -127,16 +117,6 @@ WHERE
     jsonb_typeof(contract -> 'documents') = 'array') AS r;
 
 ----
-DROP TABLE IF EXISTS contract_documents_summary;
-
-CREATE TABLE contract_documents_summary AS
-SELECT
-    *
-FROM
-    staged_contract_documents_summary;
-
-DROP TABLE IF EXISTS staged_contract_documents_summary;
-
 CREATE UNIQUE INDEX contract_documents_summary_id ON contract_documents_summary (id, contract_index, document_index);
 
 CREATE INDEX contract_documents_summary_data_id ON contract_documents_summary (data_id);
@@ -144,9 +124,9 @@ CREATE INDEX contract_documents_summary_data_id ON contract_documents_summary (d
 CREATE INDEX contract_documents_summary_collection_id ON contract_documents_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS staged_contract_milestones_summary;
+DROP TABLE IF EXISTS contract_milestones_summary;
 
-CREATE TABLE staged_contract_milestones_summary AS
+CREATE TABLE contract_milestones_summary AS
 SELECT
     r.id,
     contract_index,
@@ -173,16 +153,6 @@ WHERE
     jsonb_typeof(contract -> 'milestones') = 'array') AS r;
 
 ----
-DROP TABLE IF EXISTS contract_milestones_summary;
-
-CREATE TABLE contract_milestones_summary AS
-SELECT
-    *
-FROM
-    staged_contract_milestones_summary;
-
-DROP TABLE IF EXISTS staged_contract_milestones_summary;
-
 CREATE UNIQUE INDEX contract_milestones_summary_id ON contract_milestones_summary (id, contract_index, milestone_index);
 
 CREATE INDEX contract_milestones_summary_data_id ON contract_milestones_summary (data_id);
@@ -190,9 +160,9 @@ CREATE INDEX contract_milestones_summary_data_id ON contract_milestones_summary 
 CREATE INDEX contract_milestones_summary_collection_id ON contract_milestones_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS staged_contract_implementation_documents_summary;
+DROP TABLE IF EXISTS contract_implementation_documents_summary;
 
-CREATE TABLE staged_contract_implementation_documents_summary AS
+CREATE TABLE contract_implementation_documents_summary AS
 SELECT
     r.id,
     contract_index,
@@ -218,16 +188,6 @@ WHERE
     jsonb_typeof(contract -> 'implementation' -> 'documents') = 'array') AS r;
 
 ----
-DROP TABLE IF EXISTS contract_implementation_documents_summary;
-
-CREATE TABLE contract_implementation_documents_summary AS
-SELECT
-    *
-FROM
-    staged_contract_implementation_documents_summary;
-
-DROP TABLE IF EXISTS staged_contract_implementation_documents_summary;
-
 CREATE UNIQUE INDEX contract_implementation_documents_summary_id ON contract_implementation_documents_summary (id, contract_index, document_index);
 
 CREATE INDEX contract_implementation_documents_summary_data_id ON contract_implementation_documents_summary (data_id);
@@ -235,9 +195,9 @@ CREATE INDEX contract_implementation_documents_summary_data_id ON contract_imple
 CREATE INDEX contract_implementation_documents_summary_collection_id ON contract_implementation_documents_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS staged_contract_implementation_milestones_summary;
+DROP TABLE IF EXISTS contract_implementation_milestones_summary;
 
-CREATE TABLE staged_contract_implementation_milestones_summary AS
+CREATE TABLE contract_implementation_milestones_summary AS
 SELECT
     r.id,
     contract_index,
@@ -264,16 +224,6 @@ WHERE
     jsonb_typeof(contract -> 'implementation' -> 'milestones') = 'array') AS r;
 
 ----
-DROP TABLE IF EXISTS contract_implementation_milestones_summary;
-
-CREATE TABLE contract_implementation_milestones_summary AS
-SELECT
-    *
-FROM
-    staged_contract_implementation_milestones_summary;
-
-DROP TABLE IF EXISTS staged_contract_implementation_milestones_summary;
-
 CREATE UNIQUE INDEX contract_implementation_milestones_summary_id ON contract_implementation_milestones_summary (id, contract_index, milestone_index);
 
 CREATE INDEX contract_implementation_milestones_summary_data_id ON contract_implementation_milestones_summary (data_id);
@@ -281,9 +231,9 @@ CREATE INDEX contract_implementation_milestones_summary_data_id ON contract_impl
 CREATE INDEX contract_implementation_milestones_summary_collection_id ON contract_implementation_milestones_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS staged_contract_implementation_transactions_summary;
+DROP TABLE IF EXISTS contract_implementation_transactions_summary;
 
-CREATE TABLE staged_contract_implementation_transactions_summary AS
+CREATE TABLE contract_implementation_transactions_summary AS
 SELECT
     r.id,
     contract_index,
@@ -308,16 +258,6 @@ WHERE
     jsonb_typeof(contract -> 'implementation' -> 'transactions') = 'array') AS r;
 
 ----
-DROP TABLE IF EXISTS contract_implementation_transactions_summary;
-
-CREATE TABLE contract_implementation_transactions_summary AS
-SELECT
-    *
-FROM
-    staged_contract_implementation_transactions_summary;
-
-DROP TABLE IF EXISTS staged_contract_implementation_transactions_summary;
-
 CREATE UNIQUE INDEX contract_implementation_transactions_summary_id ON contract_implementation_transactions_summary (id, contract_index, transaction_index);
 
 CREATE INDEX contract_implementation_transactions_summary_data_id ON contract_implementation_transactions_summary (data_id);
@@ -325,9 +265,11 @@ CREATE INDEX contract_implementation_transactions_summary_data_id ON contract_im
 CREATE INDEX contract_implementation_transactions_summary_collection_id ON contract_implementation_transactions_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS staged_contracts_summary_no_data;
+DROP VIEW IF EXISTS contracts_summary;
 
-CREATE TABLE staged_contracts_summary_no_data AS SELECT DISTINCT ON (r.id, r.contract_index)
+DROP TABLE IF EXISTS contracts_summary_no_data;
+
+CREATE TABLE contracts_summary_no_data AS SELECT DISTINCT ON (r.id, r.contract_index)
     r.id,
     r.contract_index,
     r.release_type,
@@ -460,18 +402,6 @@ FROM
             contract_index) implementation_milestoneType_counts USING (id, contract_index);
 
 ----
-DROP VIEW IF EXISTS contracts_summary;
-
-DROP TABLE IF EXISTS contracts_summary_no_data;
-
-CREATE TABLE contracts_summary_no_data AS
-SELECT
-    *
-FROM
-    staged_contracts_summary_no_data;
-
-DROP TABLE IF EXISTS staged_contracts_summary_no_data;
-
 CREATE UNIQUE INDEX contracts_summary_no_data_id ON contracts_summary_no_data (id, contract_index);
 
 CREATE INDEX contracts_summary_no_data_data_id ON contracts_summary_no_data (data_id);

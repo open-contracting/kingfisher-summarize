@@ -21,9 +21,9 @@ FROM (
 CREATE UNIQUE INDEX tmp_planning_summary_id ON tmp_planning_summary (id);
 
 ----
-DROP TABLE IF EXISTS staged_planning_documents_summary;
+DROP TABLE IF EXISTS planning_documents_summary;
 
-CREATE TABLE staged_planning_documents_summary AS
+CREATE TABLE planning_documents_summary AS
 SELECT
     r.id,
     document_index,
@@ -48,16 +48,6 @@ WHERE
     jsonb_typeof(planning -> 'documents') = 'array') AS r;
 
 ----
-DROP TABLE IF EXISTS planning_documents_summary;
-
-CREATE TABLE planning_documents_summary AS
-SELECT
-    *
-FROM
-    staged_planning_documents_summary;
-
-DROP TABLE IF EXISTS staged_planning_documents_summary;
-
 CREATE UNIQUE INDEX planning_documents_summary_id ON planning_documents_summary (id, document_index);
 
 CREATE INDEX planning_documents_summary_data_id ON planning_documents_summary (data_id);
@@ -65,9 +55,9 @@ CREATE INDEX planning_documents_summary_data_id ON planning_documents_summary (d
 CREATE INDEX planning_documents_summary_collection_id ON planning_documents_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS staged_planning_milestones_summary;
+DROP TABLE IF EXISTS planning_milestones_summary;
 
-CREATE TABLE staged_planning_milestones_summary AS
+CREATE TABLE planning_milestones_summary AS
 SELECT
     r.id,
     milestone_index,
@@ -93,16 +83,6 @@ WHERE
     jsonb_typeof(planning -> 'milestones') = 'array') AS r;
 
 ----
-DROP TABLE IF EXISTS planning_milestones_summary;
-
-CREATE TABLE planning_milestones_summary AS
-SELECT
-    *
-FROM
-    staged_planning_milestones_summary;
-
-DROP TABLE IF EXISTS staged_planning_milestones_summary;
-
 CREATE UNIQUE INDEX planning_milestones_summary_id ON planning_milestones_summary (id, milestone_index);
 
 CREATE INDEX planning_milestones_summary_data_id ON planning_milestones_summary (data_id);
@@ -110,9 +90,9 @@ CREATE INDEX planning_milestones_summary_data_id ON planning_milestones_summary 
 CREATE INDEX planning_milestones_summary_collection_id ON planning_milestones_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS staged_planning_summary;
+DROP TABLE IF EXISTS planning_summary;
 
-CREATE TABLE staged_planning_summary AS
+CREATE TABLE planning_summary AS
 SELECT
     r.id,
     r.release_type,
@@ -165,16 +145,6 @@ FROM
             id) milestoneType_counts USING (id);
 
 ----
-DROP TABLE IF EXISTS planning_summary;
-
-CREATE TABLE planning_summary AS
-SELECT
-    *
-FROM
-    staged_planning_summary;
-
-DROP TABLE IF EXISTS staged_planning_summary;
-
 CREATE UNIQUE INDEX planning_summary_id ON planning_summary (id);
 
 CREATE INDEX planning_summary_data_id ON planning_summary (data_id);
