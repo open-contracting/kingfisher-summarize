@@ -143,11 +143,11 @@ SELECT
     milestone ->> 'status' AS status
 FROM (
     SELECT
-        tps.*,
+        tcs.*,
         value AS milestone,
         ORDINALITY - 1 AS milestone_index
     FROM
-        tmp_contracts_summary tps
+        tmp_contracts_summary tcs
     CROSS JOIN jsonb_array_elements(contract -> 'milestones')
     WITH ORDINALITY
 WHERE
@@ -214,11 +214,11 @@ SELECT
     milestone ->> 'status' AS status
 FROM (
     SELECT
-        tps.*,
+        tcs.*,
         value AS milestone,
         ORDINALITY - 1 AS milestone_index
     FROM
-        tmp_contracts_summary tps
+        tmp_contracts_summary tcs
     CROSS JOIN jsonb_array_elements(contract -> 'implementation' -> 'milestones')
     WITH ORDINALITY
 WHERE
@@ -248,11 +248,11 @@ SELECT
     coalesce(TRANSACTION -> 'value' ->> 'currency', TRANSACTION -> 'amount' ->> 'currency') transaction_currency
 FROM (
     SELECT
-        tps.*,
+        tcs.*,
         value AS TRANSACTION,
         ORDINALITY - 1 AS transaction_index
     FROM
-        tmp_contracts_summary tps
+        tmp_contracts_summary tcs
     CROSS JOIN jsonb_array_elements(contract -> 'implementation' -> 'transactions')
     WITH ORDINALITY
 WHERE

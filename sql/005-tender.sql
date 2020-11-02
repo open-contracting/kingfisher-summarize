@@ -37,11 +37,11 @@ SELECT
     document ->> 'format' AS format
 FROM (
     SELECT
-        tps.*,
+        tts.*,
         value AS document,
         ORDINALITY - 1 AS document_index
     FROM
-        tmp_tender_summary tps
+        tmp_tender_summary tts
     CROSS JOIN jsonb_array_elements(tender -> 'documents')
     WITH ORDINALITY
 WHERE
@@ -72,11 +72,11 @@ SELECT
     milestone ->> 'status' AS status
 FROM (
     SELECT
-        tps.*,
+        tts.*,
         value AS milestone,
         ORDINALITY - 1 AS milestone_index
     FROM
-        tmp_tender_summary tps
+        tmp_tender_summary tts
     CROSS JOIN jsonb_array_elements(tender -> 'milestones')
     WITH ORDINALITY
 WHERE
@@ -132,12 +132,12 @@ SELECT
         END) AS additional_classification_count
 FROM (
     SELECT
-        tps.*,
+        tts.*,
         value AS item,
         value -> 'unit' AS unit,
         ORDINALITY - 1 AS item_index
     FROM
-        tmp_tender_summary tps
+        tmp_tender_summary tts
     CROSS JOIN jsonb_array_elements(tender -> 'items')
     WITH ORDINALITY
 WHERE
