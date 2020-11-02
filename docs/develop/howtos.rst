@@ -46,18 +46,20 @@ Then, for any new CSV file, manually add a new sub-section to ``docs/database.rs
 Create Entity Relationship Diagram
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`Follow these instructions <https://kingfisher-process.readthedocs.io/en/latest/development.html#updating-database-tables-graphic>`__ to install `SchemaSpy <http://schemaspy.org/>`__.
+#. Install `SchemaSpy <https://schemaspy.readthedocs.io/en/latest/installation.html>`__
+#. Download the `PostgreSQL JDBC Driver <https://jdbc.postgresql.org/>`__
+#. Move and rename the JAR files into the repository's directory as ``schemaspy.jar`` and ``postgresql.jar``
 
 Add a schema with the ``--tables-only`` option:
 
 .. code-block:: bash
 
-    python ocdskingfisher-views-cli add-view 123 "The note" --name <view_name> --tables-only
+    python ocdskingfisher-views-cli add-view 123 diagram --tables-only
 
-Run SchemaSpy with:
+Run SchemaSpy, using appropriate values for the ``-db`` (database name), ``-`` (schema) ``-u`` (user) and ``-p`` (password, optional) arguments:
 
 .. code-block:: bash
 
-   java -jar /bin/schemaspy.jar -t pgsql -dp /bin/postgresql.jar -s view_data_<view_name> -db ocdskingfisher -u ocdskingfisher -p ocdskingfisher -host localhost -o /vagrant/schemaspy -norows
+   java -jar schemaspy.jar -t pgsql -dp postgresql.jar -host localhost -db ocdskingfisher -s view_data_collection_123 -u ocdskingfisher --password ocdskingfisher -o schemaspy -norows
 
 In the directory that results, copy ``schemaspy/diagrams/summary/relationships.real.compact.png`` to ``docs/_static/erd.png``.
