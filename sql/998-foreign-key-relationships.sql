@@ -61,14 +61,22 @@ DO $$
 DECLARE
     query text;
 BEGIN
-    query := $query$ ALTER TABLE release_summary_no_data
-        ADD CONSTRAINT release_summary_no_data_release_summary_fk FOREIGN KEY (id) REFERENCES release_summary (id) NOT valid;
-    ALTER TABLE tender_summary_no_data
-        ADD CONSTRAINT tender_summary_no_data_tender_summary_fk FOREIGN KEY (id) REFERENCES tender_summary (id) NOT valid;
+    query := $query$ ALTER TABLE parties_summary
+        ADD CONSTRAINT parties_summary_parties_summary_no_data_fk FOREIGN KEY (id, party_index) REFERENCES parties_summary_no_data (id, party_index) NOT valid;
+    ALTER TABLE tender_summary
+        ADD CONSTRAINT tender_summary_tender_summary_no_data_fk FOREIGN KEY (id) REFERENCES tender_summary_no_data (id) NOT valid;
+    ALTER TABLE awards_summary
+        ADD CONSTRAINT awards_summary_awards_summary_no_data_fk FOREIGN KEY (id, award_index) REFERENCES awards_summary_no_data (id, award_index) NOT valid;
+    ALTER TABLE contracts_summary
+        ADD CONSTRAINT contracts_summary_contracts_summary_no_data_fk FOREIGN KEY (id, contract_index) REFERENCES contracts_summary_no_data (id, contract_index) NOT valid;
+    ALTER TABLE release_summary
+        ADD CONSTRAINT release_summary_release_summary_no_data_fk FOREIGN KEY (id) REFERENCES release_summary_no_data (id) NOT valid;
     $query$;
     EXECUTE query;
 EXCEPTION
     WHEN wrong_object_type THEN
         NULL;
-END
-$$
+END;
+
+$$;
+
