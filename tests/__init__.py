@@ -98,7 +98,7 @@ def assert_log_records(caplog, name, messages):
     for i, record in enumerate(records):
         message = messages[i]
         if isinstance(message, str):
-            assert record.message == message
+            assert record.message == message, f'{record.message!r} != {message!r}'
         else:
             assert message.search(record.message)
 

@@ -68,6 +68,6 @@ def test_command(caplog):
         assert result.exit_code == 0
         assert result.output == ''
         assert_log_records(caplog, command, [
-            'Arguments: name=view_data_collection_1 remove=False threads=1',
+            'Arguments: name=view_data_collection_1 remove=True threads=1',
             'Dropped tables field_counts and field_counts_tmp',
         ])
