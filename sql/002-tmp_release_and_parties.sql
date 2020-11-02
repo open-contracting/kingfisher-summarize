@@ -129,7 +129,8 @@ FROM
     JOIN data d ON d.id = r.data_id;
 
 ----
-DROP VIEW IF EXISTS parties_summary;
+SELECT
+    drop_table_or_view ('parties_summary');
 
 DROP TABLE IF EXISTS parties_summary_no_data;
 

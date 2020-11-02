@@ -175,7 +175,8 @@ CREATE INDEX award_items_summary_data_id ON award_items_summary (data_id);
 CREATE INDEX award_items_summary_collection_id ON award_items_summary (collection_id);
 
 ----
-DROP VIEW IF EXISTS awards_summary;
+SELECT
+    drop_table_or_view ('awards_summary');
 
 DROP TABLE IF EXISTS awards_summary_no_data;
 

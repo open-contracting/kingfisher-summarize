@@ -266,7 +266,8 @@ CREATE INDEX contract_implementation_transactions_summary_data_id ON contract_im
 CREATE INDEX contract_implementation_transactions_summary_collection_id ON contract_implementation_transactions_summary (collection_id);
 
 ----
-DROP VIEW IF EXISTS contracts_summary;
+SELECT
+    drop_table_or_view ('contracts_summary');
 
 DROP TABLE IF EXISTS contracts_summary_no_data;
 

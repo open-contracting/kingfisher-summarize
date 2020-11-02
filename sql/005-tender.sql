@@ -151,7 +151,8 @@ CREATE INDEX tender_items_summary_data_id ON tender_items_summary (data_id);
 CREATE INDEX tender_items_summary_collection_id ON tender_items_summary (collection_id);
 
 ----
-DROP VIEW IF EXISTS tender_summary;
+SELECT
+    drop_table_or_view ('tender_summary');
 
 DROP TABLE IF EXISTS tender_summary_no_data;
 

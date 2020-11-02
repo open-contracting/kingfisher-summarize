@@ -346,7 +346,8 @@ GROUP BY
 CREATE UNIQUE INDEX tmp_release_milestones_aggregates_id ON tmp_release_milestones_aggregates (id);
 
 ----
-DROP VIEW IF EXISTS release_summary;
+SELECT
+    drop_table_or_view ('release_summary');
 
 DROP TABLE IF EXISTS release_summary_no_data CASCADE;
 
