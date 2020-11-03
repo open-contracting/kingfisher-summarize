@@ -37,17 +37,9 @@ CREATE TABLE award_suppliers_summary AS SELECT DISTINCT ON (r.id, award_index, s
     coalesce(supplier ->> 'id', (supplier -> 'identifier' ->> 'scheme') || '-' || (supplier -> 'identifier' ->> 'id'), supplier ->> 'name') AS unique_identifier_attempt,
     ps.parties_additionalIdentifiers_ids AS supplier_additionalIdentifiers_ids,
     ps.parties_additionalIdentifiers_count AS supplier_additionalIdentifiers_count,
-    CASE WHEN ps.id IS NOT NULL THEN
-        1
-    ELSE
-        0
-    END link_to_parties,
-    CASE WHEN ps.id IS NOT NULL
-        AND (ps.party -> 'roles') ? 'supplier' THEN
-        1
-    ELSE
-        0
-    END link_with_role,
+    CAST(ps.id IS NOT NULL AS integer) AS link_to_parties,
+    CAST(ps.id IS NOT NULL
+        AND (ps.party -> 'roles') ? 'supplier' AS integer) AS link_with_role,
     ps.party_index
 FROM (
     SELECT

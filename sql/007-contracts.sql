@@ -243,11 +243,7 @@ CREATE TABLE contracts_summary_no_data AS SELECT DISTINCT ON (r.id, r.contract_i
     r.release_id,
     r.data_id,
     r.award_id,
-    CASE WHEN aws.award_id IS NOT NULL THEN
-        1
-    ELSE
-        0
-    END AS link_to_awards,
+    CAST(aws.award_id IS NOT NULL AS integer) AS link_to_awards,
     contract ->> 'id' AS contract_id,
     contract ->> 'title' AS contract_title,
     contract ->> 'status' AS contract_status,

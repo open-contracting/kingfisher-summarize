@@ -23,17 +23,10 @@ SELECT DISTINCT ON ( r.id)
 ) AS unique_identifier_attempt,
     ps.parties_additionalIdentifiers_ids AS buyer_additionalIdentifiers_ids,
     ps.parties_additionalIdentifiers_count AS buyer_additionalIdentifiers_count,
-    CASE WHEN ps.id IS NOT NULL THEN
-        1
-    ELSE
-        0
-    END link_to_parties,
-    CASE WHEN ps.id IS NOT NULL
-        AND (ps.party -> 'roles') ? 'buyer' THEN
-        1
-    ELSE
-        0
-    END link_with_role,
+    CAST(ps.id IS NOT NULL AS integer
+) AS link_to_parties,
+    CAST(ps.id IS NOT NULL AND (ps.party -> 'roles') ? 'buyer' AS integer
+) AS link_with_role,
     ps.party_index
 FROM
     r
@@ -74,17 +67,10 @@ SELECT DISTINCT ON ( r.id)
 ) AS unique_identifier_attempt,
     ps.parties_additionalIdentifiers_ids AS procuringEntity_additionalIdentifiers_ids,
     ps.parties_additionalIdentifiers_count AS procuringEntity_additionalIdentifiers_count,
-    CASE WHEN ps.id IS NOT NULL THEN
-        1
-    ELSE
-        0
-    END link_to_parties,
-    CASE WHEN ps.id IS NOT NULL
-        AND (ps.party -> 'roles') ? 'procuringEntity' THEN
-        1
-    ELSE
-        0
-    END link_with_role,
+    CAST(ps.id IS NOT NULL AS integer
+) AS link_to_parties,
+    CAST(ps.id IS NOT NULL AND (ps.party -> 'roles') ? 'procuringEntity' AS integer
+) AS link_with_role,
     ps.party_index
 FROM
     r
@@ -130,17 +116,10 @@ SELECT DISTINCT ON ( r.id, tenderer_index)
 ) AS unique_identifier_attempt,
     ps.parties_additionalIdentifiers_ids AS tenderer_additionalIdentifiers_ids,
     ps.parties_additionalIdentifiers_count AS tenderer_additionalIdentifiers_count,
-    CASE WHEN ps.id IS NOT NULL THEN
-        1
-    ELSE
-        0
-    END link_to_parties,
-    CASE WHEN ps.id IS NOT NULL
-        AND (ps.party -> 'roles') ? 'tenderer' THEN
-        1
-    ELSE
-        0
-    END link_with_role,
+    CAST(ps.id IS NOT NULL AS integer
+) AS link_to_parties,
+    CAST(ps.id IS NOT NULL AND (ps.party -> 'roles') ? 'tenderer' AS integer
+) AS link_with_role,
     ps.party_index
 FROM
     r
