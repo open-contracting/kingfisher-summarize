@@ -3,24 +3,19 @@ DROP TABLE IF EXISTS tmp_awards_summary;
 CREATE TABLE tmp_awards_summary AS
 SELECT
     r.id,
-    award_index,
+    ORDINALITY - 1 AS award_index,
     r.release_type,
     r.collection_id,
     r.ocid,
     r.release_id,
     r.data_id,
-    award
-FROM (
-    SELECT
-        rs.*,
-        ORDINALITY - 1 AS award_index,
-        value AS award
-    FROM
-        tmp_release_summary_with_release_data rs
+    value AS award
+FROM
+    tmp_release_summary_with_release_data r
     CROSS JOIN jsonb_array_elements(data -> 'awards')
     WITH ORDINALITY
 WHERE
-    jsonb_typeof(data -> 'awards') = 'array') AS r;
+    jsonb_typeof(data -> 'awards') = 'array';
 
 CREATE UNIQUE INDEX tmp_awards_summary_id ON tmp_awards_summary (id, award_index);
 
@@ -84,26 +79,21 @@ CREATE TABLE award_documents_summary AS
 SELECT
     r.id,
     award_index,
-    document_index,
+    ORDINALITY - 1 AS document_index,
     r.release_type,
     r.collection_id,
     r.ocid,
     r.release_id,
     r.data_id,
-    document,
-    document ->> 'documentType' AS documentType,
-    document ->> 'format' AS format
-FROM (
-    SELECT
-        tas.*,
-        value AS document,
-        ORDINALITY - 1 AS document_index
-    FROM
-        tmp_awards_summary tas
+    value AS document,
+    value ->> 'documentType' AS documentType,
+    value ->> 'format' AS format
+FROM
+    tmp_awards_summary r
     CROSS JOIN jsonb_array_elements(award -> 'documents')
     WITH ORDINALITY
 WHERE
-    jsonb_typeof(award -> 'documents') = 'array') AS r;
+    jsonb_typeof(award -> 'documents') = 'array';
 
 ----
 CREATE UNIQUE INDEX award_documents_summary_id ON award_documents_summary (id, award_index, document_index);
@@ -119,53 +109,46 @@ CREATE TABLE award_items_summary AS
 SELECT
     r.id,
     award_index,
-    item_index,
+    ORDINALITY - 1 AS item_index,
     r.release_type,
     r.collection_id,
     r.ocid,
     r.release_id,
     r.data_id,
-    item,
-    item ->> 'id' item_id,
-    convert_to_numeric (item ->> 'quantity') quantity,
-    convert_to_numeric (unit -> 'value' ->> 'amount') unit_amount,
-    unit -> 'value' ->> 'currency' unit_currency,
-    CASE WHEN item -> 'classification' ->> 'scheme' IS NULL
-        AND item -> 'classification' ->> 'id' IS NULL THEN
+    value AS item,
+    value ->> 'id' item_id,
+    convert_to_numeric (value ->> 'quantity') quantity,
+    convert_to_numeric (value -> 'unit' -> 'value' ->> 'amount') unit_amount,
+    value -> 'unit' -> 'value' ->> 'currency' unit_currency,
+    CASE WHEN value -> 'classification' ->> 'scheme' IS NULL
+        AND value -> 'classification' ->> 'id' IS NULL THEN
         NULL
     ELSE
-        concat_ws('-', item -> 'classification' ->> 'scheme', item -> 'classification' ->> 'id')
+        concat_ws('-', value -> 'classification' ->> 'scheme', value -> 'classification' ->> 'id')
     END AS item_classification,
     (
         SELECT
             jsonb_agg((additional_classification ->> 'scheme') || '-' || (additional_classification ->> 'id'))
         FROM
             jsonb_array_elements(
-                CASE WHEN jsonb_typeof(item -> 'additionalClassifications') = 'array' THEN
-                    item -> 'additionalClassifications'
+                CASE WHEN jsonb_typeof(value -> 'additionalClassifications') = 'array' THEN
+                    value -> 'additionalClassifications'
                 ELSE
                     '[]'::jsonb
                 END) additional_classification
         WHERE
             additional_classification ?& ARRAY['scheme', 'id']) item_additionalIdentifiers_ids,
-    jsonb_array_length(
-        CASE WHEN jsonb_typeof(item -> 'additionalClassifications') = 'array' THEN
-            item -> 'additionalClassifications'
-        ELSE
-            '[]'::jsonb
-        END) AS additional_classification_count
-FROM (
-    SELECT
-        tas.*,
-        value AS item,
-        value -> 'unit' AS unit,
-        ORDINALITY - 1 AS item_index
-    FROM
-        tmp_awards_summary tas
+    CASE WHEN jsonb_typeof(value -> 'additionalClassifications') = 'array' THEN
+        jsonb_array_length(value -> 'additionalClassifications')
+    ELSE
+        0
+    END AS additional_classification_count
+FROM
+    tmp_awards_summary r
     CROSS JOIN jsonb_array_elements(award -> 'items')
     WITH ORDINALITY
 WHERE
-    jsonb_typeof(award -> 'items') = 'array') AS r;
+    jsonb_typeof(award -> 'items') = 'array';
 
 ----
 CREATE UNIQUE INDEX award_items_summary_id ON award_items_summary (id, award_index, item_index);
@@ -200,12 +183,11 @@ SELECT
     convert_to_timestamp (award -> 'contractPeriod' ->> 'endDate') AS award_contractPeriod_endDate,
     convert_to_timestamp (award -> 'contractPeriod' ->> 'maxExtentDate') AS award_contractPeriod_maxExtentDate,
     convert_to_numeric (award -> 'contractPeriod' ->> 'durationInDays') AS award_contractPeriod_durationInDays,
-    jsonb_array_length(
-        CASE WHEN jsonb_typeof(award -> 'suppliers') = 'array' THEN
-            award -> 'suppliers'
-        ELSE
-            '[]'::jsonb
-        END) AS suppliers_count,
+    CASE WHEN jsonb_typeof(award -> 'suppliers') = 'array' THEN
+        jsonb_array_length(award -> 'suppliers')
+    ELSE
+        0
+    END AS suppliers_count,
     documents_count,
     documentType_counts,
     items_count
