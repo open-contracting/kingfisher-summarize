@@ -3,24 +3,19 @@ DROP TABLE IF EXISTS tmp_awards_summary;
 CREATE TABLE tmp_awards_summary AS
 SELECT
     r.id,
-    award_index,
+    ORDINALITY - 1 AS award_index,
     r.release_type,
     r.collection_id,
     r.ocid,
     r.release_id,
     r.data_id,
-    award
-FROM (
-    SELECT
-        rs.*,
-        ORDINALITY - 1 AS award_index,
-        value AS award
-    FROM
-        tmp_release_summary_with_release_data rs
-    CROSS JOIN jsonb_array_elements(data -> 'awards')
+    value AS award
+FROM
+    tmp_release_summary_with_release_data r,
+    jsonb_array_elements(data -> 'awards')
     WITH ORDINALITY
 WHERE
-    jsonb_typeof(data -> 'awards') = 'array') AS r;
+    jsonb_typeof(data -> 'awards') = 'array';
 
 CREATE UNIQUE INDEX tmp_awards_summary_id ON tmp_awards_summary (id, award_index);
 

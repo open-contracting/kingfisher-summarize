@@ -8,16 +8,13 @@ SELECT
     r.ocid,
     r.release_id,
     r.data_id,
-    tender
-FROM (
-    SELECT
-        data -> 'tender' AS tender,
-        rs.*
-    FROM
-        tmp_release_summary_with_release_data rs
-    WHERE
-        data ? 'tender') AS r;
+    data -> 'tender' AS tender
+FROM
+    tmp_release_summary_with_release_data r
+WHERE
+    data ? 'tender';
 
+----
 CREATE UNIQUE INDEX tmp_tender_summary_id ON tmp_tender_summary (id);
 
 ----
@@ -26,26 +23,20 @@ DROP TABLE IF EXISTS tender_documents_summary;
 CREATE TABLE tender_documents_summary AS
 SELECT
     r.id,
-    document_index,
+    ORDINALITY - 1 AS document_index,
     r.release_type,
     r.collection_id,
     r.ocid,
     r.release_id,
     r.data_id,
-    document,
-    document ->> 'documentType' AS documentType,
-    document ->> 'format' AS format
-FROM (
-    SELECT
-        tts.*,
-        value AS document,
-        ORDINALITY - 1 AS document_index
-    FROM
-        tmp_tender_summary tts
-    CROSS JOIN jsonb_array_elements(tender -> 'documents')
+    value AS document,
+    value ->> 'documentType' AS documentType,
+    value ->> 'format' AS format
+FROM tmp_tender_summary r,
+ jsonb_array_elements(tender -> 'documents')
     WITH ORDINALITY
 WHERE
-    jsonb_typeof(tender -> 'documents') = 'array') AS r;
+    jsonb_typeof(tender -> 'documents') = 'array';
 
 ----
 CREATE UNIQUE INDEX tender_documents_summary_id ON tender_documents_summary (id, document_index);
@@ -60,27 +51,21 @@ DROP TABLE IF EXISTS tender_milestones_summary;
 CREATE TABLE tender_milestones_summary AS
 SELECT
     r.id,
-    milestone_index,
+    ORDINALITY - 1 AS milestone_index,
     r.release_type,
     r.collection_id,
     r.ocid,
     r.release_id,
     r.data_id,
-    milestone,
-    milestone ->> 'type' AS TYPE,
-    milestone ->> 'code' AS code,
-    milestone ->> 'status' AS status
-FROM (
-    SELECT
-        tts.*,
-        value AS milestone,
-        ORDINALITY - 1 AS milestone_index
-    FROM
-        tmp_tender_summary tts
-    CROSS JOIN jsonb_array_elements(tender -> 'milestones')
+    value AS milestone,
+    value ->> 'type' AS TYPE,
+    value ->> 'code' AS code,
+    value ->> 'status' AS status
+FROM    tmp_tender_summary r,
+    jsonb_array_elements(tender -> 'milestones')
     WITH ORDINALITY
 WHERE
-    jsonb_typeof(tender -> 'milestones') = 'array') AS r;
+    jsonb_typeof(tender -> 'milestones') = 'array';
 
 ----
 CREATE UNIQUE INDEX tender_milestones_summary_id ON tender_milestones_summary (id, milestone_index);
@@ -95,53 +80,46 @@ DROP TABLE IF EXISTS tender_items_summary;
 CREATE TABLE tender_items_summary AS
 SELECT
     r.id,
-    item_index,
+    ORDINALITY - 1 AS item_index,
     r.release_type,
     r.collection_id,
     r.ocid,
     r.release_id,
     r.data_id,
-    item,
-    item ->> 'id' item_id,
-    convert_to_numeric (item ->> 'quantity') quantity,
-    convert_to_numeric (unit -> 'value' ->> 'amount') unit_amount,
-    unit -> 'value' ->> 'currency' unit_currency,
-    CASE WHEN item -> 'classification' ->> 'scheme' IS NULL
-        AND item -> 'classification' ->> 'id' IS NULL THEN
+    value AS item,
+    value ->> 'id' item_id,
+    convert_to_numeric (value ->> 'quantity') quantity,
+    convert_to_numeric (value -> 'unit' -> 'value' ->> 'amount') unit_amount,
+    value -> 'unit' -> 'value' ->> 'currency' unit_currency,
+    CASE WHEN value -> 'classification' ->> 'scheme' IS NULL
+        AND value -> 'classification' ->> 'id' IS NULL THEN
         NULL
     ELSE
-        concat_ws('-', item -> 'classification' ->> 'scheme', item -> 'classification' ->> 'id')
+        concat_ws('-', value -> 'classification' ->> 'scheme', value -> 'classification' ->> 'id')
     END AS item_classification,
     (
         SELECT
             jsonb_agg((additional_classification ->> 'scheme') || '-' || (additional_classification ->> 'id'))
         FROM
             jsonb_array_elements(
-                CASE WHEN jsonb_typeof(item -> 'additionalClassifications') = 'array' THEN
-                    item -> 'additionalClassifications'
+                CASE WHEN jsonb_typeof(value -> 'additionalClassifications') = 'array' THEN
+                    value -> 'additionalClassifications'
                 ELSE
                     '[]'::jsonb
                 END) additional_classification
         WHERE
             additional_classification ?& ARRAY['scheme', 'id']) item_additionalIdentifiers_ids,
     jsonb_array_length(
-        CASE WHEN jsonb_typeof(item -> 'additionalClassifications') = 'array' THEN
-            item -> 'additionalClassifications'
+        CASE WHEN jsonb_typeof(value -> 'additionalClassifications') = 'array' THEN
+            value -> 'additionalClassifications'
         ELSE
             '[]'::jsonb
         END) AS additional_classification_count
-FROM (
-    SELECT
-        tts.*,
-        value AS item,
-        value -> 'unit' AS unit,
-        ORDINALITY - 1 AS item_index
-    FROM
-        tmp_tender_summary tts
-    CROSS JOIN jsonb_array_elements(tender -> 'items')
+FROM tmp_tender_summary r,
+ jsonb_array_elements(tender -> 'items')
     WITH ORDINALITY
 WHERE
-    jsonb_typeof(tender -> 'items') = 'array') AS r;
+    jsonb_typeof(tender -> 'items') = 'array';
 
 ----
 CREATE UNIQUE INDEX tender_items_summary_id ON tender_items_summary (id, item_index);

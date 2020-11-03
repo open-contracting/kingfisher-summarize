@@ -3,25 +3,20 @@ DROP TABLE IF EXISTS tmp_contracts_summary;
 CREATE TABLE tmp_contracts_summary AS
 SELECT
     r.id,
-    contract_index,
+    ORDINALITY - 1 AS contract_index,
     r.release_type,
     r.collection_id,
     r.ocid,
     r.release_id,
     r.data_id,
-    contract,
-    contract ->> 'awardID' AS award_id
-FROM (
-    SELECT
-        rs.*,
-        ORDINALITY - 1 AS contract_index,
-        value AS contract
-    FROM
-        tmp_release_summary_with_release_data rs
-    CROSS JOIN jsonb_array_elements(data -> 'contracts')
+    value AS contract,
+    value ->> 'awardID' AS award_id
+FROM
+    tmp_release_summary_with_release_data r,
+    jsonb_array_elements(data -> 'contracts')
     WITH ORDINALITY
 WHERE
-    jsonb_typeof(data -> 'contracts') = 'array') AS r;
+    jsonb_typeof(data -> 'contracts') = 'array';
 
 CREATE UNIQUE INDEX tmp_contracts_summary_id ON tmp_contracts_summary (id, contract_index);
 
