@@ -37,27 +37,12 @@ DECLARE
     is_table integer;
     is_view integer;
 BEGIN
-    SELECT
-        INTO is_table count(*)
-    FROM
-        pg_tables
-    WHERE
-        tablename = object_name;
-    SELECT
-        INTO is_view count(*)
-    FROM
-        pg_views
-    WHERE
-        viewname = object_name;
-    IF is_table = 1 THEN
-        EXECUTE 'DROP TABLE ' || object_name;
-        RETURN 1;
-    END IF;
-    IF is_view = 1 THEN
-        EXECUTE 'DROP VIEW ' || object_name;
+    EXECUTE 'DROP VIEW IF EXISTS ' || object_name;
+    RETURN 1;
+EXCEPTION
+    WHEN wrong_object_type THEN
+        EXECUTE 'DROP TABLE IF EXISTS ' || object_name;
         RETURN 2;
-    END IF;
-    RETURN 0;
 END;
 $$
 LANGUAGE plpgsql
