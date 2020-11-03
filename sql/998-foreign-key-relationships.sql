@@ -47,12 +47,10 @@ BEGIN
     ALTER TABLE award_suppliers_summary
         ADD CONSTRAINT award_suppliers_summary_awards_summary%1$s_fk FOREIGN KEY (id, award_index) REFERENCES awards_summary%1$s (id, award_index) NOT valid;
     $query$;
-    BEGIN
-        EXECUTE format(query, '');
-        EXCEPTION
-        WHEN wrong_object_type THEN
-            EXECUTE format(query, '_no_data');
-        END;
+    EXECUTE format(query, '');
+EXCEPTION
+    WHEN wrong_object_type THEN
+        EXECUTE format(query, '_no_data');
 END;
 
 $$;

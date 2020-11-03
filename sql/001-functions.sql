@@ -1,36 +1,37 @@
-CREATE OR REPLACE FUNCTION convert_to_numeric (v_input text)
-    RETURNS numeric
-    LANGUAGE 'sql'
-    PARALLEL SAFE
+-- https://github.com/csikfer/lanview2/blob/master/database/update-1.9.sql
+CREATE OR REPLACE FUNCTION convert_to_numeric (text, numeric DEFAULT NULL)
+    RETURNS numeric PARALLEL SAFE
     AS $$
-    SELECT
-        CASE WHEN length(v_input) > 20 THEN
-            0
-        ELSE
-            to_number('0' || v_input, '99999999999999999999.99')
-        END;
+BEGIN
+    RETURN CAST($1 AS numeric);
+EXCEPTION
+    WHEN invalid_text_representation THEN
+        RETURN $2;
+END;
 
-$$;
+$$
+LANGUAGE plpgsql
+IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION convert_to_timestamp (v_input text)
-    RETURNS timestamp
-    LANGUAGE 'sql'
-    PARALLEL SAFE
+CREATE OR REPLACE FUNCTION convert_to_timestamp (text, timestamp DEFAULT NULL)
+    RETURNS timestamp PARALLEL SAFE
     AS $$
-    SELECT
-        CASE WHEN v_input ~ '^0000' THEN
-            NULL
-        WHEN v_input ~ '^\d{4}-\d\d-\d\d[Tt ]\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|[Zz])?$' THEN
-            v_input::timestamp
-        ELSE
-            NULL
-        END;
+BEGIN
+    RETURN CAST($1 AS timestamp);
+EXCEPTION
+    WHEN invalid_datetime_format THEN
+        RETURN $2;
+    WHEN datetime_field_overflow THEN
+        RETURN $2;
+END;
 
-$$;
+$$
+LANGUAGE plpgsql
+IMMUTABLE STRICT;
 
 -- https://stackoverflow.com/a/463314/244258
 CREATE OR REPLACE FUNCTION drop_table_or_view (object_name text)
-    RETURNS integer
+    RETURNS integer PARALLEL UNSAFE
     AS $$
 DECLARE
     is_table integer;
@@ -59,5 +60,8 @@ BEGIN
     RETURN 0;
 END;
 $$
-LANGUAGE plpgsql;
+LANGUAGE plpgsql
+VOLATILE;
 
+-- Reference:
+-- https://www.postgresql.org/docs/current/errcodes-appendix.html
