@@ -29,13 +29,13 @@ CREATE OR REPLACE FUNCTION flatten (jsonb)
             )
 
             SELECT
-                prev.key || '/' || tt.key,
-                tt.value,
+                prev.key || '/' || next.key,
+                next.value,
                 1,
                 0
             FROM
                 prev,
-                jsonb_each(prev.value) tt
+                jsonb_each(prev.value) next
             WHERE
                 jsonb_typeof(prev.value) = 'object'
 
@@ -43,12 +43,12 @@ CREATE OR REPLACE FUNCTION flatten (jsonb)
 
             SELECT
                 prev.key,
-                tt.value,
+                next.value,
                 0,
                 1
             FROM
                 prev,
-                jsonb_array_elements(prev.value) tt
+                jsonb_array_elements(prev.value) next
             WHERE
                 jsonb_typeof(prev.value) = 'array'
                 AND jsonb_typeof(prev.value -> 0) = 'object'
@@ -95,13 +95,13 @@ CREATE OR REPLACE FUNCTION flatten_with_values (jsonb)
             )
 
             SELECT
-                prev.key || '/' || tt.key,
-                tt.value,
+                prev.key || '/' || next.key,
+                next.value,
                 1,
                 0
             FROM
                 prev,
-                jsonb_each(prev.value) tt
+                jsonb_each(prev.value) next
             WHERE
                 jsonb_typeof(prev.value) = 'object'
 
@@ -109,12 +109,12 @@ CREATE OR REPLACE FUNCTION flatten_with_values (jsonb)
 
             SELECT
                 prev.key,
-                tt.value,
+                next.value,
                 0,
                 1
             FROM
                 prev,
-                jsonb_array_elements(prev.value) tt
+                jsonb_array_elements(prev.value) next
             WHERE
                 jsonb_typeof(prev.value) = 'array'
                 AND jsonb_typeof(prev.value -> 0) = 'object'
