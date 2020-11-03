@@ -25,9 +25,9 @@ WHERE
 CREATE UNIQUE INDEX tmp_awards_summary_id ON tmp_awards_summary (id, award_index);
 
 ----
-DROP TABLE IF EXISTS staged_award_suppliers_summary;
+DROP TABLE IF EXISTS award_suppliers_summary;
 
-CREATE TABLE staged_award_suppliers_summary AS SELECT DISTINCT ON (r.id, award_index, supplier_index)
+CREATE TABLE award_suppliers_summary AS SELECT DISTINCT ON (r.id, award_index, supplier_index)
     r.id,
     award_index,
     supplier_index,
@@ -71,16 +71,6 @@ WHERE
     supplier IS NOT NULL;
 
 ----
-DROP TABLE IF EXISTS award_suppliers_summary;
-
-CREATE TABLE award_suppliers_summary AS
-SELECT
-    *
-FROM
-    staged_award_suppliers_summary;
-
-DROP TABLE IF EXISTS staged_award_suppliers_summary;
-
 CREATE UNIQUE INDEX award_suppliers_summary_id ON award_suppliers_summary (id, award_index, supplier_index);
 
 CREATE INDEX award_suppliers_summary_data_id ON award_suppliers_summary (data_id);
@@ -88,9 +78,9 @@ CREATE INDEX award_suppliers_summary_data_id ON award_suppliers_summary (data_id
 CREATE INDEX award_suppliers_summary_collection_id ON award_suppliers_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS staged_award_documents_summary;
+DROP TABLE IF EXISTS award_documents_summary;
 
-CREATE TABLE staged_award_documents_summary AS
+CREATE TABLE award_documents_summary AS
 SELECT
     r.id,
     award_index,
@@ -116,16 +106,6 @@ WHERE
     jsonb_typeof(award -> 'documents') = 'array') AS r;
 
 ----
-DROP TABLE IF EXISTS award_documents_summary;
-
-CREATE TABLE award_documents_summary AS
-SELECT
-    *
-FROM
-    staged_award_documents_summary;
-
-DROP TABLE IF EXISTS staged_award_documents_summary;
-
 CREATE UNIQUE INDEX award_documents_summary_id ON award_documents_summary (id, award_index, document_index);
 
 CREATE INDEX award_documents_summary_data_id ON award_documents_summary (data_id);
@@ -133,9 +113,9 @@ CREATE INDEX award_documents_summary_data_id ON award_documents_summary (data_id
 CREATE INDEX award_documents_summary_collection_id ON award_documents_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS staged_award_items_summary;
+DROP TABLE IF EXISTS award_items_summary;
 
-CREATE TABLE staged_award_items_summary AS
+CREATE TABLE award_items_summary AS
 SELECT
     r.id,
     award_index,
@@ -150,8 +130,9 @@ SELECT
     convert_to_numeric (item ->> 'quantity') quantity,
     convert_to_numeric (unit -> 'value' ->> 'amount') unit_amount,
     unit -> 'value' ->> 'currency' unit_currency,
-    CASE WHEN item -> 'classification' ->> 'scheme' is null and item -> 'classification' ->> 'id' is null THEN
-        null
+    CASE WHEN item -> 'classification' ->> 'scheme' IS NULL
+        AND item -> 'classification' ->> 'id' IS NULL THEN
+        NULL
     ELSE
         concat_ws('-', item -> 'classification' ->> 'scheme', item -> 'classification' ->> 'id')
     END AS item_classification,
@@ -187,16 +168,6 @@ WHERE
     jsonb_typeof(award -> 'items') = 'array') AS r;
 
 ----
-DROP TABLE IF EXISTS award_items_summary;
-
-CREATE TABLE award_items_summary AS
-SELECT
-    *
-FROM
-    staged_award_items_summary;
-
-DROP TABLE IF EXISTS staged_award_items_summary;
-
 CREATE UNIQUE INDEX award_items_summary_id ON award_items_summary (id, award_index, item_index);
 
 CREATE INDEX award_items_summary_data_id ON award_items_summary (data_id);
@@ -204,9 +175,12 @@ CREATE INDEX award_items_summary_data_id ON award_items_summary (data_id);
 CREATE INDEX award_items_summary_collection_id ON award_items_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS staged_awards_summary_no_data;
+SELECT
+    drop_table_or_view ('awards_summary');
 
-CREATE TABLE staged_awards_summary_no_data AS
+DROP TABLE IF EXISTS awards_summary_no_data;
+
+CREATE TABLE awards_summary_no_data AS
 SELECT
     r.id,
     r.award_index,
@@ -270,18 +244,6 @@ FROM
             award_index) items_counts USING (id, award_index);
 
 ----
-DROP VIEW IF EXISTS awards_summary;
-
-DROP TABLE IF EXISTS awards_summary_no_data;
-
-CREATE TABLE awards_summary_no_data AS
-SELECT
-    *
-FROM
-    staged_awards_summary_no_data;
-
-DROP TABLE IF EXISTS staged_awards_summary_no_data;
-
 CREATE UNIQUE INDEX awards_summary_no_data_id ON awards_summary_no_data (id, award_index);
 
 CREATE INDEX awards_summary_data_no_data_id ON awards_summary_no_data (data_id);

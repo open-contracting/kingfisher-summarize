@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS staged_buyer_summary;
+DROP TABLE IF EXISTS buyer_summary;
 
-CREATE TABLE staged_buyer_summary AS
+CREATE TABLE buyer_summary AS
 WITH r AS (
     SELECT
         *,
@@ -43,16 +43,6 @@ WHERE
     buyer IS NOT NULL;
 
 ----
-DROP TABLE IF EXISTS buyer_summary;
-
-CREATE TABLE buyer_summary AS
-SELECT
-    *
-FROM
-    staged_buyer_summary;
-
-DROP TABLE IF EXISTS staged_buyer_summary;
-
 CREATE UNIQUE INDEX buyer_summary_id ON buyer_summary (id);
 
 CREATE INDEX buyer_summary_data_id ON buyer_summary (data_id);
@@ -60,9 +50,9 @@ CREATE INDEX buyer_summary_data_id ON buyer_summary (data_id);
 CREATE INDEX buyer_summary_collection_id ON buyer_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS staged_procuringEntity_summary;
+DROP TABLE IF EXISTS procuringEntity_summary;
 
-CREATE TABLE staged_procuringEntity_summary AS
+CREATE TABLE procuringEntity_summary AS
 WITH r AS (
     SELECT
         *,
@@ -104,16 +94,6 @@ WHERE
     procuringEntity IS NOT NULL;
 
 ----
-DROP TABLE IF EXISTS procuringEntity_summary;
-
-CREATE TABLE procuringEntity_summary AS
-SELECT
-    *
-FROM
-    staged_procuringEntity_summary;
-
-DROP TABLE IF EXISTS staged_procuringEntity_summary;
-
 CREATE UNIQUE INDEX procuringEntity_summary_id ON procuringEntity_summary (id);
 
 CREATE INDEX procuringEntity_summary_data_id ON procuringEntity_summary (data_id);
@@ -121,9 +101,9 @@ CREATE INDEX procuringEntity_summary_data_id ON procuringEntity_summary (data_id
 CREATE INDEX procuringEntity_summary_collection_id ON procuringEntity_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS staged_tenderers_summary;
+DROP TABLE IF EXISTS tenderers_summary;
 
-CREATE TABLE staged_tenderers_summary AS
+CREATE TABLE tenderers_summary AS
 WITH r AS (
     SELECT
         rs.*,
@@ -170,16 +150,6 @@ WHERE
     tenderer IS NOT NULL;
 
 ----
-DROP TABLE IF EXISTS tenderers_summary;
-
-CREATE TABLE tenderers_summary AS
-SELECT
-    *
-FROM
-    staged_tenderers_summary;
-
-DROP TABLE IF EXISTS staged_tenderers_summary;
-
 CREATE UNIQUE INDEX tenderers_summary_id ON tenderers_summary (id, tenderer_index);
 
 CREATE INDEX tenderers_summary_data_id ON tenderers_summary (data_id);

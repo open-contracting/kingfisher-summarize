@@ -59,6 +59,7 @@ CREATE UNIQUE INDEX tmp_planning_documents_aggregates_id ON tmp_planning_documen
 
 -- end of adding planning document counts
 --- Adding tender document counts by document_type
+
 DROP TABLE IF EXISTS tmp_tender_documents_aggregates;
 
 CREATE TABLE tmp_tender_documents_aggregates AS
@@ -82,6 +83,7 @@ CREATE UNIQUE INDEX tmp_tender_documents_aggregates_id ON tmp_tender_documents_a
 
 -- end of adding tender document counts
 ----
+
 DROP TABLE IF EXISTS tmp_release_awards_aggregates;
 
 CREATE TABLE tmp_release_awards_aggregates AS
@@ -277,11 +279,8 @@ WITH all_document_types AS (
 )
 SELECT
     id,
-    jsonb_object_agg (
-coalesce(documentType, ''),
-        documentType_count) total_documentType_counts,
-    sum (
-        documentType_count) total_documents
+    jsonb_object_agg( coalesce(documentType, ''), documentType_count) total_documentType_counts,
+    sum( documentType_count) total_documents
 FROM (
     SELECT
         id,
@@ -328,11 +327,8 @@ WITH all_milestone_types AS (
 )
 SELECT
     id,
-    jsonb_object_agg (
-coalesce(TYPE, ''),
-        milestoneType_count) milestoneType_counts,
-    sum (
-        milestoneType_count) total_milestones
+    jsonb_object_agg( coalesce(TYPE, ''), milestoneType_count) milestoneType_counts,
+    sum( milestoneType_count) total_milestones
 FROM (
     SELECT
         id,
@@ -350,9 +346,12 @@ GROUP BY
 CREATE UNIQUE INDEX tmp_release_milestones_aggregates_id ON tmp_release_milestones_aggregates (id);
 
 ----
-DROP TABLE IF EXISTS staged_release_summary_no_data CASCADE;
+SELECT
+    drop_table_or_view ('release_summary');
 
-CREATE TABLE staged_release_summary_no_data AS
+DROP TABLE IF EXISTS release_summary_no_data CASCADE;
+
+CREATE TABLE release_summary_no_data AS
 SELECT
     *
 FROM
@@ -410,16 +409,6 @@ DROP TABLE IF EXISTS tmp_release_documents_aggregates;
 DROP TABLE IF EXISTS tmp_release_milestones_aggregates;
 
 ----
-DROP TABLE IF EXISTS release_summary_no_data CASCADE;
-
-CREATE TABLE release_summary_no_data AS
-SELECT
-    *
-FROM
-    staged_release_summary_no_data;
-
-DROP TABLE IF EXISTS staged_release_summary_no_data;
-
 CREATE UNIQUE INDEX release_summary_no_data_id ON release_summary_no_data (id);
 
 CREATE INDEX release_summary_no_data_data_id ON release_summary_no_data (data_id);
@@ -427,8 +416,6 @@ CREATE INDEX release_summary_no_data_data_id ON release_summary_no_data (data_id
 CREATE INDEX release_summary_no_data_package_data_id ON release_summary_no_data (package_data_id);
 
 CREATE INDEX release_summary_no_data_collection_id ON release_summary_no_data (collection_id);
-
-DROP VIEW IF EXISTS release_summary;
 
 CREATE VIEW release_summary AS
 SELECT
@@ -467,12 +454,13 @@ FROM
     LEFT JOIN record_check record_check11 ON record_check11.record_id = rs.table_id
         AND record_check11.override_schema_version = '1.1'
         AND release_type = 'record'
-    --Kingfisher Process’ compiled_release table has no package_data_id column.
-    --Therefore, any rows in release_summary_no_data sourced from that table will have a NULL package_data_id.
+        --Kingfisher Process’ compiled_release table has no package_data_id column.
+        --Therefore, any rows in release_summary_no_data sourced from that table will have a NULL package_data_id.
     LEFT JOIN package_data pd ON pd.id = rs.package_data_id;
 
 -- The following pgpsql makes indexes on release_summary,
 -- you will need to run --tables-only command line parameter to allow this to run.
+
 DO $$
 DECLARE
     query text;

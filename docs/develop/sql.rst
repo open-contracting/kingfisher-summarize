@@ -28,15 +28,15 @@ We want to add the ``description`` values of the ``Tender`` and ``Award`` object
 #. Find the SQL table to change.
 
    -  The tables summarizing the ``Tender`` object are in the ``005-tender.sql`` file.
-   -  The ``tender_summary_no_data`` table is created from the ``staged_tender_summary_no_data`` table.
+   -  The ``tender_summary_no_data`` table is the SQL table to change.
 
-#. Add the ``description`` field to the ``SELECT`` clause for the ``staged_tender_summary_no_data`` table.
+#. Add the ``description`` field to the ``SELECT`` clause for the ``tender_summary_no_data`` table.
 
    -  You can see the other OCDS fields in the statement. Add it alongside those:
 
    .. code-block:: sql
 
-       CREATE TABLE staged_tender_summary_no_data AS
+       CREATE TABLE tender_summary_no_data AS
        SELECT
            r.id,
            r.release_type,
@@ -53,7 +53,7 @@ We want to add the ``description`` values of the ``Tender`` and ``Award`` object
 #. Do the same for the table summarizing the ``Award`` object.
 
    -  The tables summarizing the ``Award`` objects are in the ``006-awards.sql`` file.
-   -  Edit the ``SELECT`` clause for the ``staged_awards_summary_no_data`` table.
+   -  Edit the ``SELECT`` clause for the ``awards_summary_no_data`` table.
 
    .. code-block:: sql
 
@@ -68,7 +68,7 @@ Example: Add an aggregate
 
 We want to add the number of ``Document`` objects (in total and for each ``documentType`` value) across all ``Planning`` objects to the :ref:`relevant table<db-releases>` in Kingfisher Views.
 
-This example demonstrates how Kingfisher Views uses temporary (``tmp_*``) and intermediate (``staged_*``) tables to build its final tables.
+This example demonstrates how Kingfisher Views uses temporary (``tmp_*``) tables to build its final tables.
 
 #. Find the :ref:`block<sql-contents>` of SQL statements to use as a template for adding the aggregate.
 
@@ -122,7 +122,7 @@ This example demonstrates how Kingfisher Views uses temporary (``tmp_*``) and in
 #. Find the SQL table to change.
 
    -  The tables summarizing the entire collection are in the ``008-release.sql`` file.
-   -  The ``release_summary`` table is created by ``SELECT`` ing from the ``staged_release_summary`` table, which in turn is created by ``JOIN`` ing many ``tmp_*`` tables.
+   -  The ``release_summary`` table is created by ``JOIN`` ing many ``tmp_*`` tables.
 
 #. Add ``JOIN`` s for the new blocks.
 

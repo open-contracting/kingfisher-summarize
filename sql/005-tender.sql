@@ -21,9 +21,9 @@ FROM (
 CREATE UNIQUE INDEX tmp_tender_summary_id ON tmp_tender_summary (id);
 
 ----
-DROP TABLE IF EXISTS staged_tender_documents_summary;
+DROP TABLE IF EXISTS tender_documents_summary;
 
-CREATE TABLE staged_tender_documents_summary AS
+CREATE TABLE tender_documents_summary AS
 SELECT
     r.id,
     document_index,
@@ -37,27 +37,17 @@ SELECT
     document ->> 'format' AS format
 FROM (
     SELECT
-        tps.*,
+        tts.*,
         value AS document,
         ORDINALITY - 1 AS document_index
     FROM
-        tmp_tender_summary tps
+        tmp_tender_summary tts
     CROSS JOIN jsonb_array_elements(tender -> 'documents')
     WITH ORDINALITY
 WHERE
     jsonb_typeof(tender -> 'documents') = 'array') AS r;
 
 ----
-DROP TABLE IF EXISTS tender_documents_summary;
-
-CREATE TABLE tender_documents_summary AS
-SELECT
-    *
-FROM
-    staged_tender_documents_summary;
-
-DROP TABLE IF EXISTS staged_tender_documents_summary;
-
 CREATE UNIQUE INDEX tender_documents_summary_id ON tender_documents_summary (id, document_index);
 
 CREATE INDEX tender_documents_summary_data_id ON tender_documents_summary (data_id);
@@ -65,9 +55,9 @@ CREATE INDEX tender_documents_summary_data_id ON tender_documents_summary (data_
 CREATE INDEX tender_documents_summary_collection_id ON tender_documents_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS staged_tender_milestones_summary;
+DROP TABLE IF EXISTS tender_milestones_summary;
 
-CREATE TABLE staged_tender_milestones_summary AS
+CREATE TABLE tender_milestones_summary AS
 SELECT
     r.id,
     milestone_index,
@@ -82,27 +72,17 @@ SELECT
     milestone ->> 'status' AS status
 FROM (
     SELECT
-        tps.*,
+        tts.*,
         value AS milestone,
         ORDINALITY - 1 AS milestone_index
     FROM
-        tmp_tender_summary tps
+        tmp_tender_summary tts
     CROSS JOIN jsonb_array_elements(tender -> 'milestones')
     WITH ORDINALITY
 WHERE
     jsonb_typeof(tender -> 'milestones') = 'array') AS r;
 
 ----
-DROP TABLE IF EXISTS tender_milestones_summary;
-
-CREATE TABLE tender_milestones_summary AS
-SELECT
-    *
-FROM
-    staged_tender_milestones_summary;
-
-DROP TABLE IF EXISTS staged_tender_milestones_summary;
-
 CREATE UNIQUE INDEX tender_milestones_summary_id ON tender_milestones_summary (id, milestone_index);
 
 CREATE INDEX tender_milestones_summary_data_id ON tender_milestones_summary (data_id);
@@ -110,9 +90,9 @@ CREATE INDEX tender_milestones_summary_data_id ON tender_milestones_summary (dat
 CREATE INDEX tender_milestones_summary_collection_id ON tender_milestones_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS staged_tender_items_summary;
+DROP TABLE IF EXISTS tender_items_summary;
 
-CREATE TABLE staged_tender_items_summary AS
+CREATE TABLE tender_items_summary AS
 SELECT
     r.id,
     item_index,
@@ -126,8 +106,9 @@ SELECT
     convert_to_numeric (item ->> 'quantity') quantity,
     convert_to_numeric (unit -> 'value' ->> 'amount') unit_amount,
     unit -> 'value' ->> 'currency' unit_currency,
-    CASE WHEN item -> 'classification' ->> 'scheme' is null and item -> 'classification' ->> 'id' is null THEN
-        null
+    CASE WHEN item -> 'classification' ->> 'scheme' IS NULL
+        AND item -> 'classification' ->> 'id' IS NULL THEN
+        NULL
     ELSE
         concat_ws('-', item -> 'classification' ->> 'scheme', item -> 'classification' ->> 'id')
     END AS item_classification,
@@ -151,28 +132,18 @@ SELECT
         END) AS additional_classification_count
 FROM (
     SELECT
-        tps.*,
+        tts.*,
         value AS item,
         value -> 'unit' AS unit,
         ORDINALITY - 1 AS item_index
     FROM
-        tmp_tender_summary tps
+        tmp_tender_summary tts
     CROSS JOIN jsonb_array_elements(tender -> 'items')
     WITH ORDINALITY
 WHERE
     jsonb_typeof(tender -> 'items') = 'array') AS r;
 
 ----
-DROP TABLE IF EXISTS tender_items_summary;
-
-CREATE TABLE tender_items_summary AS
-SELECT
-    *
-FROM
-    staged_tender_items_summary;
-
-DROP TABLE IF EXISTS staged_tender_items_summary;
-
 CREATE UNIQUE INDEX tender_items_summary_id ON tender_items_summary (id, item_index);
 
 CREATE INDEX tender_items_summary_data_id ON tender_items_summary (data_id);
@@ -180,9 +151,12 @@ CREATE INDEX tender_items_summary_data_id ON tender_items_summary (data_id);
 CREATE INDEX tender_items_summary_collection_id ON tender_items_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS staged_tender_summary_no_data;
+SELECT
+    drop_table_or_view ('tender_summary');
 
-CREATE TABLE staged_tender_summary_no_data AS
+DROP TABLE IF EXISTS tender_summary_no_data;
+
+CREATE TABLE tender_summary_no_data AS
 SELECT
     r.id,
     r.release_type,
@@ -279,23 +253,11 @@ FROM
             id) items_counts USING (id);
 
 ----
-DROP TABLE IF EXISTS tender_summary_no_data CASCADE;
-
-CREATE TABLE tender_summary_no_data AS
-SELECT
-    *
-FROM
-    staged_tender_summary_no_data;
-
-DROP TABLE IF EXISTS staged_tender_summary_no_data;
-
 CREATE UNIQUE INDEX tender_summary_no_data_id ON tender_summary_no_data (id);
 
 CREATE INDEX tender_summary_no_data_data_id ON tender_summary_no_data (data_id);
 
 CREATE INDEX tender_summary_no_data_collection_id ON tender_summary_no_data (collection_id);
-
-DROP VIEW IF EXISTS tender_summary;
 
 CREATE VIEW tender_summary AS
 SELECT
@@ -325,3 +287,4 @@ EXCEPTION
 END;
 
 $$;
+

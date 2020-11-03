@@ -12,3 +12,7 @@ __pycache__
 # Created by Kingfisher Process and/or Kingfisher Views.
 /error.log
 /info.log
+# SchemaSpy
+/postgresql.jar
+/schemaspy.jar
+/schemaspy

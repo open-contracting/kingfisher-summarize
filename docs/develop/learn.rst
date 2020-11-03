@@ -28,6 +28,6 @@ SQL statements are typically grouped into blocks. A block typically starts with 
 
 In ``008-release.sql``, blocks are ordered in roughly the same order as the stages of a contracting process.
 
-In many cases, the final tables are generated from many others. Table names starting with ``tmp_`` or ``staged_`` are temporary or intermediate tables that are typically dropped at the end of the file in which they are created.
+In many cases, the final tables are generated from many others. Table names starting with ``tmp_`` are temporary or intermediate tables that are typically dropped at the end of the file in which they are created.
 
 In some cases, ``----`` lines break the files into segments, each of which is executed in a transaction.
