@@ -223,7 +223,7 @@ Then, run:
 
 .. code-block:: bash
 
-   find . -name '*.sql' -exec pg_format -f 1 -p '%1\$s' -o {} {} \;
+   find sql -maxdepth 1 -name '*.sql' -exec pg_format -f 1 -p '%1\$s' -o {} {} \;
 
 .. _merge:
 
