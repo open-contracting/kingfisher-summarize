@@ -8,16 +8,13 @@ SELECT
     r.ocid,
     r.release_id,
     r.data_id,
-    planning
-FROM (
-    SELECT
-        data -> 'planning' AS planning,
-        rs.*
-    FROM
-        tmp_release_summary_with_release_data rs
-    WHERE
-        data ? 'planning') AS r;
+    data -> 'planning' AS planning
+FROM
+    tmp_release_summary_with_release_data r
+WHERE
+    data ? 'planning';
 
+----
 CREATE UNIQUE INDEX tmp_planning_summary_id ON tmp_planning_summary (id);
 
 ----
@@ -26,26 +23,21 @@ DROP TABLE IF EXISTS planning_documents_summary;
 CREATE TABLE planning_documents_summary AS
 SELECT
     r.id,
-    document_index,
+    ORDINALITY - 1 AS document_index,
     r.release_type,
     r.collection_id,
     r.ocid,
     r.release_id,
     r.data_id,
-    document,
-    document ->> 'documentType' AS documentType,
-    document ->> 'format' AS format
-FROM (
-    SELECT
-        tps.*,
-        value AS document,
-        ORDINALITY - 1 AS document_index
-    FROM
-        tmp_planning_summary tps
+    value AS document,
+    value ->> 'documentType' AS documentType,
+    value ->> 'format' AS format
+FROM
+    tmp_planning_summary r
     CROSS JOIN jsonb_array_elements(planning -> 'documents')
     WITH ORDINALITY
 WHERE
-    jsonb_typeof(planning -> 'documents') = 'array') AS r;
+    jsonb_typeof(planning -> 'documents') = 'array';
 
 ----
 CREATE UNIQUE INDEX planning_documents_summary_id ON planning_documents_summary (id, document_index);
@@ -60,27 +52,22 @@ DROP TABLE IF EXISTS planning_milestones_summary;
 CREATE TABLE planning_milestones_summary AS
 SELECT
     r.id,
-    milestone_index,
+    ORDINALITY - 1 AS milestone_index,
     r.release_type,
     r.collection_id,
     r.ocid,
     r.release_id,
     r.data_id,
-    milestone,
-    milestone ->> 'type' AS TYPE,
-    milestone ->> 'code' AS code,
-    milestone ->> 'status' AS status
-FROM (
-    SELECT
-        tps.*,
-        value AS milestone,
-        ORDINALITY - 1 AS milestone_index
-    FROM
-        tmp_planning_summary tps
+    value AS milestone,
+    value ->> 'type' AS TYPE,
+    value ->> 'code' AS code,
+    value ->> 'status' AS status
+FROM
+    tmp_planning_summary r
     CROSS JOIN jsonb_array_elements(planning -> 'milestones')
     WITH ORDINALITY
 WHERE
-    jsonb_typeof(planning -> 'milestones') = 'array') AS r;
+    jsonb_typeof(planning -> 'milestones') = 'array';
 
 ----
 CREATE UNIQUE INDEX planning_milestones_summary_id ON planning_milestones_summary (id, milestone_index);

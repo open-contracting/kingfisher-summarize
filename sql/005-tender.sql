@@ -32,8 +32,9 @@ SELECT
     value AS document,
     value ->> 'documentType' AS documentType,
     value ->> 'format' AS format
-FROM tmp_tender_summary r,
- jsonb_array_elements(tender -> 'documents')
+FROM
+    tmp_tender_summary r
+    CROSS JOIN jsonb_array_elements(tender -> 'documents')
     WITH ORDINALITY
 WHERE
     jsonb_typeof(tender -> 'documents') = 'array';
@@ -61,8 +62,9 @@ SELECT
     value ->> 'type' AS TYPE,
     value ->> 'code' AS code,
     value ->> 'status' AS status
-FROM    tmp_tender_summary r,
-    jsonb_array_elements(tender -> 'milestones')
+FROM
+    tmp_tender_summary r
+    CROSS JOIN jsonb_array_elements(tender -> 'milestones')
     WITH ORDINALITY
 WHERE
     jsonb_typeof(tender -> 'milestones') = 'array';
@@ -109,14 +111,14 @@ SELECT
                 END) additional_classification
         WHERE
             additional_classification ?& ARRAY['scheme', 'id']) item_additionalIdentifiers_ids,
-    jsonb_array_length(
-        CASE WHEN jsonb_typeof(value -> 'additionalClassifications') = 'array' THEN
-            value -> 'additionalClassifications'
-        ELSE
-            '[]'::jsonb
-        END) AS additional_classification_count
-FROM tmp_tender_summary r,
- jsonb_array_elements(tender -> 'items')
+    CASE WHEN jsonb_typeof(value -> 'additionalClassifications') = 'array' THEN
+        jsonb_array_length(value -> 'additionalClassifications')
+    ELSE
+        0
+    END AS additional_classification_count
+FROM
+    tmp_tender_summary r
+    CROSS JOIN jsonb_array_elements(tender -> 'items')
     WITH ORDINALITY
 WHERE
     jsonb_typeof(tender -> 'items') = 'array';
@@ -174,12 +176,11 @@ SELECT
     convert_to_timestamp (tender -> 'contractPeriod' ->> 'maxExtentDate') AS tender_contractPeriod_maxExtentDate,
     convert_to_numeric (tender -> 'contractPeriod' ->> 'durationInDays') AS tender_contractPeriod_durationInDays,
     convert_to_numeric (tender ->> 'numberOfTenderers') AS tender_numberOfTenderers,
-    jsonb_array_length(
-        CASE WHEN jsonb_typeof(tender -> 'tenderers') = 'array' THEN
-            tender -> 'tenderers'
-        ELSE
-            '[]'::jsonb
-        END) AS tenderers_count,
+    CASE WHEN jsonb_typeof(tender -> 'tenderers') = 'array' THEN
+        jsonb_array_length(tender -> 'tenderers')
+    ELSE
+        0
+    END AS tenderers_count,
     documents_count,
     documentType_counts,
     milestones_count,

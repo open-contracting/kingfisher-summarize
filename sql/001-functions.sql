@@ -44,6 +44,7 @@ EXCEPTION
         EXECUTE 'DROP TABLE IF EXISTS ' || object_name;
         RETURN 2;
 END;
+
 $$
 LANGUAGE plpgsql
 VOLATILE;
