@@ -1,3 +1,4 @@
+-- https://www.postgresql.org/docs/current/queries-with.html
 CREATE OR REPLACE FUNCTION flatten (jsonb)
     RETURNS TABLE (
         path text,
@@ -6,7 +7,6 @@ CREATE OR REPLACE FUNCTION flatten (jsonb)
     LANGUAGE 'sql'
     PARALLEL SAFE
     AS $$
-    -- https://www.postgresql.org/docs/current/queries-with.html
     WITH RECURSIVE t (
         key,
         value,
@@ -26,41 +26,32 @@ CREATE OR REPLACE FUNCTION flatten (jsonb)
                     *
                 FROM
                     t -- recursive reference to query "t" must not appear more than once
-            ),
-            obj AS (
-                SELECT
-                    prev.key || '/' || tt.key,
-                    tt.value,
-                    1,
-                    0
-                FROM
-                    prev,
-                    jsonb_each(prev.value) tt
-                WHERE
-                    jsonb_typeof(prev.value) = 'object'
-            ),
-            arr AS (
-                SELECT
-                    prev.key,
-                    tt.value,
-                    0,
-                    1
-                FROM
-                    prev,
-                    jsonb_array_elements(prev.value) tt
-                WHERE
-                    jsonb_typeof(prev.value) = 'array'
-                    AND jsonb_typeof(prev.value -> 0) = 'object'
             )
+
             SELECT
-                *
+                prev.key || '/' || tt.key,
+                tt.value,
+                1,
+                0
             FROM
-                obj
+                prev,
+                jsonb_each(prev.value) tt
+            WHERE
+                jsonb_typeof(prev.value) = 'object'
+
             UNION ALL
+
             SELECT
-                *
+                prev.key,
+                tt.value,
+                0,
+                1
             FROM
-                arr
+                prev,
+                jsonb_array_elements(prev.value) tt
+            WHERE
+                jsonb_typeof(prev.value) = 'array'
+                AND jsonb_typeof(prev.value -> 0) = 'object'
         )
     )
     SELECT
@@ -101,41 +92,32 @@ CREATE OR REPLACE FUNCTION flatten_with_values (jsonb)
                     *
                 FROM
                     t -- recursive reference to query "t" must not appear more than once
-            ),
-            obj AS (
-                SELECT
-                    prev.key || '/' || tt.key,
-                    tt.value,
-                    1,
-                    0
-                FROM
-                    prev,
-                    jsonb_each(prev.value) tt
-                WHERE
-                    jsonb_typeof(prev.value) = 'object'
-            ),
-            arr AS (
-                SELECT
-                    prev.key,
-                    tt.value,
-                    0,
-                    1
-                FROM
-                    prev,
-                    jsonb_array_elements(prev.value) tt
-                WHERE
-                    jsonb_typeof(prev.value) = 'array'
-                    AND jsonb_typeof(prev.value -> 0) = 'object'
             )
+
             SELECT
-                *
+                prev.key || '/' || tt.key,
+                tt.value,
+                1,
+                0
             FROM
-                obj
+                prev,
+                jsonb_each(prev.value) tt
+            WHERE
+                jsonb_typeof(prev.value) = 'object'
+
             UNION ALL
+
             SELECT
-                *
+                prev.key,
+                tt.value,
+                0,
+                1
             FROM
-                arr
+                prev,
+                jsonb_array_elements(prev.value) tt
+            WHERE
+                jsonb_typeof(prev.value) = 'array'
+                AND jsonb_typeof(prev.value -> 0) = 'object'
         )
     )
     SELECT
