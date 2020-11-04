@@ -31,18 +31,13 @@ IMMUTABLE STRICT;
 
 -- https://stackoverflow.com/a/463314/244258
 CREATE OR REPLACE FUNCTION drop_table_or_view (object_name text)
-    RETURNS integer PARALLEL UNSAFE
+    RETURNS void PARALLEL UNSAFE
     AS $$
-DECLARE
-    is_table integer;
-    is_view integer;
 BEGIN
     EXECUTE 'DROP VIEW IF EXISTS ' || object_name;
-    RETURN 1;
 EXCEPTION
     WHEN wrong_object_type THEN
         EXECUTE 'DROP TABLE IF EXISTS ' || object_name;
-        RETURN 2;
 END;
 
 $$
