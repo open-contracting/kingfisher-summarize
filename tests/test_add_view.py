@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 import pytest
 from click.testing import CliRunner
+from psycopg2 import sql
 
 from ocdskingfisherviews.cli import cli
 from tests import assert_bad_argument, assert_log_records, assert_log_running, fixture, noop
@@ -49,77 +50,45 @@ VIEWS = {
 }
 
 
-def test_validate_collections_noninteger(caplog):
+@pytest.mark.parametrize('collections, message', [
+    ('a', 'Collection IDs must be integers'),
+    ('1,10,100', 'Collection IDs {10, 100} not found'),
+])
+def test_validate_collections(collections, message, caplog):
     runner = CliRunner()
 
-    result = runner.invoke(cli, [command, 'a'])
+    result = runner.invoke(cli, [command, collections])
 
     assert result.exit_code == 2
-    assert_bad_argument(result, 'COLLECTIONS', 'Collection IDs must be integers')
-    assert_log_running(caplog, command)
-
-
-def test_validate_collections_nonexistent(caplog):
-    runner = CliRunner()
-
-    result = runner.invoke(cli, [command, '1,10,100'])
-
-    assert result.exit_code == 2
-    assert_bad_argument(result, 'COLLECTIONS', 'Collection IDs {10, 100} not found')
+    assert_bad_argument(result, 'COLLECTIONS', message)
     assert_log_running(caplog, command)
 
 
 @patch('ocdskingfisherviews.cli.refresh_views', noop)
 @patch('ocdskingfisherviews.cli.field_counts', noop)
-def test_command_default_name(db, caplog):
-    with fixture(db) as result:
-        assert db.schema_exists('view_data_collection_1')
-        assert db.all('SELECT * FROM view_data_collection_1.selected_collections') == [(1,)]
-        assert db.all('SELECT id, note FROM view_data_collection_1.note') == [(1, 'Default')]
+@pytest.mark.parametrize('kwargs, name, collections', [
+    ({}, 'collection_1', (1,)),
+    ({'collections': '1,2'}, 'collection_1_2', (1, 2)),
+    ({'name': 'custom'}, 'custom', (1,)),
+])
+def test_command_name(kwargs, name, collections, db, caplog):
+    schema = f'view_data_{name}'
+    identifier = sql.Identifier(schema)
+
+    with fixture(db, **kwargs) as result:
+        assert db.schema_exists(schema)
+        assert db.all(sql.SQL('SELECT * FROM {schema}.selected_collections').format(schema=identifier)) == [
+            (collection,) for collection in collections
+        ]
+        assert db.all(sql.SQL('SELECT id, note FROM {schema}.note').format(schema=identifier)) == [
+            (1, 'Default'),
+        ]
 
         assert result.exit_code == 0
         assert result.output == ''
         assert_log_records(caplog, command, [
-            'Arguments: collections=(1,) note=Default name=None tables_only=False',
-            'Added collection_1',
-            'Running refresh-views routine',
-            'Running field-counts routine',
-            'Running correct-user-permissions command',
-        ])
-
-
-@patch('ocdskingfisherviews.cli.refresh_views', noop)
-@patch('ocdskingfisherviews.cli.field_counts', noop)
-def test_command_default_name_multiple(db, caplog):
-    with fixture(db, collections='1,2') as result:
-        assert db.schema_exists('view_data_collection_1_2')
-        assert db.all('SELECT * FROM view_data_collection_1_2.selected_collections') == [(1,), (2,)]
-        assert db.all('SELECT id, note FROM view_data_collection_1_2.note') == [(1, 'Default')]
-
-        assert result.exit_code == 0
-        assert result.output == ''
-        assert_log_records(caplog, command, [
-            'Arguments: collections=(1, 2) note=Default name=None tables_only=False',
-            'Added collection_1_2',
-            'Running refresh-views routine',
-            'Running field-counts routine',
-            'Running correct-user-permissions command',
-        ])
-
-
-@patch('ocdskingfisherviews.cli.refresh_views', noop)
-@patch('ocdskingfisherviews.cli.field_counts', noop)
-def test_command_name_option(db, caplog):
-    with fixture(db, name='custom') as result:
-        assert db.schema_exists('view_data_custom')
-        assert db.all('SELECT * FROM view_data_custom.selected_collections') == [(1,)]
-        assert db.all('SELECT id, note FROM view_data_custom.note') == [(1, 'Default')]
-
-        assert result.exit_code == 0
-        assert result.output == ''
-        assert_log_records(caplog, command, [
-            'Arguments: collections=(1,) note=Default name=custom tables_only=False',
-            'Added custom',
+            f'Arguments: collections={collections!r} note=Default name={kwargs.get("name")} tables_only=False',
+            f'Added {name}',
             'Running refresh-views routine',
             'Running field-counts routine',
             'Running correct-user-permissions command',
