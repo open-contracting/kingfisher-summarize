@@ -4,7 +4,7 @@ import glob
 import json
 import logging
 import logging.config
-import os.path
+import os
 import re
 from datetime import datetime
 from timeit import default_timer as timer
@@ -17,12 +17,7 @@ from ocdskingfisherviews.db import Database
 
 global db
 
-
-def _connect(name=None):
-    global db
-    db = Database()
-    if name:
-        db.set_search_path([name, 'public'])
+max_workers = os.cpu_count() or 1
 
 
 def _read_sql_files(tables_only=False, remove=False):
@@ -91,7 +86,8 @@ def cli(ctx):
     logger = logging.getLogger('ocdskingfisher.views.cli')
     logger.info('Running %s', ctx.invoked_subcommand)
 
-    _connect()
+    global db
+    db = Database()
 
 
 @click.command()
@@ -236,21 +232,16 @@ def list_views():
         click.echo(tabulate(table, headers=['Name', 'Collections', 'Note'], tablefmt='github', numalign='left'))
 
 
-def _run_file(name, basename, content, verbose=True):
+def _run_file(basename, content, verbose=True):
     if verbose:
         logger = logging.getLogger('ocdskingfisher.views.refresh-views')
         logger.info('Running %s', basename)
 
     file_timer = timer()
 
-    db = Database()
-    db.set_search_path([name, 'public'])
-
     for part in content.split('----'):
         db.execute('/* kingfisher-views refresh-views */\n' + part)
         db.commit()
-
-    db.close()
 
     if verbose:
         logger.info('Time for %s: %ss', basename, timer() - file_timer)
@@ -277,42 +268,34 @@ def refresh_views(name, remove, tables_only):
     upgrades = _read_sql_files(tables_only)
 
     # Need `drop_table_or_view` function to drop tables.
-    _run_file(name, *upgrades['001'], verbose=False)
+    _run_file(*upgrades['001'], verbose=False)
     for number, (basename, content) in downgrades.items():
-        _run_file(name, basename, content, verbose=remove)
+        _run_file(basename, content, verbose=remove)
     if remove:
         return
 
     # This should match the description in docs/develop/learn.rst.
     for number in ('001', '002'):
-        _run_file(name, *upgrades.pop(number))
-    with concurrent.futures.ProcessPoolExecutor() as executor:
-        futures = [executor.submit(_run_file, name, *upgrades.pop(number)) for number in ('003', '004', '005', '006')]
+        _run_file(*upgrades.pop(number))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = [executor.submit(_run_file, *upgrades.pop(number)) for number in ('003', '004', '005', '006')]
         for future in concurrent.futures.as_completed(futures):
             future.result()
-
-    # Re-establish connection after multi-processing.
-    _connect(name)
-
     for number, (basename, content) in upgrades.items():
-        _run_file(name, basename, content)
+        _run_file(basename, content)
 
     logger.info('Total time: %ss', timer() - command_timer)
 
 
-def _run_collection(name, collection):
+def _run_collection(collection):
     logger = logging.getLogger('ocdskingfisher.views.field-counts')
     logger.info('Processing collection ID %s', collection)
 
     collection_timer = timer()
 
-    db = Database()
-    db.set_search_path([name, 'public'])
-
     db.execute('SET parallel_tuple_cost = 0.00001')
     db.execute('SET parallel_setup_cost = 0.00001')
     db.execute("SET work_mem = '10MB'")
-
     db.execute_values('INSERT INTO field_counts VALUES %s', db.all("""
         /* kingfisher-views field-counts */
 
@@ -332,8 +315,6 @@ def _run_collection(name, collection):
         GROUP BY collection_id, release_type, path
     """, {'id': collection}))
     db.commit()
-
-    db.close()
 
     logger.info('Time for collection ID %s: %ss', collection, timer() - collection_timer)
 
@@ -380,13 +361,10 @@ def field_counts(name, remove):
     db.commit()
 
     selected_collections = db.pluck('SELECT id FROM selected_collections')
-    with concurrent.futures.ProcessPoolExecutor() as executor:
-        futures = [executor.submit(_run_collection, name, collection) for collection in selected_collections]
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = [executor.submit(_run_collection, collection) for collection in selected_collections]
         for future in concurrent.futures.as_completed(futures):
             future.result()
-
-    # Re-establish connection after multi-processing.
-    _connect(name)
 
     db.execute("COMMENT ON COLUMN field_counts.collection_id IS 'id from the kingfisher collection table'")
     db.execute("COMMENT ON COLUMN field_counts.release_type IS 'Either release, compiled_release or record. "

@@ -48,9 +48,8 @@ def test_command(db, caplog):
             assert result.output == ''
             assert_log_records(caplog, command, [
                 'Arguments: name=view_data_collection_1 remove=False',
-                # See # https://github.com/pytest-dev/pytest/issues/3037#issuecomment-662993108
-                # 'Processing collection ID 1',
-                # re.compile(r'^Time for collection ID 1: \d+\.\d+s$'),
+                'Processing collection ID 1',
+                re.compile(r'^Time for collection ID 1: \d+\.\d+s$'),
                 re.compile(r'^Total time: \d+\.\d+s$'),
             ])
 
