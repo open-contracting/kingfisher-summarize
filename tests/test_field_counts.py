@@ -70,5 +70,5 @@ def test_command(db, caplog):
         assert result.output == ''
         assert_log_records(caplog, command, [
             'Arguments: name=view_data_collection_1 remove=True',
-            'Dropped tables field_counts and field_counts_tmp',
+            'Dropped tables field_counts',
         ])

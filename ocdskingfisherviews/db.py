@@ -69,3 +69,10 @@ class Database:
         Commits the transaction.
         """
         self.connection.commit()
+
+    def close(self):
+        """
+        Close the cursor and connection.
+        """
+        self.cursor.close()
+        self.connection.close()
