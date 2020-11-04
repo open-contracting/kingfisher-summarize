@@ -18,6 +18,11 @@ from ocdskingfisherviews.db import Database
 global db
 
 
+def _connect():
+    global db
+    db = Database()
+
+
 def _read_sql_files(tables_only=False, remove=False):
     """
     Returns a dict in which keys are the numbers of SQL files and values are their basenames and contents.
@@ -84,8 +89,7 @@ def cli(ctx):
     logger = logging.getLogger('ocdskingfisher.views.cli')
     logger.info('Running %s', ctx.invoked_subcommand)
 
-    global db
-    db = Database()
+    _connect()
 
 
 @click.command()
@@ -282,6 +286,10 @@ def refresh_views(name, remove, tables_only):
         futures = [executor.submit(_run_file, name, *upgrades.pop(number)) for number in ('003', '004', '005', '006')]
         for future in concurrent.futures.as_completed(futures):
             future.result()
+
+    # Re-establish connection after multi-processing.
+    _connect()
+
     for number, (basename, content) in upgrades.items():
         _run_file(name, basename, content)
 
@@ -371,6 +379,9 @@ def field_counts(name, remove):
         futures = [executor.submit(_run_collection, name, collection) for collection in selected_collections]
         for future in concurrent.futures.as_completed(futures):
             future.result()
+
+    # Re-establish connection after multi-processing.
+    _connect()
 
     db.execute('DROP TABLE IF EXISTS field_counts')
     db.execute('ALTER TABLE field_counts_tmp RENAME TO field_counts')
