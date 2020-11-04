@@ -5,7 +5,6 @@ import pytest
 from click.testing import CliRunner
 
 from ocdskingfisherviews.cli import cli
-from ocdskingfisherviews.db import get_cursor, pluck, schema_exists
 from tests import assert_bad_argument, assert_log_records, assert_log_running, fixture, noop
 
 command = 'add-view'
@@ -50,12 +49,6 @@ VIEWS = {
 }
 
 
-def fetch_all(statement, variables=None):
-    cursor = get_cursor()
-    cursor.execute(statement, variables)
-    return cursor.fetchall()
-
-
 def test_validate_collections_noninteger(caplog):
     runner = CliRunner()
 
@@ -78,11 +71,11 @@ def test_validate_collections_nonexistent(caplog):
 
 @patch('ocdskingfisherviews.cli.refresh_views', noop)
 @patch('ocdskingfisherviews.cli.field_counts', noop)
-def test_command_default_name(caplog):
-    with fixture() as result:
-        assert schema_exists('view_data_collection_1')
-        assert fetch_all('SELECT * FROM view_data_collection_1.selected_collections') == [(1,)]
-        assert fetch_all('SELECT id, note FROM view_data_collection_1.note') == [(1, 'Default')]
+def test_command_default_name(db, caplog):
+    with fixture(db) as result:
+        assert db.schema_exists('view_data_collection_1')
+        assert db.all('SELECT * FROM view_data_collection_1.selected_collections') == [(1,)]
+        assert db.all('SELECT id, note FROM view_data_collection_1.note') == [(1, 'Default')]
 
         assert result.exit_code == 0
         assert result.output == ''
@@ -97,11 +90,11 @@ def test_command_default_name(caplog):
 
 @patch('ocdskingfisherviews.cli.refresh_views', noop)
 @patch('ocdskingfisherviews.cli.field_counts', noop)
-def test_command_default_name_multiple(caplog):
-    with fixture(collections='1,2') as result:
-        assert schema_exists('view_data_collection_1_2')
-        assert fetch_all('SELECT * FROM view_data_collection_1_2.selected_collections') == [(1,), (2,)]
-        assert fetch_all('SELECT id, note FROM view_data_collection_1_2.note') == [(1, 'Default')]
+def test_command_default_name_multiple(db, caplog):
+    with fixture(db, collections='1,2') as result:
+        assert db.schema_exists('view_data_collection_1_2')
+        assert db.all('SELECT * FROM view_data_collection_1_2.selected_collections') == [(1,), (2,)]
+        assert db.all('SELECT id, note FROM view_data_collection_1_2.note') == [(1, 'Default')]
 
         assert result.exit_code == 0
         assert result.output == ''
@@ -118,23 +111,23 @@ def test_command_default_name_multiple(caplog):
     (False, TABLES, VIEWS),
     (True, TABLES | VIEWS, set()),
 ])
-def test_command(tables_only, tables, views, caplog):
-    with fixture(tables_only=tables_only) as result:
-        rows = fetch_all('SELECT * FROM view_data_collection_1.field_counts')
+def test_command(db, tables_only, tables, views, caplog):
+    with fixture(db, tables_only=tables_only) as result:
+        rows = db.all('SELECT * FROM view_data_collection_1.field_counts')
 
         # Check existence of schema, tables and views.
-        assert schema_exists('view_data_collection_1')
-        assert set(pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
-                         " AND table_type = 'BASE TABLE'", {'schema': 'view_data_collection_1'})) == tables
-        assert set(pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
-                         "AND table_type = 'VIEW'", {'schema': 'view_data_collection_1'})) == views
+        assert db.schema_exists('view_data_collection_1')
+        assert set(db.pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
+                            " AND table_type = 'BASE TABLE'", {'schema': 'view_data_collection_1'})) == tables
+        assert set(db.pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
+                            "AND table_type = 'VIEW'", {'schema': 'view_data_collection_1'})) == views
 
         # Check contents of tables and views.
         assert len(rows) == 65235
         assert rows[0] == (1, 'release', 'awards', 100, 301, 100)
 
         # All columns have comments.
-        assert not fetch_all("""
+        assert not db.all("""
             SELECT
                 isc.table_name,
                 isc.column_name,
@@ -167,9 +160,9 @@ def test_command(tables_only, tables, views, caplog):
 
 @patch('ocdskingfisherviews.cli.refresh_views', noop)
 @patch('ocdskingfisherviews.cli.field_counts', noop)
-def test_command_name_option(caplog):
-    with fixture(name='custom') as result:
-        assert schema_exists('view_data_custom')
+def test_command_name_option(db, caplog):
+    with fixture(db, name='custom') as result:
+        assert db.schema_exists('view_data_custom')
 
         assert result.exit_code == 0
         assert result.output == ''

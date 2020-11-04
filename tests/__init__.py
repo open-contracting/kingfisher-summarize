@@ -4,7 +4,6 @@ from contextlib import contextmanager
 from click.testing import CliRunner
 
 from ocdskingfisherviews.cli import cli
-from ocdskingfisherviews.db import get_connection
 
 
 def noop(*args, **kwargs):
@@ -12,7 +11,7 @@ def noop(*args, **kwargs):
 
 
 @contextmanager
-def fixture(collections='1', name=None, tables_only=None):
+def fixture(db, collections='1', name=None, tables_only=None):
     runner = CliRunner()
 
     args = ['add-view', collections, 'Default']
@@ -28,8 +27,7 @@ def fixture(collections='1', name=None, tables_only=None):
     try:
         yield result
     finally:
-        connection = get_connection()
-        connection.rollback()
+        db.connection.rollback()
         runner.invoke(cli, ['delete-view', name])
 
 

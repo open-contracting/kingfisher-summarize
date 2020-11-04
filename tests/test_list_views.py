@@ -6,7 +6,6 @@ from click.testing import CliRunner
 from psycopg2 import sql
 
 from ocdskingfisherviews.cli import cli
-from ocdskingfisherviews.db import commit, get_cursor
 from tests import assert_log_records, assert_log_running, fixture, noop
 
 command = 'list-views'
@@ -24,8 +23,8 @@ def test_command_none(caplog):
 
 @patch('ocdskingfisherviews.cli.refresh_views', noop)
 @patch('ocdskingfisherviews.cli.field_counts', noop)
-def test_command(caplog):
-    with fixture():
+def test_command(db, caplog):
+    with fixture(db):
         runner = CliRunner()
 
         result = runner.invoke(cli, [command])
@@ -42,15 +41,14 @@ def test_command(caplog):
 
 @patch('ocdskingfisherviews.cli.refresh_views', noop)
 @patch('ocdskingfisherviews.cli.field_counts', noop)
-def test_command_multiple(caplog):
-    with fixture(collections='1,2'):
+def test_command_multiple(db, caplog):
+    with fixture(db, collections='1,2'):
         runner = CliRunner()
 
-        cursor = get_cursor()
         statement = sql.SQL("INSERT INTO {table} (note, created_at) VALUES (%(note)s, %(created_at)s)").format(
             table=sql.Identifier(f'view_data_collection_1_2', 'note'))
-        cursor.execute(statement, {'note': 'Another', 'created_at': datetime(2000, 1, 1)})
-        commit()
+        db.execute(statement, {'note': 'Another', 'created_at': datetime(2000, 1, 1)})
+        db.commit()
 
         result = runner.invoke(cli, [command])
 
