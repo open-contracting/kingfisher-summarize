@@ -25,7 +25,6 @@ def _connect(name=None):
         db.set_search_path([name, 'public'])
 
 
-
 def _read_sql_files(tables_only=False, remove=False):
     """
     Returns a dict in which keys are the numbers of SQL files and values are their basenames and contents.
@@ -357,18 +356,17 @@ def field_counts(name, remove):
 
     db.set_search_path([name, 'public'])
 
-    if remove:
-        db.execute('DROP TABLE IF EXISTS field_counts')
-        db.commit()
+    db.execute('DROP TABLE IF EXISTS field_counts')
+    db.commit()
 
-        logger.info('Dropped tables field_counts')
+    if remove:
+        logger.info('DROP TABLE field_counts')
         return
 
     command_timer = timer()
 
     with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'sql', 'extras', 'flatten.sql')) as f:
         db.execute(f.read())
-    db.execute('DROP TABLE IF EXISTS field_counts')
     db.execute("""
         CREATE TABLE field_counts (
             collection_id bigint,
