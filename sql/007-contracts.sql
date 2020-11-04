@@ -23,8 +23,6 @@ CREATE UNIQUE INDEX tmp_contracts_summary_id ON tmp_contracts_summary (id, contr
 CREATE INDEX tmp_contracts_summary_award_id ON tmp_contracts_summary (id, award_id);
 
 ----
-DROP TABLE IF EXISTS contract_items_summary;
-
 CREATE TABLE contract_items_summary AS
 SELECT
     r.id,
@@ -78,8 +76,6 @@ CREATE INDEX contract_items_summary_data_id ON contract_items_summary (data_id);
 CREATE INDEX contract_items_summary_collection_id ON contract_items_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS contract_documents_summary;
-
 CREATE TABLE contract_documents_summary AS
 SELECT
     r.id,
@@ -108,8 +104,6 @@ CREATE INDEX contract_documents_summary_data_id ON contract_documents_summary (d
 CREATE INDEX contract_documents_summary_collection_id ON contract_documents_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS contract_milestones_summary;
-
 CREATE TABLE contract_milestones_summary AS
 SELECT
     r.id,
@@ -139,8 +133,6 @@ CREATE INDEX contract_milestones_summary_data_id ON contract_milestones_summary 
 CREATE INDEX contract_milestones_summary_collection_id ON contract_milestones_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS contract_implementation_documents_summary;
-
 CREATE TABLE contract_implementation_documents_summary AS
 SELECT
     r.id,
@@ -169,8 +161,6 @@ CREATE INDEX contract_implementation_documents_summary_data_id ON contract_imple
 CREATE INDEX contract_implementation_documents_summary_collection_id ON contract_implementation_documents_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS contract_implementation_milestones_summary;
-
 CREATE TABLE contract_implementation_milestones_summary AS
 SELECT
     r.id,
@@ -200,8 +190,6 @@ CREATE INDEX contract_implementation_milestones_summary_data_id ON contract_impl
 CREATE INDEX contract_implementation_milestones_summary_collection_id ON contract_implementation_milestones_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS contract_implementation_transactions_summary;
-
 CREATE TABLE contract_implementation_transactions_summary AS
 SELECT
     r.id,
@@ -229,11 +217,6 @@ CREATE INDEX contract_implementation_transactions_summary_data_id ON contract_im
 CREATE INDEX contract_implementation_transactions_summary_collection_id ON contract_implementation_transactions_summary (collection_id);
 
 ----
-SELECT
-    drop_table_or_view ('contracts_summary');
-
-DROP TABLE IF EXISTS contracts_summary_no_data;
-
 CREATE TABLE contracts_summary_no_data AS SELECT DISTINCT ON (r.id, r.contract_index)
     r.id,
     r.contract_index,

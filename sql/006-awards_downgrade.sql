@@ -1,4 +1,5 @@
-DROP VIEW IF EXISTS awards_summary CASCADE;
+SELECT
+    drop_table_or_view ('awards_summary', 'CASCADE');
 
 DROP TABLE IF EXISTS awards_summary_no_data CASCADE;
 

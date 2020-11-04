@@ -4,7 +4,6 @@ from contextlib import contextmanager
 from click.testing import CliRunner
 
 from ocdskingfisherviews.cli import cli
-from ocdskingfisherviews.db import get_connection, get_cursor, pluck, schema_exists
 
 ADD_VIEW_TABLES = {
     'note',
@@ -52,7 +51,7 @@ REFRESH_VIEWS_VIEWS = {
 
 
 @contextmanager
-def fixture(collections='1', dontbuild=True, name=None, tables_only=None):
+def fixture(db, collections='1', dontbuild=True, name=None, tables_only=None):
     runner = CliRunner()
 
     args = ['add-view', collections, 'Default']
@@ -70,8 +69,7 @@ def fixture(collections='1', dontbuild=True, name=None, tables_only=None):
     try:
         yield result
     finally:
-        connection = get_connection()
-        connection.rollback()
+        db.connection.rollback()
         runner.invoke(cli, ['delete-view', name])
 
 
@@ -101,26 +99,20 @@ def assert_log_records(caplog, name, messages):
             assert message.search(record.message)
 
 
-def fetch_all(statement, variables=None):
-    cursor = get_cursor()
-    cursor.execute(statement, variables)
-    return cursor.fetchall()
+def get_tables(db, schema):
+    return set(db.pluck('SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s',
+                        {'schema': schema}))
 
 
-def get_tables(schema):
-    return set(pluck('SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s',
-                     {'schema': schema}))
+def get_views(db, schema):
+    return set(db.pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
+                        "AND table_type = 'VIEW'", {'schema': schema}))
 
 
-def get_views(schema):
-    return set(pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
-                     "AND table_type = 'VIEW'", {'schema': schema}))
+def get_columns_without_comments(db, schema):
+    assert db.schema_exists(schema)
 
-
-def get_columns_without_comments(schema):
-    assert schema_exists(schema)
-
-    return fetch_all("""
+    return db.all("""
         SELECT
             isc.table_name,
             isc.column_name,

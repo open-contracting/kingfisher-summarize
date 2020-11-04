@@ -7,8 +7,8 @@ command = 'docs-table-ref'
 
 
 # This is a development command, so we don't bother testing it deeply.
-def test_command(caplog):
-    with fixture(dontbuild=False):
+def test_command(db, caplog):
+    with fixture(db, dontbuild=False):
         runner = CliRunner()
 
         result = runner.invoke(cli, [command, 'collection_1'])

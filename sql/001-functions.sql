@@ -30,14 +30,14 @@ LANGUAGE plpgsql
 IMMUTABLE STRICT;
 
 -- https://stackoverflow.com/a/463314/244258
-CREATE OR REPLACE FUNCTION drop_table_or_view (object_name text)
+CREATE OR REPLACE FUNCTION drop_table_or_view (object_name text, cascading text DEFAULT '')
     RETURNS void PARALLEL UNSAFE
     AS $$
 BEGIN
-    EXECUTE 'DROP VIEW IF EXISTS ' || object_name;
+    EXECUTE 'DROP VIEW IF EXISTS ' || object_name || ' ' || cascading;
 EXCEPTION
     WHEN wrong_object_type THEN
-        EXECUTE 'DROP TABLE IF EXISTS ' || object_name;
+        EXECUTE 'DROP TABLE IF EXISTS ' || object_name || ' ' || cascading;
 END;
 
 $$

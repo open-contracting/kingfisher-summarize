@@ -1,4 +1,5 @@
-DROP VIEW IF EXISTS tender_summary CASCADE;
+SELECT
+    drop_table_or_view ('tender_summary', 'CASCADE');
 
 DROP TABLE IF EXISTS tender_summary_no_data CASCADE;
 

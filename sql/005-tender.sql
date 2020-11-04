@@ -18,8 +18,6 @@ WHERE
 CREATE UNIQUE INDEX tmp_tender_summary_id ON tmp_tender_summary (id);
 
 ----
-DROP TABLE IF EXISTS tender_documents_summary;
-
 CREATE TABLE tender_documents_summary AS
 SELECT
     r.id,
@@ -47,8 +45,6 @@ CREATE INDEX tender_documents_summary_data_id ON tender_documents_summary (data_
 CREATE INDEX tender_documents_summary_collection_id ON tender_documents_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS tender_milestones_summary;
-
 CREATE TABLE tender_milestones_summary AS
 SELECT
     r.id,
@@ -77,8 +73,6 @@ CREATE INDEX tender_milestones_summary_data_id ON tender_milestones_summary (dat
 CREATE INDEX tender_milestones_summary_collection_id ON tender_milestones_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS tender_items_summary;
-
 CREATE TABLE tender_items_summary AS
 SELECT
     r.id,
@@ -131,11 +125,6 @@ CREATE INDEX tender_items_summary_data_id ON tender_items_summary (data_id);
 CREATE INDEX tender_items_summary_collection_id ON tender_items_summary (collection_id);
 
 ----
-SELECT
-    drop_table_or_view ('tender_summary');
-
-DROP TABLE IF EXISTS tender_summary_no_data;
-
 CREATE TABLE tender_summary_no_data AS
 SELECT
     r.id,

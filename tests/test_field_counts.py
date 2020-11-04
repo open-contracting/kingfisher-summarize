@@ -3,8 +3,8 @@ import re
 from click.testing import CliRunner
 
 from ocdskingfisherviews.cli import cli
-from tests import (assert_bad_argument, assert_log_records, assert_log_running, fetch_all, fixture,
-                   get_columns_without_comments, get_tables)
+from tests import (assert_bad_argument, assert_log_records, assert_log_running, fixture, get_columns_without_comments,
+                   get_tables)
 
 command = 'field-counts'
 
@@ -19,8 +19,8 @@ def test_validate_name(caplog):
     assert_log_running(caplog, command)
 
 
-def test_command_error(caplog):
-    with fixture():
+def test_command_error(db, caplog):
+    with fixture(db):
         runner = CliRunner()
 
         result = runner.invoke(cli, [command, 'collection_1'])
@@ -32,8 +32,8 @@ def test_command_error(caplog):
         ])
 
 
-def test_command(caplog):
-    with fixture():
+def test_command(db, caplog):
+    with fixture(db):
         runner = CliRunner()
 
         runner.invoke(cli, ['refresh-views', 'collection_1'])
@@ -41,15 +41,16 @@ def test_command(caplog):
         # The command can be run multiple times.
         for i in range(2):
             result = runner.invoke(cli, [command, 'collection_1'])
-            rows = fetch_all('SELECT * FROM view_data_collection_1.field_counts')
+            rows = db.all('SELECT * FROM view_data_collection_1.field_counts')
 
-            assert 'field_counts' in get_tables('view_data_collection_1')
+            assert 'field_counts' in get_tables(db, 'view_data_collection_1')
             assert result.exit_code == 0
             assert result.output == ''
             assert_log_records(caplog, command, [
                 'Arguments: name=view_data_collection_1 remove=False',
-                'Processing collection ID 1',
-                re.compile(r'^Time for collection ID 1: \d+\.\d+s$'),
+                # See # https://github.com/pytest-dev/pytest/issues/3037#issuecomment-662993108
+                # 'Processing collection ID 1',
+                # re.compile(r'^Time for collection ID 1: \d+\.\d+s$'),
                 re.compile(r'^Total time: \d+\.\d+s$'),
             ])
 
@@ -59,12 +60,12 @@ def test_command(caplog):
             caplog.clear()
 
         # All columns have comments.
-        assert not get_columns_without_comments('view_data_collection_1')
+        assert not get_columns_without_comments(db, 'view_data_collection_1')
 
         # The command can be reversed.
         result = runner.invoke(cli, [command, 'collection_1', '--remove'])
 
-        assert 'field_counts' not in get_tables('view_data_collection_1')
+        assert 'field_counts' not in get_tables(db, 'view_data_collection_1')
         assert result.exit_code == 0
         assert result.output == ''
         assert_log_records(caplog, command, [
