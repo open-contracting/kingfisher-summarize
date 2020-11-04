@@ -20,9 +20,11 @@ global db
 max_workers = os.cpu_count() or 1
 
 
-def _read_sql_files():
+def _read_sql_files(tables_only=False):
     """
     Returns a dict in which keys are the basenames of SQL files and values are their contents.
+
+    :param bool tables_only: whether to create SQL tables instead of SQL views
     """
     contents = {}
 
@@ -30,7 +32,11 @@ def _read_sql_files():
     for filename in sorted(filenames):
         basename = os.path.splitext(os.path.basename(filename))[0]
         with open(filename) as f:
-            contents[basename] = f.read()
+            content = f.read()
+        if tables_only:
+            content = re.sub('^CREATE VIEW', 'CREATE TABLE', content, flags=re.MULTILINE | re.IGNORECASE)
+            content = re.sub('^DROP VIEW', 'DROP TABLE', content, flags=re.MULTILINE | re.IGNORECASE)
+        contents[basename] = content
 
     return contents
 
@@ -232,14 +238,11 @@ def refresh_views(name, tables_only=False):
 
     command_timer = timer()
 
-    for basename, content in _read_sql_files().items():
+    for basename, content in _read_sql_files(tables_only=tables_only).items():
         file_timer = timer()
         logger.info('Running %s', basename)
 
         for part in content.split('----'):
-            if tables_only:
-                part = re.sub('^CREATE VIEW', 'CREATE TABLE', part, flags=re.MULTILINE | re.IGNORECASE)
-                part = re.sub('^DROP VIEW', 'DROP TABLE', part, flags=re.MULTILINE | re.IGNORECASE)
             db.execute('/* kingfisher-views refresh-views */\n' + part)
             db.commit()
 
