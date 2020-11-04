@@ -4,7 +4,7 @@ import glob
 import json
 import logging
 import logging.config
-import os.path
+import os
 import re
 from datetime import datetime
 from timeit import default_timer as timer
@@ -17,21 +17,20 @@ from tabulate import tabulate
 from ocdskingfisherviews.db import (commit, get_connection, get_cursor, get_schemas, pluck, schema_exists,
                                     set_search_path)
 
+max_workers = os.cpu_count() or 1
 
-def _read_sql_files(remove=False):
+
+def _read_sql_files():
     """
     Returns a dict in which keys are the basenames of SQL files and values are their contents.
-
-    :param bool remove: whether to read the *_downgrade.sql files
     """
     contents = {}
 
     filenames = glob.glob(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'sql', '*.sql'))
-    for filename in sorted(filenames, reverse=remove):
+    for filename in sorted(filenames):
         basename = os.path.splitext(os.path.basename(filename))[0]
-        if not (basename.endswith('_downgrade') ^ remove):
-            with open(filename) as f:
-                contents[basename] = f.read()
+        with open(filename) as f:
+            contents[basename] = f.read()
 
     return contents
 
@@ -139,13 +138,9 @@ def install():
 @click.argument('collections', callback=validate_collections)
 @click.argument('note')
 @click.option('--name', help='A custom name for the SQL schema ("view_data_" will be prepended).')
-@click.option('--dontbuild', is_flag=True, help="Don't run the refresh-views, field-counts and "
-                                                "correct-user-permissions commands.")
 @click.option('--tables-only', is_flag=True, help='Create SQL tables instead of SQL views.')
-@click.option('--threads', type=int, default=1, help='The number of threads for the field-counts command to use '
-                                                     '(up to the number of collections).')
 @click.pass_context
-def add_view(ctx, collections, note, name, dontbuild, tables_only, threads):
+def add_view(ctx, collections, note, name, tables_only):
     """
     Creates a schema containing summary tables about one or more collections.
 
@@ -154,8 +149,8 @@ def add_view(ctx, collections, note, name, dontbuild, tables_only, threads):
     NOTE is your name and a description of your purpose
     """
     logger = logging.getLogger('ocdskingfisher.views.add-view')
-    logger.info('Arguments: collections=%s note=%s name=%s dontbuild=%s tables_only=%s threads=%s',
-                collections, note, name, dontbuild, tables_only, threads)
+    logger.info('Arguments: collections=%s note=%s name=%s tables_only=%s',
+                collections, note, name, tables_only)
 
     if not name:
         if len(collections) > 5:
@@ -178,15 +173,14 @@ def add_view(ctx, collections, note, name, dontbuild, tables_only, threads):
 
     logger.info('Added %s', name)
 
-    if not dontbuild:
-        logger.info('Running refresh-views')
-        ctx.invoke(refresh_views, name=schema, tables_only=tables_only)
+    logger.info('Running refresh-views routine')
+    refresh_views(schema, tables_only=tables_only)
 
-        logger.info('Running field-counts')
-        ctx.invoke(field_counts, name=schema, threads=threads)
+    logger.info('Running field-counts routine')
+    field_counts(schema)
 
-        logger.info('Running correct-user-permissions')
-        ctx.invoke(correct_user_permissions)
+    logger.info('Running correct-user-permissions command')
+    ctx.invoke(correct_user_permissions)
 
 
 @click.command()
@@ -232,24 +226,20 @@ def list_views():
         click.echo(tabulate(table, headers=['Name', 'Collections', 'Note'], tablefmt='github', numalign='left'))
 
 
-@click.command()
-@click.argument('name', callback=validate_name)
-@click.option('--remove', is_flag=True, help='Drop the summary tables from the schema')
-@click.option('--tables-only', is_flag=True, help='Create SQL tables instead of SQL views')
-def refresh_views(name, remove, tables_only):
+def refresh_views(name, tables_only=False):
     """
-    Creates (or re-creates) the summary tables in a schema.
+    Creates the summary tables in a schema.
 
-    NAME is the last part of a schema's name after "view_data_".
+    :param str name: the last part of a schema's name after "view_data_"
+    :param boolean tables_only: whether to create SQL tables instead of SQL views
     """
     logger = logging.getLogger('ocdskingfisher.views.refresh-views')
-    logger.info('Arguments: name=%s remove=%s tables_only=%s', name, remove, tables_only)
 
     set_search_path([name, 'public'])
 
     command_timer = timer()
 
-    for basename, content in _read_sql_files(remove).items():
+    for basename, content in _read_sql_files().items():
         file_timer = timer()
         logger.info('Running %s', basename)
 
@@ -265,33 +255,15 @@ def refresh_views(name, remove, tables_only):
     logger.info('Total time: %ss', timer() - command_timer)
 
 
-@click.command()
-@click.argument('name', callback=validate_name)
-@click.option('--remove', is_flag=True, help='Drop the field_counts table from the schema')
-@click.option('--threads', type=int, default=1, help='The number of threads to use (up to the number of collections)')
-def field_counts(name, remove, threads):
+def field_counts(name):
     """
-    Creates (or re-creates) the field_counts table in a schema.
+    Creates the field_counts table in a schema.
 
-    NAME is the last part of a schema's name after "view_data_".
+    :param str name: the last part of a schema's name after "view_data_"
     """
     logger = logging.getLogger('ocdskingfisher.views.field-counts')
-    logger.info('Arguments: name=%s remove=%s threads=%s', name, remove, threads)
-
-    cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
-                   "AND table_name = 'release_summary'", {'schema': name})
-    if not cursor.fetchone():
-        raise click.UsageError('release_summary table not found. Run refresh-views first.')
 
     set_search_path([name, 'public'])
-
-    if remove:
-        cursor.execute('DROP TABLE IF EXISTS field_counts_tmp')
-        cursor.execute('DROP TABLE IF EXISTS field_counts')
-        commit()
-
-        logger.info('Dropped tables field_counts and field_counts_tmp')
-        return
 
     def _run_collection(collection):
         logger.info('Processing collection ID %s', collection)
@@ -343,7 +315,7 @@ def field_counts(name, remove, threads):
     commit()
 
     selected_collections = pluck('SELECT id FROM selected_collections')
-    with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = [executor.submit(_run_collection, collection) for collection in selected_collections]
         for future in concurrent.futures.as_completed(futures):
             future.result()
@@ -441,7 +413,5 @@ cli.add_command(add_view)
 cli.add_command(correct_user_permissions)
 cli.add_command(delete_view)
 cli.add_command(docs_table_ref)
-cli.add_command(field_counts)
 cli.add_command(install)
 cli.add_command(list_views)
-cli.add_command(refresh_views)

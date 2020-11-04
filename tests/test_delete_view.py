@@ -1,8 +1,10 @@
+from unittest.mock import patch
+
 from click.testing import CliRunner
 
 from ocdskingfisherviews.cli import cli
 from ocdskingfisherviews.db import schema_exists
-from tests import assert_bad_argument, assert_log_records, assert_log_running, fixture
+from tests import assert_bad_argument, assert_log_records, assert_log_running, fixture, noop
 
 command = 'delete-view'
 
@@ -17,6 +19,8 @@ def test_validate_name(caplog):
     assert_log_running(caplog, command)
 
 
+@patch('ocdskingfisherviews.cli.refresh_views', noop)
+@patch('ocdskingfisherviews.cli.field_counts', noop)
 def test_command(caplog):
     with fixture():
         runner = CliRunner()

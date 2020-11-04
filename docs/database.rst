@@ -7,9 +7,7 @@ Introduction
 How tables are created
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The :ref:`add-view` command *without* the ``--dontbuild`` flag creates all the tables below.
-
-Otherwise, the :ref:`add-view` command *with* the ``--dontbuild`` flag creates the :ref:`metadata` tables only, the :ref:`field-counts` command creates the :ref:`fields` tables, and the :ref:`refresh-views` command creates the rest.
+The :ref:`add-view` command creates all the tables below.
 
 How the table fields are made.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -67,7 +65,7 @@ selected_collections
 
 This table contains the collection IDs that the user provided when creating the schema.
 
-If you need to change the collections to be summarized, delete the schema with the :ref:`delete-view` command and re-create it with the :ref:`add-view` command. This ensures that the schema's name reflects its contents. (It is possible to change the collections to be summarized by inserting and/or deleting rows in this table and then re-running the :ref:`refresh-views` and :ref:`field-counts` commands, but this will take the same time and might result in the schema having an incorrect name.)
+If you need to change the collections to be summarized, delete the schema with the :ref:`delete-view` command and re-create it with the :ref:`add-view` command. This ensures that the schema's name reflects its contents.
 
 .. csv-table::
    :header-rows: 1
@@ -88,8 +86,6 @@ This table contains the note that the user provided when creating the schema.
 
 Fields
 ------
-
-These tables are created and populated by the :ref:`field-counts` command (or the :ref:`add-view` command if the ``--dontbuild`` flag isn't set).
 
 .. _field-counts-table:
 

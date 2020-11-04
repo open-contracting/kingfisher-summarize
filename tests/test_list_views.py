@@ -1,12 +1,13 @@
 from datetime import datetime
 from textwrap import dedent
+from unittest.mock import patch
 
 from click.testing import CliRunner
 from psycopg2 import sql
 
 from ocdskingfisherviews.cli import cli
 from ocdskingfisherviews.db import commit, get_cursor
-from tests import assert_log_records, assert_log_running, fixture
+from tests import assert_log_records, assert_log_running, fixture, noop
 
 command = 'list-views'
 
@@ -21,6 +22,8 @@ def test_command_none(caplog):
     assert_log_running(caplog, command)
 
 
+@patch('ocdskingfisherviews.cli.refresh_views', noop)
+@patch('ocdskingfisherviews.cli.field_counts', noop)
 def test_command(caplog):
     with fixture():
         runner = CliRunner()
@@ -37,6 +40,8 @@ def test_command(caplog):
         assert_log_records(caplog, command, [])
 
 
+@patch('ocdskingfisherviews.cli.refresh_views', noop)
+@patch('ocdskingfisherviews.cli.field_counts', noop)
 def test_command_multiple(caplog):
     with fixture(collections='1,2'):
         runner = CliRunner()

@@ -149,19 +149,11 @@ This example demonstrates how Kingfisher Views uses temporary (``tmp_*``) tables
 Review changes
 --------------
 
-Review your changes by comparing to the initial summaries you created when :ref:`loading data<load-data>`. You can *either*:
+Review your changes by comparing to the initial summaries you created when :ref:`loading data<load-data>`. Create new summaries:
 
--  Create new summaries:
+.. code-block:: bash
 
-   .. code-block:: bash
-
-      python ocdskingfisher-views-cli add-view 1 "Review new column" --name review_new_column
-
--  Or, refresh existing summaries:
-
-   .. code-block:: bash
-
-      python ocdskingfisher-views-cli refresh-views view_data_collection_1
+   python ocdskingfisher-views-cli add-view 1 "Review new column" --name review_new_column
 
 Then, check that the data is as you expect it to be. (If you're viewing the data in a PostgreSQL client, don't forget to refresh it.)
 
@@ -249,4 +241,4 @@ If you want to share your changes with others:
 
 #. Follow the link in the output to create a pull request for `Kingfisher Views <https://github.com/open-contracting/kingfisher-views>`__. The maintainers will assign your pull request for review, and merge it as appropriate.
 
-Lastly, to apply your changes to existing schema created by Kingfisher Views, run ``refresh-views`` on all applicable schema.
+To apply your changes to existing schema created by Kingfisher Views, see :ref:`upgrade-app`.

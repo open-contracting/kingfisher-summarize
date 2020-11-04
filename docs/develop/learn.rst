@@ -4,7 +4,7 @@ Orientation
 SQL files
 ---------
 
-The SQL statements that summarize data are stored in a sequence of SQL files in the `sql directory <https://github.com/open-contracting/kingfisher-views/tree/master/sql>`__. The :ref:`refresh-views` command runs these SQL files.
+The SQL statements that summarize data are stored in a sequence of SQL files in the `sql directory <https://github.com/open-contracting/kingfisher-views/tree/master/sql>`__. The :ref:`add-view` command runs these SQL files.
 
 For brevity, the SQL files are referred here by their numeric prefix.
 

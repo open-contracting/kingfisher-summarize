@@ -26,8 +26,8 @@ ocdskingfisher.views.add-view
 ocdskingfisher.views.delete-view
   An ``INFO``-level message from the delete-view command.
 ocdskingfisher.views.field-counts
-  An ``INFO``-level message from the field-counts command.
+  An ``INFO``-level message from the field-counts routine.
 ocdskingfisher.views.install
   An ``INFO``-level message from the install command.
 ocdskingfisher.views.refresh-views
-  An ``INFO``-level message from the refresh-views command.
+  An ``INFO``-level message from the refresh-views routine.

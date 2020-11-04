@@ -15,7 +15,7 @@ To run, for example, the ``004-planning.sql`` file:
 
    psql 'dbname=ocdskingfisher user=ocdskingfisher options=--search-path=view_data_NAME' -f 004-planning.sql
 
-When working on a specific file, you can first run the :ref:`refresh-views` command and then run the ``002`` file (on which all SQL files depend) as above. You can then run the specific file after each of your changes to see the new results.
+When working on a specific file, you can first run the :ref:`add-view` command and then run the ``002`` file (on which all SQL files depend) as above. You can then run the specific file after each of your changes to see the new results.
 
 Time SQL statements
 ~~~~~~~~~~~~~~~~~~~
@@ -25,6 +25,16 @@ Add the ``-c '\timing'`` option to a ``psql`` command, before any ``-f`` options
 .. code-block:: bash
 
    psql 'dbname=ocdskingfisher user=ocdskingfisher options=--search-path=view_data_NAME' -c '\timing' -f 004-planning.sql
+
+Drop tables and views
+~~~~~~~~~~~~~~~~~~~~~
+
+To undo the ``field_counts`` routine, run:
+
+.. code-block:: sql
+
+  DROP TABLE field_counts;
+
 .. _docs-files:
 
 Documentation files
