@@ -186,19 +186,6 @@ Replace ``NAME`` with the last part of a schema's name (the part after ``view_da
 
    python ocdskingfisher-views-cli field-counts NAME
 
-Improve performance
-~~~~~~~~~~~~~~~~~~~
-
-If you are :ref:`summarizing many collections<summarize-many-collections>`, then you can make this command run faster by setting the ``--threads`` argument. For example, if you are summarizing five collections, you can summarize each collection in a parallel thread:
-
-.. code-block:: bash
-
-   python ocdskingfisher-views-cli field-counts NAME --threads 5
-
-There is no advantage to setting the ``--threads`` argument to a number that is greater than the number of collections to summarize.
-
-Every computer has a maximum number of parallel threads. If the ``lscpu`` command is available, multiply its numbers for `Socket(s)`, `Core(s) per socket` and `Thread(s) per core` to get the maximum.
-
 Remove field_counts table
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 

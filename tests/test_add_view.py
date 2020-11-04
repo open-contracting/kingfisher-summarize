@@ -37,7 +37,7 @@ def test_command(caplog):
         assert result.exit_code == 0
         assert result.output == ''
         assert_log_records(caplog, command, [
-            'Arguments: collections=(1,) note=Default name=None dontbuild=True tables_only=False threads=1',
+            'Arguments: collections=(1,) note=Default name=None dontbuild=True tables_only=False',
             'Added collection_1',
         ])
 
@@ -51,19 +51,19 @@ def test_command_multiple(caplog):
         assert result.exit_code == 0
         assert result.output == ''
         assert_log_records(caplog, command, [
-            'Arguments: collections=(1, 2) note=Default name=None dontbuild=True tables_only=False threads=1',
+            'Arguments: collections=(1, 2) note=Default name=None dontbuild=True tables_only=False',
             'Added collection_1_2',
         ])
 
 
 def test_command_build(caplog):
-    with fixture(dontbuild=False, tables_only=True, threads='2') as result:
+    with fixture(dontbuild=False, tables_only=True) as result:
         assert get_tables('view_data_collection_1') == ADD_VIEW_TABLES | REFRESH_VIEWS_TABLES | {'field_counts'}
 
         assert result.exit_code == 0
         assert result.output == ''
         assert_log_records(caplog, command, [
-            'Arguments: collections=(1,) note=Default name=None dontbuild=False tables_only=True threads=2',
+            'Arguments: collections=(1,) note=Default name=None dontbuild=False tables_only=True',
             'Added collection_1',
             'Running refresh-views',
             'Running field-counts',
@@ -78,6 +78,6 @@ def test_command_name(caplog):
         assert result.exit_code == 0
         assert result.output == ''
         assert_log_records(caplog, command, [
-            'Arguments: collections=(1,) note=Default name=custom dontbuild=True tables_only=False threads=1',
+            'Arguments: collections=(1,) note=Default name=custom dontbuild=True tables_only=False',
             'Added custom',
         ])

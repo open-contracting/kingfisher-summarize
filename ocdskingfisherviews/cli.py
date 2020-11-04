@@ -142,10 +142,8 @@ def install():
 @click.option('--dontbuild', is_flag=True, help="Don't run the refresh-views, field-counts and "
                                                 "correct-user-permissions commands.")
 @click.option('--tables-only', is_flag=True, help='Create SQL tables instead of SQL views.')
-@click.option('--threads', type=int, default=1, help='The number of threads for the field-counts command to use '
-                                                     '(up to the number of collections).')
 @click.pass_context
-def add_view(ctx, collections, note, name, dontbuild, tables_only, threads):
+def add_view(ctx, collections, note, name, dontbuild, tables_only):
     """
     Creates a schema containing summary tables about one or more collections.
 
@@ -154,8 +152,8 @@ def add_view(ctx, collections, note, name, dontbuild, tables_only, threads):
     NOTE is your name and a description of your purpose
     """
     logger = logging.getLogger('ocdskingfisher.views.add-view')
-    logger.info('Arguments: collections=%s note=%s name=%s dontbuild=%s tables_only=%s threads=%s',
-                collections, note, name, dontbuild, tables_only, threads)
+    logger.info('Arguments: collections=%s note=%s name=%s dontbuild=%s tables_only=%s',
+                collections, note, name, dontbuild, tables_only)
 
     if not name:
         if len(collections) > 5:
@@ -183,7 +181,7 @@ def add_view(ctx, collections, note, name, dontbuild, tables_only, threads):
         ctx.invoke(refresh_views, name=schema, tables_only=tables_only)
 
         logger.info('Running field-counts')
-        ctx.invoke(field_counts, name=schema, threads=threads)
+        ctx.invoke(field_counts, name=schema)
 
         logger.info('Running correct-user-permissions')
         ctx.invoke(correct_user_permissions)
@@ -265,18 +263,51 @@ def refresh_views(name, remove, tables_only):
     logger.info('Total time: %ss', timer() - command_timer)
 
 
+def _run_collection(collection):
+    logger = logging.getLogger('ocdskingfisher.views.field-counts')
+    logger.info('Processing collection ID %s', collection)
+
+    collection_timer = timer()
+
+    cursor.execute('SET parallel_tuple_cost = 0.00001')
+    cursor.execute('SET parallel_setup_cost = 0.00001')
+    cursor.execute("SET work_mem = '10MB'")
+    cursor.execute("""
+        /* kingfisher-views field-counts */
+
+        SELECT
+            collection_id,
+            release_type,
+            path,
+            sum(object_property) object_property,
+            sum(array_item) array_count,
+            count(distinct id) distinct_releases
+        FROM
+            release_summary
+        CROSS JOIN
+            flatten(release)
+        WHERE
+            release_summary.collection_id = %(id)s
+        GROUP BY collection_id, release_type, path
+    """, {'id': collection})
+
+    execute_values(cursor, 'INSERT INTO field_counts_tmp VALUES %s', cursor.fetchall())
+    commit()
+
+    logger.info('Time for collection ID %s: %ss', collection, timer() - collection_timer)
+
+
 @click.command()
 @click.argument('name', callback=validate_name)
 @click.option('--remove', is_flag=True, help='Drop the field_counts table from the schema')
-@click.option('--threads', type=int, default=1, help='The number of threads to use (up to the number of collections)')
-def field_counts(name, remove, threads):
+def field_counts(name, remove):
     """
     Creates (or re-creates) the field_counts table in a schema.
 
     NAME is the last part of a schema's name after "view_data_".
     """
     logger = logging.getLogger('ocdskingfisher.views.field-counts')
-    logger.info('Arguments: name=%s remove=%s threads=%s', name, remove, threads)
+    logger.info('Arguments: name=%s remove=%s', name, remove)
 
     cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
                    "AND table_name = 'release_summary'", {'schema': name})
@@ -292,38 +323,6 @@ def field_counts(name, remove, threads):
 
         logger.info('Dropped tables field_counts and field_counts_tmp')
         return
-
-    def _run_collection(collection):
-        logger.info('Processing collection ID %s', collection)
-
-        collection_timer = timer()
-
-        cursor.execute('SET parallel_tuple_cost = 0.00001')
-        cursor.execute('SET parallel_setup_cost = 0.00001')
-        cursor.execute("SET work_mem = '10MB'")
-        cursor.execute("""
-            /* kingfisher-views field-counts */
-
-            SELECT
-                collection_id,
-                release_type,
-                path,
-                sum(object_property) object_property,
-                sum(array_item) array_count,
-                count(distinct id) distinct_releases
-            FROM
-                release_summary
-            CROSS JOIN
-                flatten(release)
-            WHERE
-                release_summary.collection_id = %(id)s
-            GROUP BY collection_id, release_type, path
-        """, {'id': collection})
-
-        execute_values(cursor, 'INSERT INTO field_counts_tmp VALUES %s', cursor.fetchall())
-        commit()
-
-        logger.info('Time for collection ID %s: %ss', collection, timer() - collection_timer)
 
     command_timer = timer()
 
@@ -343,7 +342,7 @@ def field_counts(name, remove, threads):
     commit()
 
     selected_collections = pluck('SELECT id FROM selected_collections')
-    with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
+    with concurrent.futures.ProcessPoolExecutor() as executor:
         futures = [executor.submit(_run_collection, collection) for collection in selected_collections]
         for future in concurrent.futures.as_completed(futures):
             future.result()

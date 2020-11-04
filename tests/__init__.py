@@ -52,7 +52,7 @@ REFRESH_VIEWS_VIEWS = {
 
 
 @contextmanager
-def fixture(collections='1', dontbuild=True, name=None, tables_only=None, threads=None):
+def fixture(collections='1', dontbuild=True, name=None, tables_only=None):
     runner = CliRunner()
 
     args = ['add-view', collections, 'Default']
@@ -64,8 +64,6 @@ def fixture(collections='1', dontbuild=True, name=None, tables_only=None, thread
         args.append('--dontbuild')
     if tables_only:
         args.append('--tables-only')
-    if threads:
-        args.extend(['--threads', threads])
 
     result = runner.invoke(cli, args)
 
