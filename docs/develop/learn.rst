@@ -24,10 +24,10 @@ Contents
 
 SQL files are named after the sections of the OCDS data that they summarize. The ``008-release.sql`` file summarizes the entire collection(s).
 
-SQL statements are typically grouped into blocks. A block typically starts with ``DROP TABLE IF EXISTS`` and ends with ``CREATE UNIQUE INDEX``. Make sure to copy-paste the entire block when adding a similar summary.
+SQL statements are typically grouped into blocks. A block typically starts with ``CREATE TABLE`` and ends with ``CREATE UNIQUE INDEX``. Make sure to copy-paste the entire block when adding a similar summary.
 
 In ``008-release.sql``, blocks are ordered in roughly the same order as the stages of a contracting process.
 
-In many cases, the final tables are generated from many others. Table names starting with ``tmp_`` are temporary or intermediate tables that are typically dropped at the end of the file in which they are created.
+In many cases, the final tables are generated from many others. Table names starting with ``tmp_`` are temporary tables that are typically dropped at the end of the file in which they are created.
 
 In some cases, ``----`` lines break the files into segments, each of which is executed in a transaction.

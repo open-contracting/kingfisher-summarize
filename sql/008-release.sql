@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS tmp_release_party_aggregates;
-
 CREATE TABLE tmp_release_party_aggregates AS
 SELECT
     id,
@@ -36,8 +34,6 @@ FROM (
 CREATE UNIQUE INDEX tmp_release_party_aggregates_id ON tmp_release_party_aggregates (id);
 
 --- Adding planning document counts by document_type
-DROP TABLE IF EXISTS tmp_planning_documents_aggregates;
-
 CREATE TABLE tmp_planning_documents_aggregates AS
 SELECT
     id,
@@ -59,8 +55,6 @@ CREATE UNIQUE INDEX tmp_planning_documents_aggregates_id ON tmp_planning_documen
 
 -- end of adding planning document counts
 --- Adding tender document counts by document_type
-
-DROP TABLE IF EXISTS tmp_tender_documents_aggregates;
 
 CREATE TABLE tmp_tender_documents_aggregates AS
 SELECT
@@ -84,8 +78,6 @@ CREATE UNIQUE INDEX tmp_tender_documents_aggregates_id ON tmp_tender_documents_a
 -- end of adding tender document counts
 ----
 
-DROP TABLE IF EXISTS tmp_release_awards_aggregates;
-
 CREATE TABLE tmp_release_awards_aggregates AS
 SELECT
     id,
@@ -103,8 +95,6 @@ GROUP BY
 
 CREATE UNIQUE INDEX tmp_release_awards_aggregates_id ON tmp_release_awards_aggregates (id);
 
-DROP TABLE IF EXISTS tmp_release_award_suppliers_aggregates;
-
 CREATE TABLE tmp_release_award_suppliers_aggregates AS
 SELECT
     id,
@@ -115,8 +105,6 @@ GROUP BY
     id;
 
 CREATE UNIQUE INDEX tmp_release_award_suppliers_aggregates_id ON tmp_release_award_suppliers_aggregates (id);
-
-DROP TABLE IF EXISTS tmp_award_documents_aggregates;
 
 CREATE TABLE tmp_award_documents_aggregates AS
 SELECT
@@ -136,8 +124,6 @@ GROUP BY
     id;
 
 CREATE UNIQUE INDEX tmp_award_documents_aggregates_id ON tmp_award_documents_aggregates (id);
-
-DROP TABLE IF EXISTS tmp_release_contracts_aggregates;
 
 CREATE TABLE tmp_release_contracts_aggregates AS
 SELECT
@@ -159,8 +145,6 @@ GROUP BY
 
 CREATE UNIQUE INDEX tmp_release_contracts_aggregates_id ON tmp_release_contracts_aggregates (id);
 
-DROP TABLE IF EXISTS tmp_contract_documents_aggregates;
-
 CREATE TABLE tmp_contract_documents_aggregates AS
 SELECT
     id,
@@ -179,8 +163,6 @@ GROUP BY
     id;
 
 CREATE UNIQUE INDEX tmp_contract_documents_aggregates_id ON tmp_contract_documents_aggregates (id);
-
-DROP TABLE IF EXISTS tmp_contract_implementation_documents_aggregates;
 
 CREATE TABLE tmp_contract_implementation_documents_aggregates AS
 SELECT
@@ -201,8 +183,6 @@ GROUP BY
 
 CREATE UNIQUE INDEX tmp_contract_implementation_documents_aggregates_id ON tmp_contract_implementation_documents_aggregates (id);
 
-DROP TABLE IF EXISTS tmp_contract_milestones_aggregates;
-
 CREATE TABLE tmp_contract_milestones_aggregates AS
 SELECT
     id,
@@ -222,8 +202,6 @@ GROUP BY
 
 CREATE UNIQUE INDEX tmp_contract_milestones_aggregates_id ON tmp_contract_milestones_aggregates (id);
 
-DROP TABLE IF EXISTS tmp_contract_implementation_milestones_aggregates;
-
 CREATE TABLE tmp_contract_implementation_milestones_aggregates AS
 SELECT
     id,
@@ -242,8 +220,6 @@ GROUP BY
     id;
 
 CREATE UNIQUE INDEX tmp_contract_implementation_milestones_aggregates_id ON tmp_contract_implementation_milestones_aggregates (id);
-
-DROP TABLE IF EXISTS tmp_release_documents_aggregates;
 
 CREATE TABLE tmp_release_documents_aggregates AS
 WITH all_document_types AS (
@@ -297,8 +273,6 @@ GROUP BY
 
 CREATE UNIQUE INDEX tmp_release_documents_aggregates_id ON tmp_release_documents_aggregates (id);
 
-DROP TABLE IF EXISTS tmp_release_milestones_aggregates;
-
 CREATE TABLE tmp_release_milestones_aggregates AS
 WITH all_milestone_types AS (
     SELECT
@@ -346,11 +320,6 @@ GROUP BY
 CREATE UNIQUE INDEX tmp_release_milestones_aggregates_id ON tmp_release_milestones_aggregates (id);
 
 ----
-SELECT
-    drop_table_or_view ('release_summary');
-
-DROP TABLE IF EXISTS release_summary_no_data CASCADE;
-
 CREATE TABLE release_summary_no_data AS
 SELECT
     *
@@ -382,31 +351,31 @@ FROM
     LEFT JOIN tmp_release_documents_aggregates USING (id)
     LEFT JOIN tmp_release_milestones_aggregates USING (id);
 
-DROP TABLE IF EXISTS tmp_release_party_aggregates;
+DROP TABLE tmp_release_party_aggregates;
 
-DROP TABLE IF EXISTS tmp_release_awards_aggregates;
+DROP TABLE tmp_release_awards_aggregates;
 
-DROP TABLE IF EXISTS tmp_release_award_suppliers_aggregates;
+DROP TABLE tmp_release_award_suppliers_aggregates;
 
-DROP TABLE IF EXISTS tmp_award_documents_aggregates;
+DROP TABLE tmp_award_documents_aggregates;
 
-DROP TABLE IF EXISTS tmp_tender_documents_aggregates;
+DROP TABLE tmp_tender_documents_aggregates;
 
-DROP TABLE IF EXISTS tmp_planning_documents_aggregates;
+DROP TABLE tmp_planning_documents_aggregates;
 
-DROP TABLE IF EXISTS tmp_release_contracts_aggregates;
+DROP TABLE tmp_release_contracts_aggregates;
 
-DROP TABLE IF EXISTS tmp_contract_documents_aggregates;
+DROP TABLE tmp_contract_documents_aggregates;
 
-DROP TABLE IF EXISTS tmp_contract_implementation_documents_aggregates;
+DROP TABLE tmp_contract_implementation_documents_aggregates;
 
-DROP TABLE IF EXISTS tmp_contract_milestones_aggregates;
+DROP TABLE tmp_contract_milestones_aggregates;
 
-DROP TABLE IF EXISTS tmp_contract_implementation_milestones_aggregates;
+DROP TABLE tmp_contract_implementation_milestones_aggregates;
 
-DROP TABLE IF EXISTS tmp_release_documents_aggregates;
+DROP TABLE tmp_release_documents_aggregates;
 
-DROP TABLE IF EXISTS tmp_release_milestones_aggregates;
+DROP TABLE tmp_release_milestones_aggregates;
 
 ----
 CREATE UNIQUE INDEX release_summary_no_data_id ON release_summary_no_data (id);

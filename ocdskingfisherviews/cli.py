@@ -292,7 +292,7 @@ def field_counts(name):
             GROUP BY collection_id, release_type, path
         """, {'id': collection})
 
-        execute_values(cursor, 'INSERT INTO field_counts_tmp VALUES %s', cursor.fetchall())
+        execute_values(cursor, 'INSERT INTO field_counts VALUES %s', cursor.fetchall())
         commit()
 
         logger.info('Time for collection ID %s: %ss', collection, timer() - collection_timer)
@@ -301,9 +301,8 @@ def field_counts(name):
 
     with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'sql', 'extras', 'flatten.sql')) as f:
         cursor.execute(f.read())
-    cursor.execute('DROP TABLE IF EXISTS field_counts_tmp')
     cursor.execute("""
-        CREATE TABLE field_counts_tmp (
+        CREATE TABLE field_counts (
             collection_id bigint,
             release_type text,
             path text,
@@ -320,8 +319,6 @@ def field_counts(name):
         for future in concurrent.futures.as_completed(futures):
             future.result()
 
-    cursor.execute('DROP TABLE IF EXISTS field_counts')
-    cursor.execute('ALTER TABLE field_counts_tmp RENAME TO field_counts')
     cursor.execute("COMMENT ON COLUMN field_counts.collection_id IS "
                    "'id from the kingfisher collection table'")
     cursor.execute("COMMENT ON COLUMN field_counts.release_type IS "

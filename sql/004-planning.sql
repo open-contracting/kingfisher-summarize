@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS tmp_planning_summary;
-
 CREATE TABLE tmp_planning_summary AS
 SELECT
     r.id,
@@ -18,8 +16,6 @@ WHERE
 CREATE UNIQUE INDEX tmp_planning_summary_id ON tmp_planning_summary (id);
 
 ----
-DROP TABLE IF EXISTS planning_documents_summary;
-
 CREATE TABLE planning_documents_summary AS
 SELECT
     r.id,
@@ -47,8 +43,6 @@ CREATE INDEX planning_documents_summary_data_id ON planning_documents_summary (d
 CREATE INDEX planning_documents_summary_collection_id ON planning_documents_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS planning_milestones_summary;
-
 CREATE TABLE planning_milestones_summary AS
 SELECT
     r.id,
@@ -77,8 +71,6 @@ CREATE INDEX planning_milestones_summary_data_id ON planning_milestones_summary 
 CREATE INDEX planning_milestones_summary_collection_id ON planning_milestones_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS planning_summary;
-
 CREATE TABLE planning_summary AS
 SELECT
     r.id,
@@ -138,5 +130,5 @@ CREATE INDEX planning_summary_data_id ON planning_summary (data_id);
 
 CREATE INDEX planning_summary_collection_id ON planning_summary (collection_id);
 
-DROP TABLE IF EXISTS tmp_planning_summary;
+DROP TABLE tmp_planning_summary;
 

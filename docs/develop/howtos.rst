@@ -29,6 +29,8 @@ Add the ``-c '\timing'`` option to a ``psql`` command, before any ``-f`` options
 Drop tables and views
 ~~~~~~~~~~~~~~~~~~~~~
 
+To undo a SQL file, drop the tables and views that it creates.
+
 To undo the ``field_counts`` routine, run:
 
 .. code-block:: sql

@@ -79,8 +79,6 @@ This example demonstrates how Kingfisher Views uses temporary (``tmp_*``) tables
 
        -- Add this before the tmp_award_documents_aggregates block, using that block as a template.
 
-       DROP TABLE IF EXISTS tmp_planning_documents_aggregates;
-
        CREATE TABLE tmp_planning_documents_aggregates AS
        SELECT
            id,
@@ -107,8 +105,6 @@ This example demonstrates how Kingfisher Views uses temporary (``tmp_*``) tables
    .. code-block:: sql
 
       -- Add this before the tmp_release_awards_aggregates block, using that block as a template.
-
-      DROP TABLE IF EXISTS tmp_release_planning_aggregates;
 
       CREATE TABLE tmp_release_planning_aggregates AS
       SELECT
@@ -139,10 +135,10 @@ This example demonstrates how Kingfisher Views uses temporary (``tmp_*``) tables
 
    .. code-block:: sql
 
-      -- Add this before `drop table if exists tmp_release_awards_aggregates;`
+      -- Add this before `DROP TABLE tmp_release_awards_aggregates;`
 
-      DROP TABLE IF EXISTS tmp_release_planning_aggregates;
-      DROP TABLE IF EXISTS tmp_planning_documents_aggregates;
+      DROP TABLE tmp_release_planning_aggregates;
+      DROP TABLE tmp_planning_documents_aggregates;
 
 .. _review-changes:
 

@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS buyer_summary;
-
 CREATE TABLE buyer_summary AS
 WITH r AS (
     SELECT
@@ -43,8 +41,6 @@ CREATE INDEX buyer_summary_data_id ON buyer_summary (data_id);
 CREATE INDEX buyer_summary_collection_id ON buyer_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS procuringEntity_summary;
-
 CREATE TABLE procuringEntity_summary AS
 WITH r AS (
     SELECT
@@ -87,8 +83,6 @@ CREATE INDEX procuringEntity_summary_data_id ON procuringEntity_summary (data_id
 CREATE INDEX procuringEntity_summary_collection_id ON procuringEntity_summary (collection_id);
 
 ----
-DROP TABLE IF EXISTS tenderers_summary;
-
 CREATE TABLE tenderers_summary AS
 WITH r AS (
     SELECT

@@ -29,20 +29,5 @@ $$
 LANGUAGE plpgsql
 IMMUTABLE STRICT;
 
--- https://stackoverflow.com/a/463314/244258
-CREATE OR REPLACE FUNCTION drop_table_or_view (object_name text)
-    RETURNS void PARALLEL UNSAFE
-    AS $$
-BEGIN
-    EXECUTE 'DROP VIEW IF EXISTS ' || object_name;
-EXCEPTION
-    WHEN wrong_object_type THEN
-        EXECUTE 'DROP TABLE IF EXISTS ' || object_name;
-END;
-
-$$
-LANGUAGE plpgsql
-VOLATILE;
-
 -- Reference:
 -- https://www.postgresql.org/docs/current/errcodes-appendix.html

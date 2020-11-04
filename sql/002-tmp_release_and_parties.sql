@@ -1,7 +1,3 @@
-DROP VIEW IF EXISTS tmp_release_summary_with_release_data;
-
-DROP TABLE IF EXISTS tmp_release_summary;
-
 CREATE TABLE tmp_release_summary AS
 SELECT
     r.id::bigint * 10 AS id,
@@ -129,11 +125,6 @@ FROM
     JOIN data d ON d.id = r.data_id;
 
 ----
-SELECT
-    drop_table_or_view ('parties_summary');
-
-DROP TABLE IF EXISTS parties_summary_no_data;
-
 CREATE TABLE parties_summary_no_data AS
 SELECT
     r.id,
