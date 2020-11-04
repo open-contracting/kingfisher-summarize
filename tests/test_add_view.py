@@ -107,6 +107,25 @@ def test_command_default_name_multiple(db, caplog):
         ])
 
 
+@patch('ocdskingfisherviews.cli.refresh_views', noop)
+@patch('ocdskingfisherviews.cli.field_counts', noop)
+def test_command_name_option(db, caplog):
+    with fixture(db, name='custom') as result:
+        assert db.schema_exists('view_data_custom')
+        assert db.all('SELECT * FROM view_data_custom.selected_collections') == [(1,)]
+        assert db.all('SELECT id, note FROM view_data_custom.note') == [(1, 'Default')]
+
+        assert result.exit_code == 0
+        assert result.output == ''
+        assert_log_records(caplog, command, [
+            'Arguments: collections=(1,) note=Default name=custom tables_only=False',
+            'Added custom',
+            'Running refresh-views routine',
+            'Running field-counts routine',
+            'Running correct-user-permissions command',
+        ])
+
+
 @pytest.mark.parametrize('tables_only, tables, views', [
     (False, TABLES, VIEWS),
     (True, TABLES | VIEWS, set()),
@@ -155,21 +174,4 @@ def test_command(db, tables_only, tables, views, caplog):
             'Processing collection ID 1',
             re.compile(r'^Time for collection ID 1: \d+\.\d+s$'),
             re.compile(r'^Total time: \d+\.\d+s$'),
-        ])
-
-
-@patch('ocdskingfisherviews.cli.refresh_views', noop)
-@patch('ocdskingfisherviews.cli.field_counts', noop)
-def test_command_name_option(db, caplog):
-    with fixture(db, name='custom') as result:
-        assert db.schema_exists('view_data_custom')
-
-        assert result.exit_code == 0
-        assert result.output == ''
-        assert_log_records(caplog, command, [
-            'Arguments: collections=(1,) note=Default name=custom tables_only=False',
-            'Added custom',
-            'Running refresh-views routine',
-            'Running field-counts routine',
-            'Running correct-user-permissions command',
         ])
