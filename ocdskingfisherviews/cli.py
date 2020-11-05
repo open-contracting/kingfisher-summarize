@@ -196,7 +196,7 @@ def install():
 @click.option('--name', help='A custom name for the SQL schema ("view_data_" will be prepended).')
 @click.option('--tables-only', is_flag=True, help='Create SQL tables instead of SQL views.')
 @click.option('--field-counts/--no-field-counts', 'field_counts_option', default=True,
-              help="Don't create the field_counts table.")
+              help="Whether to create the field_counts table (default true).")
 @click.pass_context
 def add_view(ctx, collections, note, name, tables_only, field_counts_option):
     """
