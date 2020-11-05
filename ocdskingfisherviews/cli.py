@@ -195,9 +195,10 @@ def install():
 @click.argument('note')
 @click.option('--name', help='A custom name for the SQL schema ("view_data_" will be prepended).')
 @click.option('--tables-only', is_flag=True, help='Create SQL tables instead of SQL views.')
-@click.option('--field-counts/--no-field-counts', default=True, help="Don't create the field_counts table.")
+@click.option('--field-counts/--no-field-counts', 'field_counts_option', 
+              default=True, help="Don't create the field_counts table.")
 @click.pass_context
-def add_view(ctx, collections, note, name, tables_only, field_counts):
+def add_view(ctx, collections, note, name, tables_only, field_counts_option):
     """
     Creates a schema containing summary tables about one or more collections.
 
@@ -233,7 +234,7 @@ def add_view(ctx, collections, note, name, tables_only, field_counts):
     logger.info('Running refresh-views routine')
     refresh_views(schema, tables_only=tables_only)
 
-    if field_counts:
+    if field_counts_option:
         logger.info('Running field-counts routine')
         field_counts(schema)
 
