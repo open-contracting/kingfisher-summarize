@@ -1,44 +1,98 @@
 import concurrent.futures
 import csv
 import glob
+import itertools
 import json
 import logging
 import logging.config
 import os
 import re
+from collections import defaultdict
 from datetime import datetime
 from timeit import default_timer as timer
 
 import click
 from psycopg2 import sql
 from tabulate import tabulate
+from toposort import toposort
 
 from ocdskingfisherviews.db import Database
+from ocdskingfisherviews.exceptions import AmbiguousSourceError
 
 global db
 
 max_workers = os.cpu_count() or 1
+flags = re.MULTILINE | re.IGNORECASE
+basedir = os.path.dirname(os.path.realpath(__file__))
 
 
-def _read_sql_files(tables_only=False):
+def _read_sql_files(directory, tables_only=False):
     """
     Returns a dict in which keys are the basenames of SQL files and values are their contents.
 
     :param bool tables_only: whether to create SQL tables instead of SQL views
     """
-    contents = {}
+    files = {}
 
-    filenames = glob.glob(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'sql', '*.sql'))
-    for filename in sorted(filenames):
+    filenames = glob.glob(os.path.join(basedir, '..', 'sql', directory, '*.sql'))
+    for filename in filenames:
         basename = os.path.splitext(os.path.basename(filename))[0]
         with open(filename) as f:
             content = f.read()
         if tables_only:
-            content = re.sub('^CREATE VIEW', 'CREATE TABLE', content, flags=re.MULTILINE | re.IGNORECASE)
-            content = re.sub('^DROP VIEW', 'DROP TABLE', content, flags=re.MULTILINE | re.IGNORECASE)
-        contents[basename] = content
+            content = re.sub(r'^(CREATE|DROP) VIEW', r'\1 TABLE', content, flags=flags)
+        files[basename] = content
 
-    return contents
+    return files
+
+
+def _dependency_graph(files):
+    ignore = {
+        # PostgreSQL
+        'jsonb_array_elements',
+        'jsonb_array_elements_text',
+        # Kingfisher Process
+        'collection',
+        'compiled_release',
+        'data',
+        'package_data',
+        'record',
+        'record_check',
+        'release',
+        'release_check',
+        # Kingfisher Views
+        'selected_collections',
+    }
+
+    sources = {}
+
+    imports = defaultdict(set)
+    for basename, content in files.items():
+        exports = set()
+        for object_name in re.findall(r'\bCREATE\s+(?:TABLE|VIEW)\s+(\w+)', content, flags=flags):
+            exports.add(object_name)
+
+        for object_name in re.findall(r'\b(?:FROM|JOIN)\s+(\w+)', content, flags=re.MULTILINE):
+            imports[basename].add(object_name)
+        for object_name in re.findall(r'\bWITH\s+(\w+)\s+AS', content, flags=re.MULTILINE):
+            imports[basename].discard(object_name)
+        imports[basename].difference_update(exports | ignore)
+
+        # This assumes no files drop tables before creating them. If that were the case, we would have to do
+        # line-by-line parsing, to calculate which tables remain.
+        for object_name in re.findall(r'\bDROP\s+(?:TABLE|VIEW)\s+(\w+)', content, flags=flags):
+            exports.discard(object_name)
+
+        for object_name in exports:
+            if object_name in sources:
+                raise AmbiguousSourceError(f'{object_name} in {sources[object_name]} and {basename}')
+            sources[object_name] = basename
+
+    graph = defaultdict(list)
+    for basename, object_names in imports.items():
+        graph[basename] = set(sources[object_name] for object_name in object_names)
+
+    return toposort(graph)
 
 
 def validate_collections(ctx, param, value):
@@ -114,7 +168,7 @@ def install():
     """)
 
     if not db.one('SELECT EXISTS(SELECT 1 FROM views.mapping_sheets)')[0]:
-        filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'sql', 'extras', '1-1-3.csv')
+        filename = os.path.join(basedir, '1-1-3.csv')
         with open(filename) as f:
             reader = csv.DictReader(f)
 
@@ -236,17 +290,30 @@ def refresh_views(name, tables_only=False):
 
     db.set_search_path([name, 'public'])
 
-    command_timer = timer()
-
-    for basename, content in _read_sql_files(tables_only=tables_only).items():
+    def _run_file(basename, content):
         file_timer = timer()
-        logger.info('Running %s', basename)
 
         for part in content.split('----'):
             db.execute('/* kingfisher-views refresh-views */\n' + part)
             db.commit()
 
-        logger.info('Time: %ss', timer() - file_timer)
+        logger.info('Time for %s: %ss', basename, timer() - file_timer)
+
+    command_timer = timer()
+
+    files = {}
+    for directory in ('initial', 'middle', 'final'):
+        files[directory] = _read_sql_files(directory, tables_only=tables_only)
+
+    contents = {**files['initial'], **files['middle'], **files['final']}
+    groups = itertools.chain([set(files['initial'])], _dependency_graph(files['middle']), [set(files['final'])])
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        for group in groups:
+            logger.info(f'Running {group!r}')
+            futures = [executor.submit(_run_file, basename, contents[basename]) for basename in group]
+            for future in concurrent.futures.as_completed(futures):
+                future.result()
 
     logger.info('Total time: %ss', timer() - command_timer)
 
@@ -284,7 +351,7 @@ def field_counts(name):
             CROSS JOIN
                 flatten(release)
             WHERE
-                release_summary.collection_id = %(id)s
+                collection_id = %(id)s
             GROUP BY collection_id, release_type, path
         """, {'id': collection}))
         db.commit()
@@ -293,8 +360,6 @@ def field_counts(name):
 
     command_timer = timer()
 
-    with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'sql', 'extras', 'flatten.sql')) as f:
-        db.execute(f.read())
     db.execute("""
         CREATE TABLE field_counts (
             collection_id bigint,
@@ -363,8 +428,8 @@ def docs_table_ref(name):
     Creates or updates the CSV files in docs/definitions.
     """
     tables = []
-    for basename, content in _read_sql_files().items():
-        for table in re.findall(r'^CREATE\s+(?:TABLE|VIEW)\s+(\S+)', content, flags=re.MULTILINE | re.IGNORECASE):
+    for basename, content in _read_sql_files('middle').items():
+        for table in re.findall(r'^CREATE\s+(?:TABLE|VIEW)\s+(\S+)', content, flags=flags):
             if not table.startswith('tmp_'):
                 tables.append(table)
     tables.append('field_counts')
@@ -383,7 +448,7 @@ def docs_table_ref(name):
             table_schema = %(schema)s AND LOWER(isc.table_name) = LOWER(%(table)s)
     """
 
-    filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'docs', 'definitions', '{}.csv')
+    filename = os.path.join(basedir, '..', 'docs', 'definitions', '{}.csv')
     for table in tables:
         with open(filename.format(table), 'w') as f:
             writer = csv.writer(f, lineterminator='\n')
