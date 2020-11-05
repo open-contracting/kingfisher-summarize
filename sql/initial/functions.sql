@@ -1,4 +1,5 @@
--- https://github.com/csikfer/lanview2/blob/master/database/update-1.9.sql
+-- Inspired by https://github.com/csikfer/lanview2/blob/master/database/update-1.9.sql
+-- Error reference: https://www.postgresql.org/docs/current/errcodes-appendix.html
 CREATE FUNCTION convert_to_numeric (text, numeric DEFAULT NULL)
     RETURNS numeric PARALLEL SAFE
     AS $$
@@ -28,6 +29,3 @@ END;
 $$
 LANGUAGE plpgsql
 IMMUTABLE STRICT;
-
--- Reference:
--- https://www.postgresql.org/docs/current/errcodes-appendix.html

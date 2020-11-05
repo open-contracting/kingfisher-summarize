@@ -1,4 +1,4 @@
--- https://www.postgresql.org/docs/current/queries-with.html
+-- Reference: https://www.postgresql.org/docs/current/queries-with.html
 CREATE FUNCTION flatten (jsonb)
     RETURNS TABLE (
         path text,
