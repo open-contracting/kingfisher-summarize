@@ -36,7 +36,7 @@ def _read_sql_files(directory, tables_only=False):
 
     filenames = glob.glob(os.path.join(basedir, '..', 'sql', directory, '*.sql'))
     for filename in filenames:
-        basename = os.path.splitext(os.path.basename(filename))[0]
+        basename = f'{directory}-{os.path.splitext(os.path.basename(filename))[0]}'
         with open(filename) as f:
             content = f.read()
         if tables_only:
@@ -282,6 +282,19 @@ def list_views():
         click.echo(tabulate(table, headers=['Name', 'Collections', 'Note'], tablefmt='github', numalign='left'))
 
 
+def _run_file(name, basename, content):
+    logger = logging.getLogger('ocdskingfisher.views.refresh-views')
+
+    start = time()
+
+    db = Database()
+    db.set_search_path([name, 'public'])
+    db.execute('/* kingfisher-views refresh-views */\n' + content)
+    db.commit()
+
+    logger.info('Time for %s: %ss', basename, time() - start)
+
+
 def refresh_views(name, tables_only=False):
     """
     Creates the summary tables in a schema.
@@ -293,14 +306,6 @@ def refresh_views(name, tables_only=False):
 
     db.set_search_path([name, 'public'])
 
-    def _run_file(basename, content):
-        start = time()
-
-        db.execute('/* kingfisher-views refresh-views */\n' + content)
-        db.commit()
-
-        logger.info('Time for %s: %ss', basename, time() - start)
-
     start = time()
 
     files = {}
@@ -308,12 +313,13 @@ def refresh_views(name, tables_only=False):
         files[directory] = _read_sql_files(directory, tables_only=tables_only)
 
     contents = {**files['initial'], **files['middle'], **files['final']}
-    groups = itertools.chain([set(files['initial'])], _dependency_graph(files['middle']), [set(files['final'])])
+    groups = itertools.chain([set(files['initial'])], _dependency_graph(files['middle']),
+                             ({basename} for basename, content in files['final'].items()))
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+    with concurrent.futures.ProcessPoolExecutor() as executor:
         for group in groups:
             logger.info(f'Running {group!r}')
-            futures = [executor.submit(_run_file, basename, contents[basename]) for basename in group]
+            futures = [executor.submit(_run_file, name, basename, contents[basename]) for basename in group]
             for future in concurrent.futures.as_completed(futures):
                 future.result()
 
