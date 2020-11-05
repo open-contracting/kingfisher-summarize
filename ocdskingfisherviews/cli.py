@@ -9,7 +9,7 @@ import os
 import re
 from collections import defaultdict
 from datetime import datetime
-from timeit import default_timer as timer
+from time import time
 
 import click
 from psycopg2 import sql
@@ -293,14 +293,14 @@ def refresh_views(name, tables_only=False):
     db.set_search_path([name, 'public'])
 
     def _run_file(basename, content):
-        file_timer = timer()
+        start = time()
 
         db.execute('/* kingfisher-views refresh-views */\n' + content)
         db.commit()
 
-        logger.info('Time for %s: %ss', basename, timer() - file_timer)
+        logger.info('Time for %s: %ss', basename, time() - start)
 
-    command_timer = timer()
+    start = time()
 
     files = {}
     for directory in ('initial', 'middle', 'final'):
@@ -316,7 +316,7 @@ def refresh_views(name, tables_only=False):
             for future in concurrent.futures.as_completed(futures):
                 future.result()
 
-    logger.info('Total time: %ss', timer() - command_timer)
+    logger.info('Total time: %ss', time() - start)
 
 
 def field_counts(name):
@@ -332,7 +332,7 @@ def field_counts(name):
     def _run_collection(collection):
         logger.info('Processing collection ID %s', collection)
 
-        collection_timer = timer()
+        start = time()
 
         db.execute('SET parallel_tuple_cost = 0.00001')
         db.execute('SET parallel_setup_cost = 0.00001')
@@ -357,9 +357,9 @@ def field_counts(name):
         """, {'id': collection}))
         db.commit()
 
-        logger.info('Time for collection ID %s: %ss', collection, timer() - collection_timer)
+        logger.info('Time for collection ID %s: %ss', collection, time() - start)
 
-    command_timer = timer()
+    start = time()
 
     db.execute("""
         CREATE TABLE field_counts (
@@ -391,7 +391,7 @@ def field_counts(name):
                "'The total number of distinct releases in which the field at this path appears'")
     db.commit()
 
-    logger.info('Total time: %ss', timer() - command_timer)
+    logger.info('Total time: %ss', time() - start)
 
 
 @click.command()
