@@ -195,8 +195,9 @@ def install():
 @click.argument('note')
 @click.option('--name', help='A custom name for the SQL schema ("view_data_" will be prepended).')
 @click.option('--tables-only', is_flag=True, help='Create SQL tables instead of SQL views.')
+@click.option('--field-counts/--no-field-counts', default=False, help="Don't create the field_counts table.")
 @click.pass_context
-def add_view(ctx, collections, note, name, tables_only):
+def add_view(ctx, collections, note, name, tables_only, field_counts):
     """
     Creates a schema containing summary tables about one or more collections.
 
@@ -232,8 +233,9 @@ def add_view(ctx, collections, note, name, tables_only):
     logger.info('Running refresh-views routine')
     refresh_views(schema, tables_only=tables_only)
 
-    logger.info('Running field-counts routine')
-    field_counts(schema)
+    if field_counts:
+        logger.info('Running field-counts routine')
+        field_counts(schema)
 
     logger.info('Running correct-user-permissions command')
     ctx.invoke(correct_user_permissions)
@@ -293,9 +295,8 @@ def refresh_views(name, tables_only=False):
     def _run_file(basename, content):
         file_timer = timer()
 
-        for part in content.split('----'):
-            db.execute('/* kingfisher-views refresh-views */\n' + part)
-            db.commit()
+        db.execute('/* kingfisher-views refresh-views */\n' + content)
+        db.commit()
 
         logger.info('Time for %s: %ss', basename, timer() - file_timer)
 
