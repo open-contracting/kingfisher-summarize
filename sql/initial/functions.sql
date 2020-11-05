@@ -1,5 +1,5 @@
 -- https://github.com/csikfer/lanview2/blob/master/database/update-1.9.sql
-CREATE OR REPLACE FUNCTION convert_to_numeric (text, numeric DEFAULT NULL)
+CREATE FUNCTION convert_to_numeric (text, numeric DEFAULT NULL)
     RETURNS numeric PARALLEL SAFE
     AS $$
 BEGIN
@@ -13,7 +13,7 @@ $$
 LANGUAGE plpgsql
 IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION convert_to_timestamp (text, timestamp DEFAULT NULL)
+CREATE FUNCTION convert_to_timestamp (text, timestamp DEFAULT NULL)
     RETURNS timestamp PARALLEL SAFE
     AS $$
 BEGIN

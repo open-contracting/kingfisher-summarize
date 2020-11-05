@@ -1,5 +1,5 @@
 -- https://www.postgresql.org/docs/current/queries-with.html
-CREATE OR REPLACE FUNCTION flatten (jsonb)
+CREATE FUNCTION flatten (jsonb)
     RETURNS TABLE (
         path text,
         object_property integer,
@@ -64,7 +64,7 @@ CREATE OR REPLACE FUNCTION flatten (jsonb)
 $$;
 
 -- This function is not used by this project, but it is defined as a helper for analysts.
-CREATE OR REPLACE FUNCTION flatten_with_values (jsonb)
+CREATE FUNCTION flatten_with_values (jsonb)
     RETURNS TABLE (
         path text,
         object_property integer,
