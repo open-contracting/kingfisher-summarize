@@ -139,8 +139,3 @@ def test_command(db, tables_only, tables, views, caplog):
             'Running field-counts routine',
             'Running correct-user-permissions command',
         ])
-        assert_log_records(caplog, 'field-counts', [
-            'Processing collection ID 1',
-            re.compile(r'^Collection ID 1: \d+\.\d+s$'),
-            re.compile(r'^Total time: \d+\.\d+s$'),
-        ])

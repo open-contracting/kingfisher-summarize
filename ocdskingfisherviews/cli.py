@@ -20,7 +20,6 @@ from ocdskingfisherviews.exceptions import AmbiguousSourceError
 
 global db
 
-max_workers = os.cpu_count() or 1
 flags = re.MULTILINE | re.IGNORECASE
 basedir = os.path.dirname(os.path.realpath(__file__))
 
@@ -298,6 +297,7 @@ def list_views():
 
 def _run_file(name, identifier, content):
     logger = logging.getLogger('ocdskingfisher.views.refresh-views')
+    logger.info(f'Processing {identifier}')
 
     start = time()
 
@@ -332,7 +332,7 @@ def refresh_views(name, tables_only=False):
         :param str directory: a sub-directory containing SQL files
         """
         for identifier, content in files[directory].items():
-            logger.info(f'Submitting {identifier}')
+            logger.info(f'Processing {identifier}')
             _run_file(name, identifier, content)
 
     def submit(identifier):
@@ -343,7 +343,6 @@ def refresh_views(name, tables_only=False):
         """
         if not graph[identifier]:
             graph.pop(identifier)
-            logger.info(f'Submitting {identifier}')
             futures[executor.submit(_run_file, name, identifier, files['middle'][identifier])] = identifier
 
     futures = {}
@@ -373,6 +372,40 @@ def refresh_views(name, tables_only=False):
     logger.info('Total time: %ss', time() - start)
 
 
+def _run_collection(name, collection_id):
+    logger = logging.getLogger('ocdskingfisher.views.refresh-views')
+    logger.info('Processing collection ID %s', collection_id)
+
+    start = time()
+
+    db = Database()
+    db.set_search_path([name, 'public'])
+    db.execute('SET parallel_tuple_cost = 0.00001')
+    db.execute('SET parallel_setup_cost = 0.00001')
+    db.execute("SET work_mem = '10MB'")
+    db.execute_values('INSERT INTO field_counts VALUES %s', db.all("""
+        /* kingfisher-views field-counts */
+
+        SELECT
+            collection_id,
+            release_type,
+            path,
+            sum(object_property) object_property,
+            sum(array_item) array_count,
+            count(distinct id) distinct_releases
+        FROM
+            release_summary
+        CROSS JOIN
+            flatten(release)
+        WHERE
+            collection_id = %(id)s
+        GROUP BY collection_id, release_type, path
+    """, {'id': collection_id}))
+    db.commit()
+
+    logger.info('Collection ID %s: %ss', collection_id, time() - start)
+
+
 def field_counts(name):
     """
     Creates the field_counts table in a schema.
@@ -382,36 +415,6 @@ def field_counts(name):
     logger = logging.getLogger('ocdskingfisher.views.field-counts')
 
     db.set_search_path([name, 'public'])
-
-    def _run_collection(collection):
-        logger.info('Processing collection ID %s', collection)
-
-        start = time()
-
-        db.execute('SET parallel_tuple_cost = 0.00001')
-        db.execute('SET parallel_setup_cost = 0.00001')
-        db.execute("SET work_mem = '10MB'")
-        db.execute_values('INSERT INTO field_counts VALUES %s', db.all("""
-            /* kingfisher-views field-counts */
-
-            SELECT
-                collection_id,
-                release_type,
-                path,
-                sum(object_property) object_property,
-                sum(array_item) array_count,
-                count(distinct id) distinct_releases
-            FROM
-                release_summary
-            CROSS JOIN
-                flatten(release)
-            WHERE
-                collection_id = %(id)s
-            GROUP BY collection_id, release_type, path
-        """, {'id': collection}))
-        db.commit()
-
-        logger.info('Collection ID %s: %ss', collection, time() - start)
 
     start = time()
 
@@ -428,8 +431,8 @@ def field_counts(name):
     db.commit()
 
     selected_collections = db.pluck('SELECT id FROM selected_collections')
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = [executor.submit(_run_collection, collection) for collection in selected_collections]
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        futures = [executor.submit(_run_collection, name, collection) for collection in selected_collections]
         for future in concurrent.futures.as_completed(futures):
             future.result()
 
