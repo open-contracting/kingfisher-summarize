@@ -14,7 +14,6 @@ from time import time
 import click
 from psycopg2 import sql
 from tabulate import tabulate
-from toposort import toposort
 
 from ocdskingfisherviews.db import Database
 from ocdskingfisherviews.exceptions import AmbiguousSourceError
@@ -26,27 +25,36 @@ flags = re.MULTILINE | re.IGNORECASE
 basedir = os.path.dirname(os.path.realpath(__file__))
 
 
-def _read_sql_files(directory, tables_only=False):
+def sql_files(directory, tables_only=False):
     """
-    Returns a dict in which keys are the basenames of SQL files and values are their contents.
+    Returns a dict in which the key is the identifier of a SQL file and the value is its content.
 
+    :param str directory: a sub-directory containing SQL files
     :param bool tables_only: whether to create SQL tables instead of SQL views
     """
     files = {}
 
     filenames = glob.glob(os.path.join(basedir, '..', 'sql', directory, '*.sql'))
     for filename in filenames:
-        basename = f'{directory}-{os.path.splitext(os.path.basename(filename))[0]}'
+        identifier = f'{directory}:{os.path.splitext(os.path.basename(filename))[0]}'
         with open(filename) as f:
             content = f.read()
         if tables_only:
             content = re.sub(r'^(CREATE|DROP) VIEW', r'\1 TABLE', content, flags=flags)
-        files[basename] = content
+        files[identifier] = content
 
     return files
 
 
-def _dependency_graph(files):
+def dependency_graph(files):
+    """
+    Returns a dict in which the key is the identifier of a SQL file and the value is the set of identifiers of SQL
+    files on which that SQL file depends.
+
+    :param dict files: the identifiers and contents of SQL files, as returned by
+                       :func:`~ocdskingfisherviews.cli.sql_files`
+    """
+    # These dependencies are always met.
     ignore = {
         # PostgreSQL
         'jsonb_array_elements',
@@ -64,35 +72,41 @@ def _dependency_graph(files):
         'selected_collections',
     }
 
+    # The key is a table/view, and the value is the file by which it is created.
     sources = {}
 
+    # The key is a file, and the value is the set of tables/views it requires.
     imports = defaultdict(set)
-    for basename, content in files.items():
+    for identifier, content in files.items():
+        # The set of tables/views this file creates.
         exports = set()
         for object_name in re.findall(r'\bCREATE\s+(?:TABLE|VIEW)\s+(\w+)', content, flags=flags):
             exports.add(object_name)
 
+        # The set of tables/views this file requires, minus temporary tables, created tables and common dependencies.
         for object_name in re.findall(r'\b(?:FROM|JOIN)\s+(\w+)', content, flags=re.MULTILINE):
-            imports[basename].add(object_name)
+            imports[identifier].add(object_name)
         for object_name in re.findall(r'\bWITH\s+(\w+)\s+AS', content, flags=re.MULTILINE):
-            imports[basename].discard(object_name)
-        imports[basename].difference_update(exports | ignore)
+            imports[identifier].discard(object_name)
+        imports[identifier].difference_update(exports | ignore)
 
-        # This assumes no files drop tables before creating them. If that were the case, we would have to do
-        # line-by-line parsing, to calculate which tables remain.
+        # Removes temporary tables from the file's exports. This assumes tables aren't dropped before being created.
+        # If that were the case, we could do line-by-line parsing, to calculate which tables remain.
         for object_name in re.findall(r'\bDROP\s+(?:TABLE|VIEW)\s+(\w+)', content, flags=flags):
             exports.discard(object_name)
 
+        # Add the file's exports to the `sources` variable.
         for object_name in exports:
             if object_name in sources:
-                raise AmbiguousSourceError(f'{object_name} in {sources[object_name]} and {basename}')
-            sources[object_name] = basename
+                raise AmbiguousSourceError(f'{object_name} in {sources[object_name]} and {identifier}')
+            sources[object_name] = identifier
 
-    graph = defaultdict(list)
-    for basename, object_names in imports.items():
-        graph[basename] = set(sources[object_name] for object_name in object_names)
+    # Build the dependency graph between files.
+    graph = {}
+    for identifier, object_names in imports.items():
+        graph[identifier] = set(sources[object_name] for object_name in object_names)
 
-    return toposort(graph)
+    return graph
 
 
 def validate_collections(ctx, param, value):
@@ -282,17 +296,17 @@ def list_views():
         click.echo(tabulate(table, headers=['Name', 'Collections', 'Note'], tablefmt='github', numalign='left'))
 
 
-def _run_file(name, basename, content):
+def _run_file(name, identifier, content):
     logger = logging.getLogger('ocdskingfisher.views.refresh-views')
 
     start = time()
 
     db = Database()
     db.set_search_path([name, 'public'])
-    db.execute('/* kingfisher-views refresh-views */\n' + content)
+    db.execute(f'/* kingfisher-views {identifier} */\n' + content)
     db.commit()
 
-    logger.info('Time for %s: %ss', basename, time() - start)
+    logger.info('%s: %ss', identifier, time() - start)
 
 
 def refresh_views(name, tables_only=False):
@@ -308,20 +322,53 @@ def refresh_views(name, tables_only=False):
 
     start = time()
 
-    files = {}
-    for directory in ('initial', 'middle', 'final'):
-        files[directory] = _read_sql_files(directory, tables_only=tables_only)
+    files = {directory: sql_files(directory, tables_only=tables_only) for directory in ('initial', 'middle', 'final')}
+    graph = dependency_graph(files['middle'])
 
-    contents = {**files['initial'], **files['middle'], **files['final']}
-    groups = itertools.chain([set(files['initial'])], _dependency_graph(files['middle']),
-                             ({basename} for basename, content in files['final'].items()))
+    def run(directory):
+        """
+        Runs the files in a directory in sequence.
 
+        :param str directory: a sub-directory containing SQL files
+        """
+        for identifier, content in files[directory].items():
+            logger.info(f'Submitting {identifier}')
+            _run_file(name, identifier, content)
+
+    def submit(identifier):
+        """
+        If a file's dependencies are met, removes it from the dependency graph and submits it.
+
+        :param str identifier: the identifier of a SQL file
+        """
+        if not graph[identifier]:
+            graph.pop(identifier)
+            logger.info(f'Submitting {identifier}')
+            futures[executor.submit(_run_file, name, identifier, files['middle'][identifier])] = identifier
+
+    futures = {}
     with concurrent.futures.ProcessPoolExecutor() as executor:
-        for group in groups:
-            logger.info(f'Running {group!r}')
-            futures = [executor.submit(_run_file, name, basename, contents[basename]) for basename in group]
+        # The initial files are fast, and don't need multiprocessing.
+        run('initial')
+
+        # Submit files whose dependencies are met.
+        for identifier in list(graph):
+            submit(identifier)
+
+        # The for-loop terminates after its given futures, so it needs to start again with new futures.
+        while futures:
             for future in concurrent.futures.as_completed(futures):
                 future.result()
+                done = futures.pop(future)
+
+                # Update dependencies, and submit files whose dependencies are met.
+                for identifier in list(graph):
+                    graph[identifier].discard(done)
+                    submit(identifier)
+
+        # The final files are fast, and can also deadlock.
+        run('final')
+
 
     logger.info('Total time: %ss', time() - start)
 
@@ -364,7 +411,7 @@ def field_counts(name):
         """, {'id': collection}))
         db.commit()
 
-        logger.info('Time for collection ID %s: %ss', collection, time() - start)
+        logger.info('Collection ID %s: %ss', collection, time() - start)
 
     start = time()
 
@@ -436,7 +483,7 @@ def docs_table_ref(name):
     Creates or updates the CSV files in docs/definitions.
     """
     tables = []
-    for basename, content in _read_sql_files('middle').items():
+    for content in sql_files('middle').values():
         for table in re.findall(r'^CREATE\s+(?:TABLE|VIEW)\s+(\S+)', content, flags=flags):
             if not table.startswith('tmp_'):
                 tables.append(table)

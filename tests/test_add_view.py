@@ -141,6 +141,6 @@ def test_command(db, tables_only, tables, views, caplog):
         ])
         assert_log_records(caplog, 'field-counts', [
             'Processing collection ID 1',
-            re.compile(r'^Time for collection ID 1: \d+\.\d+s$'),
+            re.compile(r'^Collection ID 1: \d+\.\d+s$'),
             re.compile(r'^Total time: \d+\.\d+s$'),
         ])

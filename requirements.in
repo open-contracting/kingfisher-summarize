@@ -2,4 +2,3 @@ click
 pgpasslib
 psycopg2
 tabulate
-toposort
