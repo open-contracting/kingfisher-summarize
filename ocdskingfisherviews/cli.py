@@ -1,7 +1,6 @@
 import concurrent.futures
 import csv
 import glob
-import itertools
 import json
 import logging
 import logging.config
@@ -367,7 +366,6 @@ def refresh_views(name, tables_only=False):
 
         # The final files are fast, and can also deadlock.
         run('final')
-
 
     logger.info('Total time: %ss', time() - start)
 
