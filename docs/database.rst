@@ -102,8 +102,6 @@ field_counts
 Releases
 --------
 
-These tables are created and populated by ``008-release.sql``.
-
 .. _release_summary:
 
 release_summary
@@ -126,8 +124,6 @@ release_summary_no_data
 
 Parties
 -------
-
-These tables are created and populated by ``003-buyer-procuringentity-tenderer.sql``.
 
 parties_summary
 ~~~~~~~~~~~~~~~
@@ -166,8 +162,6 @@ tenderers_summary
 Planning section
 ----------------
 
-These tables are created and populated by ``004-planning.sql``.
-
 planning_summary
 ~~~~~~~~~~~~~~~~
 
@@ -196,8 +190,6 @@ planning_milestones_summary
 
 Tender section
 --------------
-
-These tables are created and populated by ``005-tender.sql``.
 
 .. _tender_summary:
 
@@ -246,7 +238,7 @@ tender_milestones_summary
 Awards section
 --------------
 
-These tables are created and populated by ``006-awards.sql``.
+.. _awards_summary:
 
 awards_summary
 ~~~~~~~~~~~~~~
@@ -285,8 +277,6 @@ award_documents_summary
 Contracts section
 -----------------
 
-These tables are created and populated by ``007-contracts.sql``.
-
 contracts_summary
 ~~~~~~~~~~~~~~~~~
 
@@ -323,8 +313,6 @@ contract_milestones_summary
 
 Contract implementation section
 -------------------------------
-
-These tables are created and populated by ``007-contracts.sql``.
 
 contract_implementation_transactions_summary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

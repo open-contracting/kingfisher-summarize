@@ -23,122 +23,104 @@ Make changes
 Example: Add a column
 ~~~~~~~~~~~~~~~~~~~~~
 
-We want to add the ``description`` values of the ``Tender`` and ``Award`` objects to the :ref:`relevant<db-tender>` :ref:`tables<db-awards>` in Kingfisher Views.
+We want to add the ``description`` values of the ``Tender`` and ``Award`` objects to the :ref:`tender_summary` and :ref:`awards_summary` views in Kingfisher Views. (Note: This is already done.)
 
-#. Find the SQL table to change.
+#. Find the SQL file to change.
 
-   -  The tables summarizing the ``Tender`` object are in the ``005-tender.sql`` file.
-   -  The ``tender_summary_no_data`` table is the SQL table to change.
+   -  The ``tender_summary.sql`` file contains the ``CREATE VIEW tender_summary`` statement.
+
+#. Find the SQL statement to change.
+
+   -  The ``tender_summary`` view selects from the ``tender_summary_no_data`` table.
 
 #. Add the ``description`` field to the ``SELECT`` clause for the ``tender_summary_no_data`` table.
 
-   -  You can see the other OCDS fields in the statement. Add it alongside those:
+   -  You can see the other OCDS fields in the statement. Add it alongside those.
 
    .. code-block:: sql
 
-       CREATE TABLE tender_summary_no_data AS
-       SELECT
-           r.id,
-           r.release_type,
-           r.collection_id,
-           r.ocid,
-           r.release_id,
-           r.data_id,
-           tender ->> 'id' AS tender_id,
-           tender ->> 'title' AS tender_title,
-           tender ->> 'status' AS tender_status,
-           tender ->> 'description' AS tender_description, -- OUR ADDITION
-       ...
+      CREATE TABLE tender_summary_no_data AS
+      SELECT
+          r.id,
+          r.release_type,
+          r.collection_id,
+          r.ocid,
+          r.release_id,
+          r.data_id,
+          tender ->> 'id' AS tender_id,
+          tender ->> 'title' AS tender_title,
+          tender ->> 'status' AS tender_status,
+          tender ->> 'description' AS tender_description, -- OUR ADDITION
+      ...
 
-#. Do the same for the table summarizing the ``Award`` object.
-
-   -  The tables summarizing the ``Award`` objects are in the ``006-awards.sql`` file.
-   -  Edit the ``SELECT`` clause for the ``awards_summary_no_data`` table.
+#. Do the same for the table summarizing the ``Award`` object, by editing the ``SELECT`` clause for the ``awards_summary_no_data`` table in the ``awards_summary.sql`` file.
 
    .. code-block:: sql
 
-       ...
-       award ->> 'title' AS award_title,
-       award ->> 'status' AS award_status,
-       award ->> 'description' AS award_description, -- OUR ADDITION
-       ...
+      ...
+          award ->> 'title' AS award_title,
+          award ->> 'status' AS award_status,
+          award ->> 'description' AS award_description, -- OUR ADDITION
+      ...
 
 Example: Add an aggregate
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We want to add the number of ``Document`` objects (in total and for each ``documentType`` value) across all ``Planning`` objects to the :ref:`relevant table<db-releases>` in Kingfisher Views.
+We want to add the number of ``Document`` objects (in total and for each ``documentType`` value) across all ``Planning`` objects to the :ref:`release_summary` view in Kingfisher Views. (Note: This is already done.)
+
+``tender_documentType_counts`` and ``total_tender_documents`` columns already exist for ``Tender`` objects. We can follow their example to add ``planning_documentType_counts`` and ``total_planning_documents`` columns.
 
 This example demonstrates how Kingfisher Views uses temporary (``tmp_*``) tables to build its final tables.
 
-#. Find the :ref:`block<sql-contents>` of SQL statements to use as a template for adding the aggregate.
-
-   -  The ``award_documentType_counts`` and ``contract_documentType_counts`` columns already exist for ``Award`` and ``Contract`` objects.
-   -  Try to find a place to add the new block that will make sense for the next person who edits the file.
+#. The ``tender_documentType_counts`` term occurs in the ``agg_tender.sql`` file, which populates a ``tmp_tender_documents_aggregates`` table with that column. Following this template, we create this file:
 
    .. code-block:: sql
 
-       -- Add this before the tmp_award_documents_aggregates block, using that block as a template.
-
-       CREATE TABLE tmp_planning_documents_aggregates AS
-       SELECT
-           id,
-           jsonb_object_agg(coalesce(documentType, ''), documentType_count) planning_documentType_counts
-       FROM
-           (SELECT
-               id,
-               documentType,
-               count(*) documentType_count
-           FROM
-               planning_documents_summary
-           GROUP BY
-               id, documentType) AS d
-       GROUP BY
-           id;
-
-       CREATE UNIQUE INDEX tmp_planning_documents_aggregates_id ON tmp_planning_documents_aggregates(id);
-
-#. Do the same for the total documents.
-
-   -  The ``total_award_documents`` and ``total_contract_documents`` columns already exist for ``Award`` and ``Contract`` objects.
-   -  An OCDS release has only one ``Planning`` object, so we remove the ``sum()`` function and ``group by`` clause.
-
-   .. code-block:: sql
-
-      -- Add this before the tmp_release_awards_aggregates block, using that block as a template.
-
-      CREATE TABLE tmp_release_planning_aggregates AS
+      CREATE TABLE tmp_planning_documents_aggregates AS
       SELECT
           id,
-          documents_count AS total_planning_documents
-      FROM
-          planning_summary;
+          jsonb_object_agg(coalesce(documentType, ''), documentType_count) planning_documentType_counts
+      FROM (
+          SELECT
+              id,
+              documentType,
+              count(*) documentType_count
+          FROM
+              planning_documents_summary
+          GROUP BY
+              id,
+              documentType) AS d
+      GROUP BY
+          id;
 
-      CREATE UNIQUE INDEX tmp_release_planning_aggregates_id ON tmp_release_planning_aggregates(id);
+      CREATE UNIQUE INDEX tmp_planning_documents_aggregates_id ON tmp_planning_documents_aggregates (id);
 
-#. Find the SQL table to change.
-
-   -  The tables summarizing the entire collection are in the ``008-release.sql`` file.
-   -  The ``release_summary`` table is created by ``JOIN`` ing many ``tmp_*`` tables.
-
-#. Add ``JOIN`` s for the new blocks.
-
-   -  The order of the ``JOIN`` s controls the order of the columns in the table.
+#. Next, the ``tmp_tender_documents_aggregates`` term occurs in the ``release_summary.sql`` file, which ``JOIN`` s the table into the ``release_summary_no_data`` table. Following this template, we add this clause in that file:
 
    .. code-block:: sql
 
-      -- Add this before the tmp_release_awards_aggregates JOIN.
-
-      LEFT JOIN tmp_release_planning_aggregates USING (id)
       LEFT JOIN tmp_planning_documents_aggregates USING (id)
 
-#. Drop our ``tmp_`` tables:
+#. Next, the ``total_tender_documents`` term occurs in the ``release_summary.sql`` file, in a ``JOIN`` clause. Following this template, we add this clause in that file:
 
    .. code-block:: sql
 
-      -- Add this before `DROP TABLE tmp_release_awards_aggregates;`
+      LEFT JOIN (
+          SELECT
+              id,
+              documents_count AS total_planning_documents
+          FROM
+              planning_summary) AS planning_summary USING (id)
 
-      DROP TABLE tmp_release_planning_aggregates;
+#. Finally, drop the ``tmp_`` table in the ``sql/final/drop.sql`` file:
+
+   .. code-block:: sql
+
       DROP TABLE tmp_planning_documents_aggregates;
+
+.. note::
+
+   The order of the ``JOIN`` s controls the order of the columns in the table.
 
 .. _review-changes:
 
@@ -160,7 +142,7 @@ Update documentation
 
 The tests won't pass if you don't document the new columns!
 
-#. Edit the ``999-docs.sql`` file to add comments on the new columns:
+#. Edit the ``docs.sql`` file to add comments on the new columns:
 
    -  The comments should be in the same order as the corresponding columns in the tables. You can use other comments for similar columns as a template.
 
@@ -180,11 +162,11 @@ The tests won't pass if you don't document the new columns!
       COMMENT ON COLUMN %1$s.total_planning_documents IS 'Count of planning documents in this release';
       COMMENT ON COLUMN %1$s.planning_documenttype_counts IS 'JSONB object with the keys as unique planning/documents/documentType and the values as count of the appearances of those documentTypes';
 
-#. Run the ``999-docs.sql`` file (:ref:`refresh-views` throws an error if you made a typo above) (replacing ``COLLECTION_NAME`` below):
+#. Run the :ref:`add-view` command (replacing ``COLLECTION_NAME`` below):
 
    .. code-block:: bash
 
-      python ocdskingfisher-views-cli refresh-views COLLECTION_NAME
+      python ocdskingfisher-views-cli add-view COLLECTION_NAME docs
 
 #. Review your changes.
 

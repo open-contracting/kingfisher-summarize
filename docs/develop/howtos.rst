@@ -9,13 +9,15 @@ The examples below use the ``view_data_NAME`` schema and the :ref:`default datab
 Run a specific file
 ~~~~~~~~~~~~~~~~~~~
 
-To run, for example, the ``004-planning.sql`` file:
+To run, for example, the ``planning_tmp.sql`` file:
 
 .. code-block:: bash
 
-   psql 'dbname=ocdskingfisher user=ocdskingfisher options=--search-path=view_data_NAME' -f 004-planning.sql
+   psql 'dbname=ocdskingfisher user=ocdskingfisher options=--search-path=view_data_NAME' -f planning_tmp.sql
 
-When working on a specific file, you can first run the :ref:`add-view` command and then run the ``002`` file (on which all SQL files depend) as above. You can then run the specific file after each of your changes to see the new results.
+.. note::
+
+   See `issue #167 <https://github.com/open-contracting/kingfisher-views/issues/167>`__ about developer tools.
 
 Time SQL statements
 ~~~~~~~~~~~~~~~~~~~
@@ -24,7 +26,7 @@ Add the ``-c '\timing'`` option to a ``psql`` command, before any ``-f`` options
 
 .. code-block:: bash
 
-   psql 'dbname=ocdskingfisher user=ocdskingfisher options=--search-path=view_data_NAME' -c '\timing' -f 004-planning.sql
+   psql 'dbname=ocdskingfisher user=ocdskingfisher options=--search-path=view_data_NAME' -c '\timing' -f planning_tmp.sql
 
 Drop tables and views
 ~~~~~~~~~~~~~~~~~~~~~
