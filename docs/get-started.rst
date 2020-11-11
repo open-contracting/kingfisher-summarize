@@ -32,27 +32,6 @@ All instructions in this documentation assume that you have changed to the ``kin
 Configure
 ---------
 
-Create the configuration directory:
-
-.. code-block:: bash
-
-    mkdir ~/.config/ocdskingfisher-views
-
-.. _config-logging:
-
-Logging
-~~~~~~~
-
-Logging from the :doc:`cli/index` can be configured with a ``~/.config/ocdskingfisher-views/logging.json`` file. To download the default configuration::
-
-    curl https://raw.githubusercontent.com/open-contracting/kingfisher-summarize/master/samples/logging.json -o ~/.config/ocdskingfisher-views/logging.json
-
-To download a different configuration that includes debug messages::
-
-    curl https://raw.githubusercontent.com/open-contracting/kingfisher-summarize/master/samples/logging-debug.json -o ~/.config/ocdskingfisher-views/logging.json
-
-Read more about :doc:`logging`.
-
 .. _database-connection-settings:
 
 Database connection
@@ -79,6 +58,13 @@ The database user must have the `CREATE privilege <https://www.postgresql.org/do
 .. code-block:: bash
 
    psql ocdskingfisher -U ocdskingfisher -c 'GRANT CREATE ON DATABASE ocdskingfisher TO ocdskingfisher;'
+
+.. _config-logging:
+
+Logging
+~~~~~~~
+
+Logging from the :doc:`cli/index` can be configured with a ``logging.json`` file in a `configuration directory <https://click.palletsprojects.com/en/7.x/api/#click.get_app_dir>`__ appropriate to your operating system. Read more about :doc:`logging`.
 
 Setup PostgreSQL database
 -------------------------
