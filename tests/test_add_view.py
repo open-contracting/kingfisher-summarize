@@ -1,3 +1,5 @@
+import datetime
+import decimal
 from unittest.mock import patch
 
 import pytest
@@ -12,6 +14,7 @@ command = 'add-view'
 TABLES = {
     'note',
     'selected_collections',
+
     # refresh_views
     'award_documents_summary',
     'award_items_summary',
@@ -36,6 +39,7 @@ TABLES = {
     'tender_milestones_summary',
     'tender_summary_no_data',
     'tenderers_summary',
+
     # field_counts
     'field_counts',
 }
@@ -100,8 +104,6 @@ def test_command_name(kwargs, name, collections, db, caplog):
 ])
 def test_command(db, tables_only, tables, views, caplog):
     with fixture(db, tables_only=tables_only) as result:
-        rows = db.all('SELECT * FROM view_data_collection_1.field_counts')
-
         # Check existence of schema, tables and views.
         assert db.schema_exists('view_data_collection_1')
         assert set(db.pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
@@ -109,7 +111,69 @@ def test_command(db, tables_only, tables, views, caplog):
         assert set(db.pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
                             "AND table_type = 'VIEW'", {'schema': 'view_data_collection_1'})) == views
 
-        # Check contents of tables and views.
+        # Check contents of summary tables.
+        rows = db.all("""
+            SELECT
+                id,
+                award_index,
+                release_type,
+                collection_id,
+                ocid,
+                release_id,
+                data_id,
+                award_id,
+                award_title,
+                award_status,
+                award_description,
+                award_value_amount,
+                award_value_currency,
+                award_date,
+                award_contractperiod_startdate,
+                award_contractperiod_enddate,
+                award_contractperiod_maxextentdate,
+                award_contractperiod_durationindays,
+                suppliers_count,
+                documents_count,
+                documenttype_counts,
+                items_count
+            FROM view_data_collection_1.awards_summary
+            ORDER BY id
+        """)
+
+        assert rows[0] == (
+            30,  # id
+            0,  # award_index
+            'release',  # release_type
+            1,  # collection_id
+            'dolore',  # ocid
+            'ex laborumsit autein magna veniam',  # release_id
+            2,  # data_id
+            'reprehenderit magna cillum eu nisi',  # award_id
+            'laborum aute nisi eiusmod',  # award_title
+            'pending',  # award_status
+            'ullamco in voluptate',  # award_description
+            decimal.Decimal('-95099396'),  # award_value_amount
+            'AMD',  # award_value_currency
+            datetime.datetime(3263, 12, 5, 21, 24, 19, 161000),  # award_date
+            datetime.datetime(4097, 9, 16, 5, 55, 19, 125000),  # award_contractperiod_startdate
+            datetime.datetime(4591, 4, 29, 6, 34, 28, 472000),  # award_contractperiod_enddate
+            datetime.datetime(3714, 8, 9, 7, 21, 37, 544000),  # award_contractperiod_maxextentdate
+            decimal.Decimal('72802012'),  # award_contractperiod_durationindays
+            2,  # suppliers_count
+            4,  # documents_count
+            {
+                'Excepteur nisi et': 1,
+                'proident exercitation in': 1,
+                'ut magna dolore velit aute': 1,
+                'veniam enim aliqua d': 1,
+            },  # documenttype_counts
+            5,  # items_count
+        )
+        assert len(rows) == 301
+
+        # Check contents of field_counts table.
+        rows = db.all('SELECT * FROM view_data_collection_1.field_counts')
+
         assert len(rows) == 65235
         assert rows[0] == (1, 'release', 'awards', 100, 301, 100)
 

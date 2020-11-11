@@ -1,29 +1,29 @@
 -- Inspired by https://github.com/csikfer/lanview2/blob/master/database/update-1.9.sql
 -- Error reference: https://www.postgresql.org/docs/current/errcodes-appendix.html
-CREATE FUNCTION convert_to_numeric (text, numeric DEFAULT NULL)
+CREATE FUNCTION convert_to_numeric (text)
     RETURNS numeric PARALLEL SAFE
     AS $$
 BEGIN
     RETURN CAST($1 AS numeric);
 EXCEPTION
     WHEN invalid_text_representation THEN
-        RETURN $2;
+        RETURN NULL;
 END;
 
 $$
 LANGUAGE plpgsql
 IMMUTABLE STRICT;
 
-CREATE FUNCTION convert_to_timestamp (text, timestamp DEFAULT NULL)
+CREATE FUNCTION convert_to_timestamp (text)
     RETURNS timestamp PARALLEL SAFE
     AS $$
 BEGIN
     RETURN CAST($1 AS timestamp);
 EXCEPTION
     WHEN invalid_datetime_format THEN
-        RETURN $2;
+        RETURN NULL;
     WHEN datetime_field_overflow THEN
-        RETURN $2;
+        RETURN NULL;
 END;
 
 $$
