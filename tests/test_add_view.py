@@ -119,7 +119,6 @@ def test_command(db, tables_only, tables, views, caplog):
                 collection_id,
                 ocid,
                 release_id,
-                data_id,
                 award_id,
                 award_title,
                 award_status,
@@ -145,7 +144,6 @@ def test_command(db, tables_only, tables, views, caplog):
             1,  # collection_id
             'dolore',  # ocid
             'ex laborumsit autein magna veniam',  # release_id
-            2,  # data_id
             'reprehenderit magna cillum eu nisi',  # award_id
             'laborum aute nisi eiusmod',  # award_title
             'pending',  # award_status
