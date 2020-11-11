@@ -4,10 +4,7 @@ env:
   BASEDIR: https://raw.githubusercontent.com/open-contracting/standard-maintenance-scripts/master
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres:11
