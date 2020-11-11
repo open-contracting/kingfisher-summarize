@@ -135,7 +135,7 @@ def test_command(db, tables_only, tables, views, caplog):
                 documenttype_counts,
                 items_count
             FROM view_data_collection_1.awards_summary
-            ORDER BY id
+            ORDER BY id, award_index
         """)
 
         assert rows[0] == (
@@ -181,7 +181,7 @@ def test_command(db, tables_only, tables, views, caplog):
                 parties_additionalidentifiers_ids,
                 parties_additionalidentifiers_count
             FROM view_data_collection_1.parties_summary
-            ORDER BY id
+            ORDER BY id, party_index
         """)
 
         assert rows[0] == (
