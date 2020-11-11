@@ -517,12 +517,12 @@ def docs_table_ref(name):
                 writer.writerow(row)
 
 
-cli.add_command(add)
-cli.add_command(correct_user_permissions)
-cli.add_command(remove)
-cli.add_command(docs_table_ref)
 cli.add_command(install)
+cli.add_command(add)
+cli.add_command(remove)
 cli.add_command(index)
+cli.add_command(correct_user_permissions)
+cli.add_command(docs_table_ref)
 
 if __name__ == '__main__':
     cli()
