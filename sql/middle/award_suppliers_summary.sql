@@ -10,7 +10,7 @@ CREATE TABLE award_suppliers_summary AS SELECT DISTINCT ON (r.id, award_index, s
     supplier,
     supplier ->> 'id' AS supplier_parties_id,
     ps.identifier AS supplier_identifier,
-    coalesce(supplier ->> 'id', (supplier -> 'identifier' ->> 'scheme') || '-' || (supplier -> 'identifier' ->> 'id'), supplier ->> 'name') AS unique_identifier_attempt,
+    coalesce(supplier ->> 'id', hyphenate(supplier -> 'identifier' ->> 'scheme', supplier -> 'identifier' ->> 'id'), supplier ->> 'name') AS unique_identifier_attempt,
     ps.parties_additionalIdentifiers_ids AS supplier_additionalIdentifiers_ids,
     ps.parties_additionalIdentifiers_count AS supplier_additionalIdentifiers_count,
     CAST(ps.id IS NOT NULL AS integer) AS link_to_parties,

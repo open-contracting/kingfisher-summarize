@@ -9,16 +9,11 @@ SELECT
     data_id,
     value ->> 'id' AS parties_id,
     value -> 'roles' AS roles,
-    CASE WHEN value -> 'identifier' ->> 'scheme' IS NULL
-        AND value -> 'identifier' ->> 'id' IS NULL THEN
-        NULL
-    ELSE
-        concat_ws('-', value -> 'identifier' ->> 'scheme', value -> 'identifier' ->> 'id')
-    END AS identifier,
-    coalesce(value ->> 'id', (value -> 'identifier' ->> 'scheme') || '-' || (value -> 'identifier' ->> 'id'), value ->> 'name') AS unique_identifier_attempt,
+    hyphenate(value -> 'identifier' ->> 'scheme', value -> 'identifier' ->> 'id') AS identifier,
+    coalesce(value ->> 'id', hyphenate(value -> 'identifier' ->> 'scheme', value -> 'identifier' ->> 'id'), value ->> 'name') AS unique_identifier_attempt,
     (
         SELECT
-            jsonb_agg((additional_identifier ->> 'scheme') || '-' || (additional_identifier ->> 'id'))
+            jsonb_agg(hyphenate(additional_identifier ->> 'scheme', additional_identifier ->> 'id'))
         FROM
             jsonb_array_elements(
                 CASE WHEN jsonb_typeof(value -> 'additionalIdentifiers') = 'array' THEN

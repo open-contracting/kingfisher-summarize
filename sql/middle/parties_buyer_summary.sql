@@ -17,7 +17,7 @@ SELECT DISTINCT ON ( r.id)
     buyer ->> 'id' AS buyer_parties_id,
     buyer ->> 'name' AS buyer_name,
     ps.identifier AS buyer_identifier,
-    coalesce(buyer ->> 'id', (buyer -> 'identifier' ->> 'scheme') || '-' || (buyer -> 'identifier' ->> 'id'), buyer ->> 'name'
+    coalesce(buyer ->> 'id', hyphenate(buyer -> 'identifier' ->> 'scheme', buyer -> 'identifier' ->> 'id'), buyer ->> 'name'
 ) AS unique_identifier_attempt,
     ps.parties_additionalIdentifiers_ids AS buyer_additionalIdentifiers_ids,
     ps.parties_additionalIdentifiers_count AS buyer_additionalIdentifiers_count,

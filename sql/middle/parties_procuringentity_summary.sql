@@ -16,7 +16,7 @@ SELECT DISTINCT ON ( r.id)
     procuringEntity,
     procuringEntity ->> 'id' AS procuringEntity_parties_id,
     ps.identifier AS procuringEntity_identifier,
-    coalesce(procuringEntity ->> 'id', (procuringEntity -> 'identifier' ->> 'scheme') || '-' || (procuringEntity -> 'identifier' ->> 'id'), procuringEntity ->> 'name'
+    coalesce(procuringEntity ->> 'id', hyphenate(procuringEntity -> 'identifier' ->> 'scheme', procuringEntity -> 'identifier' ->> 'id'), procuringEntity ->> 'name'
 ) AS unique_identifier_attempt,
     ps.parties_additionalIdentifiers_ids AS procuringEntity_additionalIdentifiers_ids,
     ps.parties_additionalIdentifiers_count AS procuringEntity_additionalIdentifiers_count,

@@ -21,7 +21,7 @@ SELECT DISTINCT ON ( r.id, tenderer_index)
     tenderer,
     tenderer ->> 'id' AS tenderer_parties_id,
     ps.identifier AS tenderer_identifier,
-    coalesce(tenderer ->> 'id', (tenderer -> 'identifier' ->> 'scheme') || '-' || (tenderer -> 'identifier' ->> 'id'), tenderer ->> 'name'
+    coalesce(tenderer ->> 'id', hyphenate(tenderer -> 'identifier' ->> 'scheme', tenderer -> 'identifier' ->> 'id'), tenderer ->> 'name'
 ) AS unique_identifier_attempt,
     ps.parties_additionalIdentifiers_ids AS tenderer_additionalIdentifiers_ids,
     ps.parties_additionalIdentifiers_count AS tenderer_additionalIdentifiers_count,

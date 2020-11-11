@@ -11,7 +11,7 @@ def noop(*args, **kwargs):
 
 
 @contextmanager
-def fixture(db, collections='1', name=None, tables_only=None):
+def fixture(db, collections='1', name=None, tables_only=None, field_counts=True):
     runner = CliRunner()
 
     args = ['add-view', collections, 'Default']
@@ -21,6 +21,8 @@ def fixture(db, collections='1', name=None, tables_only=None):
         name = f"collection_{'_'.join(collections.split(','))}"
     if tables_only:
         args.append('--tables-only')
+    if not field_counts:
+        args.append('--no-field-counts')
 
     result = runner.invoke(cli, args)
 

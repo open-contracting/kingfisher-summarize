@@ -167,6 +167,44 @@ def test_command(db, tables_only, tables, views, caplog):
         )
         assert len(rows) == 301
 
+        rows = db.all("""
+            SELECT
+                party_index,
+                release_type,
+                collection_id,
+                ocid,
+                release_id,
+                parties_id,
+                roles,
+                identifier,
+                unique_identifier_attempt,
+                parties_additionalidentifiers_ids,
+                parties_additionalidentifiers_count
+            FROM view_data_collection_1.parties_summary
+            ORDER BY id
+        """)
+
+        assert rows[0] == (
+            3,
+            'release',
+            1,
+            'dolore',
+            'ex laborumsit autein magna veniam',
+            'proident cupidatat tempor in',
+            [
+                'eiusmod',
+                'deserunt exercitation',
+            ],
+            'cillum-cillum nulla incididunt aliqua',
+            'proident cupidatat tempor in',
+            [
+                'dolor-ad mollitvoluptate ea laborum',
+                'Excepteur culpa irure-nulla magna indolorveniam incididunt dolor',
+            ],
+            2,
+        )
+        assert len(rows) == 296
+
         # Check contents of field_counts table.
         rows = db.all('SELECT * FROM view_data_collection_1.field_counts')
 

@@ -12,15 +12,10 @@ SELECT
     convert_to_numeric (value ->> 'quantity') quantity,
     convert_to_numeric (value -> 'unit' -> 'value' ->> 'amount') unit_amount,
     value -> 'unit' -> 'value' ->> 'currency' unit_currency,
-    CASE WHEN value -> 'classification' ->> 'scheme' IS NULL
-        AND value -> 'classification' ->> 'id' IS NULL THEN
-        NULL
-    ELSE
-        concat_ws('-', value -> 'classification' ->> 'scheme', value -> 'classification' ->> 'id')
-    END AS item_classification,
+    hyphenate(value -> 'classification' ->> 'scheme', value -> 'classification' ->> 'id') AS item_classification,
     (
         SELECT
-            jsonb_agg((additional_classification ->> 'scheme') || '-' || (additional_classification ->> 'id'))
+            jsonb_agg(hyphenate(additional_classification ->> 'scheme', additional_classification ->> 'id'))
         FROM
             jsonb_array_elements(
                 CASE WHEN jsonb_typeof(value -> 'additionalClassifications') = 'array' THEN
