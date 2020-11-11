@@ -58,7 +58,7 @@ jobs:
         KINGFISHER_SUMMARIZE_DATABASE_URL: postgresql://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres
       run: |
         ./manage.py install
-        pytest -vv --cov ocdskingfishersummarize
+        pytest -vv --cov ocdskingfishersummarize --cov manage
     - env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       run: coveralls
