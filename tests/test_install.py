@@ -1,6 +1,6 @@
 from click.testing import CliRunner
 
-from ocdskingfisherviews.cli import cli
+from manage import cli
 from tests import assert_log_records
 
 command = 'install'

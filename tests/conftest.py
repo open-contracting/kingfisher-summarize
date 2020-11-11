@@ -1,6 +1,6 @@
 import pytest
 
-from ocdskingfisherviews.db import Database
+from ocdskingfishersummarize.db import Database
 
 
 @pytest.fixture(scope='session')

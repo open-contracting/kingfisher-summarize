@@ -1,7 +1,7 @@
 Edit SQL files
 ==============
 
-You should be familiar with SQL and the `Open Contracting Data Standard <ocds-standard-development-handbook.readthedocs.io/>`__. You don't need to know Python, as there's no need to touch Kingfisher Views' Python files, only its SQL files.
+You should be familiar with SQL and the `Open Contracting Data Standard <ocds-standard-development-handbook.readthedocs.io/>`__. You don't need to know Python, as there's no need to touch Kingfisher Summarize's Python files, only its SQL files.
 
 This how-to guide will walk you through the steps of editing SQL files (if you haven't already, please follow the :doc:`setup` guide):
 
@@ -15,7 +15,7 @@ This how-to guide will walk you through the steps of editing SQL files (if you h
       pytest
 
 #. :ref:`Format the SQL files<format-sql>`
-#. To merge your changes into Kingfisher Views, :ref:`push your changes to GitHub and make a pull request<merge>`
+#. To merge your changes, :ref:`push your changes to GitHub and make a pull request<merge>`
 
 Make changes
 ------------
@@ -23,7 +23,7 @@ Make changes
 Example: Add a column
 ~~~~~~~~~~~~~~~~~~~~~
 
-We want to add the ``description`` values of the ``Tender`` and ``Award`` objects to the :ref:`tender_summary` and :ref:`awards_summary` views in Kingfisher Views. (Note: This is already done.)
+We want to add the ``description`` values of the ``Tender`` and ``Award`` objects to the :ref:`tender_summary` and :ref:`awards_summary` views. (Note: This is already done.)
 
 #. Find the SQL file to change.
 
@@ -66,11 +66,11 @@ We want to add the ``description`` values of the ``Tender`` and ``Award`` object
 Example: Add an aggregate
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We want to add the number of ``Document`` objects (in total and for each ``documentType`` value) across all ``Planning`` objects to the :ref:`release_summary` view in Kingfisher Views. (Note: This is already done.)
+We want to add the number of ``Document`` objects (in total and for each ``documentType`` value) across all ``Planning`` objects to the :ref:`release_summary` view. (Note: This is already done.)
 
 ``tender_documentType_counts`` and ``total_tender_documents`` columns already exist for ``Tender`` objects. We can follow their example to add ``planning_documentType_counts`` and ``total_planning_documents`` columns.
 
-This example demonstrates how Kingfisher Views uses temporary (``tmp_*``) tables to build its final tables.
+This example demonstrates how temporary (``tmp_*``) tables are used to build final tables.
 
 #. The ``tender_documentType_counts`` term occurs in the ``agg_tender.sql`` file, which populates a ``tmp_tender_documents_aggregates`` table with that column. Following this template, we create this file:
 
@@ -131,7 +131,7 @@ Review your changes by comparing to the initial summaries you created when :ref:
 
 .. code-block:: bash
 
-   python ocdskingfisher-views-cli add-view 1 "Review new column" --name review_new_column
+   ./manage.py add 1 "Review new column" --name review_new_column
 
 Then, check that the data is as you expect it to be. (If you're viewing the data in a PostgreSQL client, don't forget to refresh it.)
 
@@ -162,11 +162,11 @@ The tests won't pass if you don't document the new columns!
       COMMENT ON COLUMN %1$s.total_planning_documents IS 'Count of planning documents in this release';
       COMMENT ON COLUMN %1$s.planning_documenttype_counts IS 'JSONB object with the keys as unique planning/documents/documentType and the values as count of the appearances of those documentTypes';
 
-#. Run the :ref:`add-view` command (replacing ``COLLECTION_NAME`` below):
+#. Run the :ref:`add` command (replacing ``COLLECTION_NAME`` below):
 
    .. code-block:: bash
 
-      python ocdskingfisher-views-cli add-view COLLECTION_NAME docs
+      ./manage.py add COLLECTION_NAME docs
 
 #. Review your changes.
 
@@ -176,7 +176,7 @@ The tests won't pass if you don't document the new columns!
 
   .. code-block:: bash
 
-     python ocdskingfisher-views-cli docs-table-ref COLLECTION_NAME
+     ./manage.py docs-table-ref COLLECTION_NAME
 
 .. _format-sql:
 
@@ -217,6 +217,6 @@ If you want to share your changes with others:
 
       git push -u origin my-changes
 
-#. Follow the link in the output to create a pull request for `Kingfisher Views <https://github.com/open-contracting/kingfisher-views>`__. The maintainers will assign your pull request for review, and merge it as appropriate.
+#. Follow the link in the output to create a `pull request <https://github.com/open-contracting/kingfisher-summarize/pulls>`__. The maintainers will assign your pull request for review, and merge it as appropriate.
 
-To apply your changes to existing schema created by Kingfisher Views, see :ref:`upgrade-app`.
+To apply your changes to existing schema created by Kingfisher Summarize, see :ref:`upgrade-app`.

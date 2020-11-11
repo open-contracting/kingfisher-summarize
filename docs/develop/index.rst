@@ -1,14 +1,14 @@
 Contributing
 ------------
 
-To contribute to Kingfisher Views, first follow the :doc:`setup` guide and read this page. Then, learn how to :doc:`sql` or follow the :doc:`howtos`.
+First, follow the :doc:`setup` guide, and read this page. Then, learn how to :doc:`sql` or follow the :doc:`howtos`.
 
 .. _sql-files:
 
 SQL files
 ---------
 
-The SQL statements that summarize data are stored in SQL files in the `sql/middle directory <https://github.com/open-contracting/kingfisher-views/tree/master/sql/middle>`__. The :ref:`add-view` command runs these SQL files.
+The SQL statements that summarize data are stored in SQL files in the `sql/middle directory <https://github.com/open-contracting/kingfisher-summarize/tree/master/sql/middle>`__. The :ref:`add` command runs these SQL files.
 
 The dependencies between SQL files are automatically determined. Files should create one table and/or view and related indices, and should not drop tables. Instead, any temporary tables should be dropped in ``sql/final/drop.sql``.
 

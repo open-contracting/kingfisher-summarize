@@ -17,7 +17,7 @@ To run, for example, the ``planning_tmp.sql`` file:
 
 .. note::
 
-   See `issue #167 <https://github.com/open-contracting/kingfisher-views/issues/167>`__ about developer tools.
+   See `issue #167 <https://github.com/open-contracting/kingfisher-summarize/issues/167>`__ about developer tools.
 
 Time SQL statements
 ~~~~~~~~~~~~~~~~~~~
@@ -47,11 +47,11 @@ Documentation files
 Update the database tables reference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:doc:`../database` displays the CSV files in the `docs/definitions/ <https://github.com/open-contracting/kingfisher-views/tree/master/docs/definitions>`__ directory. To create and/or update the CSV files, run (replacing ``COLLECTION_NAME`` below):
+:doc:`../database` displays the CSV files in the `docs/definitions/ <https://github.com/open-contracting/kingfisher-summarize/tree/master/docs/definitions>`__ directory. To create and/or update the CSV files, run (replacing ``COLLECTION_NAME`` below):
 
 .. code-block:: bash
 
-   python ocdskingfisher-views-cli docs-table-ref COLLECTION_NAME
+   ./manage.py docs-table-ref COLLECTION_NAME
 
 Then, for any new CSV file, manually add a new sub-section to ``docs/database.rst`` under an appropriate section.
 
@@ -68,7 +68,7 @@ Add a schema with the ``--tables-only`` option:
 
 .. code-block:: bash
 
-    python ocdskingfisher-views-cli add-view 123 diagram --tables-only
+    ./manage.py add 123 diagram --tables-only
 
 Run SchemaSpy, using appropriate values for the ``-db`` (database name), ``-`` (schema) ``-u`` (user) and ``-p`` (password, optional) arguments:
 

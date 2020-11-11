@@ -4,8 +4,8 @@ Sharing access
 This how-to guide describes how to:
 
 -  Add a user
--  Grant a user read-only access to *some* tables created by Kingfisher Views
--  Grant a user read-only access to *all* tables created by Kingfisher Views and Kingfisher Process
+-  Grant a user read-only access to *some* tables created by Kingfisher Summarize
+-  Grant a user read-only access to *all* tables created by Kingfisher Summarize and Kingfisher Process
 -  Remove a user
 
 Add a user
@@ -28,7 +28,7 @@ Add a user
 Grant a user read-only access to *some* tables
 ----------------------------------------------
 
-Connect to the database used by Kingfisher Views, using the connecting settings you :ref:`configured earlier<database-connection-settings>`. For example, run:
+Connect to the database used by Kingfisher Summarize, using the connecting settings you :ref:`configured earlier<database-connection-settings>`. For example, run:
 
    .. code-block:: bash
 
@@ -44,7 +44,7 @@ To grant access to all tables within a specific schema, run, for example:
 Grant a user read-only access to *all* tables
 ---------------------------------------------
 
-#. Connect to the database used by Kingfisher Views, using the connecting settings you :ref:`configured earlier<database-connection-settings>`.
+#. Connect to the database used by Kingfisher Summarize, using the connecting settings you :ref:`configured earlier<database-connection-settings>`.
 
 #. Insert the username into the ``views.read_only_user`` table. For example, replace ``the_username``, and run:
 
@@ -54,16 +54,16 @@ Grant a user read-only access to *all* tables
 
 #. Close your PostgreSQL session.
 
-#. Run the :ref:`correct-user-permissions` command to grant the user read-only access to the tables created by Kingfisher Views and Kingfisher Process:
+#. Run the :ref:`correct-user-permissions` command to grant the user read-only access to the tables created by Kingfisher Summarize and Kingfisher Process:
 
    .. code-block:: bash
 
-      python ocdskingfisher-views-cli correct-user-permissions
+      ./manage.py correct-user-permissions
 
 Remove a user
 -------------
 
-#. Connect to the database used by Kingfisher Views, using the connecting settings you :ref:`configured earlier<database-connection-settings>`.
+#. Connect to the database used by Kingfisher Summarize, using the connecting settings you :ref:`configured earlier<database-connection-settings>`.
 
 #. Delete the username from the ``views.read_only_user`` table. For example, replace ``the_username``, and run:
 

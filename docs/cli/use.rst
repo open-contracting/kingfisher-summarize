@@ -3,10 +3,10 @@ Use
 
 These commands are used to create and manage the :doc:`summary tables<../database>` of one or more collections.
 
-.. _add-view:
+.. _add:
 
-add-view
---------
+add
+---
 
 Creates a schema containing :doc:`summary tables<../database>` about one or more collections.
 
@@ -23,13 +23,13 @@ Replace ``ID`` with a Kingfisher Process collection ID, replace ``NOTE`` with yo
 
 .. code-block:: bash
 
-   python ocdskingfisher-views-cli add-view ID "NOTE"
+   ./manage.py add ID "NOTE"
 
 For example:
 
 .. code-block:: bash
 
-   python ocdskingfisher-views-cli add-view 123 "Created by Morgan A. to measure procurement indicators"
+   ./manage.py add 123 "Created by Morgan A. to measure procurement indicators"
 
 This creates a schema named ``view_data_collection_123``.
 
@@ -42,7 +42,7 @@ To customize the last part of the schema's name (for example, ``collection_123``
 
 .. code-block:: bash
 
-    python ocdskingfisher-views-cli add-view 123 "The note" --name the_name
+    ./manage.py add 123 "The note" --name the_name
 
 This creates a schema named ``view_data_the_name``.
 
@@ -55,7 +55,7 @@ Instead of passing one collection ID, you can pass many collection IDs, separate
 
 .. code-block:: bash
 
-   python ocdskingfisher-views-cli add-view 4,5,6 "Created by Morgan A. to compare field coverage"
+   ./manage.py add 4,5,6 "Created by Morgan A. to compare field coverage"
 
 This creates a schema named ``view_data_collection_4_5_6``.
 
@@ -70,7 +70,7 @@ By default, some summary tables are database `views <https://www.postgresql.org/
 
 .. code-block:: bash
 
-    python ocdskingfisher-views-cli add-view 123 "The note" --name the_name --tables-only
+    ./manage.py add 123 "The note" --name the_name --tables-only
 
 Use this option if:
 
@@ -78,10 +78,10 @@ Use this option if:
 -  You want to make it easier for a user to discover the foreign key relationships between tables (for example, using ``\d <table>`` instead of ``\d+ <view>`` followed by ``\d <table>``)
 -  You are :ref:`creating the Entity Relationship Diagram<create_erd>`
 
-.. _delete-view:
+.. _delete:
 
-delete-view
------------
+delete
+------
 
 Drops a schema.
 
@@ -89,7 +89,7 @@ Replace ``NAME`` with the last part of a schema's name (the part after ``view_da
 
 .. code-block:: bash
 
-   python ocdskingfisher-views-cli delete-view NAME
+   ./manage.py delete NAME
 
 This is equivalent to:
 
@@ -97,16 +97,16 @@ This is equivalent to:
 
   DROP SCHEMA view_data_NAME CASCADE;
 
-.. _list-views:
+.. _index:
 
-list-views
-----------
+index
+-----
 
 Lists the schemas, with collection IDs and creator's notes.
 
 .. code-block:: bash
 
-   python ocdskingfisher-views-cli list-views
+   ./manage.py index
 
 Outputs:
 
@@ -117,7 +117,7 @@ Outputs:
    | collection_4_5_6 | 4, 5, 6       | Created by Morgan A. to compare field coverage (2020-07-31 14:53:38)         |
    | collection_123   | 1             | Created by Morgan A. to measure procurement indicators (2020-01-02 03:04:05) |
 
-To list the schemas only, Connect to the database used by Kingfisher Views, using the connecting settings you :ref:`configured earlier<database-connection-settings>`, and run:
+To list the schemas only, Connect to the database used by Kingfisher Summarize, using the connecting settings you :ref:`configured earlier<database-connection-settings>`, and run:
 
 .. code-block:: none
 
@@ -136,7 +136,7 @@ correct-user-permissions
 
 .. code-block:: bash
 
-   python ocdskingfisher-views-cli correct-user-permissions
+   ./manage.py correct-user-permissions
 
 The tables to which access is granted are:
 
@@ -145,11 +145,11 @@ The tables to which access is granted are:
 ``views``
    The ``mapping_sheets`` table.
 Collection-specific schemas
-   All tables about one or more collections, created by the :ref:`add-view` command. See :doc:`../database`.
+   All tables about one or more collections, created by the :ref:`add` command. See :doc:`../database`.
 
 .. _upgrade-app:
 
-Upgrade Kingfisher Views
-------------------------
+Upgrade Kingfisher Summarize
+----------------------------
 
-If the new version of Kingfisher Views makes changes to SQL statements, you might want to re-create the collection-specific schemas, by running :ref:`delete-view` then :ref:`add_view` for the selected extensions (``SELECT id from selected_collections;``).
+If the new version of Kingfisher Summarize makes changes to SQL statements, you might want to re-create the collection-specific schemas, by running :ref:`delete` then :ref:`add` for the selected extensions (``SELECT id from selected_collections;``).

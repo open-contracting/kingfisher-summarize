@@ -4,7 +4,7 @@ Get started
 Prerequisites
 -------------
 
-To use Kingfisher Views, you need:
+To use Kingfisher Summarize, you need:
 
 -  Access to a `Unix-like shell <https://en.wikipedia.org/wiki/Shell_(computing)>`__ (some are available for Windows)
 -  `Git <https://git-scm.com>`__
@@ -14,23 +14,23 @@ To use Kingfisher Views, you need:
 
 .. _install:
 
-Install Kingfisher Views
-------------------------
+Install
+-------
 
 Open a shell, and run:
 
 .. code-block:: bash
 
-   git clone https://github.com/open-contracting/kingfisher-views.git
-   cd kingfisher-views
+   git clone https://github.com/open-contracting/kingfisher-summarize.git
+   cd kingfisher-summarize
    pip install -r requirements.txt
 
-All instructions in this documentation assume that you have changed to the ``kingfisher-views`` directory (the ``cd`` command above).
+All instructions in this documentation assume that you have changed to the ``kingfisher-summarize`` directory (the ``cd`` command above).
 
 .. _configure:
 
-Configure Kingfisher Views
---------------------------
+Configure
+---------
 
 Create the configuration directory:
 
@@ -45,11 +45,11 @@ Logging
 
 Logging from the :doc:`cli/index` can be configured with a ``~/.config/ocdskingfisher-views/logging.json`` file. To download the default configuration::
 
-    curl https://raw.githubusercontent.com/open-contracting/kingfisher-views/master/samples/logging.json -o ~/.config/ocdskingfisher-views/logging.json
+    curl https://raw.githubusercontent.com/open-contracting/kingfisher-summarize/master/samples/logging.json -o ~/.config/ocdskingfisher-views/logging.json
 
 To download a different configuration that includes debug messages::
 
-    curl https://raw.githubusercontent.com/open-contracting/kingfisher-views/master/samples/logging-debug.json -o ~/.config/ocdskingfisher-views/logging.json
+    curl https://raw.githubusercontent.com/open-contracting/kingfisher-summarize/master/samples/logging-debug.json -o ~/.config/ocdskingfisher-views/logging.json
 
 Read more about :doc:`logging`.
 
@@ -58,19 +58,19 @@ Read more about :doc:`logging`.
 Database connection
 ~~~~~~~~~~~~~~~~~~~
 
-The database connection is configured by setting the ``KINGFISHER_VIEWS_DATABASE_URL`` environment variable to the `connection URI <https://www.postgresql.org/docs/current/libpq-connect.html#id-1.7.3.8.3.6>`__ of the database used by `Kingfisher Process <https://kingfisher-process.readthedocs.io/en/latest/config.html#postgresql>`__.
+The database connection is configured by setting the ``KINGFISHER_SUMMARIZE_DATABASE_URL`` environment variable to the `connection URI <https://www.postgresql.org/docs/current/libpq-connect.html#id-1.7.3.8.3.6>`__ of the database used by `Kingfisher Process <https://kingfisher-process.readthedocs.io/en/latest/config.html#postgresql>`__.
 
 It can be set on the command line. For example:
 
 .. code-block:: bash
 
-   export KINGFISHER_VIEWS_DATABASE_URL=postgresql://user:password@localhost:5432/dbname
+   export KINGFISHER_SUMMARIZE_DATABASE_URL=postgresql://user:password@localhost:5432/dbname
 
-Or, it can be set in a ``.env`` file in the ``kingfisher-views`` directory. For example:
+Or, it can be set in a ``.env`` file in the ``kingfisher-summarize`` directory. For example:
 
 .. code-block:: none
 
-   KINGFISHER_VIEWS_DATABASE_URL=postgresql://user:password@localhost:5432/dbname
+   KINGFISHER_SUMMARIZE_DATABASE_URL=postgresql://user:password@localhost:5432/dbname
 
 If you prefer not to store the password in the ``.env`` file, you can use the `PostgreSQL Password File <https://www.postgresql.org/docs/11/libpq-pgpass.html>`__, ``~/.pgpass``.
 
@@ -97,13 +97,13 @@ Setup PostgreSQL database
 
 #. Close your PostgreSQL session, e.g. with ``Ctrl-D`` for both
 
-#. Create Kingfisher Views' configuration tables using the :ref:`install` command:
+#. Create Kingfisher Summarize's configuration tables using the :ref:`install` command:
 
    .. code-block:: bash
 
-      python ocdskingfisher-views-cli install
+      ./manage.py install
 
-You're now ready to :doc:`use Kingfisher Views<cli/use>`.
+You're now ready to :doc:`use Kingfisher Summarize<cli/use>`.
 
 .. note::
 

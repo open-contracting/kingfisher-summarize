@@ -1,9 +1,9 @@
 Querying data
 =============
 
-Before you begin, read the :doc:`index` page to learn about how data is stored in Kingfisher Views.
+Before you begin, read the :doc:`index` page to learn about how data is stored in Kingfisher Summarize.
 
-Tables in Kingfisher Views can contain summaries of:
+Tables in Kingfisher Summarize can contain summaries of:
 
 * individual OCDS releases
 * individual OCDS releases from an OCDS record
@@ -15,7 +15,7 @@ Since most analysis is much easier to perform on compiled releases, we recommend
 List all schemas in the database
 --------------------------------
 
-Kingfisher Views creates database schemas to store summary data.
+Kingfisher Summarize creates database schemas to store summary data.
 
 The following query returns a list of schemas in the database:
 
@@ -119,7 +119,7 @@ To learn more about the summaries and aggregates in the ``tender_summary`` table
 
   The ``tender``, ``awards`` and ``contracts`` objects in OCDS all have a ``.status`` field.
 
-  Kingfisher Views stores these status fields in the ``tender_summary.tender_status``, ``awards_summary.award_status`` and ``contracts_summary.contract_status`` columns.
+  Kingfisher Summarize stores these status fields in the ``tender_summary.tender_status``, ``awards_summary.award_status`` and ``contracts_summary.contract_status`` columns.
 
   Consider which statuses you want to include or exclude from your analysis; for example, you might want to exclude pending and cancelled contracts when calculating the total value of contracts for each buyer.
 

@@ -44,7 +44,7 @@ jobs:
         python /tmp/kingfisher-process/ocdskingfisher-process-cli new-collection 'two' '2000-01-01 00:00:00'
         python /tmp/kingfisher-process/ocdskingfisher-process-cli local-load 1 tests/fixtures release_package
         python /tmp/kingfisher-process/ocdskingfisher-process-cli local-load 2 tests/fixtures release_package
-    - name: Setup Kingfisher Views database
+    - name: Setup Kingfisher Summarize database
       env:
         PGUSER: postgres
         PGPASSWORD: postgres
@@ -55,10 +55,10 @@ jobs:
         psql -c 'CREATE SCHEMA views;'
     - name: Test
       env:
-        KINGFISHER_VIEWS_DATABASE_URL: postgresql://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres
+        KINGFISHER_SUMMARIZE_DATABASE_URL: postgresql://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres
       run: |
-        python ocdskingfisher-views-cli install
-        pytest -vv --cov ocdskingfisherviews
+        ./manage.py install
+        pytest -vv --cov ocdskingfishersummarize
     - env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       run: coveralls

@@ -10,7 +10,7 @@ class Database:
         """
         Connects to the database.
         """
-        self.connection = psycopg2.connect(os.getenv('KINGFISHER_VIEWS_DATABASE_URL'))
+        self.connection = psycopg2.connect(os.getenv('KINGFISHER_SUMMARIZE_DATABASE_URL'))
         self.cursor = self.connection.cursor()
 
     def set_search_path(self, schemas):

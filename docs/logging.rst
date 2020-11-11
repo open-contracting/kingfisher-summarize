@@ -17,15 +17,15 @@ In particular, you can use the ``name`` attribute to filter messages by topic. F
 
 where ``NAME`` is one of:
 
-ocdskingfisher.views.cli
+ocdskingfisher.summarize.cli
   An ``INFO``-level message whenever a CLI command is run, by a user or by `cron <https://en.wikipedia.org/wiki/Cron>`__.
-ocdskingfisher.views.add-view
-  An ``INFO``-level message from the add-view command.
-ocdskingfisher.views.delete-view
-  An ``INFO``-level message from the delete-view command.
-ocdskingfisher.views.field-counts
+ocdskingfisher.summarize.add
+  An ``INFO``-level message from the add command.
+ocdskingfisher.summarize.delete
+  An ``INFO``-level message from the delete command.
+ocdskingfisher.summarize.field-counts
   An ``INFO``-level message from the field-counts routine.
-ocdskingfisher.views.install
+ocdskingfisher.summarize.install
   An ``INFO``-level message from the install command.
-ocdskingfisher.views.refresh-views
-  An ``INFO``-level message from the refresh-views routine.
+ocdskingfisher.summarize.summary-tables
+  An ``INFO``-level message from the summary-tables routine.

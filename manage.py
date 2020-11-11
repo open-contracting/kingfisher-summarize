@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import concurrent.futures
 import csv
 import glob
@@ -15,8 +16,8 @@ from dotenv import load_dotenv
 from psycopg2 import sql
 from tabulate import tabulate
 
-from ocdskingfisherviews.db import Database
-from ocdskingfisherviews.exceptions import AmbiguousSourceError
+from ocdskingfishersummarize.db import Database
+from ocdskingfishersummarize.exceptions import AmbiguousSourceError
 
 global db
 
@@ -33,7 +34,7 @@ def sql_files(directory, tables_only=False):
     """
     files = {}
 
-    filenames = glob.glob(os.path.join(basedir, '..', 'sql', directory, '*.sql'))
+    filenames = glob.glob(os.path.join(basedir, 'sql', directory, '*.sql'))
     for filename in filenames:
         identifier = f'{directory}:{os.path.splitext(os.path.basename(filename))[0]}'
         with open(filename) as f:
@@ -51,7 +52,7 @@ def dependency_graph(files):
     files on which that SQL file depends.
 
     :param dict files: the identifiers and contents of SQL files, as returned by
-                       :func:`~ocdskingfisherviews.cli.sql_files`
+                       :func:`~manage.sql_files`
     """
     # These dependencies are always met.
     ignore = {
@@ -67,7 +68,7 @@ def dependency_graph(files):
         'record_check',
         'release',
         'release_check',
-        # Kingfisher Views
+        # Kingfisher Summarize
         'selected_collections',
     }
 
@@ -149,7 +150,7 @@ def cli(ctx):
     else:
         logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-    logger = logging.getLogger('ocdskingfisher.views.cli')
+    logger = logging.getLogger('ocdskingfisher.summarize.cli')
     logger.info('Running %s', ctx.invoked_subcommand)
 
     global db
@@ -159,9 +160,9 @@ def cli(ctx):
 @click.command()
 def install():
     """
-    Creates the views schema and the read_only_user and mapping_sheets tables within it, if they don't exist.
+    Creates the ``views`` schema and its ``read_only_user`` and ``mapping_sheets`` tables, if they don't exist.
     """
-    logger = logging.getLogger('ocdskingfisher.views.install')
+    logger = logging.getLogger('ocdskingfisher.summarize.install')
 
     db.execute('CREATE TABLE IF NOT EXISTS views.read_only_user(username VARCHAR(64) NOT NULL PRIMARY KEY)')
     db.execute("""
@@ -183,7 +184,7 @@ def install():
     """)
 
     if not db.one('SELECT EXISTS(SELECT 1 FROM views.mapping_sheets)')[0]:
-        filename = os.path.join(basedir, '1-1-3.csv')
+        filename = os.path.join(basedir, 'ocdskingfishersummarize', '1-1-3.csv')
         with open(filename) as f:
             reader = csv.DictReader(f)
 
@@ -213,7 +214,7 @@ def install():
 @click.option('--field-counts/--no-field-counts', 'field_counts_option', default=True,
               help="Whether to create the field_counts table (default true).")
 @click.pass_context
-def add_view(ctx, collections, note, name, tables_only, field_counts_option):
+def add(ctx, collections, note, name, tables_only, field_counts_option):
     """
     Creates a schema containing summary tables about one or more collections.
 
@@ -221,7 +222,7 @@ def add_view(ctx, collections, note, name, tables_only, field_counts_option):
     COLLECTIONS is one or more comma-separated collection IDs
     NOTE is your name and a description of your purpose
     """
-    logger = logging.getLogger('ocdskingfisher.views.add-view')
+    logger = logging.getLogger('ocdskingfisher.summarize.add')
     logger.info('Arguments: collections=%s note=%s name=%s tables_only=%s',
                 collections, note, name, tables_only)
 
@@ -246,8 +247,8 @@ def add_view(ctx, collections, note, name, tables_only, field_counts_option):
 
     logger.info('Added %s', name)
 
-    logger.info('Running refresh-views routine')
-    refresh_views(schema, tables_only=tables_only)
+    logger.info('Running summary-tables routine')
+    summary_tables(schema, tables_only=tables_only)
 
     if field_counts_option:
         logger.info('Running field-counts routine')
@@ -259,13 +260,13 @@ def add_view(ctx, collections, note, name, tables_only, field_counts_option):
 
 @click.command()
 @click.argument('name', callback=validate_name)
-def delete_view(name):
+def delete(name):
     """
     Drops a schema.
 
     NAME is the last part of a schema's name after "view_data_".
     """
-    logger = logging.getLogger('ocdskingfisher.views.delete-view')
+    logger = logging.getLogger('ocdskingfisher.summarize.delete')
     logger.info('Arguments: name=%s', name)
 
     # `CASCADE` drops all objects (tables, functions, etc.) in the schema.
@@ -277,7 +278,7 @@ def delete_view(name):
 
 
 @click.command()
-def list_views():
+def index():
     """
     Lists the schemas, with collection IDs and creator's notes.
     """
@@ -298,27 +299,27 @@ def list_views():
 
 
 def _run_file(name, identifier, content):
-    logger = logging.getLogger('ocdskingfisher.views.refresh-views')
+    logger = logging.getLogger('ocdskingfisher.summarize.summary-tables')
     logger.info(f'Processing {identifier}')
 
     start = time()
 
     db = Database()
     db.set_search_path([name, 'public'])
-    db.execute(f'/* kingfisher-views {identifier} */\n' + content)
+    db.execute(f'/* kingfisher-summarize {identifier} */\n' + content)
     db.commit()
 
     logger.info('%s: %ss', identifier, time() - start)
 
 
-def refresh_views(name, tables_only=False):
+def summary_tables(name, tables_only=False):
     """
     Creates the summary tables in a schema.
 
     :param str name: the last part of a schema's name after "view_data_"
     :param boolean tables_only: whether to create SQL tables instead of SQL views
     """
-    logger = logging.getLogger('ocdskingfisher.views.refresh-views')
+    logger = logging.getLogger('ocdskingfisher.summarize.summary-tables')
 
     db.set_search_path([name, 'public'])
 
@@ -374,7 +375,7 @@ def refresh_views(name, tables_only=False):
 
 
 def _run_collection(name, collection_id):
-    logger = logging.getLogger('ocdskingfisher.views.refresh-views')
+    logger = logging.getLogger('ocdskingfisher.summarize.field-counts')
     logger.info('Processing collection ID %s', collection_id)
 
     start = time()
@@ -385,7 +386,7 @@ def _run_collection(name, collection_id):
     db.execute('SET parallel_setup_cost = 0.00001')
     db.execute("SET work_mem = '10MB'")
     db.execute_values('INSERT INTO field_counts VALUES %s', db.all("""
-        /* kingfisher-views field-counts */
+        /* kingfisher-summarize field-counts */
 
         SELECT
             collection_id,
@@ -413,7 +414,7 @@ def field_counts(name):
 
     :param str name: the last part of a schema's name after "view_data_"
     """
-    logger = logging.getLogger('ocdskingfisher.views.field-counts')
+    logger = logging.getLogger('ocdskingfisher.summarize.field-counts')
 
     db.set_search_path([name, 'public'])
 
@@ -471,7 +472,7 @@ def correct_user_permissions():
         db.execute(sql.SQL('GRANT USAGE ON SCHEMA views TO {user}').format(user=user))
         db.execute(sql.SQL('GRANT SELECT ON views.mapping_sheets TO {user}').format(user=user))
 
-        # Grant access to all tables in every schema created by Kingfisher Views.
+        # Grant access to all tables in every schema created by Kingfisher Summarize.
         for schema in schemas:
             db.execute(sql.SQL('GRANT USAGE ON SCHEMA {schema} TO {user}').format(schema=schema, user=user))
             db.execute(sql.SQL('GRANT SELECT ON ALL TABLES IN SCHEMA {schema} TO {user}').format(
@@ -507,7 +508,7 @@ def docs_table_ref(name):
             table_schema = %(schema)s AND LOWER(isc.table_name) = LOWER(%(table)s)
     """
 
-    filename = os.path.join(basedir, '..', 'docs', 'definitions', '{}.csv')
+    filename = os.path.join(basedir, 'docs', 'definitions', '{}.csv')
     for table in tables:
         with open(filename.format(table), 'w') as f:
             writer = csv.writer(f, lineterminator='\n')
@@ -521,9 +522,12 @@ def docs_table_ref(name):
                 writer.writerow(row)
 
 
-cli.add_command(add_view)
+cli.add_command(add)
 cli.add_command(correct_user_permissions)
-cli.add_command(delete_view)
+cli.add_command(delete)
 cli.add_command(docs_table_ref)
 cli.add_command(install)
-cli.add_command(list_views)
+cli.add_command(index)
+
+if __name__ == '__main__':
+    cli()

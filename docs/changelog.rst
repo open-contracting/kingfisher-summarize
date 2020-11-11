@@ -7,7 +7,14 @@ Changelog
 Changed
 ~~~~~~~
 
--  Configure the database connection with a ``KINGFISHER_VIEWS_DATABASE_URL`` environment variable instead of a ``config.ini`` file.
+-  Rename ``ocdskingfisher-views-cli`` to ``manage.py``.
+-  Rename commands:
+
+   -  ``list-views`` to ``index``
+   -  ``add-view`` to ``add``
+   -  ``delete-view`` to ``delete``
+
+-  Configure the database connection using a ``KINGFISHER_SUMMARIZE_DATABASE_URL`` environment variable or ``.env`` file, instead of a ``KINGFISHER_VIEWS_DB_URI`` environment variable or ``config.ini`` file.
 
 2020-11-05
 ----------
@@ -20,6 +27,7 @@ Added
 Changed
 ~~~~~~~
 
--  Remove ``refresh-views`` and ``field-counts`` commands.
 -  ``add-view``: Remove ``--threads`` option.
+-  ``refresh-views``: Remove command.
+-  ``field-counts``: Remove command.
 -  Improve performance.

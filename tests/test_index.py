@@ -5,10 +5,10 @@ from unittest.mock import patch
 from click.testing import CliRunner
 from psycopg2 import sql
 
-from ocdskingfisherviews.cli import cli
+from manage import cli
 from tests import assert_log_records, assert_log_running, fixture, noop
 
-command = 'list-views'
+command = 'index'
 
 
 def test_command_none(caplog):
@@ -21,8 +21,8 @@ def test_command_none(caplog):
     assert_log_running(caplog, command)
 
 
-@patch('ocdskingfisherviews.cli.refresh_views', noop)
-@patch('ocdskingfisherviews.cli.field_counts', noop)
+@patch('manage.summary_tables', noop)
+@patch('manage.field_counts', noop)
 def test_command(db, caplog):
     with fixture(db):
         runner = CliRunner()
@@ -39,8 +39,8 @@ def test_command(db, caplog):
         assert_log_records(caplog, command, [])
 
 
-@patch('ocdskingfisherviews.cli.refresh_views', noop)
-@patch('ocdskingfisherviews.cli.field_counts', noop)
+@patch('manage.summary_tables', noop)
+@patch('manage.field_counts', noop)
 def test_command_multiple(db, caplog):
     with fixture(db, collections='1,2'):
         runner = CliRunner()

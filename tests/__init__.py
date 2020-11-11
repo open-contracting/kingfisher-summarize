@@ -3,7 +3,7 @@ from contextlib import contextmanager
 
 from click.testing import CliRunner
 
-from ocdskingfisherviews.cli import cli
+from manage import cli
 
 
 def noop(*args, **kwargs):
@@ -14,7 +14,7 @@ def noop(*args, **kwargs):
 def fixture(db, collections='1', name=None, tables_only=None, field_counts=True):
     runner = CliRunner()
 
-    args = ['add-view', collections, 'Default']
+    args = ['add', collections, 'Default']
     if name:
         args.extend(['--name', name])
     else:
@@ -30,7 +30,7 @@ def fixture(db, collections='1', name=None, tables_only=None, field_counts=True)
         yield result
     finally:
         db.connection.rollback()
-        runner.invoke(cli, ['delete-view', name])
+        runner.invoke(cli, ['delete', name])
 
 
 # Click seems to use different quoting on different platforms.
@@ -41,13 +41,13 @@ def assert_bad_argument(result, argument, message):
 
 def assert_log_running(caplog, command):
     assert len(caplog.records) == 1, [record.message for record in caplog.records]
-    assert caplog.records[0].name == 'ocdskingfisher.views.cli'
+    assert caplog.records[0].name == 'ocdskingfisher.summarize.cli'
     assert caplog.records[0].levelname == 'INFO'
     assert caplog.records[0].message == f'Running {command}'
 
 
 def assert_log_records(caplog, name, messages):
-    records = [record for record in caplog.records if record.name == f'ocdskingfisher.views.{name}']
+    records = [record for record in caplog.records if record.name == f'ocdskingfisher.summarize.{name}']
 
     assert len(records) == len(messages), [record.message for record in records]
     assert all(record.levelname == 'INFO' for record in records)

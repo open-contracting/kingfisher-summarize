@@ -1,6 +1,6 @@
 from click.testing import CliRunner
 
-from ocdskingfisherviews.cli import cli
+from manage import cli
 
 command = 'correct-user-permissions'
 
@@ -15,6 +15,6 @@ def test_correct_user_permissions_nonexistent(db, caplog):
 
     assert result.exit_code == 0
     assert len(caplog.records) == 1, [record.message for record in caplog.records]
-    assert caplog.records[0].name == 'ocdskingfisher.views.cli'
+    assert caplog.records[0].name == 'ocdskingfisher.summarize.cli'
     assert caplog.records[0].levelname == 'INFO'
     assert caplog.records[0].message == f'Running {command}'
