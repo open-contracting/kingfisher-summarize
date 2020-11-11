@@ -9,13 +9,15 @@ How tables are created
 
 The :ref:`add` command creates all the tables below.
 
-How the table fields are made.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+How values are extracted
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-Most fields are extracted from the OCSD JSON data as strings. This is the case even if the field within the JSON is a different type e.g if an ``id`` field is expressed as a number in JSON this will be converted to a string in the views tables. However, there are two other type conversion that happen:
+Most values are extracted from OCDS JSON as SQL text. This is the case even if the JSON value is of a different type; for example, if the value of an ``id`` field is serialized as a JSON integer, it will be stored as text in the SQL tables.
 
-* ISO datetimes are converted to postgres ``timestamp`` fields.  **Warning:** If the ISO datetime appears invalid or starts with a ``0000`` year, these will be converted to ``null``.
-* numbers are converted to postgres ``numeric``.  **Warning:** if the number is a string within the JSON and contains any non numeric characters, these will be converted to ``null``.
+There are two cases in which other types are used:
+
+* Date fields are converted to the ``timestamp`` type.  **Warning:** If the value is an invalid date like ``"2020-02-30"``, or if the year is less than or equal to ``0000``, it will be converted to ``NULL``.
+* Number fields are converted to the ``numeric`` type.  **Warning:** If the value is an invalid number like ``"123a"``, it will be converted to ``NULL``.
 
 .. _relationships:
 
