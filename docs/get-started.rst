@@ -72,6 +72,8 @@ Or, it can be set in a ``.env`` file in the ``kingfisher-views`` directory. For 
 
    KINGFISHER_VIEWS_DATABASE_URL=postgresql://user:password@localhost:5432/dbname
 
+If you prefer not to store the password in the ``.env`` file, you can use the `PostgreSQL Password File <https://www.postgresql.org/docs/11/libpq-pgpass.html>`__, ``~/.pgpass``.
+
 The database user must have the `CREATE privilege <https://www.postgresql.org/docs/current/ddl-priv.html>`__ on the database used by Kingfisher Process. For example, for the default database connection settings:
 
 .. code-block:: bash
