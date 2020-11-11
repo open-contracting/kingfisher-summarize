@@ -137,7 +137,7 @@ def validate_name(ctx, param, value):
 def cli(ctx):
     load_dotenv()
 
-    path = os.path.expanduser('~/.config/ocdskingfisher-views/logging.json')
+    path = os.path.join(click.get_app_dir('Kingfisher Summarize'), 'logging.json')
     if os.path.isfile(path):
         with open(path) as f:
             logging.config.dictConfig(json.load(f))
