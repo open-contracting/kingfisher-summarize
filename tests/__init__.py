@@ -30,7 +30,7 @@ def fixture(db, collections='1', name=None, tables_only=None, field_counts=True)
         yield result
     finally:
         db.connection.rollback()
-        runner.invoke(cli, ['delete', name])
+        runner.invoke(cli, ['remove', name])
 
 
 # Click seems to use different quoting on different platforms.

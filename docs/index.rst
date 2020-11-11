@@ -46,10 +46,10 @@ You can then run statements like:
    SELECT * FROM release_summary;
    SELECT * FROM collection;
 
-Delete the schema
+Remove the schema
 ~~~~~~~~~~~~~~~~~
 
-Once you no longer need the schema, delete it using the :ref:`delete` command to free up disk space. (You can re-create it at any time using the :ref:`add` command.)
+Once you no longer need the schema, remove it using the :ref:`remove` command to free up disk space. (You can re-create it at any time using the :ref:`add` command.)
 
 List all schemas
 ~~~~~~~~~~~~~~~~

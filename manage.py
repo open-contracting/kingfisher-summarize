@@ -90,11 +90,6 @@ def dependency_graph(files):
             imports[identifier].discard(object_name)
         imports[identifier].difference_update(exports | ignore)
 
-        # Removes temporary tables from the file's exports. This assumes tables aren't dropped before being created.
-        # If that were the case, we could do line-by-line parsing, to calculate which tables remain.
-        for object_name in re.findall(r'\bDROP\s+(?:TABLE|VIEW)\s+(\w+)', content, flags=flags):
-            exports.discard(object_name)
-
         # Add the file's exports to the `sources` variable.
         for object_name in exports:
             if object_name in sources:
@@ -260,13 +255,13 @@ def add(ctx, collections, note, name, tables_only, field_counts_option):
 
 @click.command()
 @click.argument('name', callback=validate_name)
-def delete(name):
+def remove(name):
     """
     Drops a schema.
 
     NAME is the last part of a schema's name after "view_data_".
     """
-    logger = logging.getLogger('ocdskingfisher.summarize.delete')
+    logger = logging.getLogger('ocdskingfisher.summarize.remove')
     logger.info('Arguments: name=%s', name)
 
     # `CASCADE` drops all objects (tables, functions, etc.) in the schema.
@@ -524,7 +519,7 @@ def docs_table_ref(name):
 
 cli.add_command(add)
 cli.add_command(correct_user_permissions)
-cli.add_command(delete)
+cli.add_command(remove)
 cli.add_command(docs_table_ref)
 cli.add_command(install)
 cli.add_command(index)

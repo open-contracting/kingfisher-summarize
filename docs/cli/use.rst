@@ -78,9 +78,9 @@ Use this option if:
 -  You want to make it easier for a user to discover the foreign key relationships between tables (for example, using ``\d <table>`` instead of ``\d+ <view>`` followed by ``\d <table>``)
 -  You are :ref:`creating the Entity Relationship Diagram<create_erd>`
 
-.. _delete:
+.. _remove:
 
-delete
+remove
 ------
 
 Drops a schema.
@@ -89,7 +89,7 @@ Replace ``NAME`` with the last part of a schema's name (the part after ``view_da
 
 .. code-block:: bash
 
-   ./manage.py delete NAME
+   ./manage.py remove NAME
 
 This is equivalent to:
 
@@ -152,4 +152,4 @@ Collection-specific schemas
 Upgrade Kingfisher Summarize
 ----------------------------
 
-If the new version of Kingfisher Summarize makes changes to SQL statements, you might want to re-create the collection-specific schemas, by running :ref:`delete` then :ref:`add` for the selected extensions (``SELECT id from selected_collections;``).
+If the new version of Kingfisher Summarize makes changes to SQL statements, you might want to re-create the collection-specific schemas, by running :ref:`remove` then :ref:`add` for the selected extensions (``SELECT id from selected_collections;``).

@@ -67,7 +67,7 @@ selected_collections
 
 This table contains the collection IDs that the user provided when creating the schema.
 
-If you need to change the collections to be summarized, delete the schema with the :ref:`delete` command and re-create it with the :ref:`add` command. This ensures that the schema's name reflects its contents.
+If you need to change the collections to be summarized, remove the schema with the :ref:`remove` command and re-create it with the :ref:`add` command. This ensures that the schema's name reflects its contents.
 
 .. csv-table::
    :header-rows: 1

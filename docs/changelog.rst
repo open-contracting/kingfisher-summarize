@@ -12,7 +12,7 @@ Changed
 
    -  ``list-views`` to ``index``
    -  ``add-view`` to ``add``
-   -  ``delete-view`` to ``delete``
+   -  ``delete-view`` to ``remove``
 
 -  Configure the database connection using a ``KINGFISHER_SUMMARIZE_DATABASE_URL`` environment variable or ``.env`` file, instead of a ``KINGFISHER_VIEWS_DB_URI`` environment variable or ``config.ini`` file.
 

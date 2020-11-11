@@ -5,7 +5,7 @@ from click.testing import CliRunner
 from manage import cli
 from tests import assert_bad_argument, assert_log_records, assert_log_running, fixture, noop
 
-command = 'delete'
+command = 'remove'
 
 
 def test_validate_name(caplog):

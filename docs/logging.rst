@@ -21,8 +21,8 @@ ocdskingfisher.summarize.cli
   An ``INFO``-level message whenever a CLI command is run, by a user or by `cron <https://en.wikipedia.org/wiki/Cron>`__.
 ocdskingfisher.summarize.add
   An ``INFO``-level message from the add command.
-ocdskingfisher.summarize.delete
-  An ``INFO``-level message from the delete command.
+ocdskingfisher.summarize.remove
+  An ``INFO``-level message from the remove command.
 ocdskingfisher.summarize.field-counts
   An ``INFO``-level message from the field-counts routine.
 ocdskingfisher.summarize.install
