@@ -1,8 +1,8 @@
+import os
+
 import psycopg2
 from psycopg2 import sql
 from psycopg2.extras import execute_values
-
-from ocdskingfisherviews.config import get_connection_parameters
 
 
 class Database:
@@ -10,7 +10,7 @@ class Database:
         """
         Connects to the database.
         """
-        self.connection = psycopg2.connect(**get_connection_parameters())
+        self.connection = psycopg2.connect(os.getenv('KINGFISHER_VIEWS_DATABASE_URL'))
         self.cursor = self.connection.cursor()
 
     def set_search_path(self, schemas):

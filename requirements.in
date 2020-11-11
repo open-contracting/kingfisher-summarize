@@ -1,4 +1,4 @@
 click
-pgpasslib
 psycopg2
+python-dotenv
 tabulate

@@ -55,7 +55,7 @@ jobs:
         psql -c 'CREATE SCHEMA views;'
     - name: Test
       env:
-        KINGFISHER_VIEWS_DB_URI: postgresql://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres
+        KINGFISHER_VIEWS_DATABASE_URL: postgresql://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres
       run: |
         python ocdskingfisher-views-cli install
         pytest -vv --cov ocdskingfisherviews

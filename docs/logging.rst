@@ -19,8 +19,6 @@ where ``NAME`` is one of:
 
 ocdskingfisher.views.cli
   An ``INFO``-level message whenever a CLI command is run, by a user or by `cron <https://en.wikipedia.org/wiki/Cron>`__.
-ocdskingfisher.views.config
-  An ``WARN``-level message if there was a problem loading the config.
 ocdskingfisher.views.add-view
   An ``INFO``-level message from the add-view command.
 ocdskingfisher.views.delete-view

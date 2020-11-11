@@ -9,7 +9,8 @@ __pycache__
 /.coverage
 /htmlcov
 /docs/_build
-# Created by Kingfisher Process and/or Kingfisher Views.
+# Kingfisher
+/.env
 /error.log
 /info.log
 # SchemaSpy

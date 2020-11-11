@@ -11,6 +11,7 @@ from datetime import datetime
 from time import time
 
 import click
+from dotenv import load_dotenv
 from psycopg2 import sql
 from tabulate import tabulate
 
@@ -138,6 +139,8 @@ def validate_name(ctx, param, value):
 @click.group()
 @click.pass_context
 def cli(ctx):
+    load_dotenv()
+
     path = os.path.expanduser('~/.config/ocdskingfisher-views/logging.json')
     if os.path.isfile(path):
         with open(path) as f:

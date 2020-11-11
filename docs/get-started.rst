@@ -38,12 +38,6 @@ Create the configuration directory:
 
     mkdir ~/.config/ocdskingfisher-views
 
-Download the sample configuration file to the configuration directory:
-
-.. code-block:: bash
-
-    curl -o ~/.config/ocdskingfisher-views/config.ini https://kingfisher-views.readthedocs.io/en/latest/_static/config.ini
-
 .. _config-logging:
 
 Logging
@@ -61,29 +55,22 @@ Read more about :doc:`logging`.
 
 .. _database-connection-settings:
 
-Database connection settings
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Database connection
+~~~~~~~~~~~~~~~~~~~
 
-Open the configuration file (``~/.config/ocdskingfisher-views/config.ini``), and configure the database connection settings to point to the database used by `Kingfisher Process <https://kingfisher-process.readthedocs.io/en/latest/config.html#postgresql>`__:
+The database connection is configured by setting the ``KINGFISHER_VIEWS_DATABASE_URL`` environment variable to the `connection URI <https://www.postgresql.org/docs/current/libpq-connect.html#id-1.7.3.8.3.6>`__ of the database used by `Kingfisher Process <https://kingfisher-process.readthedocs.io/en/latest/config.html#postgresql>`__.
 
-.. code-block:: ini
+It can be set on the command line. For example:
 
-   [DBHOST]
-   HOSTNAME = localhost
-   PORT = 5432
-   USERNAME = ocdskingfisher
-   PASSWORD =
-   DBNAME = ocdskingfisher
+.. code-block:: bash
 
-If you prefer not to store the password in ``config.ini``, you can use the `PostgreSQL Password File <https://www.postgresql.org/docs/11/libpq-pgpass.html>`__, ``~/.pgpass``, which overrides any password in ``config.ini``.
+   export KINGFISHER_VIEWS_DATABASE_URL=postgresql://user:password@localhost:5432/dbname
 
-.. note::
+Or, it can be set in a ``.env`` file in the ``kingfisher-views`` directory. For example:
 
-   You can override the settings in ``config.ini`` (and ``.pgpass``) by setting a ``KINGFISHER_VIEWS_DB_URI`` environment variable. You might want to do this in order to temporarily use a different database than the configured database. For example:
+.. code-block:: none
 
-   .. code-block:: bash
-
-      export KINGFISHER_VIEWS_DB_URI='postgresql://user:password@localhost:5432/dbname'
+   KINGFISHER_VIEWS_DATABASE_URL=postgresql://user:password@localhost:5432/dbname
 
 The database user must have the `CREATE privilege <https://www.postgresql.org/docs/current/ddl-priv.html>`__ on the database used by Kingfisher Process. For example, for the default database connection settings:
 
