@@ -114,7 +114,6 @@ def test_command(db, tables_only, tables, views, caplog):
         # Check contents of summary tables.
         rows = db.all("""
             SELECT
-                id,
                 award_index,
                 release_type,
                 collection_id,
@@ -141,7 +140,6 @@ def test_command(db, tables_only, tables, views, caplog):
         """)
 
         assert rows[0] == (
-            30,  # id
             0,  # award_index
             'release',  # release_type
             1,  # collection_id
