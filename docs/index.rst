@@ -76,3 +76,4 @@ That's it! Feel free to browse the documentation below.
    logging
    users
    develop/index
+   changelog
