@@ -457,7 +457,7 @@ def correct_user_permissions():
     """
     schemas = [sql.Identifier(schema) for schema in db.schemas()]
 
-    for user in db.pluck('SELECT username FROM views.read_only_user'):
+    for user in db.pluck('SELECT username FROM views.read_only_user INNER JOIN pg_roles ON rolname = username'):
         user = sql.Identifier(user)
 
         # Grant access to all tables in the public schema.
