@@ -185,23 +185,28 @@ def test_command(db, tables_only, tables, views, caplog):
         """)
 
         assert rows[0] == (
-            3,
+            0,
             'release',
             1,
             'dolore',
             'ex laborumsit autein magna veniam',
-            'proident cupidatat tempor in',
+            'voluptate officia tempor dolor',
             [
-                'eiusmod',
-                'deserunt exercitation',
+                'ex ',
+                'in est exercitation nulla Excepteur',
+                'ipsum do',
             ],
-            'cillum-cillum nulla incididunt aliqua',
-            'proident cupidatat tempor in',
+            'ad proident dolor reprehenderit veniam-in quis exercitation reprehenderit',
+            'voluptate officia tempor dolor',
             [
-                'dolor-ad mollitvoluptate ea laborum',
-                'Excepteur culpa irure-nulla magna indolorveniam incididunt dolor',
+                'exercitation proident voluptate-sed culpa eamollit consectetur dolor l',
+                'magna-dolor ut indolorein in tempor magna mollit',
+                'ad occaecat amet anim-laboris ea Duisdeserunt quis sed pariatur mollit',
+                'elit mollit-officia proidentmagna',
+                'ex-minim Ut consectetur',
             ],
-            2,
+            5,
+
         )
         assert len(rows) == 296
 
