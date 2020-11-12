@@ -330,7 +330,6 @@ def summary_tables(name, tables_only=False):
         :param str directory: a sub-directory containing SQL files
         """
         for identifier, content in files[directory].items():
-            logger.info(f'Processing {identifier}')
             _run_file(name, identifier, content)
 
     def submit(identifier):
