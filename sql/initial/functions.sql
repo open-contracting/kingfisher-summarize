@@ -1,7 +1,4 @@
 -- Inspired by https://github.com/csikfer/lanview2/blob/master/database/update-1.9.sql
--- Reference:
--- https://www.postgresql.org/docs/current/parallel-safety.html
--- https://www.postgresql.org/docs/current/errcodes-appendix.html
 
 CREATE FUNCTION convert_to_numeric (text)
 RETURNS numeric
@@ -18,6 +15,8 @@ IMMUTABLE
 STRICT
 PARALLEL SAFE;
 
+-- https://www.postgresql.org/docs/current/parallel-safety.html
+-- https://www.postgresql.org/docs/current/errcodes-appendix.html
 CREATE FUNCTION convert_to_timestamp (text)
 RETURNS timestamp
 AS $$
