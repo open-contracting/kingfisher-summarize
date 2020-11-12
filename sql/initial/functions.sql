@@ -1,8 +1,10 @@
 -- Inspired by https://github.com/csikfer/lanview2/blob/master/database/update-1.9.sql
--- Error reference: https://www.postgresql.org/docs/current/errcodes-appendix.html
+-- Reference:
+-- https://www.postgresql.org/docs/current/parallel-safety.html
+-- https://www.postgresql.org/docs/current/errcodes-appendix.html
 
 CREATE FUNCTION convert_to_numeric (text)
-    RETURNS numeric PARALLEL SAFE
+    RETURNS numeric PARALLEL UNSAFE
     AS $$
 BEGIN
     RETURN CAST($1 AS numeric);
@@ -16,7 +18,7 @@ LANGUAGE plpgsql
 IMMUTABLE STRICT;
 
 CREATE FUNCTION convert_to_timestamp (text)
-    RETURNS timestamp PARALLEL SAFE
+    RETURNS timestamp PARALLEL UNSAFE
     AS $$
 BEGIN
     RETURN CAST($1 AS timestamp);
