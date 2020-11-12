@@ -4,47 +4,47 @@
 -- https://www.postgresql.org/docs/current/errcodes-appendix.html
 
 CREATE FUNCTION convert_to_numeric (text)
-    RETURNS numeric PARALLEL UNSAFE
-    AS $$
-BEGIN
-    RETURN CAST($1 AS numeric);
-EXCEPTION
-    WHEN invalid_text_representation THEN
-        RETURN NULL;
-END;
-
+RETURNS numeric
+AS $$
+    BEGIN
+        RETURN CAST($1 AS numeric);
+    EXCEPTION
+        WHEN invalid_text_representation THEN
+            RETURN NULL;
+    END;
 $$
 LANGUAGE plpgsql
-IMMUTABLE STRICT;
+IMMUTABLE
+STRICT
+PARALLEL UNSAFE;
 
 CREATE FUNCTION convert_to_timestamp (text)
-    RETURNS timestamp PARALLEL UNSAFE
-    AS $$
-BEGIN
-    RETURN CAST($1 AS timestamp);
-EXCEPTION
-    WHEN invalid_datetime_format THEN
-        RETURN NULL;
-    WHEN datetime_field_overflow THEN
-        RETURN NULL;
-END;
-
+RETURNS timestamp
+AS $$
+    BEGIN
+        RETURN CAST($1 AS timestamp);
+    EXCEPTION
+        WHEN invalid_datetime_format THEN
+            RETURN NULL;
+        WHEN datetime_field_overflow THEN
+            RETURN NULL;
+    END;
 $$
 LANGUAGE plpgsql
-IMMUTABLE STRICT;
+IMMUTABLE
+STRICT
+PARALLEL UNSAFE;
 
 CREATE FUNCTION hyphenate (text, text)
-    RETURNS text PARALLEL SAFE
-    AS $$
-BEGIN
-    IF $1 IS NULL AND $2 IS NULL THEN
-        RETURN NULL;
+RETURNS text
+AS $$
+    SELECT CASE WHEN $1 IS NULL AND $2 IS NULL THEN
+        NULL
     ELSE
-        RETURN concat_ws('-', $1, $2);
-    END IF;
-END;
-
+        concat_ws('-', $1, $2)
+    END
 $$
-LANGUAGE plpgsql
-IMMUTABLE;
+LANGUAGE sql
+IMMUTABLE
+PARALLEL SAFE;
 
