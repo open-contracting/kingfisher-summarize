@@ -35,13 +35,15 @@ IMMUTABLE
 STRICT
 PARALLEL UNSAFE;
 
+-- concat() and concat_ws() are STABLE not IMMUTABLE.
+-- https://stackoverflow.com/questions/12310986/combine-two-columns-and-add-into-one-new-column
 CREATE FUNCTION hyphenate (text, text)
 RETURNS text
 AS $$
-    SELECT CASE WHEN $1 IS NULL AND $2 IS NULL THEN
-        NULL
-    ELSE
-        concat_ws('-', $1, $2)
+    SELECT CASE
+    WHEN $1 IS NULL THEN $2
+    WHEN $2 IS NULL THEN $1
+    ELSE $1 || '-' || $2
     END
 $$
 LANGUAGE sql
