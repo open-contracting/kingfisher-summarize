@@ -6,23 +6,23 @@
 CREATE FUNCTION convert_to_numeric (text)
 RETURNS numeric
 AS $$
-    BEGIN
-        RETURN CAST($1 AS numeric);
-    EXCEPTION
-        WHEN invalid_text_representation THEN
-            RETURN NULL;
-    END;
+    SELECT
+        CASE WHEN $1 ~ '^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$' THEN
+            $1::numeric
+        ELSE
+            NULL
+        END
 $$
-LANGUAGE plpgsql
+LANGUAGE sql
 IMMUTABLE
 STRICT
-PARALLEL UNSAFE;
+PARALLEL SAFE;
 
 CREATE FUNCTION convert_to_timestamp (text)
 RETURNS timestamp
 AS $$
     BEGIN
-        RETURN CAST($1 AS timestamp);
+        RETURN $1::timestamp;
     EXCEPTION
         WHEN invalid_datetime_format THEN
             RETURN NULL;
@@ -36,15 +36,18 @@ STRICT
 PARALLEL UNSAFE;
 
 -- concat() and concat_ws() are STABLE not IMMUTABLE.
--- https://stackoverflow.com/questions/12310986/combine-two-columns-and-add-into-one-new-column
+-- https://stackoverflow.com/a/12320369/244258
 CREATE FUNCTION hyphenate (text, text)
 RETURNS text
 AS $$
-    SELECT CASE
-    WHEN $1 IS NULL THEN $2
-    WHEN $2 IS NULL THEN $1
-    ELSE $1 || '-' || $2
-    END
+    SELECT
+        CASE WHEN $1 IS NULL THEN
+            $2
+        WHEN $2 IS NULL THEN
+            $1
+        ELSE
+            $1 || '-' || $2
+        END
 $$
 LANGUAGE sql
 IMMUTABLE
