@@ -10,7 +10,7 @@ Kingfisher Summarize runs SQL statements to create `SQL schemas <https://www.pos
 
 A SQL schema is like a set of SQL tables in a common namespace. It is not like a set of constraints, like `XML schema <https://en.wikipedia.org/wiki/XML_schema>`__ or `JSON Schema <https://json-schema.org>`__.
 
-The schemas are created in the database used by Kingfisher Process, and the schemas' names start with ``view``. (The default ``public`` schema contains the tables created by Kingfisher Process.)
+The schemas are created in the database used by Kingfisher Process, and the schemas' names start with ``view_data_``. (The default ``public`` schema contains the tables created by Kingfisher Process.)
 
 Typical usage
 -------------
