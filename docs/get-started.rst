@@ -69,7 +69,7 @@ Logging from the :doc:`cli/index` can be configured with a ``logging.json`` file
 Setup PostgreSQL database
 -------------------------
 
-#. Create Kingfisher Summarize's configuration tables using the :ref:`install` command:
+Create Kingfisher Summarize's configuration tables using the :ref:`install` command:
 
    .. code-block:: bash
 
