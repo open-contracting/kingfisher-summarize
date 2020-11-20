@@ -34,8 +34,8 @@ Configure
 
 .. _database-connection-settings:
 
-Database connection
-~~~~~~~~~~~~~~~~~~~
+Database
+~~~~~~~~
 
 The database connection is configured by setting the ``KINGFISHER_SUMMARIZE_DATABASE_URL`` environment variable to the `connection URI <https://www.postgresql.org/docs/current/libpq-connect.html#id-1.7.3.8.3.6>`__ of the database used by `Kingfisher Process <https://kingfisher-process.readthedocs.io/en/latest/config.html#postgresql>`__.
 
@@ -63,6 +63,10 @@ The database user must have the `CREATE privilege <https://www.postgresql.org/do
 
 Logging
 ~~~~~~~
+
+.. note::
+
+   This step is optional.
 
 Logging from the :doc:`cli/index` can be configured with a ``logging.json`` file in a `configuration directory <https://click.palletsprojects.com/en/7.x/api/#click.get_app_dir>`__ appropriate to your operating system. Read more about :doc:`logging`.
 
