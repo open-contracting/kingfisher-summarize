@@ -159,6 +159,7 @@ def install():
     """
     logger = logging.getLogger('ocdskingfisher.summarize.install')
 
+    db.execute('CREATE SCHEMA IF NOT EXISTS views')
     db.execute('CREATE TABLE IF NOT EXISTS views.read_only_user(username VARCHAR(64) NOT NULL PRIMARY KEY)')
     db.execute("""
         CREATE TABLE IF NOT EXISTS views.mapping_sheets (

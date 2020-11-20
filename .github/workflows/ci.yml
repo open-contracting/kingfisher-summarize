@@ -44,15 +44,6 @@ jobs:
         python /tmp/kingfisher-process/ocdskingfisher-process-cli local-load 2 tests/fixtures release_package
       env:
         KINGFISHER_PROCESS_DB_URI: postgresql://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres
-    - name: Setup Kingfisher Summarize database
-      run: |
-        psql -c 'CREATE SCHEMA views;'
-      env:
-        PGUSER: postgres
-        PGPASSWORD: postgres
-        PGHOST: localhost
-        PGPORT: ${{ job.services.postgres.ports[5432] }}
-        PGDATABASE: postgres
     - name: Test
       run: |
         ./manage.py install

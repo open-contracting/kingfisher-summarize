@@ -69,21 +69,7 @@ Logging from the :doc:`cli/index` can be configured with a ``logging.json`` file
 Setup PostgreSQL database
 -------------------------
 
-#. Connect to the database as the ``postgres`` user. For example, as a sudoer, run:
-
-   .. code-block:: bash
-
-      su - postgres -c 'psql ocdskingfisher'
-
-#. `Create <https://www.postgresql.org/docs/current/sql-createschema.html>`__ the ``views`` schema, and set it to be owned by the database user configured above. For example, run:
-
-   .. code-block:: sql
-
-      CREATE SCHEMA views AUTHORIZATION ocdskingfisher;
-
-#. Close your PostgreSQL session, e.g. with ``Ctrl-D`` for both
-
-#. Create Kingfisher Summarize's configuration tables using the :ref:`install` command:
+Create Kingfisher Summarize's configuration tables using the :ref:`install` command:
 
    .. code-block:: bash
 
