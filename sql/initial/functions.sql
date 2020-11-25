@@ -1,4 +1,6 @@
 -- Inspired by https://github.com/csikfer/lanview2/blob/master/database/update-1.9.sql
+-- https://www.postgresql.org/docs/11/sql-createfunction.html
+-- https://www.postgresql.org/docs/11/parallel-safety.html
 
 CREATE FUNCTION convert_to_numeric (text)
 RETURNS numeric
@@ -15,8 +17,8 @@ IMMUTABLE
 STRICT
 PARALLEL SAFE;
 
--- https://www.postgresql.org/docs/current/parallel-safety.html
--- https://www.postgresql.org/docs/current/errcodes-appendix.html
+-- UNSAFE due to EXCEPTION block.
+-- https://www.postgresql.org/docs/11/errcodes-appendix.html
 CREATE FUNCTION convert_to_timestamp (text)
 RETURNS timestamp
 AS $$
@@ -35,6 +37,7 @@ STRICT
 PARALLEL UNSAFE;
 
 -- concat() and concat_ws() are STABLE not IMMUTABLE.
+-- Not STRICT as NULL inputs are expected.
 -- https://stackoverflow.com/a/12320369/244258
 CREATE FUNCTION hyphenate (text, text)
 RETURNS text
