@@ -343,11 +343,11 @@ def summary_tables(name, tables_only=False):
             graph.pop(identifier)
             futures[executor.submit(_run_file, name, identifier, files['middle'][identifier])] = identifier
 
+    # The initial files are fast, and don't need multiprocessing.
+    run('initial')
+
     futures = {}
     with concurrent.futures.ProcessPoolExecutor() as executor:
-        # The initial files are fast, and don't need multiprocessing.
-        run('initial')
-
         # Submit files whose dependencies are met.
         for identifier in list(graph):
             submit(identifier)
@@ -363,8 +363,8 @@ def summary_tables(name, tables_only=False):
                     graph[identifier].discard(done)
                     submit(identifier)
 
-        # The final files are fast, and can also deadlock.
-        run('final')
+    # The final files are fast, and can also deadlock.
+    run('final')
 
     logger.info('Total time: %ss', time() - start)
 
