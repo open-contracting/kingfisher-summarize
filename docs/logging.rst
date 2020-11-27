@@ -3,7 +3,9 @@ Reading logs
 
 If logging is configured using a :ref:`default configuration<config-logging>`, then log messages are written to ``info.log`` (and possibly ``debug.log``).
 
-Log messages are formatted as::
+Log messages are formatted as:
+
+.. code-block:: none
 
     %(asctime)s - %(process)d - %(name)s - %(levelname)s - %(message)s
 

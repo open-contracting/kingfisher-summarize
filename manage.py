@@ -377,9 +377,6 @@ def _run_collection(name, collection_id):
 
     db = Database()
     db.set_search_path([name, 'public'])
-    db.execute('SET parallel_tuple_cost = 0.00001')
-    db.execute('SET parallel_setup_cost = 0.00001')
-    db.execute("SET work_mem = '10MB'")
     db.execute_values('INSERT INTO field_counts VALUES %s', db.all("""
         /* kingfisher-summarize field-counts */
 
