@@ -57,8 +57,8 @@ Then, for any new CSV file, manually add a new sub-section to ``docs/database.rs
 
 .. _create_erd:
 
-Create Entity Relationship Diagram
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Create the Entity Relationship Diagram
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #. Install `SchemaSpy <https://schemaspy.readthedocs.io/en/latest/installation.html>`__
 #. Download the `PostgreSQL JDBC Driver <https://jdbc.postgresql.org/>`__
