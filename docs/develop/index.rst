@@ -1,5 +1,5 @@
 Contributing
-------------
+============
 
 First, follow the :doc:`setup` guide, and read this page. Then, learn how to :doc:`sql` or follow the :doc:`howtos`.
 
