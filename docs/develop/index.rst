@@ -23,6 +23,7 @@ SQL files are named after the tables they create, though some files don't match 
 
 .. toctree::
    :maxdepth: 2
+   :caption: Contents
 
    setup
    howtos
