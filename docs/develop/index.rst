@@ -12,7 +12,7 @@ The SQL statements that summarize data are stored in SQL files in the `sql/middl
 
 The dependencies between SQL files are automatically determined. Files should create one table and/or view and related indices, and should not drop tables. Instead, any temporary tables should be dropped in ``sql/final/drop.sql``.
 
-SQL files are named after the tables they create, though some files don't match table names.
+SQL files are named after the tables they create, though some files don't match table names:
 
 ``*_tmp.sql``
   For example, the ``tmp_planning_summary`` table is created in the ``planning_tmp.sql`` file, so that it appears next to files that create :ref:`planning<db-planning>` tables.
