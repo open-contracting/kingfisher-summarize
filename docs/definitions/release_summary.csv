@@ -59,3 +59,4 @@ release_check,jsonb,JSONB of Data Review Tool output which includes validation e
 release_check11,jsonb,JSONB of Data Review Tool output run against 1.1 version of OCDS even if the data is from 1.0
 record_check,jsonb,JSONB of Data Review Tool output which includes validation errors and additional field information
 record_check11,jsonb,JSONB of Data Review Tool output run against 1.1 version of OCDS even if the data is from 1.0
+field_list,ARRAY,Array of paths for the release object. Paths excluding index numbers for arrays.This field will only appear if --field-lists option is specified

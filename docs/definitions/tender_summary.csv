@@ -44,3 +44,4 @@ milestones_count,bigint,Count of milestones
 milestonetype_counts,jsonb,JSONB object with the keys as unique milestoneTypes and the values as a count of the appearances of that `milestoneType` in the `milestones` array
 items_count,bigint,Count of items
 tender,jsonb,JSONB of tender object
+field_list,ARRAY,Array of paths for the tender object. Paths excluding index numbers for arrays.This field will only appear if --field-lists option is specified

@@ -13,3 +13,4 @@ unique_identifier_attempt,text,"The `id` from party object if it exists, otherwi
 parties_additionalidentifiers_ids,jsonb,JSONB list of the concatenation of scheme and id of all additionalIdentifier objects
 parties_additionalidentifiers_count,integer,Count of additional identifiers
 party,jsonb,JSONB of party object
+field_list,ARRAY,Array of paths for the party object. Paths excluding index numbers for arrays.This field will only appear if --field-lists option is specified

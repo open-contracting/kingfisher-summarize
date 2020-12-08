@@ -4,12 +4,12 @@ DECLARE
 BEGIN
     query := $query$ ALTER TABLE parties_summary%1$s
         ADD CONSTRAINT parties_summary%1$s_release_summary%1$s_fk FOREIGN KEY (id) REFERENCES release_summary%1$s (id) NOT valid;
-    ALTER TABLE planning_summary
-        ADD CONSTRAINT planning_summary_release_summary%1$s_fk FOREIGN KEY (id) REFERENCES release_summary%1$s (id) NOT valid;
+    ALTER TABLE planning_summary%1$s
+        ADD CONSTRAINT planning_summary%1$s_release_summary%1$s_fk FOREIGN KEY (id) REFERENCES release_summary%1$s (id) NOT valid;
     ALTER TABLE planning_documents_summary
-        ADD CONSTRAINT planning_documents_summary_planning_summary_fk FOREIGN KEY (id) REFERENCES planning_summary (id) NOT valid;
+        ADD CONSTRAINT planning_documents_summary_planning_summary_fk FOREIGN KEY (id) REFERENCES planning_summary%1$s (id) NOT valid;
     ALTER TABLE planning_milestones_summary
-        ADD CONSTRAINT planning_milestones_summary_planning_summary_fk FOREIGN KEY (id) REFERENCES planning_summary (id) NOT valid;
+        ADD CONSTRAINT planning_milestones_summary_planning_summary_fk FOREIGN KEY (id) REFERENCES planning_summary%1$s (id) NOT valid;
     ALTER TABLE buyer_summary
         ADD CONSTRAINT buyer_summary_release_summary%1$s_fk FOREIGN KEY (id) REFERENCES release_summary%1$s (id) NOT valid;
     ALTER TABLE tender_summary%1$s
@@ -61,6 +61,8 @@ DECLARE
 BEGIN
     query := $query$ ALTER TABLE parties_summary
         ADD CONSTRAINT parties_summary_parties_summary_no_data_fk FOREIGN KEY (id, party_index) REFERENCES parties_summary_no_data (id, party_index) NOT valid;
+    ALTER TABLE planning_summary
+        ADD CONSTRAINT planning_summary_planning_summary_no_data_fk FOREIGN KEY (id) REFERENCES planning_summary_no_data (id) NOT valid;
     ALTER TABLE tender_summary
         ADD CONSTRAINT tender_summary_tender_summary_no_data_fk FOREIGN KEY (id) REFERENCES tender_summary_no_data (id) NOT valid;
     ALTER TABLE awards_summary

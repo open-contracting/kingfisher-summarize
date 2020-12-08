@@ -11,7 +11,7 @@ def noop(*args, **kwargs):
 
 
 @contextmanager
-def fixture(db, collections='1', name=None, tables_only=None, field_counts=True):
+def fixture(db, collections='1', name=None, tables_only=None, field_counts=True, field_lists=True):
     runner = CliRunner()
 
     args = ['add', collections, 'Default']
@@ -23,6 +23,8 @@ def fixture(db, collections='1', name=None, tables_only=None, field_counts=True)
         args.append('--tables-only')
     if not field_counts:
         args.append('--no-field-counts')
+    if field_lists:
+        args.append('--field-lists')
 
     result = runner.invoke(cli, args)
 

@@ -15,3 +15,4 @@ unit_currency,text,`currency` from the unit/value object
 item_classification,text,Concatenation of classification/scheme and classification/id
 item_additionalidentifiers_ids,jsonb,JSONB list of the concatenation of additionalClassification/scheme and additionalClassification/id
 additional_classification_count,integer,Count of additional classifications
+field_list,ARRAY,Array of paths for the item object. Paths excluding index numbers for arrays.This field will only appear if --field-lists option is specified
