@@ -78,6 +78,27 @@ Use this option if:
 -  You want to make it easier for a user to discover the foreign key relationships between tables (for example, using ``\d <table>`` instead of ``\d+ <view>`` followed by ``\d <table>``)
 -  You are :ref:`creating the Entity Relationship Diagram<create_erd>`
 
+.. _field-lists:
+
+Create array of all paths for each row in each summary table
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``--field_lists`` option adds a new field to each summary table called ``field_list`` which contains an array of all JSON paths (excluding index postiions) contained in the object that the row represents. So for example in the ``awards_summary`` table it will contain the paths of every ``award`` object.
+
+.. code-block:: bash
+
+    ./manage.py add 123 "The note" --field-lists
+
+This can be useful when asking questions about the existance of multiple child fields in a simple way.  For example, if you want to know how many awards have at least one ``document`` whith an ``id`` and at least one ``item`` with an ``id``, you could run the following.
+
+```
+
+.. code-block:: sql
+
+   SELECT count(*) FROM view_data_collection_1.awards_summary WHERE field_list @> '{documents/id, items/id}';
+
+The ``@>`` symbol stands for 'contains' and the right hand argument is a string representation of an array.
+
 .. _remove:
 
 remove

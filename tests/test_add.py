@@ -6,7 +6,7 @@ import pytest
 from click.testing import CliRunner
 from psycopg2 import sql
 
-from manage import cli
+from manage import cli, SUMMARY_TABLES
 from tests import assert_bad_argument, assert_log_records, assert_log_running, fixture, noop
 
 command = 'add'
@@ -14,43 +14,25 @@ command = 'add'
 TABLES = {
     'note',
     'selected_collections',
-
-    # summarize
-    'award_documents_summary',
-    'award_items_summary',
-    'award_suppliers_summary',
-    'awards_summary_no_data',
-    'buyer_summary',
-    'contract_documents_summary',
-    'contract_implementation_documents_summary',
-    'contract_implementation_milestones_summary',
-    'contract_implementation_transactions_summary',
-    'contract_items_summary',
-    'contract_milestones_summary',
-    'contracts_summary_no_data',
-    'parties_summary_no_data',
-    'planning_documents_summary',
-    'planning_milestones_summary',
-    'planning_summary',
-    'procuringentity_summary',
-    'release_summary_no_data',
-    'tender_documents_summary',
-    'tender_items_summary',
-    'tender_milestones_summary',
-    'tender_summary_no_data',
-    'tenderers_summary',
-
-    # field_counts
+    # due to --field-counts option being set
     'field_counts',
 }
 
-VIEWS = {
-    'awards_summary',
-    'contracts_summary',
-    'parties_summary',
-    'release_summary',
-    'tender_summary',
-}
+VIEWS = set()
+
+for summary_table in SUMMARY_TABLES:
+    # all summary relations are views with --field-lists set
+    VIEWS.add(summary_table.name)
+
+    TABLES.add(f'{summary_table.name}_field_list')
+
+    # original relations have now suffixed with _no_field_list
+    if summary_table.is_table:
+        TABLES.add(f'{summary_table.name}_no_field_list')
+    else:
+        VIEWS.add(f'{summary_table.name}_no_field_list')
+        # *_no_data table for each summary that is a view
+        TABLES.add(f'{summary_table.name}_no_data')
 
 
 @pytest.mark.parametrize('collections, message', [
@@ -69,6 +51,7 @@ def test_validate_collections(collections, message, caplog):
 
 @patch('manage.summary_tables', noop)
 @patch('manage.field_counts', noop)
+@patch('manage.field_lists', noop)
 @pytest.mark.parametrize('kwargs, name, collections', [
     ({}, 'collection_1', (1,)),
     ({'collections': '1,2'}, 'collection_1_2', (1, 2)),
@@ -94,6 +77,7 @@ def test_command_name(kwargs, name, collections, db, caplog):
             f'Added {name}',
             'Running summary-tables routine',
             'Running field-counts routine',
+            'Running field-lists routine',
             'Running correct-user-permissions command',
         ])
 
@@ -216,6 +200,34 @@ def test_command(db, tables_only, tables, views, caplog):
         assert len(rows) == 65235
         assert rows[0] == (1, 'release', 'awards', 100, 301, 100)
 
+        # Check length of field_list field for lowest ids in each summary table.
+        each_table = '(SELECT array_length(field_list, 1) FROM view_data_collection_1.{} order by {} limit 1)'
+        union_all = ' UNION ALL '.join(each_table.format(table.name, table.primary_keys) for table in SUMMARY_TABLES)
+        results = dict(zip((table.name for table in SUMMARY_TABLES), db.pluck(union_all)))
+        assert results == {'award_documents_summary': 11,
+                           'award_items_summary': 32,
+                           'award_suppliers_summary': 29,
+                           'awards_summary': 373,
+                           'buyer_summary': 29,
+                           'contract_documents_summary': 11,
+                           'contract_implementation_documents_summary': 11,
+                           'contract_implementation_milestones_summary': 60,
+                           'contract_implementation_transactions_summary': 100,
+                           'contract_items_summary': 32,
+                           'contract_milestones_summary': 48,
+                           'contracts_summary': 940,
+                           'parties_summary': 55,
+                           'planning_documents_summary': 11,
+                           'planning_milestones_summary': 60,
+                           'planning_summary': 115,
+                           'procuringentity_summary': 53,
+                           'release_summary': 3569,
+                           'tender_documents_summary': 33,
+                           'tender_items_summary': 26,
+                           'tender_milestones_summary': 24,
+                           'tender_summary': 482,
+                           'tenderers_summary': 47}
+
         # All columns have comments.
         assert not db.all("""
             SELECT
@@ -226,8 +238,9 @@ def test_command(db, tables_only, tables, views, caplog):
                 information_schema.columns isc
             WHERE
                 isc.table_schema = %(schema)s
-                AND LOWER(isc.table_name) NOT IN ('selected_collections', 'note', 'awards_summary_no_data',
-                                                  'contracts_summary_no_data', 'parties_summary_no_data')
+                AND LOWER(isc.table_name) NOT IN ('selected_collections', 'note')
+                AND LOWER(isc.table_name) NOT LIKE '%%_no_data'
+                AND LOWER(isc.table_name) NOT LIKE '%%_field_list'
                 AND pg_catalog.col_description(format('%%s.%%s',isc.table_schema,isc.table_name)::regclass::oid,
                                                isc.ordinal_position) IS NULL
         """, {'schema': 'view_data_collection_1'})
@@ -239,5 +252,6 @@ def test_command(db, tables_only, tables, views, caplog):
             'Added collection_1',
             'Running summary-tables routine',
             'Running field-counts routine',
+            'Running field-lists routine',
             'Running correct-user-permissions command',
         ])

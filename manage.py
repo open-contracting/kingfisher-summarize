@@ -7,7 +7,7 @@ import logging
 import logging.config
 import os
 import re
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 from datetime import datetime
 from time import time
 
@@ -23,6 +23,37 @@ global db
 
 flags = re.MULTILINE | re.IGNORECASE
 basedir = os.path.dirname(os.path.realpath(__file__))
+
+SummaryTable = namedtuple("SummaryTable", "name primary_keys data_field is_table")
+
+SUMMARY_TABLES = [
+    SummaryTable('award_documents_summary', 'id, award_index, document_index', 'document', True),
+    SummaryTable('award_items_summary', 'id, award_index, item_index', 'item', True),
+    SummaryTable('award_suppliers_summary', 'id, award_index, supplier_index', 'supplier', True),
+    SummaryTable('awards_summary', 'id, award_index', "award", False),
+    SummaryTable('buyer_summary', 'id', 'buyer', True),
+    SummaryTable('contract_documents_summary', 'id, contract_index, document_index', 'document', True),
+    SummaryTable('contract_implementation_documents_summary',
+                 'id, contract_index, document_index', 'document', True),
+    SummaryTable('contract_implementation_milestones_summary',
+                 'id, contract_index, milestone_index', 'milestone', True),
+    SummaryTable('contract_implementation_transactions_summary',
+                 'id, contract_index, transaction_index', 'transaction', True),
+    SummaryTable('contract_items_summary', 'id, contract_index, item_index', 'item', True),
+    SummaryTable('contract_milestones_summary', 'id, contract_index, milestone_index', 'milestone', True),
+    SummaryTable('contracts_summary', 'id, contract_index', "contract", False),
+    SummaryTable('parties_summary', 'id, party_index', "party", False),
+    SummaryTable('planning_documents_summary', 'id, document_index', 'document', True),
+    SummaryTable('planning_milestones_summary', 'id, milestone_index', 'milestone', True),
+    SummaryTable('planning_summary', 'id', 'planning', False),
+    SummaryTable('procuringentity_summary', 'id', 'procuringentity', True),
+    SummaryTable('release_summary', 'id', "release", False),
+    SummaryTable('tender_documents_summary', 'id', 'document', True),
+    SummaryTable('tender_items_summary', 'id, item_index', 'item', True),
+    SummaryTable('tender_milestones_summary', 'id, milestone_index', 'milestone', True),
+    SummaryTable('tender_summary', 'id', "tender", False),
+    SummaryTable('tenderers_summary', 'id, tenderer_index', 'tenderer', True),
+]
 
 
 def sql_files(directory, tables_only=False):
@@ -209,8 +240,10 @@ def install():
 @click.option('--tables-only', is_flag=True, help='Create SQL tables instead of SQL views.')
 @click.option('--field-counts/--no-field-counts', 'field_counts_option', default=True,
               help="Whether to create the field_counts table (default true).")
+@click.option('--field-lists/--no-field-lists', 'field_lists_option', default=False,
+              help="Whether to create the field_lists column to all summary tables (default false).")
 @click.pass_context
-def add(ctx, collections, note, name, tables_only, field_counts_option):
+def add(ctx, collections, note, name, tables_only, field_counts_option, field_lists_option):
     """
     Creates a schema containing summary tables about one or more collections.
 
@@ -249,6 +282,10 @@ def add(ctx, collections, note, name, tables_only, field_counts_option):
     if field_counts_option:
         logger.info('Running field-counts routine')
         field_counts(schema)
+
+    if field_lists_option:
+        logger.info('Running field-lists routine')
+        field_lists(schema, tables_only=tables_only)
 
     logger.info('Running correct-user-permissions command')
     ctx.invoke(correct_user_permissions)
@@ -471,6 +508,82 @@ def correct_user_permissions():
                 schema=schema, user=user))
 
     db.commit()
+
+
+def _create_field_list_field(summary_table, tables_only):
+
+    if tables_only or summary_table.is_table:
+        relation_type = "TABLE"
+    else:
+        relation_type = "VIEW"
+
+    db.execute(f"""
+        CREATE TABLE {summary_table.name}_field_list AS
+        SELECT
+            {summary_table.primary_keys},
+            array_agg(path) AS field_list
+        FROM
+            {summary_table.name}
+        CROSS JOIN
+            flatten({summary_table.name}.{summary_table.data_field})
+        GROUP BY
+            {summary_table.primary_keys};
+
+        CREATE UNIQUE INDEX {summary_table.name}_field_list_keys ON
+               {summary_table.name}_field_list({summary_table.primary_keys});
+
+        ALTER {relation_type} {summary_table.name} RENAME TO {summary_table.name}_no_field_list;
+
+        CREATE {'TABLE' if tables_only else 'VIEW'} {summary_table.name} AS
+        SELECT
+            {summary_table.name}_no_field_list.*,
+            {summary_table.name}_field_list.field_list
+        FROM
+            {summary_table.name}_no_field_list
+        JOIN
+            {summary_table.name}_field_list USING ({summary_table.primary_keys});
+    """)
+
+
+def _comments_on_field_list_views(summary_table, name):
+
+    statement = """
+        SELECT
+            isc.column_name,
+            pg_catalog.col_description(format('%%s.%%s', isc.table_schema,isc.table_name)::regclass::oid,
+                                       isc.ordinal_position) AS column_description
+        FROM
+            information_schema.columns isc
+        WHERE
+            table_schema = %(schema)s AND LOWER(isc.table_name) = LOWER(%(table)s)
+    """
+
+    for row in db.all(statement, {'schema': name, 'table': summary_table.name + '_no_field_list'}):
+        db.execute(f'COMMENT ON COLUMN {summary_table.name}.{row[0]} IS %(comment)s', {'comment': row[1]})
+
+    comment = (f'Array of paths for the {summary_table.data_field} object. Paths excluding index numbers for arrays.'
+               f'This field will only appear if --field-lists option is specified')
+    db.execute(f'COMMENT ON COLUMN {summary_table.name}.field_list IS %(comment)s', {'comment': comment})
+
+
+def field_lists(name, tables_only=False):
+    """
+    Creates the field_lists field on all summary tables.
+
+    :param str name: the last part of a schema's name after "view_data_"
+    :param bool tables_only: whether to create SQL tables instead of SQL views
+    """
+    logger = logging.getLogger('ocdskingfisher.summarize.field-lists')
+
+    db.set_search_path([name, 'public'])
+
+    start = time()
+
+    for summary_table in SUMMARY_TABLES:
+        _create_field_list_field(summary_table, tables_only)
+        _comments_on_field_list_views(summary_table, name)
+
+    logger.info('Total time: %ss', time() - start)
 
 
 @click.command()

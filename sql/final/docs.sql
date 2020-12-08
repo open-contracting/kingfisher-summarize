@@ -189,6 +189,8 @@ COMMENT ON COLUMN planning_summary.milestones_count IS 'Count of milestones';
 
 COMMENT ON COLUMN planning_summary.milestonetype_counts IS 'JSONB object with the keys as unique milestoneTypes and the values as a count of the appearances of that `milestoneType` in the `milestones` array';
 
+COMMENT ON COLUMN planning_summary.planning IS 'JSONB of planning object';
+
 SELECT
     common_comments ('tender_documents_summary');
 
@@ -377,6 +379,8 @@ COMMENT ON COLUMN contract_implementation_transactions_summary.transaction_index
 COMMENT ON COLUMN contract_implementation_transactions_summary.transaction_amount IS '`amount` field from the value object or the deprecated amount object';
 
 COMMENT ON COLUMN contract_implementation_transactions_summary.transaction_currency IS '`currency` field from the value object or the deprecated amount object';
+
+COMMENT ON COLUMN contract_implementation_transactions_summary.transaction IS 'JSONB of transaction object';
 
 SELECT
     common_comments ('contract_items_summary');
