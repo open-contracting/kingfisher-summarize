@@ -29,4 +29,4 @@ implementation_documenttype_counts,jsonb,JSONB object with the keys as unique do
 implementation_milestones_count,bigint,Number of documents in documents array
 implementation_milestonetype_counts,jsonb,JSONB object with the keys as unique milestoneTypes and the values as count of the appearances of that `milestoneType` in the `milestone` array
 contract,jsonb,JSONB of contract object
-field_list,ARRAY,Array of paths for the contract object. Paths excluding index numbers for arrays.This field will only appear if --field-lists option is specified
+field_list,ARRAY,"Array of JSON paths in the contract object, excluding array indices.This column is only available if the --field-lists option was used."
