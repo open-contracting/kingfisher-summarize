@@ -83,13 +83,13 @@ Use this option if:
 Create array of all paths for each row in each summary table
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``--field_lists`` option adds a new field to each summary table called ``field_list`` which contains an array of all JSON paths (excluding index postiions) contained in the object that the row represents. So for example in the ``awards_summary`` table it will contain the paths of every ``award`` object.
+The ``--field_lists`` option adds a ``field_list`` column to each summary table, which contains a JSON array of all JSON paths (excluding array indices) in the object that the row describes. For example, a ``field_list`` value in the ``awards_summary`` table will contain the JSON paths in an award object.
 
 .. code-block:: bash
 
     ./manage.py add 123 "The note" --field-lists
 
-This can be useful when asking questions about the existance of multiple child fields in a simple way.  For example, if you want to know how many awards have at least one ``document`` whith an ``id`` and at least one ``item`` with an ``id``, you could run the following.
+This can be used to check for the presence of multiple fields.  For example, to count the number of awards that have at least one document with an ``id`` and at least one item with an ``id``, run:
 
 ```
 
@@ -97,7 +97,7 @@ This can be useful when asking questions about the existance of multiple child f
 
    SELECT count(*) FROM view_data_collection_1.awards_summary WHERE field_list @> '{documents/id, items/id}';
 
-The ``@>`` symbol stands for 'contains' and the right hand argument is a string representation of an array.
+The ``@>`` operator tests whether the left ARRAY value contains the right ARRAY values.
 
 .. _remove:
 

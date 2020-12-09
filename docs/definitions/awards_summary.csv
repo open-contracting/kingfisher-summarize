@@ -22,4 +22,4 @@ documents_count,bigint,Number of documents in documents array
 documenttype_counts,jsonb,JSONB object with the keys as unique documentTypes and the values as count of the appearances of that `documentType` in the `documents` array
 items_count,bigint,Count of items
 award,jsonb,JSONB of award object
-field_list,ARRAY,Array of paths for the award object. Paths excluding index numbers for arrays.This field will only appear if --field-lists option is specified
+field_list,ARRAY,"Array of JSON paths in the award object, excluding array indices.This column is only available if the --field-lists option was used."

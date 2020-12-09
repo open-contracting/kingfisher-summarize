@@ -10,4 +10,4 @@ data_id,integer,"id for the ""data"" table in Kingfisher that holds the original
 document,jsonb,JSONB of the document
 documenttype,text,`documentType` field from the document object
 format,text,`format` field from the document object
-field_list,ARRAY,Array of paths for the document object. Paths excluding index numbers for arrays.This field will only appear if --field-lists option is specified
+field_list,ARRAY,"Array of JSON paths in the document object, excluding array indices.This column is only available if the --field-lists option was used."
