@@ -1,6 +1,16 @@
 Changelog
 =========
 
+2020-12-09
+----------
+
+Added
+~~~~~
+
+-  ``add`` command: ``--field-lists`` option to add a ``field_list`` column to all summary tables. The ``field-list`` column is an array of all fields in the data.
+-  ``planning_summary`` table: A ``planning`` JSONB column for the planning object.
+-  ``contract_implementation_transactions_summary`` table:  A ``transaction`` JSONB column for the transaction object.
+
 2020-11-11
 ----------
 
