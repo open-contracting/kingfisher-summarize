@@ -7,7 +7,7 @@ Changelog
 Changed
 ~~~~~~~
 
-- ``field_list`` field now a JSONB with keys as the path and values as NULL
+-  The ``field_list`` column is now a JSONB object in which keys are paths and values are ``NULL``
 
 
 2020-12-09

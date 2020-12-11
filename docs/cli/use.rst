@@ -80,10 +80,10 @@ Use this option if:
 
 .. _field-lists:
 
-Create JSON of all paths for each row in each summary table
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Calculate JSON paths in each JSON object in each summary table
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``--field_lists`` option adds a ``field_list`` column to each summary table, which contains a JSONB object of all JSON paths (excluding array indices) in the object that the row describes. For example, a ``field_list`` value in the ``awards_summary`` table will contain the JSON paths in an award object. The keys of the ``field-list`` JSONB object are the path and the values are NULL.
+The ``--field_lists`` option adds a ``field_list`` column to each summary table, which contains all JSON paths (excluding array indices) in the object that the row describes. For example, a ``field_list`` value in the ``awards_summary`` table will contain the JSON paths in an award object. A ``field_list`` value is a JSONB object in which keys are paths and values are ``NULL``.
 
 .. code-block:: bash
 
@@ -97,23 +97,27 @@ This can be used to check for the presence of multiple fields.  For example, to 
 
    SELECT count(*) FROM view_data_collection_1.awards_summary WHERE field_list ?& ARRAY['documents/id', 'items/id'];
 
-   -- this could also be written as
+This could also be written as:
+
+.. code-block:: sql
 
    SELECT count(*) FROM view_data_collection_1.awards_summary WHERE field_list ? 'documents/id' AND field_list ? 'items/id';
 
-The ``?&`` operator tests whether the left JSON object has all the keys in the right ARRAY values.  The ``?`` operator checks if the key exists in the object.
+The ``?&`` operator tests whether *all* keys in the right-hand array exist in the left-hand object.  The ``?`` operator tests whether one key exists in the left-hand object.
 
-To count the number of awards that have either at least one document with an ``id`` or at least one iten with an ``id``, run:
+To count the number of awards that have either at least one document with an ``id`` or at least one item with an ``id``, run:
 
 .. code-block:: sql
 
    SELECT count(*) FROM view_data_collection_1.awards_summary WHERE field_list ?| ARRAY['documents/id', 'items/id'];
 
-   -- this could also be written as
+This could also be written as:
+
+.. code-block:: sql
 
    SELECT count(*) FROM view_data_collection_1.awards_summary WHERE field_list ? 'documents/id' OR field_list ? 'items/id';
 
-The ``?|`` operator tests whether the left JSON object has any of the keys in the right ARRAY values.
+The ``?|`` operator tests whether *any* key in the right-hand array exists in the left-hand object.
 
 .. _remove:
 
