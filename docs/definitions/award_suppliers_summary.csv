@@ -16,4 +16,4 @@ supplier_additionalidentifiers_count,integer,Count of additional identifiers
 link_to_parties,integer,"Does this buyer link to a party in the parties array using the `id` field from buyer object linking to the `id` field in a party object? If this is true then 1, otherwise 0"
 link_with_role,integer,If there is a link does the parties object have `suppliers` in its roles list? If it does then 1 otherwise 0
 party_index,bigint,Position of the party in the parties array
-field_list,ARRAY,"Array of JSON paths in the supplier object, excluding array indices.This column is only available if the --field-lists option was used."
+field_list,jsonb,"JSONB object of JSON paths in the supplier object, excluding array indices. Keys in the object are the paths and values are NULL. This column is only available if the --field-lists option was used."

@@ -10,4 +10,4 @@ milestone,jsonb,JSONB of milestone object
 type,text,`type` from milestone object
 code,text,`code` from milestone object
 status,text,`status` from milestone object
-field_list,ARRAY,"Array of JSON paths in the milestone object, excluding array indices.This column is only available if the --field-lists option was used."
+field_list,jsonb,"JSONB object of JSON paths in the milestone object, excluding array indices. Keys in the object are the paths and values are NULL. This column is only available if the --field-lists option was used."

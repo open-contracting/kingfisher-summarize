@@ -200,33 +200,50 @@ def test_command(db, tables_only, tables, views, caplog):
         assert len(rows) == 65235
         assert rows[0] == (1, 'release', 'awards', 100, 301, 100)
 
-        # Check length of field_list field for lowest ids in each summary table.
-        each_table = '(SELECT array_length(field_list, 1) FROM view_data_collection_1.{} order by {} limit 1)'
+        # Check count of keys in field_list field for lowest ids in each summary table.
+        each_table = '''
+            (SELECT
+                count(*)
+            FROM
+                (SELECT
+                    jsonb_each(field_list)
+                FROM (
+                    SELECT
+                       field_list
+                    FROM
+                       view_data_collection_1.{}
+                    ORDER BY
+                       {}
+                    LIMIT 1) AS field_list
+                ) AS each
+            )
+        '''
+
         union_all = ' UNION ALL '.join(each_table.format(table.name, table.primary_keys) for table in SUMMARY_TABLES)
         results = dict(zip((table.name for table in SUMMARY_TABLES), db.pluck(union_all)))
         assert results == {'award_documents_summary': 11,
-                           'award_items_summary': 32,
-                           'award_suppliers_summary': 29,
-                           'awards_summary': 373,
-                           'buyer_summary': 29,
+                           'award_items_summary': 26,
+                           'award_suppliers_summary': 28,
+                           'awards_summary': 140,
+                           'buyer_summary': 28,
                            'contract_documents_summary': 11,
                            'contract_implementation_documents_summary': 11,
-                           'contract_implementation_milestones_summary': 60,
-                           'contract_implementation_transactions_summary': 100,
-                           'contract_items_summary': 32,
-                           'contract_milestones_summary': 48,
-                           'contracts_summary': 940,
-                           'parties_summary': 55,
+                           'contract_implementation_milestones_summary': 29,
+                           'contract_implementation_transactions_summary': 83,
+                           'contract_items_summary': 26,
+                           'contract_milestones_summary': 27,
+                           'contracts_summary': 328,
+                           'parties_summary': 34,
                            'planning_documents_summary': 11,
-                           'planning_milestones_summary': 60,
-                           'planning_summary': 115,
-                           'procuringentity_summary': 53,
-                           'release_summary': 3569,
-                           'tender_documents_summary': 33,
-                           'tender_items_summary': 26,
-                           'tender_milestones_summary': 24,
-                           'tender_summary': 482,
-                           'tenderers_summary': 47}
+                           'planning_milestones_summary': 29,
+                           'planning_summary': 61,
+                           'procuringentity_summary': 32,
+                           'release_summary': 1046,
+                           'tender_documents_summary': 15,
+                           'tender_items_summary': 25,
+                           'tender_milestones_summary': 23,
+                           'tender_summary': 228,
+                           'tenderers_summary': 31}
 
         # All columns have comments.
         assert not db.all("""

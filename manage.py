@@ -521,7 +521,7 @@ def _add_field_list_column(summary_table, tables_only):
         CREATE TABLE {summary_table.name}_field_list AS
         SELECT
             {summary_table.primary_keys},
-            array_agg(path) AS field_list
+            jsonb_object_agg(path, NULL) AS field_list
         FROM
             {summary_table.name}
         CROSS JOIN
@@ -561,7 +561,8 @@ def _add_field_list_comments(summary_table, name):
     for row in db.all(statement, {'schema': name, 'table': f'{summary_table.name}_no_field_list'}):
         db.execute(f'COMMENT ON COLUMN {summary_table.name}.{row[0]} IS %(comment)s', {'comment': row[1]})
 
-    comment = (f'Array of JSON paths in the {summary_table.data_field} object, excluding array indices. '
+    comment = (f'JSONB object of JSON paths in the {summary_table.data_field} object, excluding array indices. '
+               f'Keys in the object are the paths and values are NULL. '
                f'This column is only available if the --field-lists option was used.')
     db.execute(f'COMMENT ON COLUMN {summary_table.name}.field_list IS %(comment)s', {'comment': comment})
 

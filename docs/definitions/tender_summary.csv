@@ -44,4 +44,4 @@ milestones_count,bigint,Count of milestones
 milestonetype_counts,jsonb,JSONB object with the keys as unique milestoneTypes and the values as a count of the appearances of that `milestoneType` in the `milestones` array
 items_count,bigint,Count of items
 tender,jsonb,JSONB of tender object
-field_list,ARRAY,"Array of JSON paths in the tender object, excluding array indices.This column is only available if the --field-lists option was used."
+field_list,jsonb,"JSONB object of JSON paths in the tender object, excluding array indices. Keys in the object are the paths and values are NULL. This column is only available if the --field-lists option was used."
