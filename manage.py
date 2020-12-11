@@ -561,8 +561,8 @@ def _add_field_list_comments(summary_table, name):
     for row in db.all(statement, {'schema': name, 'table': f'{summary_table.name}_no_field_list'}):
         db.execute(f'COMMENT ON COLUMN {summary_table.name}.{row[0]} IS %(comment)s', {'comment': row[1]})
 
-    comment = (f'JSONB object of JSON paths in the {summary_table.data_field} object, excluding array indices. '
-               f'Keys in the object are the paths and values are NULL. '
+    comment = (f'All JSON paths in the {summary_table.data_field} object, excluding array indices, expressed as '
+               f'a JSONB object in which keys are paths and values are NULL. '
                f'This column is only available if the --field-lists option was used.')
     db.execute(f'COMMENT ON COLUMN {summary_table.name}.field_list IS %(comment)s', {'comment': comment})
 

@@ -202,7 +202,7 @@ def test_command(db, tables_only, tables, views, caplog):
 
         # Check count of keys in field_list field for lowest ids in each summary table.
         each_table = '''
-            (SELECT
+            SELECT
                 count(*)
             FROM
                 (SELECT
@@ -216,7 +216,6 @@ def test_command(db, tables_only, tables, views, caplog):
                        {}
                     LIMIT 1) AS field_list
                 ) AS each
-            )
         '''
 
         union_all = ' UNION ALL '.join(each_table.format(table.name, table.primary_keys) for table in SUMMARY_TABLES)
