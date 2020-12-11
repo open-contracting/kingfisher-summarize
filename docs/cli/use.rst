@@ -80,10 +80,10 @@ Use this option if:
 
 .. _field-lists:
 
-Create array of all paths for each row in each summary table
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Create JSON of all paths for each row in each summary table
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``--field_lists`` option adds a ``field_list`` column to each summary table, which contains a JSON array of all JSON paths (excluding array indices) in the object that the row describes. For example, a ``field_list`` value in the ``awards_summary`` table will contain the JSON paths in an award object.
+The ``--field_lists`` option adds a ``field_list`` column to each summary table, which contains a JSONB object of all JSON paths (excluding array indices) in the object that the row describes. For example, a ``field_list`` value in the ``awards_summary`` table will contain the JSON paths in an award object. The keys of the ``field-list`` JSONB object are the path and the values are NULL.
 
 .. code-block:: bash
 
@@ -95,9 +95,25 @@ This can be used to check for the presence of multiple fields.  For example, to 
 
 .. code-block:: sql
 
-   SELECT count(*) FROM view_data_collection_1.awards_summary WHERE field_list @> '{documents/id, items/id}';
+   SELECT count(*) FROM view_data_collection_1.awards_summary WHERE field_list ?& ARRAY['documents/id', 'items/id'];
 
-The ``@>`` operator tests whether the left ARRAY value contains the right ARRAY values.
+   -- this could also be written as
+
+   SELECT count(*) FROM view_data_collection_1.awards_summary WHERE field_list ? 'documents/id' AND field_list ? 'items/id';
+
+The ``?&`` operator tests whether the left JSON object has all the keys in the right ARRAY values.  The ``?`` operator checks if the key exists in the object.
+
+To count the number of awards that have either at least one document with an ``id`` or at least one iten with an ``id``, run:
+
+.. code-block:: sql
+
+   SELECT count(*) FROM view_data_collection_1.awards_summary WHERE field_list ?| ARRAY['documents/id', 'items/id'];
+
+   -- this could also be written as
+
+   SELECT count(*) FROM view_data_collection_1.awards_summary WHERE field_list ? 'documents/id' OR field_list ? 'items/id';
+
+The ``?|`` operator tests whether the left JSON object has any of the keys in the right ARRAY values.
 
 .. _remove:
 

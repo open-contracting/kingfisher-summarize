@@ -10,4 +10,4 @@ data_id,integer,"id for the ""data"" table in Kingfisher that holds the original
 transaction_amount,numeric,`amount` field from the value object or the deprecated amount object
 transaction_currency,text,`currency` field from the value object or the deprecated amount object
 transaction,jsonb,JSONB of transaction object
-field_list,ARRAY,"Array of JSON paths in the transaction object, excluding array indices.This column is only available if the --field-lists option was used."
+field_list,jsonb,"JSONB object of JSON paths in the transaction object, excluding array indices. Keys in the object are the paths and values are NULL. This column is only available if the --field-lists option was used."

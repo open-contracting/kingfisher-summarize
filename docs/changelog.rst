@@ -1,6 +1,15 @@
 Changelog
 =========
 
+2020-12-11
+----------
+
+Changed
+~~~~~~~
+
+- ``field_list`` field now a JSONB with keys as the path and values as NULL
+
+
 2020-12-09
 ----------
 
