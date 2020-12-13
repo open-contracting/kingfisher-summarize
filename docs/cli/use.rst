@@ -83,15 +83,13 @@ Use this option if:
 Calculate JSON paths in each JSON object in each summary table
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``--field_lists`` option adds a ``field_list`` column to each summary table, which contains all JSON paths (excluding array indices) in the object that the row describes. For example, a ``field_list`` value in the ``awards_summary`` table will contain the JSON paths in an award object. A ``field_list`` value is a JSONB object in which keys are paths and values are ``NULL``.
+The ``--field-lists`` option adds a ``field_list`` column to each summary table, which contains all JSON paths (excluding array indices) in the object that the row describes. For example, a ``field_list`` value in the ``awards_summary`` table will contain the JSON paths in an award object. A ``field_list`` value is a JSONB object in which keys are paths and values are ``NULL``.
 
 .. code-block:: bash
 
     ./manage.py add 123 "The note" --field-lists
 
 This can be used to check for the presence of multiple fields.  For example, to count the number of awards that have at least one document with an ``id`` and at least one item with an ``id``, run:
-
-```
 
 .. code-block:: sql
 
