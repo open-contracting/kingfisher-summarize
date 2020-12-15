@@ -517,6 +517,8 @@ def _add_field_list_column(summary_table, tables_only):
     else:
         relation_type = "VIEW"
 
+    # Use jsonb_object_agg instead of array_agg so that paths are unique, and so that queries against the field use the
+    # faster "in" operator for objects (?&) than for arrays (@>).
     db.execute(f"""
         CREATE TABLE {summary_table.name}_field_list AS
         SELECT
