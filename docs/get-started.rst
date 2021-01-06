@@ -70,4 +70,4 @@ Logging
 
 Logging from the :doc:`cli` can be configured with a ``logging.json`` file in a `configuration directory <https://click.palletsprojects.com/en/7.x/api/#click.get_app_dir>`__ appropriate to your operating system. Read more about :doc:`logging`.
 
-You're now ready to :doc:`use Kingfisher Summarize<cli`.
+You're now ready to :doc:`use Kingfisher Summarize<cli>`.

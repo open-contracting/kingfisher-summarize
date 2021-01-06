@@ -1,7 +1,7 @@
 Command-line tools
 ==================
 
-The ``manage.py`` script at the root of the repository provides access to a suite of command-line tools to create and manage the :doc:`summary tables<../database>` of one or more collections.
+The ``manage.py`` script at the root of the repository provides access to a suite of command-line tools to create and manage the :doc:`summary tables<database>` of one or more collections.
 
 To see all available commands, change to the directory containing your copy of the repository, and run:
 
@@ -20,7 +20,7 @@ To see the help message for a specific command, run, for example:
 add
 ---
 
-Creates a schema containing :doc:`summary tables<../database>` about one or more collections.
+Creates a schema containing :doc:`summary tables<database>` about one or more collections.
 
 This command will fail if the schema already exists.
 
