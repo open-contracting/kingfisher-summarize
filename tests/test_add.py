@@ -78,7 +78,6 @@ def test_command_name(kwargs, name, collections, db, caplog):
             'Running summary-tables routine',
             'Running field-counts routine',
             'Running field-lists routine',
-            'Running correct-user-permissions command',
         ])
 
 
@@ -269,5 +268,4 @@ def test_command(db, tables_only, tables, views, caplog):
             'Running summary-tables routine',
             'Running field-counts routine',
             'Running field-lists routine',
-            'Running correct-user-permissions command',
         ])

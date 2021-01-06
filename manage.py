@@ -184,56 +184,6 @@ def cli(ctx):
 
 
 @click.command()
-def install():
-    """
-    Creates the ``views`` schema and its ``read_only_user`` and ``mapping_sheets`` tables, if they don't exist.
-    """
-    logger = logging.getLogger('ocdskingfisher.summarize.install')
-
-    db.execute('CREATE SCHEMA IF NOT EXISTS views')
-    db.execute('CREATE TABLE IF NOT EXISTS views.read_only_user(username VARCHAR(64) NOT NULL PRIMARY KEY)')
-    db.execute("""
-        CREATE TABLE IF NOT EXISTS views.mapping_sheets (
-            id serial primary key,
-            version text,
-            extension text,
-            section text,
-            path text,
-            title text,
-            description text,
-            type text,
-            range text,
-            values text,
-            links text,
-            deprecated text,
-            "deprecationNotes" text
-        )
-    """)
-
-    if not db.one('SELECT EXISTS(SELECT 1 FROM views.mapping_sheets)')[0]:
-        filename = os.path.join(basedir, 'ocdskingfishersummarize', '1-1-3.csv')
-        with open(filename) as f:
-            reader = csv.DictReader(f)
-
-            paths = set()
-            values = []
-            for row in reader:
-                row['version'] = '1.1'
-                row['extension'] = 'core'
-                if row['path'] not in paths:
-                    paths.add(row['path'])
-                    values.append(tuple(row))
-
-        statement = sql.SQL('INSERT INTO views.mapping_sheets ({columns}, version, extension) VALUES %s').format(
-            columns=sql.SQL(', ').join(sql.Identifier(column) for column in reader.fieldnames))
-        db.execute_values(statement, values)
-
-    db.commit()
-
-    logger.info('Created tables')
-
-
-@click.command()
 @click.argument('collections', callback=validate_collections)
 @click.argument('note')
 @click.option('--name', help='A custom name for the SQL schema ("view_data_" will be prepended).')
@@ -271,6 +221,7 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
     db.execute(sql.SQL('INSERT INTO note (note, created_at) VALUES (%(note)s, %(at)s)'),
                {'note': note, 'at': datetime.utcnow()})
 
+    # https://github.com/open-contracting/kingfisher-summarize/issues/92
     db.execute('ANALYZE selected_collections')
     db.commit()
 
@@ -287,8 +238,14 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
         logger.info('Running field-lists routine')
         field_lists(schema, tables_only=tables_only)
 
-    logger.info('Running correct-user-permissions command')
-    ctx.invoke(correct_user_permissions)
+    # XXX: Couples Kingfisher Summarize to the deploy repository.
+    if db.one("SELECT 1 FROM pg_roles WHERE rolname = 'readonly'")[0]:
+        db.execute(sql.SQL('GRANT USAGE ON SCHEMA {schema} to readonly').format(schema=schema))
+        db.execute(sql.SQL('GRANT SELECT ON ALL TABLES IN SCHEMA {schema} to readonly').format(schema=schema))
+        db.commit()
+
+    logger.info('Configured read-only access to %s', name)
+
 
 
 @click.command()
@@ -482,34 +439,6 @@ def field_counts(name):
     logger.info('Total time: %ss', time() - start)
 
 
-@click.command()
-def correct_user_permissions():
-    """
-    Grants the users in the views.read_only_user table the USAGE privilege on the public, views and collection-specific
-    schemas, and the SELECT privilege on public tables, the views.mapping_sheets table, and collection-specific tables.
-    """
-    schemas = [sql.Identifier(schema) for schema in db.schemas()]
-
-    for user in db.pluck('SELECT username FROM views.read_only_user INNER JOIN pg_roles ON rolname = username'):
-        user = sql.Identifier(user)
-
-        # Grant access to all tables in the public schema.
-        db.execute(sql.SQL('GRANT USAGE ON SCHEMA public TO {user}').format(user=user))
-        db.execute(sql.SQL('GRANT SELECT ON ALL TABLES IN SCHEMA public TO {user}').format(user=user))
-
-        # Grant access to the mapping_sheets table in the views schema.
-        db.execute(sql.SQL('GRANT USAGE ON SCHEMA views TO {user}').format(user=user))
-        db.execute(sql.SQL('GRANT SELECT ON views.mapping_sheets TO {user}').format(user=user))
-
-        # Grant access to all tables in every schema created by Kingfisher Summarize.
-        for schema in schemas:
-            db.execute(sql.SQL('GRANT USAGE ON SCHEMA {schema} TO {user}').format(schema=schema, user=user))
-            db.execute(sql.SQL('GRANT SELECT ON ALL TABLES IN SCHEMA {schema} TO {user}').format(
-                schema=schema, user=user))
-
-    db.commit()
-
-
 def _add_field_list_column(summary_table, tables_only):
 
     if tables_only or summary_table.is_table:
@@ -630,11 +559,9 @@ def docs_table_ref(name):
                 writer.writerow(row)
 
 
-cli.add_command(install)
 cli.add_command(add)
 cli.add_command(remove)
 cli.add_command(index)
-cli.add_command(correct_user_permissions)
 cli.add_command(docs_table_ref)
 
 if __name__ == '__main__':

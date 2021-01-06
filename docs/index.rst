@@ -67,7 +67,7 @@ That's it! Feel free to browse the documentation below.
    :caption: Contents
 
    get-started
-   cli/index
+   cli
    database
    querying-data
    logging

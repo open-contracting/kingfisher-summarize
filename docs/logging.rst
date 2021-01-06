@@ -27,7 +27,5 @@ ocdskingfisher.summarize.remove
   An ``INFO``-level message from the remove command.
 ocdskingfisher.summarize.field-counts
   An ``INFO``-level message from the field-counts routine.
-ocdskingfisher.summarize.install
-  An ``INFO``-level message from the install command.
 ocdskingfisher.summarize.summary-tables
   An ``INFO``-level message from the summary-tables routine.
