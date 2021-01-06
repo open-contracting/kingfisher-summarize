@@ -59,6 +59,8 @@ The database user must have the `CREATE privilege <https://www.postgresql.org/do
 
    psql ocdskingfisher -U ocdskingfisher -c 'GRANT CREATE ON DATABASE ocdskingfisher TO ocdskingfisher;'
 
+Optionally, you can configure Kingfisher Summarize to grant to a SQL role the ``USAGE`` privilege on the schemas it creates and the ``SELECT`` privilege on all tables in the schemas. To do so, set the ``KINGFISHER_SUMMARIZE_READONLY_ROLE`` environment variable.
+
 .. _config-logging:
 
 Logging

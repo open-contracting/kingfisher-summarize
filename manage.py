@@ -238,13 +238,13 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
         logger.info('Running field-lists routine')
         field_lists(schema, tables_only=tables_only)
 
-    # XXX: Couples Kingfisher Summarize to the deploy repository.
-    if db.one("SELECT 1 FROM pg_roles WHERE rolname = 'readonly'")[0]:
-        db.execute(sql.SQL('GRANT USAGE ON SCHEMA {schema} to readonly').format(schema=schema))
-        db.execute(sql.SQL('GRANT SELECT ON ALL TABLES IN SCHEMA {schema} to readonly').format(schema=schema))
+    role = os.getenv('KINGFISHER_SUMMARIZE_READONLY_ROLE', '')
+    if db.one("SELECT 1 FROM pg_roles WHERE rolname = %(role)s", {'role': role}):
+        db.execute(sql.SQL('GRANT USAGE ON SCHEMA {schema} to {user}').format(schema=schema, user=user))
+        db.execute(sql.SQL('GRANT SELECT ON ALL TABLES IN SCHEMA {schema} to {user}').format(schema=schema, user=user))
         db.commit()
 
-    logger.info('Configured read-only access to %s', name)
+        logger.info('Configured read-only access to %s', name)
 
 
 
