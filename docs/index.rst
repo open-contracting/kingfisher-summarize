@@ -71,6 +71,5 @@ That's it! Feel free to browse the documentation below.
    database
    querying-data
    logging
-   users
    develop/index
    changelog
