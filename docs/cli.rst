@@ -1,18 +1,36 @@
-Use
-===
+Command-line tools
+==================
 
-These commands are used to create and manage the :doc:`summary tables<../database>` of one or more collections.
+The ``manage.py`` script at the root of the repository provides access to a suite of command-line tools to create and manage the :doc:`summary tables<database>` of one or more collections.
+
+To see all available commands, change to the directory containing your copy of the repository, and run:
+
+.. code-block:: bash
+
+   ./manage.py --help
+
+To see the help message for a specific command, run, for example:
+
+.. code-block:: bash
+
+   ./manage.py add --help
 
 .. _add:
 
 add
 ---
 
-Creates a schema containing :doc:`summary tables<../database>` about one or more collections.
-
-This command also calls the :ref:`correct-user-permissions` command.
+Creates a schema containing :doc:`summary tables<database>` about one or more collections.
 
 This command will fail if the schema already exists.
+
+.. note::
+
+   If you notice slow queries and are using solid-state drives, consider tuning PostgreSQL by decreasing ``random_page_cost``:
+
+   .. code-block:: bash
+
+      ALTER TABLESPACE pg_default SET (random_page_cost = 1.0);
 
 .. summarize-one-collection:
 
@@ -161,30 +179,6 @@ To list the schemas only, Connect to the database used by Kingfisher Summarize, 
 .. code-block:: none
 
    \dn
-
-.. _correct-user-permissions:
-
-correct-user-permissions
-------------------------
-
-.. note::
-
-   You only need to learn this command if you are :doc:`sharing access<../users>`.
-
-`Grants <https://www.postgresql.org/docs/current/ddl-priv.html>`__ the users in the ``views.read_only_user`` table the ``USAGE`` privilege on the schemas and the ``SELECT`` privilege on some tables in those schemas:
-
-.. code-block:: bash
-
-   ./manage.py correct-user-permissions
-
-The tables to which access is granted are:
-
-``public``
-   All tables created by Kingfisher Process. See `Kingfisher Process documentation <https://kingfisher-process.readthedocs.io/en/latest/database-structure.html>`__.
-``views``
-   The ``mapping_sheets`` table.
-Collection-specific schemas
-   All tables about one or more collections, created by the :ref:`add` command. See :doc:`../database`.
 
 .. _upgrade-app:
 

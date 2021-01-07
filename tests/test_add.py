@@ -6,7 +6,7 @@ import pytest
 from click.testing import CliRunner
 from psycopg2 import sql
 
-from manage import cli, SUMMARY_TABLES
+from manage import cli, SUMMARIES
 from tests import assert_bad_argument, assert_log_records, assert_log_running, fixture, noop
 
 command = 'add'
@@ -14,24 +14,22 @@ command = 'add'
 TABLES = {
     'note',
     'selected_collections',
-    # due to --field-counts option being set
-    'field_counts',
 }
+SUMMARY_TABLES = set()
+SUMMARY_VIEWS = set()
+FIELD_LIST_TABLES = set()
+NO_FIELD_LIST_TABLES = set()
+NO_FIELD_LIST_VIEWS = set()
 
-VIEWS = set()
+for summary_table in SUMMARIES:
+    FIELD_LIST_TABLES.add(f'{summary_table.name}_field_list')
 
-for summary_table in SUMMARY_TABLES:
-    # all summary relations are views with --field-lists set
-    VIEWS.add(summary_table.name)
-
-    TABLES.add(f'{summary_table.name}_field_list')
-
-    # original relations have now suffixed with _no_field_list
     if summary_table.is_table:
-        TABLES.add(f'{summary_table.name}_no_field_list')
+        SUMMARY_TABLES.add(summary_table.name)
+        NO_FIELD_LIST_TABLES.add(f'{summary_table.name}_no_field_list')
     else:
-        VIEWS.add(f'{summary_table.name}_no_field_list')
-        # *_no_data table for each summary that is a view
+        SUMMARY_VIEWS.add(summary_table.name)
+        NO_FIELD_LIST_VIEWS.add(f'{summary_table.name}_no_field_list')
         TABLES.add(f'{summary_table.name}_no_data')
 
 
@@ -78,24 +76,32 @@ def test_command_name(kwargs, name, collections, db, caplog):
             'Running summary-tables routine',
             'Running field-counts routine',
             'Running field-lists routine',
-            'Running correct-user-permissions command',
         ])
 
 
-@pytest.mark.parametrize('tables_only, tables, views', [
-    (False, TABLES, VIEWS),
-    (True, TABLES | VIEWS, set()),
+@pytest.mark.parametrize('tables_only, field_counts, field_lists, tables, views', [
+    (False, True, False,
+     TABLES | SUMMARY_TABLES, SUMMARY_VIEWS),
+    (True, True, False,
+     TABLES | SUMMARY_TABLES | SUMMARY_VIEWS, set()),
+    (False, False, True,
+     TABLES | FIELD_LIST_TABLES | NO_FIELD_LIST_TABLES, SUMMARY_TABLES | SUMMARY_VIEWS | NO_FIELD_LIST_VIEWS),
+    (True, False, True,
+     TABLES | FIELD_LIST_TABLES | NO_FIELD_LIST_TABLES | SUMMARY_TABLES | SUMMARY_VIEWS | NO_FIELD_LIST_VIEWS, set()),
 ])
-def test_command(db, tables_only, tables, views, caplog):
-    with fixture(db, tables_only=tables_only) as result:
+def test_command(db, tables_only, field_counts, field_lists, tables, views, caplog):
+    with fixture(db, tables_only=tables_only, field_counts=field_counts, field_lists=field_lists) as result:
         # Check existence of schema, tables and views.
+        if field_counts:
+            tables.add('field_counts')
+
         assert db.schema_exists('view_data_collection_1')
         assert set(db.pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
-                            " AND table_type = 'BASE TABLE'", {'schema': 'view_data_collection_1'})) == tables
+                            "AND table_type = 'BASE TABLE'", {'schema': 'view_data_collection_1'})) == tables
         assert set(db.pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
                             "AND table_type = 'VIEW'", {'schema': 'view_data_collection_1'})) == views
 
-        # Check contents of summary tables.
+        # Check contents of summary relations.
         rows = db.all("""
             SELECT
                 award_index,
@@ -169,80 +175,87 @@ def test_command(db, tables_only, tables, views, caplog):
         """)
 
         assert rows[0] == (
-            0,
-            'release',
-            1,
-            'dolore',
-            'ex laborumsit autein magna veniam',
-            'voluptate officia tempor dolor',
+            0,  # party_index
+            'release',  # release_type
+            1,  # collection_id
+            'dolore',  # ocid
+            'ex laborumsit autein magna veniam',  # release_id
+            'voluptate officia tempor dolor',  # parties_id
             [
                 'ex ',
                 'in est exercitation nulla Excepteur',
                 'ipsum do',
-            ],
-            'ad proident dolor reprehenderit veniam-in quis exercitation reprehenderit',
-            'voluptate officia tempor dolor',
+            ],  # roles
+            'ad proident dolor reprehenderit veniam-in quis exercitation reprehenderit',  # identifier
+            'voluptate officia tempor dolor',  # unique_identifier_attempt
             [
                 'exercitation proident voluptate-sed culpa eamollit consectetur dolor l',
                 'magna-dolor ut indolorein in tempor magna mollit',
                 'ad occaecat amet anim-laboris ea Duisdeserunt quis sed pariatur mollit',
                 'elit mollit-officia proidentmagna',
                 'ex-minim Ut consectetur',
-            ],
-            5,
+            ],  # parties_additionalidentifiers_ids
+            5,  # parties_additionalidentifiers_count
 
         )
         assert len(rows) == 296
 
-        # Check contents of field_counts table.
-        rows = db.all('SELECT * FROM view_data_collection_1.field_counts')
+        if field_counts:
+            # Check contents of field_counts table.
+            rows = db.all('SELECT * FROM view_data_collection_1.field_counts')
 
-        assert len(rows) == 65235
-        assert rows[0] == (1, 'release', 'awards', 100, 301, 100)
+            assert len(rows) == 65235
+            assert rows[0] == (1, 'release', 'awards', 100, 301, 100)
 
-        # Check count of keys in field_list field for lowest ids in each summary table.
-        each_table = '''
-            SELECT
-                count(*)
-            FROM
-                (SELECT
-                    jsonb_each(field_list)
-                FROM (
-                    SELECT
-                       field_list
-                    FROM
-                       view_data_collection_1.{}
-                    ORDER BY
-                       {}
-                    LIMIT 1) AS field_list
-                ) AS each
-        '''
+        if field_lists:
+            # Check the count of keys in the field_list field for the lowest primary keys in each summary relation.
+            statement = """
+                SELECT
+                    count(*)
+                FROM
+                    (SELECT
+                        jsonb_each(field_list)
+                    FROM (
+                        SELECT
+                            field_list
+                        FROM
+                            view_data_collection_1.{table}
+                        ORDER BY
+                            {primary_keys}
+                        LIMIT 1) AS field_list
+                    ) AS each
+            """
 
-        union_all = ' UNION ALL '.join(each_table.format(table.name, table.primary_keys) for table in SUMMARY_TABLES)
-        results = dict(zip((table.name for table in SUMMARY_TABLES), db.pluck(union_all)))
-        assert results == {'award_documents_summary': 11,
-                           'award_items_summary': 26,
-                           'award_suppliers_summary': 28,
-                           'awards_summary': 140,
-                           'buyer_summary': 28,
-                           'contract_documents_summary': 11,
-                           'contract_implementation_documents_summary': 11,
-                           'contract_implementation_milestones_summary': 29,
-                           'contract_implementation_transactions_summary': 83,
-                           'contract_items_summary': 26,
-                           'contract_milestones_summary': 27,
-                           'contracts_summary': 328,
-                           'parties_summary': 34,
-                           'planning_documents_summary': 11,
-                           'planning_milestones_summary': 29,
-                           'planning_summary': 61,
-                           'procuringentity_summary': 32,
-                           'release_summary': 1046,
-                           'tender_documents_summary': 15,
-                           'tender_items_summary': 25,
-                           'tender_milestones_summary': 23,
-                           'tender_summary': 228,
-                           'tenderers_summary': 31}
+            expected = {
+                'award_documents_summary': 11,
+                'award_items_summary': 26,
+                'award_suppliers_summary': 28,
+                'awards_summary': 140,
+                'buyer_summary': 28,
+                'contract_documents_summary': 11,
+                'contract_implementation_documents_summary': 11,
+                'contract_implementation_milestones_summary': 29,
+                'contract_implementation_transactions_summary': 83,
+                'contract_items_summary': 26,
+                'contract_milestones_summary': 27,
+                'contracts_summary': 328,
+                'parties_summary': 34,
+                'planning_documents_summary': 11,
+                'planning_milestones_summary': 29,
+                'planning_summary': 61,
+                'procuringentity_summary': 32,
+                'release_summary': 1046,
+                'tender_documents_summary': 15,
+                'tender_items_summary': 25,
+                'tender_milestones_summary': 23,
+                'tender_summary': 228,
+                'tenderers_summary': 31,
+            }
+
+            for table in SUMMARIES:
+                count = db.one(db.format(statement, table=table.name, primary_keys=table.primary_keys))[0]
+
+                assert count == expected[table.name], f'{table.name}: {count} != {expected[table.name]}'
 
         # All columns have comments.
         assert not db.all("""
@@ -261,13 +274,16 @@ def test_command(db, tables_only, tables, views, caplog):
                                                isc.ordinal_position) IS NULL
         """, {'schema': 'view_data_collection_1'})
 
-        assert result.exit_code == 0
-        assert result.output == ''
-        assert_log_records(caplog, command, [
+        expected = [
             f'Arguments: collections=(1,) note=Default name=None tables_only={tables_only!r}',
             'Added collection_1',
             'Running summary-tables routine',
-            'Running field-counts routine',
-            'Running field-lists routine',
-            'Running correct-user-permissions command',
-        ])
+        ]
+        if field_counts:
+            expected.append('Running field-counts routine')
+        if field_lists:
+            expected.append('Running field-lists routine')
+
+        assert result.exit_code == 0
+        assert result.output == ''
+        assert_log_records(caplog, command, expected)

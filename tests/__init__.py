@@ -51,7 +51,7 @@ def assert_log_running(caplog, command):
 def assert_log_records(caplog, name, messages):
     records = [record for record in caplog.records if record.name == f'ocdskingfisher.summarize.{name}']
 
-    assert len(records) == len(messages), [record.message for record in records]
+    assert len(records) == len(messages), f'{[record.message for record in records]!r} != {messages!r}'
     assert all(record.levelname == 'INFO' for record in records)
     for i, record in enumerate(records):
         message = messages[i]

@@ -17,8 +17,7 @@ class Database:
         """
         Sets the search path to the given schemas.
         """
-        self.cursor.execute(sql.SQL('SET search_path = {schemas}').format(schemas=sql.SQL(', ').join(
-            sql.Identifier(schema) for schema in schemas)))
+        self.cursor.execute(self.format('SET search_path = {schemas}', schemas=schemas))
 
     def schema_exists(self, schema):
         """
@@ -52,10 +51,27 @@ class Database:
         self.cursor.execute(statement, variables)
         return self.cursor.fetchone()
 
-    def execute(self, statement, variables=None):
+    def format(self, statement, **kwargs):
+        """
+        Formats the SQL statement, expressed as a format string with keyword arguments. A keyword argument's value is
+        converted to a SQL identifier, or a list of SQL identifiers, unless it's already a ``sql`` object.
+        """
+        objects = {}
+        for key, value in kwargs.items():
+            if isinstance(value, sql.Composable):
+                objects[key] = value
+            elif isinstance(value, list):
+                objects[key] = sql.SQL(', ').join(sql.Identifier(entry) for entry in value)
+            else:
+                objects[key] = sql.Identifier(value)
+        return sql.SQL(statement).format(**objects)
+
+    def execute(self, statement, variables=None, **kwargs):
         """
         Executes the SQL statement.
         """
+        if kwargs:
+            statement = self.format(statement, **kwargs)
         self.cursor.execute(statement, variables)
 
     def execute_values(self, sql, argslist):

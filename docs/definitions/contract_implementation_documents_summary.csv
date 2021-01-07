@@ -10,4 +10,4 @@ data_id,integer,"id for the ""data"" table in Kingfisher that holds the original
 document,jsonb,JSONB of the document
 documenttype,text,`documentType` field from the document object
 format,text,`format` field from the document object
-field_list,jsonb,"JSONB object of JSON paths in the document object, excluding array indices. Keys in the object are the paths and values are NULL. This column is only available if the --field-lists option was used."
+field_list,jsonb,"All JSON paths in the document object, excluding array indices, expressed as a JSONB object in which keys are paths and values are NULL. This column is only available if the --field-lists option was used."

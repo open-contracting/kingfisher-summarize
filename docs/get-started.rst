@@ -59,6 +59,8 @@ The database user must have the `CREATE privilege <https://www.postgresql.org/do
 
    psql ocdskingfisher -U ocdskingfisher -c 'GRANT CREATE ON DATABASE ocdskingfisher TO ocdskingfisher;'
 
+Optionally, you can configure Kingfisher Summarize to grant to a SQL role the ``USAGE`` privilege on the schemas it creates and the ``SELECT`` privilege on all tables in the schemas. To do so, set the ``KINGFISHER_SUMMARIZE_READONLY_ROLE`` environment variable.
+
 .. _config-logging:
 
 Logging
@@ -68,23 +70,6 @@ Logging
 
    This step is optional.
 
-Logging from the :doc:`cli/index` can be configured with a ``logging.json`` file in a `configuration directory <https://click.palletsprojects.com/en/7.x/api/#click.get_app_dir>`__ appropriate to your operating system. Read more about :doc:`logging`.
+Logging from the :doc:`cli` can be configured with a ``logging.json`` file in a `configuration directory <https://click.palletsprojects.com/en/7.x/api/#click.get_app_dir>`__ appropriate to your operating system. Read more about :doc:`logging`.
 
-Setup PostgreSQL database
--------------------------
-
-Create Kingfisher Summarize's configuration tables using the :ref:`install` command:
-
-   .. code-block:: bash
-
-      ./manage.py install
-
-You're now ready to :doc:`use Kingfisher Summarize<cli/use>`.
-
-.. note::
-
-   If you notice slow queries and are using solid-state drives, consider tuning PostgreSQL by decreasing ``random_page_cost``:
-
-   .. code-block:: bash
-
-      ALTER TABLESPACE pg_default SET (random_page_cost = 2.0);
+You're now ready to :doc:`use Kingfisher Summarize<cli>`.
