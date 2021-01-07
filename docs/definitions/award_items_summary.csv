@@ -15,4 +15,4 @@ unit_currency,text,`currency` from the unit/value object
 item_classification,text,Concatenation of classification/scheme and classification/id
 item_additionalidentifiers_ids,jsonb,JSONB list of the concatenation of additionalClassification/scheme and additionalClassification/id
 additional_classification_count,integer,Count of additional classifications
-field_list,jsonb,"JSONB object of JSON paths in the item object, excluding array indices. Keys in the object are the paths and values are NULL. This column is only available if the --field-lists option was used."
+field_list,jsonb,"All JSON paths in the item object, excluding array indices, expressed as a JSONB object in which keys are paths and values are NULL. This column is only available if the --field-lists option was used."
