@@ -1,6 +1,17 @@
 Changelog
 =========
 
+2021-01-06
+----------
+
+Changed
+~~~~~~~
+
+-  Remove ``install`` command
+-  Remove ``correct-user-permissions`` command
+-  Remove ``views`` schema, including ``views.read_only_user`` and ``views.mapping_sheets`` tables
+-  Remove ``flatten_with_values`` SQL function
+
 2020-12-11
 ----------
 
