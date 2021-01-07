@@ -24,36 +24,48 @@ global db
 flags = re.MULTILINE | re.IGNORECASE
 basedir = os.path.dirname(os.path.realpath(__file__))
 
-SummaryTable = namedtuple('SummaryTable', 'name primary_keys data_field is_table')
+Summary = namedtuple('Summary', 'name primary_keys data_column is_table')
 
-SUMMARY_TABLES = [
-    SummaryTable('award_documents_summary', 'id, award_index, document_index', 'document', True),
-    SummaryTable('award_items_summary', 'id, award_index, item_index', 'item', True),
-    SummaryTable('award_suppliers_summary', 'id, award_index, supplier_index', 'supplier', True),
-    SummaryTable('awards_summary', 'id, award_index', 'award', False),
-    SummaryTable('buyer_summary', 'id', 'buyer', True),
-    SummaryTable('contract_documents_summary', 'id, contract_index, document_index', 'document', True),
-    SummaryTable('contract_implementation_documents_summary',
-                 'id, contract_index, document_index', 'document', True),
-    SummaryTable('contract_implementation_milestones_summary',
-                 'id, contract_index, milestone_index', 'milestone', True),
-    SummaryTable('contract_implementation_transactions_summary',
-                 'id, contract_index, transaction_index', 'transaction', True),
-    SummaryTable('contract_items_summary', 'id, contract_index, item_index', 'item', True),
-    SummaryTable('contract_milestones_summary', 'id, contract_index, milestone_index', 'milestone', True),
-    SummaryTable('contracts_summary', 'id, contract_index', 'contract', False),
-    SummaryTable('parties_summary', 'id, party_index', 'party', False),
-    SummaryTable('planning_documents_summary', 'id, document_index', 'document', True),
-    SummaryTable('planning_milestones_summary', 'id, milestone_index', 'milestone', True),
-    SummaryTable('planning_summary', 'id', 'planning', False),
-    SummaryTable('procuringentity_summary', 'id', 'procuringentity', True),
-    SummaryTable('release_summary', 'id', 'release', False),
-    SummaryTable('tender_documents_summary', 'id', 'document', True),
-    SummaryTable('tender_items_summary', 'id, item_index', 'item', True),
-    SummaryTable('tender_milestones_summary', 'id, milestone_index', 'milestone', True),
-    SummaryTable('tender_summary', 'id', 'tender', False),
-    SummaryTable('tenderers_summary', 'id, tenderer_index', 'tenderer', True),
+SUMMARIES = [
+    Summary('award_documents_summary', ['id', 'award_index', 'document_index'], 'document', True),
+    Summary('award_items_summary', ['id', 'award_index', 'item_index'], 'item', True),
+    Summary('award_suppliers_summary', ['id', 'award_index', 'supplier_index'], 'supplier', True),
+    Summary('awards_summary', ['id', 'award_index'], 'award', False),
+    Summary('buyer_summary', ['id'], 'buyer', True),
+    Summary('contract_documents_summary', ['id', 'contract_index', 'document_index'], 'document', True),
+    Summary('contract_implementation_documents_summary',
+            ['id', 'contract_index', 'document_index'], 'document', True),
+    Summary('contract_implementation_milestones_summary',
+            ['id', 'contract_index', 'milestone_index'], 'milestone', True),
+    Summary('contract_implementation_transactions_summary',
+            ['id', 'contract_index', 'transaction_index'], 'transaction', True),
+    Summary('contract_items_summary', ['id', 'contract_index', 'item_index'], 'item', True),
+    Summary('contract_milestones_summary', ['id', 'contract_index', 'milestone_index'], 'milestone', True),
+    Summary('contracts_summary', ['id', 'contract_index'], 'contract', False),
+    Summary('parties_summary', ['id', 'party_index'], 'party', False),
+    Summary('planning_documents_summary', ['id', 'document_index'], 'document', True),
+    Summary('planning_milestones_summary', ['id', 'milestone_index'], 'milestone', True),
+    Summary('planning_summary', ['id'], 'planning', False),
+    Summary('procuringentity_summary', ['id'], 'procuringentity', True),
+    Summary('release_summary', ['id'], 'release', False),
+    Summary('tender_documents_summary', ['id'], 'document', True),
+    Summary('tender_items_summary', ['id', 'item_index'], 'item', True),
+    Summary('tender_milestones_summary', ['id', 'milestone_index'], 'milestone', True),
+    Summary('tender_summary', ['id'], 'tender', False),
+    Summary('tenderers_summary', ['id', 'tenderer_index'], 'tenderer', True),
 ]
+
+COLUMN_COMMENTS_SQL = """
+    SELECT
+        isc.column_name,
+        isc.data_type,
+        pg_catalog.col_description(format('%%s.%%s', isc.table_schema,isc.table_name)::regclass::oid,
+                                   isc.ordinal_position) AS column_description
+    FROM
+        information_schema.columns isc
+    WHERE
+        table_schema = %(schema)s AND LOWER(isc.table_name) = LOWER(%(table)s)
+"""
 
 
 def sql_files(directory, tables_only=False):
@@ -211,15 +223,15 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
         name = f"collection_{'_'.join(str(_id) for _id in sorted(collections))}"
 
     schema = f'view_data_{name}'
-    db.execute(sql.SQL('CREATE SCHEMA {schema}').format(schema=sql.Identifier(schema)))
+    db.execute('CREATE SCHEMA {schema}', schema=schema)
     db.set_search_path([schema])
 
     db.execute('CREATE TABLE selected_collections (id INTEGER PRIMARY KEY)')
     db.execute_values('INSERT INTO selected_collections (id) VALUES %s', [(_id,) for _id in collections])
 
     db.execute('CREATE TABLE note (id SERIAL, note TEXT NOT NULL, created_at TIMESTAMP WITHOUT TIME ZONE)')
-    db.execute(sql.SQL('INSERT INTO note (note, created_at) VALUES (%(note)s, %(at)s)'),
-               {'note': note, 'at': datetime.utcnow()})
+    db.execute('INSERT INTO note (note, created_at) VALUES (%(note)s, %(created_at)s)',
+               {'note': note, 'created_at': datetime.utcnow()})
 
     # https://github.com/open-contracting/kingfisher-summarize/issues/92
     db.execute('ANALYZE selected_collections')
@@ -240,12 +252,11 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
 
     role = os.getenv('KINGFISHER_SUMMARIZE_READONLY_ROLE', '')
     if db.one("SELECT 1 FROM pg_roles WHERE rolname = %(role)s", {'role': role}):
-        db.execute(sql.SQL('GRANT USAGE ON SCHEMA {schema} to {user}').format(schema=schema, user=user))
-        db.execute(sql.SQL('GRANT SELECT ON ALL TABLES IN SCHEMA {schema} to {user}').format(schema=schema, user=user))
+        db.execute('GRANT USAGE ON SCHEMA {schema} TO {role}', schema=schema, role=role)
+        db.execute('GRANT SELECT ON ALL TABLES IN SCHEMA {schema} TO {role}', schema=schema, role=role)
         db.commit()
 
         logger.info('Configured read-only access to %s', name)
-
 
 
 @click.command()
@@ -260,7 +271,7 @@ def remove(name):
     logger.info('Arguments: name=%s', name)
 
     # `CASCADE` drops all objects (tables, functions, etc.) in the schema.
-    statement = sql.SQL('DROP SCHEMA {schema} CASCADE').format(schema=sql.Identifier(name))
+    statement = db.format('DROP SCHEMA {schema} CASCADE', schema=name)
     db.execute(statement)
     db.commit()
 
@@ -296,6 +307,7 @@ def _run_file(name, identifier, content):
 
     db = Database()
     db.set_search_path([name, 'public'])
+
     db.execute(f'/* kingfisher-summarize {identifier} */\n' + content)
     db.commit()
 
@@ -306,12 +318,10 @@ def summary_tables(name, tables_only=False):
     """
     Creates the summary tables in a schema.
 
-    :param str name: the last part of a schema's name after "view_data_"
+    :param str name: the schema's name
     :param boolean tables_only: whether to create SQL tables instead of SQL views
     """
     logger = logging.getLogger('ocdskingfisher.summarize.summary-tables')
-
-    db.set_search_path([name, 'public'])
 
     start = time()
 
@@ -363,7 +373,7 @@ def summary_tables(name, tables_only=False):
     logger.info('Total time: %ss', time() - start)
 
 
-def _run_collection(name, collection_id):
+def _run_field_counts(name, collection_id):
     logger = logging.getLogger('ocdskingfisher.summarize.field-counts')
     logger.info('Processing collection ID %s', collection_id)
 
@@ -371,6 +381,7 @@ def _run_collection(name, collection_id):
 
     db = Database()
     db.set_search_path([name, 'public'])
+
     db.execute_values('INSERT INTO field_counts VALUES %s', db.all("""
         /* kingfisher-summarize field-counts */
 
@@ -398,7 +409,7 @@ def field_counts(name):
     """
     Creates the field_counts table in a schema.
 
-    :param str name: the last part of a schema's name after "view_data_"
+    :param str name: the schema's name
     """
     logger = logging.getLogger('ocdskingfisher.summarize.field-counts')
 
@@ -420,7 +431,7 @@ def field_counts(name):
 
     selected_collections = db.pluck('SELECT id FROM selected_collections')
     with concurrent.futures.ProcessPoolExecutor() as executor:
-        futures = [executor.submit(_run_collection, name, collection) for collection in selected_collections]
+        futures = [executor.submit(_run_field_counts, name, collection) for collection in selected_collections]
         for future in concurrent.futures.as_completed(futures):
             future.result()
 
@@ -439,81 +450,97 @@ def field_counts(name):
     logger.info('Total time: %ss', time() - start)
 
 
-def _add_field_list_column(summary_table, tables_only):
+def _run_field_lists(name, table, tables_only):
+    logger = logging.getLogger('ocdskingfisher.summarize.field-lists')
+    logger.info(f'Processing {table.name}')
 
-    if tables_only or summary_table.is_table:
-        relation_type = "TABLE"
+    start = time()
+
+    db = Database()
+    db.set_search_path([name, 'public'])
+
+    summary_table = table.name
+    field_list_table = f'{summary_table}_field_list'
+    no_field_list_table = f'{summary_table}_no_field_list'
+
+    if tables_only:
+        no_field_list_type = sql.SQL('TABLE')
+        final_summary_type = sql.SQL('TABLE')
     else:
-        relation_type = "VIEW"
+        no_field_list_type = sql.SQL('TABLE' if table.is_table else 'VIEW')
+        final_summary_type = sql.SQL('VIEW')
+
+    # Create a *_field_list table, add a unique index, rename the *_summary table to *_no_field_list, and re-create
+    # the *_summary table. Then, copy the comments from the old to the new *_summary table.
 
     # Use jsonb_object_agg instead of array_agg so that paths are unique, and so that queries against the field use the
     # faster "in" operator for objects (?&) than for arrays (@>).
-    db.execute(f"""
-        CREATE TABLE {summary_table.name}_field_list AS
+    statement = """
+        CREATE TABLE {field_list_table} AS
         SELECT
-            {summary_table.primary_keys},
+            {primary_keys},
             jsonb_object_agg(path, NULL) AS field_list
         FROM
-            {summary_table.name}
+            {summary_table}
         CROSS JOIN
-            flatten({summary_table.name}.{summary_table.data_field})
+            flatten({summary_table}.{data_column})
         GROUP BY
-            {summary_table.primary_keys};
+            {primary_keys}
+    """
+    db.execute(statement, summary_table=summary_table, field_list_table=field_list_table,
+               data_column=table.data_column, primary_keys=table.primary_keys)
 
-        CREATE UNIQUE INDEX {summary_table.name}_field_list_keys ON
-               {summary_table.name}_field_list({summary_table.primary_keys});
+    statement = 'CREATE UNIQUE INDEX {index} ON {field_list_table}({primary_keys})'
+    db.execute(statement, index=f'{field_list_table}_id', field_list_table=field_list_table,
+               primary_keys=table.primary_keys)
 
-        ALTER {relation_type} {summary_table.name} RENAME TO {summary_table.name}_no_field_list;
-
-        CREATE {'TABLE' if tables_only else 'VIEW'} {summary_table.name} AS
-        SELECT
-            {summary_table.name}_no_field_list.*,
-            {summary_table.name}_field_list.field_list
-        FROM
-            {summary_table.name}_no_field_list
-        JOIN
-            {summary_table.name}_field_list USING ({summary_table.primary_keys});
-    """)
-
-
-def _add_field_list_comments(summary_table, name):
+    statement = 'ALTER {no_field_list_type} {summary_table} RENAME TO {no_field_list_table}'
+    db.execute(statement, no_field_list_type=no_field_list_type, summary_table=summary_table,
+               no_field_list_table=no_field_list_table)
 
     statement = """
+        CREATE {final_summary_type} {summary_table} AS
         SELECT
-            isc.column_name,
-            pg_catalog.col_description(format('%%s.%%s', isc.table_schema,isc.table_name)::regclass::oid,
-                                       isc.ordinal_position) AS column_description
+            {no_field_list_table}.*,
+            {field_list_table}.field_list
         FROM
-            information_schema.columns isc
-        WHERE
-            table_schema = %(schema)s AND LOWER(isc.table_name) = LOWER(%(table)s)
+            {no_field_list_table}
+        JOIN
+            {field_list_table} USING ({primary_keys})
     """
+    db.execute(statement, final_summary_type=final_summary_type, summary_table=summary_table,
+               no_field_list_table=no_field_list_table, field_list_table=field_list_table,
+               primary_keys=table.primary_keys)
 
-    for row in db.all(statement, {'schema': name, 'table': f'{summary_table.name}_no_field_list'}):
-        db.execute(f'COMMENT ON COLUMN {summary_table.name}.{row[0]} IS %(comment)s', {'comment': row[1]})
+    for row in db.all(COLUMN_COMMENTS_SQL, {'schema': name, 'table': f'{table.name}_no_field_list'}):
+        statement = 'COMMENT ON COLUMN {table}.{column} IS %(comment)s'
+        db.execute(statement, {'comment': row[2]}, table=table.name, column=row[0])
 
-    comment = (f'All JSON paths in the {summary_table.data_field} object, excluding array indices, expressed as '
-               f'a JSONB object in which keys are paths and values are NULL. '
-               f'This column is only available if the --field-lists option was used.')
-    db.execute(f'COMMENT ON COLUMN {summary_table.name}.field_list IS %(comment)s', {'comment': comment})
+    comment = f'All JSON paths in the {table.data_column} object, excluding array indices, expressed as a JSONB ' \
+              'object in which keys are paths and values are NULL. This column is only available if the --field-' \
+              'lists option was used.'
+    db.execute('COMMENT ON COLUMN {table}.field_list IS %(comment)s', {'comment': comment}, table=table.name)
+
+    db.commit()
+
+    logger.info('%s: %ss', table.name, time() - start)
 
 
 def field_lists(name, tables_only=False):
     """
     Adds the field_list column on all summary tables.
 
-    :param str name: the last part of a schema's name after "view_data_"
+    :param str name: the schema's name
     :param bool tables_only: whether to create SQL tables instead of SQL views
     """
     logger = logging.getLogger('ocdskingfisher.summarize.field-lists')
 
-    db.set_search_path([name, 'public'])
-
     start = time()
 
-    for summary_table in SUMMARY_TABLES:
-        _add_field_list_column(summary_table, tables_only)
-        _add_field_list_comments(summary_table, name)
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        futures = [executor.submit(_run_field_lists, name, table, tables_only) for table in SUMMARIES]
+        for future in concurrent.futures.as_completed(futures):
+            future.result()
 
     logger.info('Total time: %ss', time() - start)
 
@@ -533,25 +560,13 @@ def docs_table_ref(name):
 
     headers = ['Column Name', 'Data Type', 'Description']
 
-    statement = """
-        SELECT
-            isc.column_name,
-            isc.data_type,
-            pg_catalog.col_description(format('%%s.%%s', isc.table_schema,isc.table_name)::regclass::oid,
-                                       isc.ordinal_position) AS column_description
-        FROM
-            information_schema.columns isc
-        WHERE
-            table_schema = %(schema)s AND LOWER(isc.table_name) = LOWER(%(table)s)
-    """
-
     filename = os.path.join(basedir, 'docs', 'definitions', '{}.csv')
     for table in tables:
         with open(filename.format(table), 'w') as f:
             writer = csv.writer(f, lineterminator='\n')
             writer.writerow(headers)
 
-            for row in db.all(statement, {'schema': name, 'table': table}):
+            for row in db.all(COLUMN_COMMENTS_SQL, {'schema': name, 'table': table}):
                 # Change "timestamp without time zone" (and  "timestamp with time zone") to "timestamp".
                 if 'timestamp' in row[1]:
                     row = list(row)
