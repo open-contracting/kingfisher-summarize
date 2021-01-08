@@ -297,7 +297,8 @@ def index():
         for note in notes[1:]:
             table.append([None, None, format_note(note)])
 
-    click.echo(tabulate(table, headers=['Name', 'Collections', 'Note'], tablefmt='github', numalign='left'))
+    if table:
+        click.echo(tabulate(table, headers=['Name', 'Collections', 'Note'], tablefmt='github', numalign='left'))
 
 
 def _run_file(name, identifier, content):
