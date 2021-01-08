@@ -286,17 +286,18 @@ def index():
     def format_note(note):
         return f"{note[0]} ({note[1].strftime('%Y-%m-%d %H:%M:%S')})"
 
+    table = []
     for schema in db.schemas():
         db.set_search_path([schema])
 
         collections = map(str, db.pluck('SELECT id FROM selected_collections ORDER BY id'))
         notes = db.all('SELECT note, created_at FROM note ORDER BY created_at')
 
-        table = [[schema[10:], ', '.join(collections), format_note(notes[0])]]
+        table.append([schema[10:], ', '.join(collections), format_note(notes[0])])
         for note in notes[1:]:
             table.append([None, None, format_note(note)])
 
-        click.echo(tabulate(table, headers=['Name', 'Collections', 'Note'], tablefmt='github', numalign='left'))
+    click.echo(tabulate(table, headers=['Name', 'Collections', 'Note'], tablefmt='github', numalign='left'))
 
 
 def _run_file(name, identifier, content):
