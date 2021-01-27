@@ -185,4 +185,22 @@ To list the schemas only, Connect to the database used by Kingfisher Summarize, 
 Upgrade Kingfisher Summarize
 ----------------------------
 
-If the new version of Kingfisher Summarize makes changes to SQL statements, you might want to re-create the collection-specific schemas, by running :ref:`remove` then :ref:`add` for the selected extensions (``SELECT id from selected_collections;``).
+If the new version of Kingfisher Summarize makes changes to SQL statements, you might want to re-create the collection-specific schemas, by running :ref:`remove` then :ref:`add` for the selected collections:
+
+#. Get the schema's collections, for example:
+
+   .. code-block:: sql
+
+      SELECT id from view_data_collection_4_5_6.selected_collections;
+
+#. Remove the schema, for example:
+
+   .. code-block:: bash
+
+      ./manage.py remove collection_4_5_6
+
+#. Re-add the schema, for example:
+
+   .. code-block:: bash
+
+      ./manage.py add 4,5,6 "NOTE"
