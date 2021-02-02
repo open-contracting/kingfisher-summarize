@@ -486,7 +486,7 @@ BEGIN
     COMMENT ON COLUMN %1$s.total_contract_implementation_documents IS 'Count of contracts/implementation/documents';
     COMMENT ON COLUMN %1$s.total_contract_implementation_milestones IS 'Count of contracts/implementation/milestones';
     COMMENT ON COLUMN %1$s.contract_documenttype_counts IS 'JSONB object with the keys as unique contracts/documents/documentType and the values as count of the appearances of those documentTypes';
-    COMMENT ON COLUMN %1$s.contract_implemetation_documenttype_counts IS 'JSONB object with the keys as unique contracts/implementation/documents/documentType and the values as count of the appearances of those documentTypes';
+    COMMENT ON COLUMN %1$s.contract_implementation_documenttype_counts IS 'JSONB object with the keys as unique contracts/implementation/documents/documentType and the values as count of the appearances of those documentTypes';
     COMMENT ON COLUMN %1$s.contract_milestonetype_counts IS 'JSONB object with the keys as unique contracts/milestone/milestoneType and the values as count of the appearances of those milestoneTypes';
     COMMENT ON COLUMN %1$s.contract_implementation_milestonetype_counts IS 'JSONB object with the keys as unique contracts/implementation/documents/milestoneType and the values as count of the appearances of those milestoneTypes';
     COMMENT ON COLUMN %1$s.total_documenttype_counts IS 'JSONB object with the keys as unique documentTypes from all documents in the release and the values as count of the appearances of those documentTypes';

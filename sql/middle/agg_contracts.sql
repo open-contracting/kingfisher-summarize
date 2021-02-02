@@ -40,7 +40,7 @@ CREATE UNIQUE INDEX tmp_contract_documents_aggregates_id ON tmp_contract_documen
 CREATE TABLE tmp_contract_implementation_documents_aggregates AS
 SELECT
     id,
-    jsonb_object_agg(coalesce(documentType, ''), documentType_count) contract_implemetation_documentType_counts
+    jsonb_object_agg(coalesce(documentType, ''), documentType_count) contract_implementation_documenttype_counts
 FROM (
     SELECT
         id,
