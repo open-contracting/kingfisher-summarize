@@ -38,7 +38,7 @@ def fixture(db, collections='1', name=None, tables_only=None, field_counts=True,
 # Click seems to use different quoting on different platforms.
 def assert_bad_argument(result, argument, message):
     expression = rf"""\nError: Invalid value for ['"']{argument}['"']: {message}\n$"""
-    assert re.search(expression, result.output)
+    assert re.search(expression, result.output), f'{expression} not in {result.output}'
 
 
 def assert_log_running(caplog, command):

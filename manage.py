@@ -165,6 +165,16 @@ def validate_collections(ctx, param, value):
 
 def validate_name(ctx, param, value):
     """
+    Returns a schema suffix. Raises an error if the suffix isn't lowercase.
+    """
+    if value != value.lower():
+        raise click.BadParameter(f'value must be lowercase')
+
+    return schema
+
+
+def validate_schema(ctx, param, value):
+    """
     Returns a schema name. Raises an error if the schema isn't in the database.
     """
     schema = f'view_data_{value}'
@@ -198,7 +208,8 @@ def cli(ctx):
 @click.command()
 @click.argument('collections', callback=validate_collections)
 @click.argument('note')
-@click.option('--name', help='A custom name for the SQL schema ("view_data_" will be prepended).')
+@click.option('--name', callback=validate_name,
+              help='A custom name for the SQL schema ("view_data_" will be prepended).')
 @click.option('--tables-only', is_flag=True, help='Create SQL tables instead of SQL views.')
 @click.option('--field-counts/--no-field-counts', 'field_counts_option', default=True,
               help="Whether to create the field_counts table (default true).")
@@ -260,7 +271,7 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
 
 
 @click.command()
-@click.argument('name', callback=validate_name)
+@click.argument('name', callback=validate_schema)
 def remove(name):
     """
     Drops a schema.
@@ -548,7 +559,7 @@ def field_lists(name, tables_only=False):
 
 
 @click.command()
-@click.argument('name', callback=validate_name)
+@click.argument('name', callback=validate_schema)
 def docs_table_ref(name):
     """
     Creates or updates the CSV files in docs/definitions.

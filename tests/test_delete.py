@@ -8,7 +8,7 @@ from tests import assert_bad_argument, assert_log_records, assert_log_running, f
 command = 'remove'
 
 
-def test_validate_name(caplog):
+def test_validate_schema(caplog):
     runner = CliRunner()
 
     result = runner.invoke(cli, [command, 'nonexistent'])

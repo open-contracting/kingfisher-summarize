@@ -47,6 +47,16 @@ def test_validate_collections(collections, message, caplog):
     assert_log_running(caplog, command)
 
 
+def test_validate_name(caplog):
+    runner = CliRunner()
+
+    result = runner.invoke(cli, [command, '1', '--name', 'camelCase'])
+
+    assert result.exit_code == 2
+    assert_bad_argument(result, '--name', 'value must be lowercase')
+    assert_log_running(caplog, command)
+
+
 @patch('manage.summary_tables', noop)
 @patch('manage.field_counts', noop)
 @patch('manage.field_lists', noop)

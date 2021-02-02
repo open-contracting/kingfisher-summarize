@@ -7,6 +7,7 @@ Changelog
 Changed
 ~~~~~~~
 
+-  ``add`` command: Errors if ``--name`` value contains uppercase characters.
 -  Fix typo in ``contract_implemetation_documenttype_counts`` column (missing "n").
 
 2021-01-06
