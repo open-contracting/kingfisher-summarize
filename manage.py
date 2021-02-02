@@ -167,7 +167,7 @@ def validate_name(ctx, param, value):
     """
     Returns a schema suffix. Raises an error if the suffix isn't lowercase.
     """
-    if value != value.lower():
+    if value and value != value.lower():
         raise click.BadParameter(f'value must be lowercase')
 
     return schema
