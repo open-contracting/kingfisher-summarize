@@ -170,7 +170,7 @@ def validate_name(ctx, param, value):
     if value and value != value.lower():
         raise click.BadParameter(f'value must be lowercase')
 
-    return schema
+    return value
 
 
 def validate_schema(ctx, param, value):
