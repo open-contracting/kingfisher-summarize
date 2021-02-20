@@ -8,7 +8,7 @@ Follow the :doc:`../get-started` guide.
 Load data
 ---------
 
-To test your changes, you need to have some data loaded. The `test data <https://github.com/open-contracting/kingfisher-summarize/tree/master/tests/fixtures>`__ covers common fields, but you might have specific data that you want to test against.
+To test your changes, you need to have some data loaded. The `test data <https://github.com/open-contracting/kingfisher-summarize/tree/main/tests/fixtures>`__ covers common fields, but you might have specific data that you want to test against.
 
 #. Change to Kingfisher Process's directory, and activate its virtual environment. Then, set up Kingfisher Process' database, create a collection, and load the test data into it (replacing ``COLLECTION_NAME`` below):
 
