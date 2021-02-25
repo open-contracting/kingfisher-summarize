@@ -51,7 +51,7 @@ Update the database tables reference
 
 .. code-block:: bash
 
-   ./manage.py docs-table-ref COLLECTION_NAME
+   ./manage.py dev docs-table-ref COLLECTION_NAME
 
 Then, for any new CSV file, manually add a new sub-section to ``docs/database.rst`` under an appropriate section.
 

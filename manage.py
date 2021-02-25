@@ -205,7 +205,7 @@ def cli(ctx):
     db = Database()
 
 
-@click.command()
+@cli.command()
 @click.argument('collections', callback=validate_collections)
 @click.argument('note')
 @click.option('--name', callback=validate_name,
@@ -270,7 +270,7 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
         logger.info('Configured read-only access to %s', name)
 
 
-@click.command()
+@cli.command()
 @click.argument('name', callback=validate_schema)
 def remove(name):
     """
@@ -289,7 +289,7 @@ def remove(name):
     logger.info(statement.as_string(db.connection))
 
 
-@click.command()
+@cli.command()
 def index():
     """
     Lists the schemas, with collection IDs and creator's notes.
@@ -312,7 +312,7 @@ def index():
         click.echo(tabulate(table, headers=['Name', 'Collections', 'Note'], tablefmt='github', numalign='left'))
 
 
-def _run_file(name, identifier, content):
+def _run_summary_tables(name, identifier, content):
     logger = logging.getLogger('ocdskingfisher.summarize.summary-tables')
     logger.info(f'Processing {identifier}')
 
@@ -348,7 +348,7 @@ def summary_tables(name, tables_only=False):
         :param str directory: a sub-directory containing SQL files
         """
         for identifier, content in files[directory].items():
-            _run_file(name, identifier, content)
+            _run_summary_tables(name, identifier, content)
 
     def submit(identifier):
         """
@@ -358,7 +358,7 @@ def summary_tables(name, tables_only=False):
         """
         if not graph[identifier]:
             graph.pop(identifier)
-            futures[executor.submit(_run_file, name, identifier, files['middle'][identifier])] = identifier
+            futures[executor.submit(_run_summary_tables, name, identifier, files['middle'][identifier])] = identifier
 
     # The initial files are fast, and don't need multiprocessing.
     run('initial')
@@ -558,7 +558,15 @@ def field_lists(name, tables_only=False):
     logger.info('Total time: %ss', time() - start)
 
 
-@click.command()
+@cli.group()
+def dev():
+    """
+    Commands for developers of Kingfisher Summarize.
+    """
+    pass
+
+
+@dev.command()
 @click.argument('name', callback=validate_schema)
 def docs_table_ref(name):
     """
@@ -586,11 +594,6 @@ def docs_table_ref(name):
                     row[1] = 'timestamp'
                 writer.writerow(row)
 
-
-cli.add_command(add)
-cli.add_command(remove)
-cli.add_command(index)
-cli.add_command(docs_table_ref)
 
 if __name__ == '__main__':
     cli()

@@ -11,7 +11,7 @@ def test_command(db, caplog):
     with fixture(db):
         runner = CliRunner()
 
-        result = runner.invoke(cli, [command, 'collection_1'])
+        result = runner.invoke(cli, ['dev', command, 'collection_1'])
 
         assert result.exit_code == 0
         assert result.output == ''

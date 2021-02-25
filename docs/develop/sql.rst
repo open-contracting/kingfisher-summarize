@@ -176,7 +176,7 @@ The tests won't pass if you don't document the new columns!
 
   .. code-block:: bash
 
-     ./manage.py docs-table-ref COLLECTION_NAME
+     ./manage.py dev docs-table-ref COLLECTION_NAME
 
 .. _format-sql:
 
