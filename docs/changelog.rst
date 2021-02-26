@@ -1,6 +1,15 @@
 Changelog
 =========
 
+2021-02-25
+----------
+
+Changed
+~~~~~~~
+
+-  Move ``docs-table-ref`` command under ``dev`` group.
+-  ``add`` command: ``--skip`` developer's option to skip SQL files.
+
 2021-02-01
 ----------
 

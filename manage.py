@@ -215,8 +215,10 @@ def cli(ctx):
               help="Whether to create the field_counts table (default true).")
 @click.option('--field-lists/--no-field-lists', 'field_lists_option', default=False,
               help="Whether to add a field_list column to all summary tables (default false).")
+@click.option('--skip', multiple=True,
+              help="Any SQL files to skip. Dependent files and final files will be skipped.")
 @click.pass_context
-def add(ctx, collections, note, name, tables_only, field_counts_option, field_lists_option):
+def add(ctx, collections, note, name, tables_only, field_counts_option, field_lists_option, skip):
     """
     Creates a schema containing summary tables about one or more collections.
 
@@ -251,7 +253,7 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
     logger.info('Added %s', name)
 
     logger.info('Running summary-tables routine')
-    summary_tables(schema, tables_only=tables_only)
+    summary_tables(schema, tables_only=tables_only, skip=skip)
 
     if field_counts_option:
         logger.info('Running field-counts routine')
@@ -327,12 +329,13 @@ def _run_summary_tables(name, identifier, content):
     logger.info('%s: %ss', identifier, time() - start)
 
 
-def summary_tables(name, tables_only=False):
+def summary_tables(name, tables_only=False, skip=()):
     """
     Creates the summary tables in a schema.
 
     :param str name: the schema's name
     :param boolean tables_only: whether to create SQL tables instead of SQL views
+    :param tuple skip: any SQL files to skip
     """
     logger = logging.getLogger('ocdskingfisher.summarize.summary-tables')
 
@@ -340,6 +343,11 @@ def summary_tables(name, tables_only=False):
 
     files = {directory: sql_files(directory, tables_only=tables_only) for directory in ('initial', 'middle', 'final')}
     graph = dependency_graph(files['middle'])
+
+    if skip:
+        for basename in skip:
+            graph.pop(f'middle:{basename}')
+        files['final'] = {}
 
     def run(directory):
         """
