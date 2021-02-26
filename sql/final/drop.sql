@@ -1,6 +1,6 @@
 DROP TABLE tmp_release_summary CASCADE;
 
-DROP TABLE IF EXISTS tmp_release_summary_with_release_data; -- will not cascade if --tables-only
+DROP TABLE IF EXISTS tmp_release_summary_with_release_data; -- will not cascade from above if --tables-only
 
 DROP TABLE tmp_contracts_summary;
 
