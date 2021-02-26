@@ -4,34 +4,76 @@
 #
 #    pip-compile requirements_dev.in
 #
-attrs==19.3.0             # via pytest
-certifi==2019.11.28       # via requests
-chardet==3.0.4            # via requests
+attrs==19.3.0
+    # via pytest
+certifi==2019.11.28
+    # via requests
+chardet==3.0.4
+    # via requests
 click==7.1.2
-coverage==5.0.3           # via coveralls, pytest-cov
-coveralls==1.10.0
-docopt==0.6.2             # via coveralls
-entrypoints==0.3          # via flake8
+    # via
+    #   -r requirements.txt
+    #   pip-tools
+coverage==5.0.3
+    # via
+    #   coveralls
+    #   pytest-cov
+coveralls==3.0.0
+    # via -r requirements_dev.in
+docopt==0.6.2
+    # via coveralls
+entrypoints==0.3
+    # via flake8
 flake8==3.7.9
-idna==2.8                 # via requests
-importlib-metadata==1.5.0  # via pluggy, pytest
+    # via -r requirements_dev.in
+idna==2.8
+    # via requests
+importlib-metadata==1.5.0
+    # via
+    #   pluggy
+    #   pytest
 isort==4.3.21
-mccabe==0.6.1             # via flake8
-more-itertools==8.2.0     # via pytest
-packaging==20.1           # via pytest
-pip-tools==4.4.1
-pluggy==0.13.1            # via pytest
+    # via -r requirements_dev.in
+mccabe==0.6.1
+    # via flake8
+more-itertools==8.2.0
+    # via pytest
+packaging==20.1
+    # via pytest
+pip-tools==5.5.0
+    # via -r requirements_dev.in
+pluggy==0.13.1
+    # via pytest
 psycopg2==2.8.4
-py==1.8.1                 # via pytest
-pycodestyle==2.5.0        # via flake8
-pyflakes==2.1.1           # via flake8
-pyparsing==2.4.6          # via packaging
+    # via -r requirements.txt
+py==1.8.1
+    # via pytest
+pycodestyle==2.5.0
+    # via flake8
+pyflakes==2.1.1
+    # via flake8
+pyparsing==2.4.6
+    # via packaging
 pytest-cov==2.8.1
+    # via -r requirements_dev.in
 pytest==5.3.5
+    # via
+    #   -r requirements_dev.in
+    #   pytest-cov
 python-dotenv==0.15.0
-requests==2.22.0          # via coveralls
-six==1.15.0               # via packaging, pip-tools
+    # via -r requirements.txt
+requests==2.22.0
+    # via coveralls
+six==1.15.0
+    # via packaging
 tabulate==0.8.7
-urllib3==1.25.8           # via requests
-wcwidth==0.1.8            # via pytest
-zipp==2.1.0               # via importlib-metadata
+    # via -r requirements.txt
+urllib3==1.25.8
+    # via requests
+wcwidth==0.1.8
+    # via pytest
+zipp==2.1.0
+    # via importlib-metadata
+
+# The following packages are considered to be unsafe in a requirements file:
+# pip
