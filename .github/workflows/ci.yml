@@ -31,6 +31,7 @@ jobs:
     - run: curl -s -S --retry 3 $BASEDIR/tests/install.sh | bash -
     - run: pip install -r requirements_dev.txt
     - run: curl -s -S --retry 3 $BASEDIR/tests/script.sh | bash -
+    - run: pytest /tmp/test_requirements.py
     - name: Install Kingfisher Process
       run: |
         git clone https://github.com/open-contracting/kingfisher-process.git /tmp/kingfisher-process
