@@ -5,6 +5,10 @@
 #    pip-compile
 #
 click==7.1.2
+    # via -r requirements.in
 psycopg2==2.8.4
+    # via -r requirements.in
 python-dotenv==0.15.0
+    # via -r requirements.in
 tabulate==0.8.7
+    # via -r requirements.in
