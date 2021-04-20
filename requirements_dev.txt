@@ -46,7 +46,7 @@ pluggy==0.13.1
     # via pytest
 psycopg2==2.8.4
     # via -r requirements.txt
-py==1.8.1
+py==1.10.0
     # via pytest
 pycodestyle==2.5.0
     # via flake8
