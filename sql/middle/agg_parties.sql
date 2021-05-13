@@ -24,12 +24,17 @@ FROM (
                 count(*) role_count
             FROM
                 parties_summary
-                CROSS JOIN jsonb_array_elements_text(roles) AS ROLE
-            GROUP BY
-                id,
-                ROLE) id_role
+                CROSS JOIN jsonb_array_elements_text(
+                    CASE WHEN jsonb_typeof(roles) = 'array' THEN
+                        roles
+                    ELSE
+                        '[]'::jsonb
+                    END)) AS ROLE
         GROUP BY
-            id) role_counts USING (id);
+            id,
+            ROLE) id_role
+GROUP BY
+    id) role_counts USING (id);
 
 CREATE UNIQUE INDEX tmp_release_party_aggregates_id ON tmp_release_party_aggregates (id);
 
