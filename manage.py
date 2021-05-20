@@ -264,7 +264,7 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
         field_lists(schema, tables_only=tables_only)
 
     role = os.getenv('KINGFISHER_SUMMARIZE_READONLY_ROLE', '')
-    if db.one("SELECT 1 FROM pg_roles WHERE rolname = %(role)s", {'role': role}):
+    if db.one('SELECT 1 FROM pg_roles WHERE rolname = %(role)s', {'role': role}):
         db.execute('GRANT USAGE ON SCHEMA {schema} TO {role}', schema=schema, role=role)
         db.execute('GRANT SELECT ON ALL TABLES IN SCHEMA {schema} TO {role}', schema=schema, role=role)
         db.commit()
@@ -572,6 +572,22 @@ def dev():
     Commands for developers of Kingfisher Summarize.
     """
     pass
+
+
+@dev.command()
+def stale():
+    """
+    Prints schemas summarizing deleted collections.
+    """
+    skip = ','.split(os.getenv('KINGFISHER_SUMMARIZE_PROTECT_SCHEMA', ''))
+
+    statement = """
+        SELECT 1 FROM {schema}.selected_collections sc JOIN collection c ON sc.id = c.id WHERE deleted_at IS NULL
+    """
+
+    for schema in db.schemas():
+        if schema not in skip and not db.one(statement, schema=schema):
+            print(schema)
 
 
 @dev.command()
