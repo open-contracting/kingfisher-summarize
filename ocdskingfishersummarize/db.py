@@ -37,18 +37,18 @@ class Database:
         """
         return self.pluck("SELECT schema_name FROM information_schema.schemata WHERE schema_name LIKE 'view_data_%'")
 
-    def all(self, statement, variables=None):
+    def all(self, statement, variables=None, **kwargs):
         """
         Executes the SQL statement and fetches all rows.
         """
-        self.cursor.execute(statement, variables)
+        self.execute(statement, variables, **kwargs)
         return self.cursor.fetchall()
 
-    def one(self, statement, variables=None):
+    def one(self, statement, variables=None, **kwargs):
         """
         Executes the SQL statement and fetches one row.
         """
-        self.cursor.execute(statement, variables)
+        self.execute(statement, variables, **kwargs)
         return self.cursor.fetchone()
 
     def format(self, statement, **kwargs):
