@@ -186,8 +186,9 @@ def validate_schema(ctx, param, value):
 
 
 @click.group()
+@click.option('-q', '--quiet', is_flag=True, help='Change the log level to warning')
 @click.pass_context
-def cli(ctx):
+def cli(ctx, quiet):
     load_dotenv()
 
     path = os.path.join(click.get_app_dir('Kingfisher Summarize'), 'logging.json')
@@ -195,7 +196,7 @@ def cli(ctx):
         with open(path) as f:
             logging.config.dictConfig(json.load(f))
     # Python's root logger only prints warning and above.
-    else:
+    elif not quiet:
         logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
     logger = logging.getLogger('ocdskingfisher.summarize.cli')
@@ -579,7 +580,7 @@ def stale():
     """
     Prints schemas summarizing deleted collections.
     """
-    skip = ','.split(os.getenv('KINGFISHER_SUMMARIZE_PROTECT_SCHEMA', ''))
+    skip = os.getenv('KINGFISHER_SUMMARIZE_PROTECT_SCHEMA', '').split(',')
 
     statement = """
         SELECT 1 FROM {schema}.selected_collections sc JOIN collection c ON sc.id = c.id WHERE deleted_at IS NULL
@@ -587,7 +588,7 @@ def stale():
 
     for schema in db.schemas():
         if schema not in skip and not db.one(statement, schema=schema):
-            print(schema)
+            print(schema[10:])
 
 
 @dev.command()
