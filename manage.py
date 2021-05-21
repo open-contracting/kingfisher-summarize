@@ -196,8 +196,11 @@ def cli(ctx, quiet):
         with open(path) as f:
             logging.config.dictConfig(json.load(f))
     # Python's root logger only prints warning and above.
-    elif not quiet:
+    else:
         logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+    if quiet:
+        logging.getLogger('ocdskingfisher').setLevel(logging.WARNING)
 
     logger = logging.getLogger('ocdskingfisher.summarize.cli')
     logger.info('Running %s', ctx.invoked_subcommand)
