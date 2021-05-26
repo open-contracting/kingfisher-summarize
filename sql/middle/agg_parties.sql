@@ -11,17 +11,17 @@ FROM (
     FROM
         parties_summary
     GROUP BY
-        id) parties_count
+        id) total_parties
     LEFT JOIN (
         SELECT
             id,
-            sum(role_count) AS total_roles,
-            jsonb_object_agg(coalesce(ROLE, ''), role_count) role_counts
+            sum(total_roles) AS total_roles,
+            jsonb_object_agg(coalesce(ROLE, ''), total_roles) role_counts
         FROM (
             SELECT
                 id,
                 ROLE,
-                count(*) role_count
+                count(*) total_roles
             FROM
                 parties_summary
                 CROSS JOIN jsonb_array_elements_text(roles) AS ROLE

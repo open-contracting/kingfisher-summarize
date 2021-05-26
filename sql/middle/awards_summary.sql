@@ -22,24 +22,24 @@ SELECT
         jsonb_array_length(award -> 'suppliers')
     ELSE
         0
-    END AS suppliers_count,
-    documents_count,
+    END AS total_suppliers,
+    total_documents,
     documentType_counts,
-    items_count
+    total_items
 FROM
     tmp_awards_summary r
     LEFT JOIN (
         SELECT
             id,
             award_index,
-            jsonb_object_agg(coalesce(documentType, ''), documentType_count) documentType_counts,
-            count(*) documents_count
+            jsonb_object_agg(coalesce(documentType, ''), total_documentTypes) documentType_counts,
+            count(*) total_documents
         FROM (
             SELECT
                 id,
                 award_index,
                 documentType,
-                count(*) documentType_count
+                count(*) total_documentTypes
             FROM
                 award_documents_summary
             GROUP BY
@@ -53,7 +53,7 @@ FROM
         SELECT
             id,
             award_index,
-            count(*) items_count
+            count(*) total_items
         FROM
             award_items_summary
         GROUP BY

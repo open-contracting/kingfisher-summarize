@@ -37,11 +37,11 @@ tender_contractperiod_enddate,timestamp,`endDate` from awardPeriod object
 tender_contractperiod_maxextentdate,timestamp,`maxExtentDate` from awardPeriod object
 tender_contractperiod_durationindays,numeric,`durationInDays` from awardPeriod object
 tender_numberoftenderers,numeric,`numberOfTenderers` from tender object
-tenderers_count,integer,Count of amount of tenderers
-documents_count,bigint,Count of amount of tender documents
+total_tenderers,integer,Count of amount of tenderers
+total_documents,bigint,Count of amount of tender documents
 documenttype_counts,jsonb,JSONB object with the keys as unique documentTypes and the values as count of the appearances of that `documentType` in the `documents` array
-milestones_count,bigint,Count of milestones
+total_milestones,bigint,Count of milestones
 milestonetype_counts,jsonb,JSONB object with the keys as unique milestoneTypes and the values as a count of the appearances of that `milestoneType` in the `milestones` array
-items_count,bigint,Count of items
+total_items,bigint,Count of items
 tender,jsonb,JSONB of tender object
 field_list,jsonb,"All JSON paths in the tender object, excluding array indices, expressed as a JSONB object in which keys are paths and values are NULL. This column is only available if the --field-lists option was used."

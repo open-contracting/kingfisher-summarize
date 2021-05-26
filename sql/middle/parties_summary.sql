@@ -27,7 +27,7 @@ SELECT
         jsonb_array_length(value -> 'additionalIdentifiers')
     ELSE
         0
-    END parties_additionalIdentifiers_count
+    END total_parties_additionalIdentifiers
 FROM
     tmp_release_summary_with_release_data AS r
     CROSS JOIN jsonb_array_elements(data -> 'parties')

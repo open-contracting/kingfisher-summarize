@@ -19,14 +19,14 @@ contract_period_startdate,timestamp,`startDate` field from contractPeriod
 contract_period_enddate,timestamp,`endDate` field from contractPeriod
 contract_period_maxextentdate,timestamp,`maxExtentDate` field from contractPeriod
 contract_period_durationindays,numeric,`durationInDays` field from contractPeriod
-documents_count,bigint,Number of documents in documents array
+total_documents,bigint,Number of documents in documents array
 documenttype_counts,jsonb,JSONB object with the keys as unique documentTypes and the values as count of the appearances of that `documentType` in the `documents` array
-milestones_count,bigint,Count of milestones
+total_milestones,bigint,Count of milestones
 milestonetype_counts,jsonb,JSONB object with the keys as unique milestoneTypes and the values as a count of the appearances of that `milestoneType` in the `milestones` array
-items_count,bigint,Count of items
-implementation_documents_count,bigint,Number of documents in documents array
+total_items,bigint,Count of items
+total_implementation_documents,bigint,Number of documents in documents array
 implementation_documenttype_counts,jsonb,JSONB object with the keys as unique documentTypes and the values as count of the appearances of that `documentType` in the `documents` array
-implementation_milestones_count,bigint,Number of documents in documents array
+total_implementation_milestones,bigint,Number of documents in documents array
 implementation_milestonetype_counts,jsonb,JSONB object with the keys as unique milestoneTypes and the values as count of the appearances of that `milestoneType` in the `milestone` array
 contract,jsonb,JSONB of contract object
 field_list,jsonb,"All JSON paths in the contract object, excluding array indices, expressed as a JSONB object in which keys are paths and values are NULL. This column is only available if the --field-lists option was used."

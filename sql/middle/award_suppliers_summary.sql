@@ -25,7 +25,7 @@ SELECT DISTINCT ON ( r.id, award_index, supplier_index)
     coalesce(supplier ->> 'id', hyphenate (supplier -> 'identifier' ->> 'scheme', supplier -> 'identifier' ->> 'id'), supplier ->> 'name'
 ) AS unique_identifier_attempt,
     ps.parties_additionalIdentifiers_ids AS supplier_additionalIdentifiers_ids,
-    ps.parties_additionalIdentifiers_count AS supplier_additionalIdentifiers_count,
+    ps.total_parties_additionalIdentifiers AS total_supplier_additionalIdentifiers,
     CAST(ps.id IS NOT NULL AS integer
 ) AS link_to_parties,
     CAST(ps.id IS NOT NULL AND (ps.party -> 'roles') ? 'supplier' AS integer

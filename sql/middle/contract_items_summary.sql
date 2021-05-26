@@ -30,7 +30,7 @@ SELECT
         jsonb_array_length(value -> 'additionalClassifications')
     ELSE
         0
-    END AS additional_classification_count
+    END AS total_additional_classifications
 FROM
     tmp_contracts_summary r
     CROSS JOIN jsonb_array_elements(contract -> 'items')

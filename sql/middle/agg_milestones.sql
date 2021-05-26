@@ -26,13 +26,13 @@ WITH all_milestone_types AS (
 )
 SELECT
     id,
-    jsonb_object_agg( coalesce(TYPE, ''), milestoneType_count) milestoneType_counts,
-    sum( milestoneType_count) total_milestones
+    jsonb_object_agg( coalesce(TYPE, ''), total_milestoneTypes) milestoneType_counts,
+    sum( total_milestoneTypes) total_milestones
 FROM (
     SELECT
         id,
         TYPE,
-        count(*) milestoneType_count
+        count(*) total_milestoneTypes
     FROM
         all_milestone_types
     GROUP BY

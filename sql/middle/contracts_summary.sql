@@ -19,14 +19,14 @@ CREATE TABLE contracts_summary_no_data AS SELECT DISTINCT ON (r.id, r.contract_i
     convert_to_timestamp (contract -> 'period' ->> 'endDate') AS contract_period_endDate,
     convert_to_timestamp (contract -> 'period' ->> 'maxExtentDate') AS contract_period_maxExtentDate,
     convert_to_numeric (contract -> 'period' ->> 'durationInDays') AS contract_period_durationInDays,
-    documentType_counts.documents_count,
+    documentType_counts.total_documents,
     documentType_counts.documentType_counts,
-    milestones_count,
+    total_milestones,
     milestoneType_counts,
-    items_counts.items_count,
-    implementation_documents_count,
+    items_counts.total_items,
+    total_implementation_documents,
     implementation_documentType_counts,
-    implementation_milestones_count,
+    total_implementation_milestones,
     implementation_milestoneType_counts
 FROM
     tmp_contracts_summary r
@@ -35,14 +35,14 @@ FROM
         SELECT
             id,
             contract_index,
-            jsonb_object_agg(coalesce(documentType, ''), documentType_count) documentType_counts,
-            count(*) documents_count
+            jsonb_object_agg(coalesce(documentType, ''), total_documentTypes) documentType_counts,
+            count(*) total_documents
         FROM (
             SELECT
                 id,
                 contract_index,
                 documentType,
-                count(*) documentType_count
+                count(*) total_documentTypes
             FROM
                 contract_documents_summary
             GROUP BY
@@ -56,14 +56,14 @@ FROM
         SELECT
             id,
             contract_index,
-            jsonb_object_agg(coalesce(documentType, ''), documentType_count) implementation_documentType_counts,
-            count(*) implementation_documents_count
+            jsonb_object_agg(coalesce(documentType, ''), total_documentTypes) implementation_documentType_counts,
+            count(*) total_implementation_documents
         FROM (
             SELECT
                 id,
                 contract_index,
                 documentType,
-                count(*) documentType_count
+                count(*) total_documentTypes
             FROM
                 contract_implementation_documents_summary
             GROUP BY
@@ -77,7 +77,7 @@ FROM
         SELECT
             id,
             contract_index,
-            count(*) items_count
+            count(*) total_items
         FROM
             contract_items_summary
         GROUP BY
@@ -87,14 +87,14 @@ FROM
         SELECT
             id,
             contract_index,
-            jsonb_object_agg(coalesce(TYPE, ''), milestoneType_count) milestoneType_counts,
-            count(*) milestones_count
+            jsonb_object_agg(coalesce(TYPE, ''), total_milestoneTypes) milestoneType_counts,
+            count(*) total_milestones
         FROM (
             SELECT
                 id,
                 contract_index,
                 TYPE,
-                count(*) milestoneType_count
+                count(*) total_milestoneTypes
             FROM
                 contract_milestones_summary
             GROUP BY
@@ -108,14 +108,14 @@ FROM
         SELECT
             id,
             contract_index,
-            jsonb_object_agg(coalesce(TYPE, ''), milestoneType_count) implementation_milestoneType_counts,
-            count(*) implementation_milestones_count
+            jsonb_object_agg(coalesce(TYPE, ''), total_milestoneTypes) implementation_milestoneType_counts,
+            count(*) total_implementation_milestones
         FROM (
             SELECT
                 id,
                 contract_index,
                 TYPE,
-                count(*) milestoneType_count
+                count(*) total_milestoneTypes
             FROM
                 contract_implementation_milestones_summary
             GROUP BY

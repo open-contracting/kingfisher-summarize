@@ -50,7 +50,7 @@ BEGIN
     COMMENT ON COLUMN %1$s.unit_currency IS '`currency` from the unit/value object';
     COMMENT ON COLUMN %1$s.item_classification IS 'Concatenation of classification/scheme and classification/id';
     COMMENT ON COLUMN %1$s.item_additionalidentifiers_ids IS 'JSONB list of the concatenation of additionalClassification/scheme and additionalClassification/id';
-    COMMENT ON COLUMN %1$s.additional_classification_count IS 'Count of additional classifications';
+    COMMENT ON COLUMN %1$s.total_additional_classifications IS 'Count of additional classifications';
     $template$;
     EXECUTE format(TEMPLATE, table_name);
     RETURN 'Common item comments added';
@@ -89,7 +89,7 @@ COMMENT ON COLUMN parties_summary.unique_identifier_attempt IS 'The `id` from pa
 
 COMMENT ON COLUMN parties_summary.parties_additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
 
-COMMENT ON COLUMN parties_summary.parties_additionalidentifiers_count IS 'Count of additional identifiers';
+COMMENT ON COLUMN parties_summary.total_parties_additionalidentifiers IS 'Count of additional identifiers';
 
 COMMENT ON COLUMN parties_summary.party IS 'JSONB of party object';
 
@@ -108,7 +108,7 @@ COMMENT ON COLUMN buyer_summary.unique_identifier_attempt IS 'The `id` from buye
 
 COMMENT ON COLUMN buyer_summary.buyer_additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
 
-COMMENT ON COLUMN buyer_summary.buyer_additionalidentifiers_count IS 'Count of additional identifiers';
+COMMENT ON COLUMN buyer_summary.total_buyer_additionalidentifiers IS 'Count of additional identifiers';
 
 COMMENT ON COLUMN buyer_summary.link_to_parties IS 'Does this buyer link to a party in the parties array using the `id` field from buyer object linking to the `id` field in a party object? If this is true then 1, otherwise 0';
 
@@ -129,7 +129,7 @@ COMMENT ON COLUMN procuringentity_summary.unique_identifier_attempt IS 'The `id`
 
 COMMENT ON COLUMN procuringentity_summary.procuringentity_additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
 
-COMMENT ON COLUMN procuringentity_summary.procuringentity_additionalidentifiers_count IS 'Count of additional identifiers';
+COMMENT ON COLUMN procuringentity_summary.total_procuringentity_additionalidentifiers IS 'Count of additional identifiers';
 
 COMMENT ON COLUMN procuringentity_summary.link_to_parties IS 'Does this procuringEntity link to a party in the parties array using the `id` field from buyer object linking to the `id` field in a party object? If this is true then 1, otherwise 0';
 
@@ -152,7 +152,7 @@ COMMENT ON COLUMN tenderers_summary.unique_identifier_attempt IS 'The `id` from 
 
 COMMENT ON COLUMN tenderers_summary.tenderer_additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
 
-COMMENT ON COLUMN tenderers_summary.tenderer_additionalidentifiers_count IS 'Count of additional identifiers';
+COMMENT ON COLUMN tenderers_summary.total_tenderer_additionalidentifiers IS 'Count of additional identifiers';
 
 COMMENT ON COLUMN tenderers_summary.link_to_parties IS 'Does this tenderer link to a party in the parties array using the `id` field from buyer object linking to the `id` field in a party object? If this is true then 1, otherwise 0';
 
@@ -181,11 +181,11 @@ COMMENT ON COLUMN planning_summary.planning_budget_currency IS 'amount/currency 
 
 COMMENT ON COLUMN planning_summary.planning_budget_projectid IS '`projectID` from `budget` object';
 
-COMMENT ON COLUMN planning_summary.documents_count IS 'Number of documents in documents array';
+COMMENT ON COLUMN planning_summary.total_documents IS 'Number of documents in documents array';
 
 COMMENT ON COLUMN planning_summary.documenttype_counts IS 'JSONB object with the keys as unique documentTypes and the values as count of the appearances of that `documentType` in the `documents` array';
 
-COMMENT ON COLUMN planning_summary.milestones_count IS 'Count of milestones';
+COMMENT ON COLUMN planning_summary.total_milestones IS 'Count of milestones';
 
 COMMENT ON COLUMN planning_summary.milestonetype_counts IS 'JSONB object with the keys as unique milestoneTypes and the values as a count of the appearances of that `milestoneType` in the `milestones` array';
 
@@ -247,12 +247,12 @@ BEGIN
     COMMENT ON COLUMN %1$s.tender_contractperiod_maxextentdate IS '`maxExtentDate` from awardPeriod object';
     COMMENT ON COLUMN %1$s.tender_contractperiod_durationindays IS '`durationInDays` from awardPeriod object';
     COMMENT ON COLUMN %1$s.tender_numberoftenderers IS '`numberOfTenderers` from tender object';
-    COMMENT ON COLUMN %1$s.tenderers_count IS 'Count of amount of tenderers';
-    COMMENT ON COLUMN %1$s.documents_count IS 'Count of amount of tender documents';
+    COMMENT ON COLUMN %1$s.total_tenderers IS 'Count of amount of tenderers';
+    COMMENT ON COLUMN %1$s.total_documents IS 'Count of amount of tender documents';
     COMMENT ON COLUMN %1$s.documenttype_counts IS 'JSONB object with the keys as unique documentTypes and the values as count of the appearances of that `documentType` in the `documents` array';
-    COMMENT ON COLUMN %1$s.milestones_count IS 'Count of milestones';
+    COMMENT ON COLUMN %1$s.total_milestones IS 'Count of milestones';
     COMMENT ON COLUMN %1$s.milestonetype_counts IS 'JSONB object with the keys as unique milestoneTypes and the values as a count of the appearances of that `milestoneType` in the `milestones` array';
-    COMMENT ON COLUMN %1$s.items_count IS 'Count of items';
+    COMMENT ON COLUMN %1$s.total_items IS 'Count of items';
     $template$;
     EXECUTE format(TEMPLATE, 'tender_summary_no_data');
     EXECUTE format(TEMPLATE, 'tender_summary');
@@ -300,7 +300,7 @@ COMMENT ON COLUMN award_suppliers_summary.unique_identifier_attempt IS 'The `id`
 
 COMMENT ON COLUMN award_suppliers_summary.supplier_additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
 
-COMMENT ON COLUMN award_suppliers_summary.supplier_additionalidentifiers_count IS 'Count of additional identifiers';
+COMMENT ON COLUMN award_suppliers_summary.total_supplier_additionalidentifiers IS 'Count of additional identifiers';
 
 COMMENT ON COLUMN award_suppliers_summary.link_to_parties IS 'Does this buyer link to a party in the parties array using the `id` field from buyer object linking to the `id` field in a party object? If this is true then 1, otherwise 0';
 
@@ -335,13 +335,13 @@ COMMENT ON COLUMN awards_summary.award_contractperiod_maxextentdate IS '`maxExte
 
 COMMENT ON COLUMN awards_summary.award_contractperiod_durationindays IS '`durationInDays` field from contractPeriod';
 
-COMMENT ON COLUMN awards_summary.suppliers_count IS 'The number of suppliers declared for this award.';
+COMMENT ON COLUMN awards_summary.total_suppliers IS 'The number of suppliers declared for this award.';
 
-COMMENT ON COLUMN awards_summary.documents_count IS 'Number of documents in documents array';
+COMMENT ON COLUMN awards_summary.total_documents IS 'Number of documents in documents array';
 
 COMMENT ON COLUMN awards_summary.documenttype_counts IS 'JSONB object with the keys as unique documentTypes and the values as count of the appearances of that `documentType` in the `documents` array';
 
-COMMENT ON COLUMN awards_summary.items_count IS 'Count of items';
+COMMENT ON COLUMN awards_summary.total_items IS 'Count of items';
 
 COMMENT ON COLUMN awards_summary.award IS 'JSONB of award object';
 
@@ -429,21 +429,21 @@ COMMENT ON COLUMN contracts_summary.contract_period_maxextentdate IS '`maxExtent
 
 COMMENT ON COLUMN contracts_summary.contract_period_durationindays IS '`durationInDays` field from contractPeriod';
 
-COMMENT ON COLUMN contracts_summary.documents_count IS 'Number of documents in documents array';
+COMMENT ON COLUMN contracts_summary.total_documents IS 'Number of documents in documents array';
 
 COMMENT ON COLUMN contracts_summary.documenttype_counts IS 'JSONB object with the keys as unique documentTypes and the values as count of the appearances of that `documentType` in the `documents` array';
 
-COMMENT ON COLUMN contracts_summary.milestones_count IS 'Count of milestones';
+COMMENT ON COLUMN contracts_summary.total_milestones IS 'Count of milestones';
 
 COMMENT ON COLUMN contracts_summary.milestonetype_counts IS 'JSONB object with the keys as unique milestoneTypes and the values as a count of the appearances of that `milestoneType` in the `milestones` array';
 
-COMMENT ON COLUMN contracts_summary.items_count IS 'Count of items';
+COMMENT ON COLUMN contracts_summary.total_items IS 'Count of items';
 
-COMMENT ON COLUMN contracts_summary.implementation_documents_count IS 'Number of documents in documents array';
+COMMENT ON COLUMN contracts_summary.total_implementation_documents IS 'Number of documents in documents array';
 
 COMMENT ON COLUMN contracts_summary.implementation_documenttype_counts IS 'JSONB object with the keys as unique documentTypes and the values as count of the appearances of that `documentType` in the `documents` array';
 
-COMMENT ON COLUMN contracts_summary.implementation_milestones_count IS 'Number of documents in documents array';
+COMMENT ON COLUMN contracts_summary.total_implementation_milestones IS 'Number of documents in documents array';
 
 COMMENT ON COLUMN contracts_summary.implementation_milestonetype_counts IS 'JSONB object with the keys as unique milestoneTypes and the values as count of the appearances of that `milestoneType` in the `milestone` array';
 
@@ -466,16 +466,16 @@ BEGIN
     COMMENT ON COLUMN %1$s.planning_documenttype_counts IS 'Count of planning document types';
     COMMENT ON COLUMN %1$s.total_tender_documents IS 'Count of tender documents';
     COMMENT ON COLUMN %1$s.tender_documenttype_counts IS 'Count of tender document types';
-    COMMENT ON COLUMN %1$s.award_count IS 'Count of awards';
+    COMMENT ON COLUMN %1$s.total_awards IS 'Count of awards';
     COMMENT ON COLUMN %1$s.first_award_date IS 'Earliest `date` in all award objects';
     COMMENT ON COLUMN %1$s.last_award_date IS 'Latest `date` in all award objects';
-    COMMENT ON COLUMN %1$s.total_award_documents IS 'The sum of `documents_count` for each `award` in this release';
+    COMMENT ON COLUMN %1$s.total_award_documents IS 'The sum of `total_documents` for each `award` in this release';
     COMMENT ON COLUMN %1$s.total_award_items IS 'Count of all items in all awards';
-    COMMENT ON COLUMN %1$s.total_award_suppliers IS 'The sum of `suppliers_count` for each `award` in this release';
+    COMMENT ON COLUMN %1$s.total_award_suppliers IS 'The sum of `total_suppliers` for each `award` in this release';
     COMMENT ON COLUMN %1$s.award_amount IS 'Total of all value/amount across awards. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway';
     COMMENT ON COLUMN %1$s.unique_award_suppliers IS 'A count of distinct suppliers for all awards for this release, based on the `unique_identifier_attempt` field';
     COMMENT ON COLUMN %1$s.award_documenttype_counts IS 'JSONB object with the keys as unique awards/documents/documentType and the values as count of the appearances of those documentTypes';
-    COMMENT ON COLUMN %1$s.contract_count IS 'Count of contracts';
+    COMMENT ON COLUMN %1$s.total_contracts IS 'Count of contracts';
     COMMENT ON COLUMN %1$s.total_contract_link_to_awards IS 'Count of all contracts that have link to awards through awardID field';
     COMMENT ON COLUMN %1$s.contract_amount IS 'Total of all value/amount across contracts. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway';
     COMMENT ON COLUMN %1$s.first_contract_datesigned IS 'First `dateSigned` across all contracts';

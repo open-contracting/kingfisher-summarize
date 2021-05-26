@@ -42,24 +42,24 @@ SELECT
         jsonb_array_length(tender -> 'tenderers')
     ELSE
         0
-    END AS tenderers_count,
-    documents_count,
+    END AS total_tenderers,
+    total_documents,
     documentType_counts,
-    milestones_count,
+    total_milestones,
     milestoneType_counts,
-    items_count
+    total_items
 FROM
     tmp_tender_summary r
     LEFT JOIN (
         SELECT
             id,
-            jsonb_object_agg(coalesce(documentType, ''), documentType_count) documentType_counts,
-            count(*) documents_count
+            jsonb_object_agg(coalesce(documentType, ''), total_documentTypes) documentType_counts,
+            count(*) total_documents
         FROM (
             SELECT
                 id,
                 documentType,
-                count(*) documentType_count
+                count(*) total_documentTypes
             FROM
                 tender_documents_summary
             GROUP BY
@@ -70,13 +70,13 @@ FROM
     LEFT JOIN (
         SELECT
             id,
-            jsonb_object_agg(coalesce(TYPE, ''), milestoneType_count) milestoneType_counts,
-            count(*) milestones_count
+            jsonb_object_agg(coalesce(TYPE, ''), total_milestoneTypes) milestoneType_counts,
+            count(*) total_milestones
         FROM (
             SELECT
                 id,
                 TYPE,
-                count(*) milestoneType_count
+                count(*) total_milestoneTypes
             FROM
                 tender_milestones_summary
             GROUP BY
@@ -87,7 +87,7 @@ FROM
     LEFT JOIN (
         SELECT
             id,
-            count(*) items_count
+            count(*) total_items
         FROM
             tender_items_summary
         GROUP BY

@@ -19,7 +19,7 @@ SELECT DISTINCT ON ( r.id)
     coalesce(procuringEntity ->> 'id', hyphenate(procuringEntity -> 'identifier' ->> 'scheme', procuringEntity -> 'identifier' ->> 'id'), procuringEntity ->> 'name'
 ) AS unique_identifier_attempt,
     ps.parties_additionalIdentifiers_ids AS procuringEntity_additionalIdentifiers_ids,
-    ps.parties_additionalIdentifiers_count AS procuringEntity_additionalIdentifiers_count,
+    ps.total_parties_additionalIdentifiers AS total_procuringEntity_additionalIdentifiers,
     CAST(ps.id IS NOT NULL AS integer
 ) AS link_to_parties,
     CAST(ps.id IS NOT NULL AND (ps.party -> 'roles') ? 'procuringEntity' AS integer

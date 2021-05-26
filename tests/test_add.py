@@ -130,10 +130,10 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, capl
                 award_contractperiod_enddate,
                 award_contractperiod_maxextentdate,
                 award_contractperiod_durationindays,
-                suppliers_count,
-                documents_count,
+                total_suppliers,
+                total_documents,
                 documenttype_counts,
-                items_count
+                total_items
             FROM view_data_collection_1.awards_summary
             ORDER BY id, award_index
         """)
@@ -155,15 +155,15 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, capl
             datetime.datetime(4591, 4, 29, 6, 34, 28, 472000),  # award_contractperiod_enddate
             datetime.datetime(3714, 8, 9, 7, 21, 37, 544000),  # award_contractperiod_maxextentdate
             decimal.Decimal('72802012'),  # award_contractperiod_durationindays
-            2,  # suppliers_count
-            4,  # documents_count
+            2,  # total_suppliers
+            4,  # total_documents
             {
                 'Excepteur nisi et': 1,
                 'proident exercitation in': 1,
                 'ut magna dolore velit aute': 1,
                 'veniam enim aliqua d': 1,
             },  # documenttype_counts
-            5,  # items_count
+            5,  # total_items
         )
         assert len(rows) == 301
 
@@ -179,7 +179,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, capl
                 identifier,
                 unique_identifier_attempt,
                 parties_additionalidentifiers_ids,
-                parties_additionalidentifiers_count
+                total_parties_additionalidentifiers
             FROM view_data_collection_1.parties_summary
             ORDER BY id, party_index
         """)
@@ -205,7 +205,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, capl
                 'elit mollit-officia proidentmagna',
                 'ex-minim Ut consectetur',
             ],  # parties_additionalidentifiers_ids
-            5,  # parties_additionalidentifiers_count
+            5,  # total_parties_additionalidentifiers
 
         )
         assert len(rows) == 296

@@ -1,12 +1,12 @@
 CREATE TABLE tmp_release_awards_aggregates AS
 SELECT
     id,
-    count(*) AS award_count,
+    count(*) AS total_awards,
     min(award_date) AS first_award_date,
     max(award_date) AS last_award_date,
-    sum(documents_count) AS total_award_documents,
-    sum(items_count) AS total_award_items,
-    sum(suppliers_count) AS total_award_suppliers,
+    sum(total_documents) AS total_award_documents,
+    sum(total_items) AS total_award_items,
+    sum(total_suppliers) AS total_award_suppliers,
     sum(award_value_amount) award_amount
 FROM
     awards_summary
@@ -29,12 +29,12 @@ CREATE UNIQUE INDEX tmp_release_award_suppliers_aggregates_id ON tmp_release_awa
 CREATE TABLE tmp_award_documents_aggregates AS
 SELECT
     id,
-    jsonb_object_agg(coalesce(documentType, ''), documentType_count) award_documentType_counts
+    jsonb_object_agg(coalesce(documentType, ''), total_documentTypes) award_documentType_counts
 FROM (
     SELECT
         id,
         documentType,
-        count(*) documentType_count
+        count(*) total_documentTypes
     FROM
         award_documents_summary
     GROUP BY
