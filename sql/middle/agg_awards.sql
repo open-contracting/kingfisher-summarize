@@ -7,7 +7,7 @@ SELECT
     sum(total_documents) AS total_award_documents,
     sum(total_items) AS total_award_items,
     sum(total_suppliers) AS total_award_suppliers,
-    sum(award_value_amount) award_amount
+    sum(award_value_amount) sum_awards_amount
 FROM
     awards_summary
 GROUP BY

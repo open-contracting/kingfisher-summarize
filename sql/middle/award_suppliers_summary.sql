@@ -20,7 +20,7 @@ SELECT DISTINCT ON ( r.id, award_index, supplier_index)
     r.release_id,
     r.data_id,
     supplier,
-    supplier ->> 'id' AS supplier_parties_id,
+    supplier ->> 'id' AS supplier_id,
     ps.identifier AS supplier_identifier,
     coalesce(supplier ->> 'id', hyphenate (supplier -> 'identifier' ->> 'scheme', supplier -> 'identifier' ->> 'id'), supplier ->> 'name'
 ) AS unique_identifier_attempt,

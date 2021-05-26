@@ -292,7 +292,7 @@ COMMENT ON COLUMN award_suppliers_summary.supplier_index IS 'Position of the sup
 
 COMMENT ON COLUMN award_suppliers_summary.supplier IS 'JSONB of supplier object';
 
-COMMENT ON COLUMN award_suppliers_summary.supplier_parties_id IS '`id` from supplier object';
+COMMENT ON COLUMN award_suppliers_summary.supplier_id IS '`id` from supplier object';
 
 COMMENT ON COLUMN award_suppliers_summary.supplier_identifier IS 'Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`';
 
@@ -472,12 +472,12 @@ BEGIN
     COMMENT ON COLUMN %1$s.total_award_documents IS 'The sum of `total_documents` for each `award` in this release';
     COMMENT ON COLUMN %1$s.total_award_items IS 'Count of all items in all awards';
     COMMENT ON COLUMN %1$s.total_award_suppliers IS 'The sum of `total_suppliers` for each `award` in this release';
-    COMMENT ON COLUMN %1$s.award_amount IS 'Total of all value/amount across awards. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway';
+    COMMENT ON COLUMN %1$s.sum_awards_amount IS 'Total of all value/amount across awards. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway';
     COMMENT ON COLUMN %1$s.unique_award_suppliers IS 'A count of distinct suppliers for all awards for this release, based on the `unique_identifier_attempt` field';
     COMMENT ON COLUMN %1$s.award_documenttype_counts IS 'JSONB object with the keys as unique awards/documents/documentType and the values as count of the appearances of those documentTypes';
     COMMENT ON COLUMN %1$s.total_contracts IS 'Count of contracts';
     COMMENT ON COLUMN %1$s.total_contract_link_to_awards IS 'Count of all contracts that have link to awards through awardID field';
-    COMMENT ON COLUMN %1$s.contract_amount IS 'Total of all value/amount across contracts. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway';
+    COMMENT ON COLUMN %1$s.sum_contracts_amount IS 'Total of all value/amount across contracts. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway';
     COMMENT ON COLUMN %1$s.first_contract_datesigned IS 'First `dateSigned` across all contracts';
     COMMENT ON COLUMN %1$s.last_contract_datesigned IS 'Last `dateSigned` across all contracts';
     COMMENT ON COLUMN %1$s.total_contract_documents IS 'Count of contracts/documents';
