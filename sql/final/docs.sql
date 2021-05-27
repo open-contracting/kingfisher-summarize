@@ -50,7 +50,7 @@ BEGIN
     COMMENT ON COLUMN %1$s.unit_value_currency IS '`currency` from the unit/value object';
     COMMENT ON COLUMN %1$s.item_classification IS 'Concatenation of classification/scheme and classification/id';
     COMMENT ON COLUMN %1$s.item_additionalidentifiers_ids IS 'JSONB list of the concatenation of additionalClassification/scheme and additionalClassification/id';
-    COMMENT ON COLUMN %1$s.total_additional_classifications IS 'Count of additional classifications';
+    COMMENT ON COLUMN %1$s.total_additionalclassifications IS 'Count of additional classifications';
     $template$;
     EXECUTE format(TEMPLATE, table_name);
     RETURN 'Common item comments added';
@@ -313,7 +313,7 @@ SELECT
 
 COMMENT ON COLUMN awards_summary.award_index IS 'Position of the award in the awards array';
 
-COMMENT ON COLUMN awards_summary.award_id IS '`id` field from award object';
+COMMENT ON COLUMN awards_summary.awardid IS '`id` field from award object';
 
 COMMENT ON COLUMN awards_summary.award_title IS '`title` field from award object';
 
@@ -403,7 +403,7 @@ SELECT
 
 COMMENT ON COLUMN contracts_summary.contract_index IS 'Position of the contract in the contracts array';
 
-COMMENT ON COLUMN contracts_summary.award_id IS '`awardID` field in contract object';
+COMMENT ON COLUMN contracts_summary.awardid IS '`awardID` field in contract object';
 
 COMMENT ON COLUMN contracts_summary.link_to_awards IS 'If there is an award with the above `awardID` then 1 otherwise 0';
 

@@ -6,8 +6,8 @@ CREATE TABLE contracts_summary_no_data AS SELECT DISTINCT ON (r.id, r.contract_i
     r.ocid,
     r.release_id,
     r.data_id,
-    r.award_id,
-    CAST(aws.award_id IS NOT NULL AS integer) AS link_to_awards,
+    r.awardid,
+    CAST(aws.awardid IS NOT NULL AS integer) AS link_to_awards,
     contract ->> 'id' AS contract_id,
     contract ->> 'title' AS contract_title,
     contract ->> 'status' AS contract_status,
@@ -30,7 +30,7 @@ CREATE TABLE contracts_summary_no_data AS SELECT DISTINCT ON (r.id, r.contract_i
     implementation_milestoneType_counts
 FROM
     tmp_contracts_summary r
-    LEFT JOIN awards_summary aws USING (id, award_id)
+    LEFT JOIN awards_summary aws USING (id, awardid)
     LEFT JOIN (
         SELECT
             id,
@@ -132,7 +132,7 @@ CREATE INDEX contracts_summary_no_data_data_id ON contracts_summary_no_data (dat
 
 CREATE INDEX contracts_summary_no_data_collection_id ON contracts_summary_no_data (collection_id);
 
-CREATE INDEX contracts_summary_no_data_award_id ON contracts_summary_no_data (id, award_id);
+CREATE INDEX contracts_summary_no_data_awardid ON contracts_summary_no_data (id, awardid);
 
 CREATE VIEW contracts_summary AS
 SELECT
@@ -152,7 +152,7 @@ BEGIN
     query := $query$ CREATE UNIQUE INDEX contracts_summary_id ON contracts_summary (id, contract_index);
     CREATE INDEX contracts_summary_data_id ON contracts_summary (data_id);
     CREATE INDEX contracts_summary_collection_id ON contracts_summary (collection_id);
-    CREATE INDEX contracts_summary_award_id ON contracts_summary (id, award_id);
+    CREATE INDEX contracts_summary_awardid ON contracts_summary (id, awardid);
     $query$;
     EXECUTE query;
 EXCEPTION
