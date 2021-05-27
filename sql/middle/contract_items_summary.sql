@@ -11,8 +11,8 @@ SELECT
     value AS item,
     value ->> 'id' item_id,
     convert_to_numeric (value ->> 'quantity') quantity,
-    convert_to_numeric (value -> 'unit' -> 'value' ->> 'amount') unit_amount,
-    value -> 'unit' -> 'value' ->> 'currency' unit_currency,
+    convert_to_numeric (value -> 'unit' -> 'value' ->> 'amount') unit_value_amount,
+    value -> 'unit' -> 'value' ->> 'currency' unit_value_currency,
     hyphenate(value -> 'classification' ->> 'scheme', value -> 'classification' ->> 'id') AS item_classification,
     (
         SELECT

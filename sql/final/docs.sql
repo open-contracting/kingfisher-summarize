@@ -46,8 +46,8 @@ BEGIN
     COMMENT ON COLUMN %1$s.item IS 'JSONB of item object';
     COMMENT ON COLUMN %1$s.item_id IS '`id` field in the item object';
     COMMENT ON COLUMN %1$s.quantity IS '`quantity` from the item object';
-    COMMENT ON COLUMN %1$s.unit_amount IS '`amount` from the unit/value object';
-    COMMENT ON COLUMN %1$s.unit_currency IS '`currency` from the unit/value object';
+    COMMENT ON COLUMN %1$s.unit_value_amount IS '`amount` from the unit/value object';
+    COMMENT ON COLUMN %1$s.unit_value_currency IS '`currency` from the unit/value object';
     COMMENT ON COLUMN %1$s.item_classification IS 'Concatenation of classification/scheme and classification/id';
     COMMENT ON COLUMN %1$s.item_additionalidentifiers_ids IS 'JSONB list of the concatenation of additionalClassification/scheme and additionalClassification/id';
     COMMENT ON COLUMN %1$s.total_additional_classifications IS 'Count of additional classifications';
@@ -175,9 +175,9 @@ SELECT
 SELECT
     common_comments ('planning_summary');
 
-COMMENT ON COLUMN planning_summary.planning_budget_amount IS 'amount/amount from `budget` object';
+COMMENT ON COLUMN planning_summary.planning_budget_amount_amount IS 'amount/amount from `budget` object';
 
-COMMENT ON COLUMN planning_summary.planning_budget_currency IS 'amount/currency from `budget` object';
+COMMENT ON COLUMN planning_summary.planning_budget_amount_currency IS 'amount/currency from `budget` object';
 
 COMMENT ON COLUMN planning_summary.planning_budget_projectid IS '`projectID` from `budget` object';
 
@@ -376,9 +376,9 @@ COMMENT ON COLUMN contract_implementation_transactions_summary.contract_index IS
 
 COMMENT ON COLUMN contract_implementation_transactions_summary.transaction_index IS 'Position of the transaction in the transaction array';
 
-COMMENT ON COLUMN contract_implementation_transactions_summary.transaction_amount IS '`amount` field from the value object or the deprecated amount object';
+COMMENT ON COLUMN contract_implementation_transactions_summary.transaction_value_amount IS '`amount` field from the value object or the deprecated amount object';
 
-COMMENT ON COLUMN contract_implementation_transactions_summary.transaction_currency IS '`currency` field from the value object or the deprecated amount object';
+COMMENT ON COLUMN contract_implementation_transactions_summary.transaction_value_currency IS '`currency` field from the value object or the deprecated amount object';
 
 COMMENT ON COLUMN contract_implementation_transactions_summary.transaction IS 'JSONB of transaction object';
 
