@@ -8,9 +8,9 @@ release_id,text,Release id from the data. Relevant for releases and not for comp
 data_id,integer,"id for the ""data"" table in Kingfisher that holds the original JSON data."
 package_data_id,integer,`id` from package_data table
 package_version,text,OCDS version gathered from the `version` field in package
-release_date,timestamp,`date` field from release
-release_tag,jsonb,JSONB list of `tags` field from release
-release_language,text,`language` field from release object
+date,timestamp,`date` field from release
+tag,jsonb,JSONB list of `tags` field from release
+language,text,`language` field from release object
 role_counts,jsonb,JSONB object with the keys as unique `roles` and the values as count of the appearances of those `roles`
 total_roles,numeric,Total amount of roles specified across all parties
 total_parties,bigint,Count of parties
@@ -24,12 +24,12 @@ last_award_date,timestamp,Latest `date` in all award objects
 total_award_documents,numeric,The sum of `total_documents` for each `award` in this release
 total_award_items,numeric,Count of all items in all awards
 total_award_suppliers,bigint,The sum of `total_suppliers` for each `award` in this release
-sum_awards_amount,numeric,Total of all value/amount across awards. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway
+sum_awards_value_amount,numeric,Total of all value/amount across awards. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway
 unique_award_suppliers,bigint,"A count of distinct suppliers for all awards for this release, based on the `unique_identifier_attempt` field"
 award_documenttype_counts,jsonb,JSONB object with the keys as unique awards/documents/documentType and the values as count of the appearances of those documentTypes
 total_contracts,bigint,Count of contracts
 total_contract_link_to_awards,bigint,Count of all contracts that have link to awards through awardID field
-sum_contracts_amount,numeric,Total of all value/amount across contracts. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway
+sum_contracts_value_amount,numeric,Total of all value/amount across contracts. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway
 first_contract_datesigned,timestamp,First `dateSigned` across all contracts
 last_contract_datesigned,timestamp,Last `dateSigned` across all contracts
 total_contract_documents,numeric,Count of contracts/documents

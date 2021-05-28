@@ -2,12 +2,12 @@ CREATE TABLE tmp_release_awards_aggregates AS
 SELECT
     id,
     count(*) AS total_awards,
-    min(award_date) AS first_award_date,
-    max(award_date) AS last_award_date,
+    min(date) AS first_award_date,
+    max(date) AS last_award_date,
     sum(total_documents) AS total_award_documents,
     sum(total_items) AS total_award_items,
     sum(total_suppliers) AS total_award_suppliers,
-    sum(award_value_amount) sum_awards_amount
+    sum(value_amount) sum_awards_value_amount
 FROM
     awards_summary
 GROUP BY

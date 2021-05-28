@@ -13,7 +13,7 @@ SELECT
     convert_to_numeric (value ->> 'quantity') quantity,
     convert_to_numeric (value -> 'unit' -> 'value' ->> 'amount') unit_value_amount,
     value -> 'unit' -> 'value' ->> 'currency' unit_value_currency,
-    hyphenate(value -> 'classification' ->> 'scheme', value -> 'classification' ->> 'id') AS item_classification,
+    hyphenate(value -> 'classification' ->> 'scheme', value -> 'classification' ->> 'id') AS classification,
     (
         SELECT
             jsonb_agg(hyphenate(additionalclassification ->> 'scheme', additionalclassification ->> 'id'))
@@ -25,7 +25,7 @@ SELECT
                     '[]'::jsonb
                 END) additionalclassification
         WHERE
-            additionalclassification ?& ARRAY['scheme', 'id']) item_additionalIdentifiers_ids,
+            additionalclassification ?& ARRAY['scheme', 'id']) additionalIdentifiers_ids,
     CASE WHEN jsonb_typeof(value -> 'additionalClassifications') = 'array' THEN
         jsonb_array_length(value -> 'additionalClassifications')
     ELSE

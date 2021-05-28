@@ -7,7 +7,7 @@ collection_id,integer,id from Kingfisher collection table
 ocid,text,ocid from the data
 release_id,text,Release id from the data. Relevant for releases and not for compiled_releases or records
 data_id,integer,"id for the ""data"" table in Kingfisher that holds the original JSON data."
-transaction_value_amount,numeric,`amount` field from the value object or the deprecated amount object
-transaction_value_currency,text,`currency` field from the value object or the deprecated amount object
+value_amount,numeric,`amount` field from the value object or the deprecated amount object
+value_currency,text,`currency` field from the value object or the deprecated amount object
 transaction,jsonb,JSONB of transaction object
 field_list,jsonb,"All JSON paths in the transaction object, excluding array indices, expressed as a JSONB object in which keys are paths and values are NULL. This column is only available if the --field-lists option was used."

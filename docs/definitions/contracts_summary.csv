@@ -9,16 +9,16 @@ data_id,integer,"id for the ""data"" table in Kingfisher that holds the original
 awardid,text,`awardID` field in contract object
 link_to_awards,integer,If there is an award with the above `awardID` then 1 otherwise 0
 contract_id,text,`id` field from contract object
-contract_title,text,`title` field from contract object
-contract_status,text,`status` field from contract object
-contract_description,text,`description` field from contract object
-contract_value_amount,numeric,`amount` field from value object
-contract_value_currency,text,`currency` field from value object
+title,text,`title` field from contract object
+status,text,`status` field from contract object
+description,text,`description` field from contract object
+value_amount,numeric,`amount` field from value object
+value_currency,text,`currency` field from value object
 datesigned,timestamp,`dateSigned` from contract object
-contract_period_startdate,timestamp,`startDate` field from contractPeriod
-contract_period_enddate,timestamp,`endDate` field from contractPeriod
-contract_period_maxextentdate,timestamp,`maxExtentDate` field from contractPeriod
-contract_period_durationindays,numeric,`durationInDays` field from contractPeriod
+period_startdate,timestamp,`startDate` field from contractPeriod
+period_enddate,timestamp,`endDate` field from contractPeriod
+period_maxextentdate,timestamp,`maxExtentDate` field from contractPeriod
+period_durationindays,numeric,`durationInDays` field from contractPeriod
 total_documents,bigint,Number of documents in documents array
 documenttype_counts,jsonb,JSONB object with the keys as unique documentTypes and the values as count of the appearances of that `documentType` in the `documents` array
 total_milestones,bigint,Count of milestones

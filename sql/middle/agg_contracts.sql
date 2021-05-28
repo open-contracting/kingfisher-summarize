@@ -3,7 +3,7 @@ SELECT
     id,
     count(*) AS total_contracts,
     sum(link_to_awards) total_contract_link_to_awards,
-    sum(contract_value_amount) sum_contracts_amount,
+    sum(value_amount) sum_contracts_value_amount,
     min(datesigned) AS first_contract_datesigned,
     max(datesigned) AS last_contract_datesigned,
     sum(total_documents) AS total_contract_documents,

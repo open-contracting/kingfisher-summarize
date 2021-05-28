@@ -14,12 +14,12 @@ SELECT DISTINCT ON ( r.id)
     r.release_id,
     r.data_id,
     procuringEntity,
-    procuringEntity ->> 'id' AS procuringEntity_parties_id,
-    ps.identifier AS procuringEntity_identifier,
+    procuringEntity ->> 'id' AS parties_id,
+    ps.identifier AS identifier,
     coalesce(procuringEntity ->> 'id', hyphenate(procuringEntity -> 'identifier' ->> 'scheme', procuringEntity -> 'identifier' ->> 'id'), procuringEntity ->> 'name'
 ) AS unique_identifier_attempt,
-    ps.parties_additionalIdentifiers_ids AS procuringEntity_additionalIdentifiers_ids,
-    ps.total_parties_additionalIdentifiers AS total_procuringEntity_additionalIdentifiers,
+    ps.parties_additionalIdentifiers_ids AS additionalIdentifiers_ids,
+    ps.total_parties_additionalIdentifiers AS total_additionalIdentifiers,
     CAST(ps.id IS NOT NULL AS integer
 ) AS link_to_parties,
     CAST(ps.id IS NOT NULL AND (ps.party -> 'roles') ? 'procuringEntity' AS integer

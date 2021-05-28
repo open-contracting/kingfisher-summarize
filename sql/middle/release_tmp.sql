@@ -9,9 +9,9 @@ SELECT
     data_id,
     package_data_id,
     coalesce(pd.data ->> 'version', '1.0') AS package_version,
-    convert_to_timestamp (d.data ->> 'date') release_date,
-    d.data -> 'tag' release_tag,
-    d.data ->> 'language' release_language
+    convert_to_timestamp (d.data ->> 'date') date,
+    d.data -> 'tag' tag,
+    d.data ->> 'language' AS language
 FROM
     release AS r
     JOIN package_data pd ON pd.id = r.package_data_id
@@ -34,9 +34,9 @@ SELECT
     data_id,
     package_data_id,
     coalesce(pd.data ->> 'version', '1.0') AS package_version,
-    convert_to_timestamp (d.data -> 'compiledRelease' ->> 'date') release_date,
-    d.data -> 'compiledRelease' -> 'tag' release_tag,
-    d.data -> 'compiledRelease' ->> 'language' release_language
+    convert_to_timestamp (d.data -> 'compiledRelease' ->> 'date') date,
+    d.data -> 'compiledRelease' -> 'tag' tag,
+    d.data -> 'compiledRelease' ->> 'language' AS language
 FROM
     record AS r
     JOIN package_data pd ON pd.id = r.package_data_id
@@ -60,9 +60,9 @@ SELECT
     --Kingfisher Process’ compiled_release table has no package_data_id column, so setting package_data_id to null.
     NULL AS package_data_id,
     NULL AS package_version, -- this would be useful but hard to get
-    convert_to_timestamp (d.data ->> 'date') release_date,
-    d.data -> 'tag' release_tag,
-    d.data ->> 'language' release_language
+    convert_to_timestamp (d.data ->> 'date') date,
+    d.data -> 'tag' tag,
+    d.data ->> 'language' AS language
 FROM
     compiled_release AS r
     JOIN data d ON d.id = r.data_id
@@ -83,9 +83,9 @@ SELECT
     data_id,
     package_data_id,
     coalesce(pd.data ->> 'version', '1.0') AS package_version,
-    convert_to_timestamp (value ->> 'date') release_date,
-    value -> 'tag' release_tag,
-    value ->> 'language' release_language
+    convert_to_timestamp (value ->> 'date') date,
+    value -> 'tag' tag,
+    value ->> 'language' AS language
 FROM
     record AS r
     JOIN package_data pd ON pd.id = r.package_data_id
