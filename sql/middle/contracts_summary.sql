@@ -30,7 +30,7 @@ CREATE TABLE contracts_summary_no_data AS SELECT DISTINCT ON (r.id, r.contract_i
     implementation_milestoneType_counts
 FROM
     tmp_contracts_summary r
-    LEFT JOIN awards_summary aws USING (id, awardid)
+    LEFT JOIN (SELECT award_id AS awardid, * FROM awards_summary) aws USING (id, awardid)
     LEFT JOIN (
         SELECT
             id,

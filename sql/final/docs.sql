@@ -313,7 +313,7 @@ SELECT
 
 COMMENT ON COLUMN awards_summary.award_index IS 'Position of the award in the awards array';
 
-COMMENT ON COLUMN awards_summary.awardid IS '`id` field from award object';
+COMMENT ON COLUMN awards_summary.award_id IS '`id` field from award object';
 
 COMMENT ON COLUMN awards_summary.title IS '`title` field from award object';
 

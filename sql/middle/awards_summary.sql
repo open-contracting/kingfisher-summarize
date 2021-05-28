@@ -7,7 +7,7 @@ SELECT
     r.ocid,
     r.release_id,
     r.data_id,
-    award ->> 'id' AS awardid,
+    award ->> 'id' AS award_id,
     award ->> 'title' AS title,
     award ->> 'status' AS status,
     award ->> 'description' AS description,

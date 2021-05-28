@@ -119,7 +119,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, capl
                 collection_id,
                 ocid,
                 release_id,
-                awardid,
+                award_id,
                 title,
                 status,
                 description,
@@ -144,7 +144,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, capl
             1,  # collection_id
             'dolore',  # ocid
             'ex laborumsit autein magna veniam',  # release_id
-            'reprehenderit magna cillum eu nisi',  # awardid
+            'reprehenderit magna cillum eu nisi',  # award_id
             'laborum aute nisi eiusmod',  # award_title
             'pending',  # award_status
             'ullamco in voluptate',  # award_description

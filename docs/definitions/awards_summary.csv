@@ -6,7 +6,7 @@ collection_id,integer,id from Kingfisher collection table
 ocid,text,ocid from the data
 release_id,text,Release id from the data. Relevant for releases and not for compiled_releases or records
 data_id,integer,"id for the ""data"" table in Kingfisher that holds the original JSON data."
-awardid,text,`id` field from award object
+award_id,text,`id` field from award object
 title,text,`title` field from award object
 status,text,`status` field from award object
 description,text,`description` field from award object
