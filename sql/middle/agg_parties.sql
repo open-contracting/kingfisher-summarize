@@ -1,8 +1,8 @@
 CREATE TABLE tmp_release_party_aggregates AS
 SELECT
     id,
-    role_counts,
-    total_roles,
+    parties_role_counts,
+    total_parties_roles,
     total_parties
 FROM (
     SELECT
@@ -15,13 +15,13 @@ FROM (
     LEFT JOIN (
         SELECT
             id,
-            sum(total_roles) AS total_roles,
-            jsonb_object_agg(coalesce(ROLE, ''), total_roles) role_counts
+            sum(total_parties_roles) AS total_parties_roles,
+            jsonb_object_agg(coalesce(ROLE, ''), total_parties_roles) parties_role_counts
         FROM (
             SELECT
                 id,
                 ROLE,
-                count(*) total_roles
+                count(*) total_parties_roles
             FROM
                 parties_summary
                 CROSS JOIN jsonb_array_elements_text(roles) AS ROLE
@@ -29,7 +29,7 @@ FROM (
                 id,
                 ROLE) id_role
         GROUP BY
-            id) role_counts USING (id);
+            id) parties_role_counts USING (id);
 
 CREATE UNIQUE INDEX tmp_release_party_aggregates_id ON tmp_release_party_aggregates (id);
 

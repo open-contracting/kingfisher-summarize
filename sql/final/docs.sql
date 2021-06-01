@@ -459,8 +459,8 @@ BEGIN
     COMMENT ON COLUMN %1$s.date IS '`date` field from release';
     COMMENT ON COLUMN %1$s.tag IS 'JSONB list of `tags` field from release';
     COMMENT ON COLUMN %1$s.language IS '`language` field from release object';
-    COMMENT ON COLUMN %1$s.role_counts IS 'JSONB object with the keys as unique `roles` and the values as count of the appearances of those `roles`';
-    COMMENT ON COLUMN %1$s.total_roles IS 'Total amount of roles specified across all parties';
+    COMMENT ON COLUMN %1$s.parties_role_counts IS 'JSONB object with the keys as unique `roles` and the values as count of the appearances of those `roles`';
+    COMMENT ON COLUMN %1$s.total_parties_roles IS 'Total amount of roles specified across all parties';
     COMMENT ON COLUMN %1$s.total_parties IS 'Count of parties';
     COMMENT ON COLUMN %1$s.total_planning_documents IS 'Count of planning documents';
     COMMENT ON COLUMN %1$s.planning_documenttype_counts IS 'Count of planning document types';
