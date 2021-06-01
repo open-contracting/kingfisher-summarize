@@ -178,8 +178,8 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, capl
                 roles,
                 identifier,
                 unique_identifier_attempt,
-                parties_additionalidentifiers_ids,
-                total_parties_additionalidentifiers
+                additionalidentifiers_ids,
+                total_additionalidentifiers
             FROM view_data_collection_1.parties_summary
             ORDER BY id, party_index
         """)
@@ -204,8 +204,8 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, capl
                 'ad occaecat amet anim-laboris ea Duisdeserunt quis sed pariatur mollit',
                 'elit mollit-officia proidentmagna',
                 'ex-minim Ut consectetur',
-            ],  # parties_additionalidentifiers_ids
-            5,  # total_parties_additionalidentifiers
+            ],  # additionalidentifiers_ids
+            5,  # total_additionalidentifiers
 
         )
         assert len(rows) == 296

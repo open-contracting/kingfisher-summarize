@@ -87,9 +87,9 @@ COMMENT ON COLUMN parties_summary.identifier IS 'Concatenation of `scheme` and `
 
 COMMENT ON COLUMN parties_summary.unique_identifier_attempt IS 'The `id` from party object if it exists, otherwise the identifier described above if it exists, otherwise the party name';
 
-COMMENT ON COLUMN parties_summary.parties_additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
+COMMENT ON COLUMN parties_summary.additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
 
-COMMENT ON COLUMN parties_summary.total_parties_additionalidentifiers IS 'Count of additional identifiers';
+COMMENT ON COLUMN parties_summary.total_additionalidentifiers IS 'Count of additional identifiers';
 
 COMMENT ON COLUMN parties_summary.party IS 'JSONB of party object';
 
@@ -144,15 +144,15 @@ COMMENT ON COLUMN tenderers_summary.tenderer_index IS 'Position of the tenderer 
 
 COMMENT ON COLUMN tenderers_summary.tenderer IS 'JSONB of tenderer object';
 
-COMMENT ON COLUMN tenderers_summary.tenderer_parties_id IS '`id` from tenderer object';
+COMMENT ON COLUMN tenderers_summary.parties_id IS '`id` from tenderer object';
 
-COMMENT ON COLUMN tenderers_summary.tenderer_identifier IS 'Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`';
+COMMENT ON COLUMN tenderers_summary.identifier IS 'Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`';
 
 COMMENT ON COLUMN tenderers_summary.unique_identifier_attempt IS 'The `id` from tenderer object if it exists, otherwise the identifier described above if it exists, otherwise the party name';
 
-COMMENT ON COLUMN tenderers_summary.tenderer_additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
+COMMENT ON COLUMN tenderers_summary.additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
 
-COMMENT ON COLUMN tenderers_summary.total_tenderer_additionalidentifiers IS 'Count of additional identifiers';
+COMMENT ON COLUMN tenderers_summary.total_additionalidentifiers IS 'Count of additional identifiers';
 
 COMMENT ON COLUMN tenderers_summary.link_to_parties IS 'Does this tenderer link to a party in the parties array using the `id` field from buyer object linking to the `id` field in a party object? If this is true then 1, otherwise 0';
 
@@ -294,13 +294,13 @@ COMMENT ON COLUMN award_suppliers_summary.supplier IS 'JSONB of supplier object'
 
 COMMENT ON COLUMN award_suppliers_summary.supplier_id IS '`id` from supplier object';
 
-COMMENT ON COLUMN award_suppliers_summary.supplier_identifier IS 'Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`';
+COMMENT ON COLUMN award_suppliers_summary.identifier IS 'Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`';
 
 COMMENT ON COLUMN award_suppliers_summary.unique_identifier_attempt IS 'The `id` from party object if it exists, otherwise the identifier described above if it exists, otherwise the party name';
 
-COMMENT ON COLUMN award_suppliers_summary.supplier_additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
+COMMENT ON COLUMN award_suppliers_summary.additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
 
-COMMENT ON COLUMN award_suppliers_summary.total_supplier_additionalidentifiers IS 'Count of additional identifiers';
+COMMENT ON COLUMN award_suppliers_summary.total_additionalidentifiers IS 'Count of additional identifiers';
 
 COMMENT ON COLUMN award_suppliers_summary.link_to_parties IS 'Does this buyer link to a party in the parties array using the `id` field from buyer object linking to the `id` field in a party object? If this is true then 1, otherwise 0';
 

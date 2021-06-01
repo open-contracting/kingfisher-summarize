@@ -19,8 +19,8 @@ SELECT DISTINCT ON ( r.id)
     ps.identifier AS identifier,
     coalesce(buyer ->> 'id', hyphenate(buyer -> 'identifier' ->> 'scheme', buyer -> 'identifier' ->> 'id'), buyer ->> 'name'
 ) AS unique_identifier_attempt,
-    ps.parties_additionalIdentifiers_ids AS additionalIdentifiers_ids,
-    ps.total_parties_additionalIdentifiers AS total_additionalIdentifiers,
+    ps.additionalIdentifiers_ids AS additionalIdentifiers_ids,
+    ps.total_additionalIdentifiers AS total_additionalIdentifiers,
     CAST(ps.id IS NOT NULL AS integer
 ) AS link_to_parties,
     CAST(ps.id IS NOT NULL AND (ps.party -> 'roles') ? 'buyer' AS integer
