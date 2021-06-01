@@ -25,7 +25,7 @@ total_award_documents,numeric,The sum of `total_documents` for each `award` in t
 total_award_items,numeric,Count of all items in all awards
 total_award_suppliers,bigint,The sum of `total_suppliers` for each `award` in this release
 sum_awards_value_amount,numeric,Total of all value/amount across awards. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway
-unique_award_suppliers,bigint,"A count of distinct suppliers for all awards for this release, based on the `unique_identifier_attempt` field"
+total_unique_award_suppliers,bigint,"A count of distinct suppliers for all awards for this release, based on the `unique_identifier_attempt` field"
 award_documenttype_counts,jsonb,JSONB object with the keys as unique awards/documents/documentType and the values as count of the appearances of those documentTypes
 total_contracts,bigint,Count of contracts
 total_contract_link_to_awards,bigint,Count of all contracts that have link to awards through awardID field

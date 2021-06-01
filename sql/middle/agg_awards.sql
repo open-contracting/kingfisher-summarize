@@ -18,7 +18,7 @@ CREATE UNIQUE INDEX tmp_release_awards_aggregates_id ON tmp_release_awards_aggre
 CREATE TABLE tmp_release_award_suppliers_aggregates AS
 SELECT
     id,
-    count(DISTINCT unique_identifier_attempt) AS unique_award_suppliers
+    count(DISTINCT unique_identifier_attempt) AS total_unique_award_suppliers
 FROM
     award_suppliers_summary
 GROUP BY
