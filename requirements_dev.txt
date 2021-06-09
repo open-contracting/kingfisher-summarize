@@ -62,13 +62,13 @@ pytest==5.3.5
     #   pytest-cov
 python-dotenv==0.15.0
     # via -r requirements.txt
-requests==2.22.0
+requests==2.25.1
     # via coveralls
 six==1.15.0
     # via packaging
 tabulate==0.8.7
     # via -r requirements.txt
-urllib3==1.25.8
+urllib3==1.26.5
     # via requests
 wcwidth==0.1.8
     # via pytest
