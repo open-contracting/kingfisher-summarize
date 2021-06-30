@@ -8,7 +8,7 @@ SELECT
     r.release_id,
     r.data_id,
     value AS contract,
-    value ->> 'awardID' AS award_id
+    value ->> 'awardID' AS awardid
 FROM
     tmp_release_summary_with_release_data r
     CROSS JOIN jsonb_array_elements(data -> 'contracts')
@@ -18,5 +18,5 @@ WHERE
 
 CREATE UNIQUE INDEX tmp_contracts_summary_id ON tmp_contracts_summary (id, contract_index);
 
-CREATE INDEX tmp_contracts_summary_award_id ON tmp_contracts_summary (id, award_id);
+CREATE INDEX tmp_contracts_summary_awardid ON tmp_contracts_summary (id, awardid);
 

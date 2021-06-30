@@ -46,11 +46,11 @@ BEGIN
     COMMENT ON COLUMN %1$s.item IS 'JSONB of item object';
     COMMENT ON COLUMN %1$s.item_id IS '`id` field in the item object';
     COMMENT ON COLUMN %1$s.quantity IS '`quantity` from the item object';
-    COMMENT ON COLUMN %1$s.unit_amount IS '`amount` from the unit/value object';
-    COMMENT ON COLUMN %1$s.unit_currency IS '`currency` from the unit/value object';
-    COMMENT ON COLUMN %1$s.item_classification IS 'Concatenation of classification/scheme and classification/id';
-    COMMENT ON COLUMN %1$s.item_additionalidentifiers_ids IS 'JSONB list of the concatenation of additionalClassification/scheme and additionalClassification/id';
-    COMMENT ON COLUMN %1$s.additional_classification_count IS 'Count of additional classifications';
+    COMMENT ON COLUMN %1$s.unit_value_amount IS '`amount` from the unit/value object';
+    COMMENT ON COLUMN %1$s.unit_value_currency IS '`currency` from the unit/value object';
+    COMMENT ON COLUMN %1$s.classification IS 'Concatenation of classification/scheme and classification/id';
+    COMMENT ON COLUMN %1$s.additionalidentifiers_ids IS 'JSONB list of the concatenation of additionalClassification/scheme and additionalClassification/id';
+    COMMENT ON COLUMN %1$s.total_additionalclassifications IS 'Count of additional classifications';
     $template$;
     EXECUTE format(TEMPLATE, table_name);
     RETURN 'Common item comments added';
@@ -87,9 +87,9 @@ COMMENT ON COLUMN parties_summary.identifier IS 'Concatenation of `scheme` and `
 
 COMMENT ON COLUMN parties_summary.unique_identifier_attempt IS 'The `id` from party object if it exists, otherwise the identifier described above if it exists, otherwise the party name';
 
-COMMENT ON COLUMN parties_summary.parties_additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
+COMMENT ON COLUMN parties_summary.additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
 
-COMMENT ON COLUMN parties_summary.parties_additionalidentifiers_count IS 'Count of additional identifiers';
+COMMENT ON COLUMN parties_summary.total_additionalidentifiers IS 'Count of additional identifiers';
 
 COMMENT ON COLUMN parties_summary.party IS 'JSONB of party object';
 
@@ -98,17 +98,17 @@ SELECT
 
 COMMENT ON COLUMN buyer_summary.buyer IS 'JSONB of buyer object';
 
-COMMENT ON COLUMN buyer_summary.buyer_parties_id IS '`id` from buyer object';
+COMMENT ON COLUMN buyer_summary.parties_id IS '`id` from buyer object';
 
-COMMENT ON COLUMN buyer_summary.buyer_name IS '`name` from buyer object';
+COMMENT ON COLUMN buyer_summary.name IS '`name` from buyer object';
 
-COMMENT ON COLUMN buyer_summary.buyer_identifier IS 'Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`';
+COMMENT ON COLUMN buyer_summary.identifier IS 'Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`';
 
 COMMENT ON COLUMN buyer_summary.unique_identifier_attempt IS 'The `id` from buyer object if it exists, otherwise the identifier described above if it exists, otherwise the party name';
 
-COMMENT ON COLUMN buyer_summary.buyer_additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
+COMMENT ON COLUMN buyer_summary.additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
 
-COMMENT ON COLUMN buyer_summary.buyer_additionalidentifiers_count IS 'Count of additional identifiers';
+COMMENT ON COLUMN buyer_summary.total_additionalidentifiers IS 'Count of additional identifiers';
 
 COMMENT ON COLUMN buyer_summary.link_to_parties IS 'Does this buyer link to a party in the parties array using the `id` field from buyer object linking to the `id` field in a party object? If this is true then 1, otherwise 0';
 
@@ -121,15 +121,15 @@ SELECT
 
 COMMENT ON COLUMN procuringentity_summary.procuringentity IS 'JSONB of procuringEntity object';
 
-COMMENT ON COLUMN procuringentity_summary.procuringentity_parties_id IS '`id` from procuringEntity object';
+COMMENT ON COLUMN procuringentity_summary.parties_id IS '`id` from procuringEntity object';
 
-COMMENT ON COLUMN procuringentity_summary.procuringentity_identifier IS 'Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`';
+COMMENT ON COLUMN procuringentity_summary.identifier IS 'Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`';
 
 COMMENT ON COLUMN procuringentity_summary.unique_identifier_attempt IS 'The `id` from procuringEntity object if it exists, otherwise the identifier described above if it exists, otherwise the party name';
 
-COMMENT ON COLUMN procuringentity_summary.procuringentity_additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
+COMMENT ON COLUMN procuringentity_summary.additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
 
-COMMENT ON COLUMN procuringentity_summary.procuringentity_additionalidentifiers_count IS 'Count of additional identifiers';
+COMMENT ON COLUMN procuringentity_summary.total_additionalidentifiers IS 'Count of additional identifiers';
 
 COMMENT ON COLUMN procuringentity_summary.link_to_parties IS 'Does this procuringEntity link to a party in the parties array using the `id` field from buyer object linking to the `id` field in a party object? If this is true then 1, otherwise 0';
 
@@ -144,15 +144,15 @@ COMMENT ON COLUMN tenderers_summary.tenderer_index IS 'Position of the tenderer 
 
 COMMENT ON COLUMN tenderers_summary.tenderer IS 'JSONB of tenderer object';
 
-COMMENT ON COLUMN tenderers_summary.tenderer_parties_id IS '`id` from tenderer object';
+COMMENT ON COLUMN tenderers_summary.parties_id IS '`id` from tenderer object';
 
-COMMENT ON COLUMN tenderers_summary.tenderer_identifier IS 'Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`';
+COMMENT ON COLUMN tenderers_summary.identifier IS 'Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`';
 
 COMMENT ON COLUMN tenderers_summary.unique_identifier_attempt IS 'The `id` from tenderer object if it exists, otherwise the identifier described above if it exists, otherwise the party name';
 
-COMMENT ON COLUMN tenderers_summary.tenderer_additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
+COMMENT ON COLUMN tenderers_summary.additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
 
-COMMENT ON COLUMN tenderers_summary.tenderer_additionalidentifiers_count IS 'Count of additional identifiers';
+COMMENT ON COLUMN tenderers_summary.total_additionalidentifiers IS 'Count of additional identifiers';
 
 COMMENT ON COLUMN tenderers_summary.link_to_parties IS 'Does this tenderer link to a party in the parties array using the `id` field from buyer object linking to the `id` field in a party object? If this is true then 1, otherwise 0';
 
@@ -175,17 +175,17 @@ SELECT
 SELECT
     common_comments ('planning_summary');
 
-COMMENT ON COLUMN planning_summary.planning_budget_amount IS 'amount/amount from `budget` object';
+COMMENT ON COLUMN planning_summary.budget_amount_amount IS 'amount/amount from `budget` object';
 
-COMMENT ON COLUMN planning_summary.planning_budget_currency IS 'amount/currency from `budget` object';
+COMMENT ON COLUMN planning_summary.budget_amount_currency IS 'amount/currency from `budget` object';
 
-COMMENT ON COLUMN planning_summary.planning_budget_projectid IS '`projectID` from `budget` object';
+COMMENT ON COLUMN planning_summary.budget_projectid IS '`projectID` from `budget` object';
 
-COMMENT ON COLUMN planning_summary.documents_count IS 'Number of documents in documents array';
+COMMENT ON COLUMN planning_summary.total_documents IS 'Number of documents in documents array';
 
 COMMENT ON COLUMN planning_summary.documenttype_counts IS 'JSONB object with the keys as unique documentTypes and the values as count of the appearances of that `documentType` in the `documents` array';
 
-COMMENT ON COLUMN planning_summary.milestones_count IS 'Count of milestones';
+COMMENT ON COLUMN planning_summary.total_milestones IS 'Count of milestones';
 
 COMMENT ON COLUMN planning_summary.milestonetype_counts IS 'JSONB object with the keys as unique milestoneTypes and the values as a count of the appearances of that `milestoneType` in the `milestones` array';
 
@@ -216,43 +216,43 @@ DECLARE
     TEMPLATE text;
 BEGIN
     TEMPLATE := $template$ COMMENT ON COLUMN %1$s.tender_id IS '`id` from `tender` object';
-    COMMENT ON COLUMN %1$s.tender_title IS '`title` from `tender` object';
-    COMMENT ON COLUMN %1$s.tender_status IS '`status` from `tender` object';
-    COMMENT ON COLUMN %1$s.tender_description IS '`description` from `tender` object';
-    COMMENT ON COLUMN %1$s.tender_value_amount IS '`amount` from `value` object';
-    COMMENT ON COLUMN %1$s.tender_value_currency IS '`currency` from `value` object';
-    COMMENT ON COLUMN %1$s.tender_minvalue_amount IS '`amount` from `minValue` object';
-    COMMENT ON COLUMN %1$s.tender_minvalue_currency IS '`currency` from `minValue` object';
-    COMMENT ON COLUMN %1$s.tender_procurementmethod IS '`procumentMethod` form `tender` object';
-    COMMENT ON COLUMN %1$s.tender_mainprocurementcategory IS '`mainProcurementCategory` from tender object';
-    COMMENT ON COLUMN %1$s.tender_additionalprocurementcategories IS '`additionalProcurementCategories` from tender object';
-    COMMENT ON COLUMN %1$s.tender_awardcriteria IS '`awardCriteria` from tender object';
-    COMMENT ON COLUMN %1$s.tender_submissionmethod IS '`submissionMethod` from tender object';
-    COMMENT ON COLUMN %1$s.tender_tenderperiod_startdate IS '`startDate` from tenderPeriod object';
-    COMMENT ON COLUMN %1$s.tender_tenderperiod_enddate IS '`endDate` from tenderPeriod object';
-    COMMENT ON COLUMN %1$s.tender_tenderperiod_maxextentdate IS '`maxExtentDate` from tenderPeriod object';
-    COMMENT ON COLUMN %1$s.tender_tenderperiod_durationindays IS '`durationInDays` from tenderPeriod object';
-    COMMENT ON COLUMN %1$s.tender_enquiryperiod_startdate IS '`startDate` from enquiryPeriod object';
-    COMMENT ON COLUMN %1$s.tender_enquiryperiod_enddate IS '`endDate` from enquiryPeriod object';
-    COMMENT ON COLUMN %1$s.tender_enquiryperiod_maxextentdate IS '`maxExtentDate` from enquiryPeriod object';
-    COMMENT ON COLUMN %1$s.tender_enquiryperiod_durationindays IS '`durationInDays` from enquiryPeriod object';
-    COMMENT ON COLUMN %1$s.tender_hasenquiries IS '`hasEnquiries` from tender object';
-    COMMENT ON COLUMN %1$s.tender_eligibilitycriteria IS '`eligibilityCriteria from tender object';
-    COMMENT ON COLUMN %1$s.tender_awardperiod_startdate IS '`startDate` from awardPeriod object';
-    COMMENT ON COLUMN %1$s.tender_awardperiod_enddate IS '`endDate` from awardPeriod object';
-    COMMENT ON COLUMN %1$s.tender_awardperiod_maxextentdate IS '`maxExtentDate` from awardPeriod object';
-    COMMENT ON COLUMN %1$s.tender_awardperiod_durationindays IS '`durationInDays` from awardPeriod object';
-    COMMENT ON COLUMN %1$s.tender_contractperiod_startdate IS '`startDate` from awardPeriod object';
-    COMMENT ON COLUMN %1$s.tender_contractperiod_enddate IS '`endDate` from awardPeriod object';
-    COMMENT ON COLUMN %1$s.tender_contractperiod_maxextentdate IS '`maxExtentDate` from awardPeriod object';
-    COMMENT ON COLUMN %1$s.tender_contractperiod_durationindays IS '`durationInDays` from awardPeriod object';
-    COMMENT ON COLUMN %1$s.tender_numberoftenderers IS '`numberOfTenderers` from tender object';
-    COMMENT ON COLUMN %1$s.tenderers_count IS 'Count of amount of tenderers';
-    COMMENT ON COLUMN %1$s.documents_count IS 'Count of amount of tender documents';
+    COMMENT ON COLUMN %1$s.title IS '`title` from `tender` object';
+    COMMENT ON COLUMN %1$s.status IS '`status` from `tender` object';
+    COMMENT ON COLUMN %1$s.description IS '`description` from `tender` object';
+    COMMENT ON COLUMN %1$s.value_amount IS '`amount` from `value` object';
+    COMMENT ON COLUMN %1$s.value_currency IS '`currency` from `value` object';
+    COMMENT ON COLUMN %1$s.minvalue_amount IS '`amount` from `minValue` object';
+    COMMENT ON COLUMN %1$s.minvalue_currency IS '`currency` from `minValue` object';
+    COMMENT ON COLUMN %1$s.procurementmethod IS '`procumentMethod` form `tender` object';
+    COMMENT ON COLUMN %1$s.mainprocurementcategory IS '`mainProcurementCategory` from tender object';
+    COMMENT ON COLUMN %1$s.additionalprocurementcategories IS '`additionalProcurementCategories` from tender object';
+    COMMENT ON COLUMN %1$s.awardcriteria IS '`awardCriteria` from tender object';
+    COMMENT ON COLUMN %1$s.submissionmethod IS '`submissionMethod` from tender object';
+    COMMENT ON COLUMN %1$s.tenderperiod_startdate IS '`startDate` from tenderPeriod object';
+    COMMENT ON COLUMN %1$s.tenderperiod_enddate IS '`endDate` from tenderPeriod object';
+    COMMENT ON COLUMN %1$s.tenderperiod_maxextentdate IS '`maxExtentDate` from tenderPeriod object';
+    COMMENT ON COLUMN %1$s.tenderperiod_durationindays IS '`durationInDays` from tenderPeriod object';
+    COMMENT ON COLUMN %1$s.enquiryperiod_startdate IS '`startDate` from enquiryPeriod object';
+    COMMENT ON COLUMN %1$s.enquiryperiod_enddate IS '`endDate` from enquiryPeriod object';
+    COMMENT ON COLUMN %1$s.enquiryperiod_maxextentdate IS '`maxExtentDate` from enquiryPeriod object';
+    COMMENT ON COLUMN %1$s.enquiryperiod_durationindays IS '`durationInDays` from enquiryPeriod object';
+    COMMENT ON COLUMN %1$s.hasenquiries IS '`hasEnquiries` from tender object';
+    COMMENT ON COLUMN %1$s.eligibilitycriteria IS '`eligibilityCriteria from tender object';
+    COMMENT ON COLUMN %1$s.awardperiod_startdate IS '`startDate` from awardPeriod object';
+    COMMENT ON COLUMN %1$s.awardperiod_enddate IS '`endDate` from awardPeriod object';
+    COMMENT ON COLUMN %1$s.awardperiod_maxextentdate IS '`maxExtentDate` from awardPeriod object';
+    COMMENT ON COLUMN %1$s.awardperiod_durationindays IS '`durationInDays` from awardPeriod object';
+    COMMENT ON COLUMN %1$s.contractperiod_startdate IS '`startDate` from awardPeriod object';
+    COMMENT ON COLUMN %1$s.contractperiod_enddate IS '`endDate` from awardPeriod object';
+    COMMENT ON COLUMN %1$s.contractperiod_maxextentdate IS '`maxExtentDate` from awardPeriod object';
+    COMMENT ON COLUMN %1$s.contractperiod_durationindays IS '`durationInDays` from awardPeriod object';
+    COMMENT ON COLUMN %1$s.numberoftenderers IS '`numberOfTenderers` from tender object';
+    COMMENT ON COLUMN %1$s.total_tenderers IS 'Count of amount of tenderers';
+    COMMENT ON COLUMN %1$s.total_documents IS 'Count of amount of tender documents';
     COMMENT ON COLUMN %1$s.documenttype_counts IS 'JSONB object with the keys as unique documentTypes and the values as count of the appearances of that `documentType` in the `documents` array';
-    COMMENT ON COLUMN %1$s.milestones_count IS 'Count of milestones';
+    COMMENT ON COLUMN %1$s.total_milestones IS 'Count of milestones';
     COMMENT ON COLUMN %1$s.milestonetype_counts IS 'JSONB object with the keys as unique milestoneTypes and the values as a count of the appearances of that `milestoneType` in the `milestones` array';
-    COMMENT ON COLUMN %1$s.items_count IS 'Count of items';
+    COMMENT ON COLUMN %1$s.total_items IS 'Count of items';
     $template$;
     EXECUTE format(TEMPLATE, 'tender_summary_no_data');
     EXECUTE format(TEMPLATE, 'tender_summary');
@@ -292,15 +292,15 @@ COMMENT ON COLUMN award_suppliers_summary.supplier_index IS 'Position of the sup
 
 COMMENT ON COLUMN award_suppliers_summary.supplier IS 'JSONB of supplier object';
 
-COMMENT ON COLUMN award_suppliers_summary.supplier_parties_id IS '`id` from supplier object';
+COMMENT ON COLUMN award_suppliers_summary.supplier_id IS '`id` from supplier object';
 
-COMMENT ON COLUMN award_suppliers_summary.supplier_identifier IS 'Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`';
+COMMENT ON COLUMN award_suppliers_summary.identifier IS 'Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`';
 
 COMMENT ON COLUMN award_suppliers_summary.unique_identifier_attempt IS 'The `id` from party object if it exists, otherwise the identifier described above if it exists, otherwise the party name';
 
-COMMENT ON COLUMN award_suppliers_summary.supplier_additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
+COMMENT ON COLUMN award_suppliers_summary.additionalidentifiers_ids IS 'JSONB list of the concatenation of scheme and id of all additionalIdentifier objects';
 
-COMMENT ON COLUMN award_suppliers_summary.supplier_additionalidentifiers_count IS 'Count of additional identifiers';
+COMMENT ON COLUMN award_suppliers_summary.total_additionalidentifiers IS 'Count of additional identifiers';
 
 COMMENT ON COLUMN award_suppliers_summary.link_to_parties IS 'Does this buyer link to a party in the parties array using the `id` field from buyer object linking to the `id` field in a party object? If this is true then 1, otherwise 0';
 
@@ -315,33 +315,33 @@ COMMENT ON COLUMN awards_summary.award_index IS 'Position of the award in the aw
 
 COMMENT ON COLUMN awards_summary.award_id IS '`id` field from award object';
 
-COMMENT ON COLUMN awards_summary.award_title IS '`title` field from award object';
+COMMENT ON COLUMN awards_summary.title IS '`title` field from award object';
 
-COMMENT ON COLUMN awards_summary.award_status IS '`status` field from award object';
+COMMENT ON COLUMN awards_summary.status IS '`status` field from award object';
 
-COMMENT ON COLUMN awards_summary.award_description IS '`description` field from award object';
+COMMENT ON COLUMN awards_summary.description IS '`description` field from award object';
 
-COMMENT ON COLUMN awards_summary.award_value_amount IS '`value` field from award/amount object';
+COMMENT ON COLUMN awards_summary.value_amount IS '`value` field from award/amount object';
 
-COMMENT ON COLUMN awards_summary.award_value_currency IS '`currency` field from award/amount object';
+COMMENT ON COLUMN awards_summary.value_currency IS '`currency` field from award/amount object';
 
-COMMENT ON COLUMN awards_summary.award_date IS '`date` field from award object';
+COMMENT ON COLUMN awards_summary.date IS '`date` field from award object';
 
-COMMENT ON COLUMN awards_summary.award_contractperiod_startdate IS '`startDate` field from contractPeriod';
+COMMENT ON COLUMN awards_summary.contractperiod_startdate IS '`startDate` field from contractPeriod';
 
-COMMENT ON COLUMN awards_summary.award_contractperiod_enddate IS '`endDate` field from contractPeriod';
+COMMENT ON COLUMN awards_summary.contractperiod_enddate IS '`endDate` field from contractPeriod';
 
-COMMENT ON COLUMN awards_summary.award_contractperiod_maxextentdate IS '`maxExtentDate` field from contractPeriod';
+COMMENT ON COLUMN awards_summary.contractperiod_maxextentdate IS '`maxExtentDate` field from contractPeriod';
 
-COMMENT ON COLUMN awards_summary.award_contractperiod_durationindays IS '`durationInDays` field from contractPeriod';
+COMMENT ON COLUMN awards_summary.contractperiod_durationindays IS '`durationInDays` field from contractPeriod';
 
-COMMENT ON COLUMN awards_summary.suppliers_count IS 'The number of suppliers declared for this award.';
+COMMENT ON COLUMN awards_summary.total_suppliers IS 'The number of suppliers declared for this award.';
 
-COMMENT ON COLUMN awards_summary.documents_count IS 'Number of documents in documents array';
+COMMENT ON COLUMN awards_summary.total_documents IS 'Number of documents in documents array';
 
 COMMENT ON COLUMN awards_summary.documenttype_counts IS 'JSONB object with the keys as unique documentTypes and the values as count of the appearances of that `documentType` in the `documents` array';
 
-COMMENT ON COLUMN awards_summary.items_count IS 'Count of items';
+COMMENT ON COLUMN awards_summary.total_items IS 'Count of items';
 
 COMMENT ON COLUMN awards_summary.award IS 'JSONB of award object';
 
@@ -376,9 +376,9 @@ COMMENT ON COLUMN contract_implementation_transactions_summary.contract_index IS
 
 COMMENT ON COLUMN contract_implementation_transactions_summary.transaction_index IS 'Position of the transaction in the transaction array';
 
-COMMENT ON COLUMN contract_implementation_transactions_summary.transaction_amount IS '`amount` field from the value object or the deprecated amount object';
+COMMENT ON COLUMN contract_implementation_transactions_summary.value_amount IS '`amount` field from the value object or the deprecated amount object';
 
-COMMENT ON COLUMN contract_implementation_transactions_summary.transaction_currency IS '`currency` field from the value object or the deprecated amount object';
+COMMENT ON COLUMN contract_implementation_transactions_summary.value_currency IS '`currency` field from the value object or the deprecated amount object';
 
 COMMENT ON COLUMN contract_implementation_transactions_summary.transaction IS 'JSONB of transaction object';
 
@@ -403,47 +403,47 @@ SELECT
 
 COMMENT ON COLUMN contracts_summary.contract_index IS 'Position of the contract in the contracts array';
 
-COMMENT ON COLUMN contracts_summary.award_id IS '`awardID` field in contract object';
+COMMENT ON COLUMN contracts_summary.awardid IS '`awardID` field in contract object';
 
 COMMENT ON COLUMN contracts_summary.link_to_awards IS 'If there is an award with the above `awardID` then 1 otherwise 0';
 
 COMMENT ON COLUMN contracts_summary.contract_id IS '`id` field from contract object';
 
-COMMENT ON COLUMN contracts_summary.contract_title IS '`title` field from contract object';
+COMMENT ON COLUMN contracts_summary.title IS '`title` field from contract object';
 
-COMMENT ON COLUMN contracts_summary.contract_status IS '`status` field from contract object';
+COMMENT ON COLUMN contracts_summary.status IS '`status` field from contract object';
 
-COMMENT ON COLUMN contracts_summary.contract_description IS '`description` field from contract object';
+COMMENT ON COLUMN contracts_summary.description IS '`description` field from contract object';
 
-COMMENT ON COLUMN contracts_summary.contract_value_amount IS '`amount` field from value object';
+COMMENT ON COLUMN contracts_summary.value_amount IS '`amount` field from value object';
 
-COMMENT ON COLUMN contracts_summary.contract_value_currency IS '`currency` field from value object';
+COMMENT ON COLUMN contracts_summary.value_currency IS '`currency` field from value object';
 
 COMMENT ON COLUMN contracts_summary.datesigned IS '`dateSigned` from contract object';
 
-COMMENT ON COLUMN contracts_summary.contract_period_startdate IS '`startDate` field from contractPeriod';
+COMMENT ON COLUMN contracts_summary.period_startdate IS '`startDate` field from contractPeriod';
 
-COMMENT ON COLUMN contracts_summary.contract_period_enddate IS '`endDate` field from contractPeriod';
+COMMENT ON COLUMN contracts_summary.period_enddate IS '`endDate` field from contractPeriod';
 
-COMMENT ON COLUMN contracts_summary.contract_period_maxextentdate IS '`maxExtentDate` field from contractPeriod';
+COMMENT ON COLUMN contracts_summary.period_maxextentdate IS '`maxExtentDate` field from contractPeriod';
 
-COMMENT ON COLUMN contracts_summary.contract_period_durationindays IS '`durationInDays` field from contractPeriod';
+COMMENT ON COLUMN contracts_summary.period_durationindays IS '`durationInDays` field from contractPeriod';
 
-COMMENT ON COLUMN contracts_summary.documents_count IS 'Number of documents in documents array';
+COMMENT ON COLUMN contracts_summary.total_documents IS 'Number of documents in documents array';
 
 COMMENT ON COLUMN contracts_summary.documenttype_counts IS 'JSONB object with the keys as unique documentTypes and the values as count of the appearances of that `documentType` in the `documents` array';
 
-COMMENT ON COLUMN contracts_summary.milestones_count IS 'Count of milestones';
+COMMENT ON COLUMN contracts_summary.total_milestones IS 'Count of milestones';
 
 COMMENT ON COLUMN contracts_summary.milestonetype_counts IS 'JSONB object with the keys as unique milestoneTypes and the values as a count of the appearances of that `milestoneType` in the `milestones` array';
 
-COMMENT ON COLUMN contracts_summary.items_count IS 'Count of items';
+COMMENT ON COLUMN contracts_summary.total_items IS 'Count of items';
 
-COMMENT ON COLUMN contracts_summary.implementation_documents_count IS 'Number of documents in documents array';
+COMMENT ON COLUMN contracts_summary.total_implementation_documents IS 'Number of documents in documents array';
 
 COMMENT ON COLUMN contracts_summary.implementation_documenttype_counts IS 'JSONB object with the keys as unique documentTypes and the values as count of the appearances of that `documentType` in the `documents` array';
 
-COMMENT ON COLUMN contracts_summary.implementation_milestones_count IS 'Number of documents in documents array';
+COMMENT ON COLUMN contracts_summary.total_implementation_milestones IS 'Number of documents in documents array';
 
 COMMENT ON COLUMN contracts_summary.implementation_milestonetype_counts IS 'JSONB object with the keys as unique milestoneTypes and the values as count of the appearances of that `milestoneType` in the `milestone` array';
 
@@ -456,28 +456,28 @@ BEGIN
     TEMPLATE := $template$ COMMENT ON COLUMN %1$s.table_id IS '`id` from either release, compiled_release or release tables in Kingfisher Process where this row was generated from';
     COMMENT ON COLUMN %1$s.package_data_id IS '`id` from package_data table';
     COMMENT ON COLUMN %1$s.package_version IS 'OCDS version gathered from the `version` field in package';
-    COMMENT ON COLUMN %1$s.release_date IS '`date` field from release';
-    COMMENT ON COLUMN %1$s.release_tag IS 'JSONB list of `tags` field from release';
-    COMMENT ON COLUMN %1$s.release_language IS '`language` field from release object';
-    COMMENT ON COLUMN %1$s.role_counts IS 'JSONB object with the keys as unique `roles` and the values as count of the appearances of those `roles`';
-    COMMENT ON COLUMN %1$s.total_roles IS 'Total amount of roles specified across all parties';
+    COMMENT ON COLUMN %1$s.date IS '`date` field from release';
+    COMMENT ON COLUMN %1$s.tag IS 'JSONB list of `tags` field from release';
+    COMMENT ON COLUMN %1$s.language IS '`language` field from release object';
+    COMMENT ON COLUMN %1$s.parties_role_counts IS 'JSONB object with the keys as unique `roles` and the values as count of the appearances of those `roles`';
+    COMMENT ON COLUMN %1$s.total_parties_roles IS 'Total amount of roles specified across all parties';
     COMMENT ON COLUMN %1$s.total_parties IS 'Count of parties';
     COMMENT ON COLUMN %1$s.total_planning_documents IS 'Count of planning documents';
     COMMENT ON COLUMN %1$s.planning_documenttype_counts IS 'Count of planning document types';
     COMMENT ON COLUMN %1$s.total_tender_documents IS 'Count of tender documents';
     COMMENT ON COLUMN %1$s.tender_documenttype_counts IS 'Count of tender document types';
-    COMMENT ON COLUMN %1$s.award_count IS 'Count of awards';
+    COMMENT ON COLUMN %1$s.total_awards IS 'Count of awards';
     COMMENT ON COLUMN %1$s.first_award_date IS 'Earliest `date` in all award objects';
     COMMENT ON COLUMN %1$s.last_award_date IS 'Latest `date` in all award objects';
-    COMMENT ON COLUMN %1$s.total_award_documents IS 'The sum of `documents_count` for each `award` in this release';
+    COMMENT ON COLUMN %1$s.total_award_documents IS 'The sum of `total_documents` for each `award` in this release';
     COMMENT ON COLUMN %1$s.total_award_items IS 'Count of all items in all awards';
-    COMMENT ON COLUMN %1$s.total_award_suppliers IS 'The sum of `suppliers_count` for each `award` in this release';
-    COMMENT ON COLUMN %1$s.award_amount IS 'Total of all value/amount across awards. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway';
-    COMMENT ON COLUMN %1$s.unique_award_suppliers IS 'A count of distinct suppliers for all awards for this release, based on the `unique_identifier_attempt` field';
+    COMMENT ON COLUMN %1$s.total_award_suppliers IS 'The sum of `total_suppliers` for each `award` in this release';
+    COMMENT ON COLUMN %1$s.sum_awards_value_amount IS 'Total of all value/amount across awards. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway';
+    COMMENT ON COLUMN %1$s.total_unique_award_suppliers IS 'A count of distinct suppliers for all awards for this release, based on the `unique_identifier_attempt` field';
     COMMENT ON COLUMN %1$s.award_documenttype_counts IS 'JSONB object with the keys as unique awards/documents/documentType and the values as count of the appearances of those documentTypes';
-    COMMENT ON COLUMN %1$s.contract_count IS 'Count of contracts';
+    COMMENT ON COLUMN %1$s.total_contracts IS 'Count of contracts';
     COMMENT ON COLUMN %1$s.total_contract_link_to_awards IS 'Count of all contracts that have link to awards through awardID field';
-    COMMENT ON COLUMN %1$s.contract_amount IS 'Total of all value/amount across contracts. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway';
+    COMMENT ON COLUMN %1$s.sum_contracts_value_amount IS 'Total of all value/amount across contracts. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway';
     COMMENT ON COLUMN %1$s.first_contract_datesigned IS 'First `dateSigned` across all contracts';
     COMMENT ON COLUMN %1$s.last_contract_datesigned IS 'Last `dateSigned` across all contracts';
     COMMENT ON COLUMN %1$s.total_contract_documents IS 'Count of contracts/documents';

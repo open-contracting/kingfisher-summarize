@@ -8,8 +8,8 @@ SELECT
     r.ocid,
     r.release_id,
     r.data_id,
-    convert_to_numeric (coalesce(value -> 'value' ->> 'amount', value -> 'amount' ->> 'amount')) transaction_amount,
-    coalesce(value -> 'value' ->> 'currency', value -> 'amount' ->> 'currency') transaction_currency,
+    convert_to_numeric (coalesce(value -> 'value' ->> 'amount', value -> 'amount' ->> 'amount')) value_amount,
+    coalesce(value -> 'value' ->> 'currency', value -> 'amount' ->> 'currency') value_currency,
     value AS transaction
 FROM
     tmp_contracts_summary r

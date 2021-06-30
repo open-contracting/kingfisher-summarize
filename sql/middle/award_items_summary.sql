@@ -11,26 +11,26 @@ SELECT
     value AS item,
     value ->> 'id' item_id,
     convert_to_numeric (value ->> 'quantity') quantity,
-    convert_to_numeric (value -> 'unit' -> 'value' ->> 'amount') unit_amount,
-    value -> 'unit' -> 'value' ->> 'currency' unit_currency,
-    hyphenate(value -> 'classification' ->> 'scheme', value -> 'classification' ->> 'id') AS item_classification,
+    convert_to_numeric (value -> 'unit' -> 'value' ->> 'amount') unit_value_amount,
+    value -> 'unit' -> 'value' ->> 'currency' unit_value_currency,
+    hyphenate(value -> 'classification' ->> 'scheme', value -> 'classification' ->> 'id') AS classification,
     (
         SELECT
-            jsonb_agg(hyphenate(additional_classification ->> 'scheme', additional_classification ->> 'id'))
+            jsonb_agg(hyphenate(additionalclassification ->> 'scheme', additionalclassification ->> 'id'))
         FROM
             jsonb_array_elements(
                 CASE WHEN jsonb_typeof(value -> 'additionalClassifications') = 'array' THEN
                     value -> 'additionalClassifications'
                 ELSE
                     '[]'::jsonb
-                END) additional_classification
+                END) additionalclassification
         WHERE
-            additional_classification ?& ARRAY['scheme', 'id']) item_additionalIdentifiers_ids,
+            additionalclassification ?& ARRAY['scheme', 'id']) additionalIdentifiers_ids,
     CASE WHEN jsonb_typeof(value -> 'additionalClassifications') = 'array' THEN
         jsonb_array_length(value -> 'additionalClassifications')
     ELSE
         0
-    END AS additional_classification_count
+    END AS total_additionalclassifications
 FROM
     tmp_awards_summary r
     CROSS JOIN jsonb_array_elements(award -> 'items')

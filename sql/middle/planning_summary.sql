@@ -6,25 +6,25 @@ SELECT
     r.ocid,
     r.release_id,
     r.data_id,
-    convert_to_numeric (planning -> 'budget' -> 'amount' ->> 'amount') planning_budget_amount,
-    planning -> 'budget' -> 'amount' ->> 'currency' planning_budget_currency,
-    planning -> 'budget' ->> 'projectID' planning_budget_projectID,
-    documents_count,
+    convert_to_numeric (planning -> 'budget' -> 'amount' ->> 'amount') budget_amount_amount,
+    planning -> 'budget' -> 'amount' ->> 'currency' budget_amount_currency,
+    planning -> 'budget' ->> 'projectID' budget_projectID,
+    total_documents,
     documentType_counts,
-    milestones_count,
+    total_milestones,
     milestoneType_counts
 FROM
     tmp_planning_summary r
     LEFT JOIN (
         SELECT
             id,
-            jsonb_object_agg(coalesce(documentType, ''), documentType_count) documentType_counts,
-            count(*) documents_count
+            jsonb_object_agg(coalesce(documentType, ''), total_documentTypes) documentType_counts,
+            count(*) total_documents
         FROM (
             SELECT
                 id,
                 documentType,
-                count(*) documentType_count
+                count(*) total_documentTypes
             FROM
                 planning_documents_summary
             GROUP BY
@@ -35,13 +35,13 @@ FROM
     LEFT JOIN (
         SELECT
             id,
-            jsonb_object_agg(coalesce(TYPE, ''), milestoneType_count) milestoneType_counts,
-            count(*) milestones_count
+            jsonb_object_agg(coalesce(TYPE, ''), total_milestoneTypes) milestoneType_counts,
+            count(*) total_milestones
         FROM (
             SELECT
                 id,
                 TYPE,
-                count(*) milestoneType_count
+                count(*) total_milestoneTypes
             FROM
                 planning_milestones_summary
             GROUP BY

@@ -1,12 +1,12 @@
 CREATE TABLE tmp_planning_documents_aggregates AS
 SELECT
     id,
-    jsonb_object_agg(coalesce(documentType, ''), documentType_count) planning_documentType_counts
+    jsonb_object_agg(coalesce(documentType, ''), total_documentTypes) planning_documentType_counts
 FROM (
     SELECT
         id,
         documentType,
-        count(*) documentType_count
+        count(*) total_documentTypes
     FROM
         planning_documents_summary
     GROUP BY

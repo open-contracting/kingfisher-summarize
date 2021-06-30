@@ -7,19 +7,19 @@ ocid,text,ocid from the data
 release_id,text,Release id from the data. Relevant for releases and not for compiled_releases or records
 data_id,integer,"id for the ""data"" table in Kingfisher that holds the original JSON data."
 award_id,text,`id` field from award object
-award_title,text,`title` field from award object
-award_status,text,`status` field from award object
-award_description,text,`description` field from award object
-award_value_amount,numeric,`value` field from award/amount object
-award_value_currency,text,`currency` field from award/amount object
-award_date,timestamp,`date` field from award object
-award_contractperiod_startdate,timestamp,`startDate` field from contractPeriod
-award_contractperiod_enddate,timestamp,`endDate` field from contractPeriod
-award_contractperiod_maxextentdate,timestamp,`maxExtentDate` field from contractPeriod
-award_contractperiod_durationindays,numeric,`durationInDays` field from contractPeriod
-suppliers_count,integer,The number of suppliers declared for this award.
-documents_count,bigint,Number of documents in documents array
+title,text,`title` field from award object
+status,text,`status` field from award object
+description,text,`description` field from award object
+value_amount,numeric,`value` field from award/amount object
+value_currency,text,`currency` field from award/amount object
+date,timestamp,`date` field from award object
+contractperiod_startdate,timestamp,`startDate` field from contractPeriod
+contractperiod_enddate,timestamp,`endDate` field from contractPeriod
+contractperiod_maxextentdate,timestamp,`maxExtentDate` field from contractPeriod
+contractperiod_durationindays,numeric,`durationInDays` field from contractPeriod
+total_suppliers,integer,The number of suppliers declared for this award.
+total_documents,bigint,Number of documents in documents array
 documenttype_counts,jsonb,JSONB object with the keys as unique documentTypes and the values as count of the appearances of that `documentType` in the `documents` array
-items_count,bigint,Count of items
+total_items,bigint,Count of items
 award,jsonb,JSONB of award object
 field_list,jsonb,"All JSON paths in the award object, excluding array indices, expressed as a JSONB object in which keys are paths and values are NULL. This column is only available if the --field-lists option was used."

@@ -8,38 +8,38 @@ SELECT
     r.release_id,
     r.data_id,
     award ->> 'id' AS award_id,
-    award ->> 'title' AS award_title,
-    award ->> 'status' AS award_status,
-    award ->> 'description' AS award_description,
-    convert_to_numeric (award -> 'value' ->> 'amount') AS award_value_amount,
-    award -> 'value' ->> 'currency' AS award_value_currency,
-    convert_to_timestamp (award ->> 'date') AS award_date,
-    convert_to_timestamp (award -> 'contractPeriod' ->> 'startDate') AS award_contractPeriod_startDate,
-    convert_to_timestamp (award -> 'contractPeriod' ->> 'endDate') AS award_contractPeriod_endDate,
-    convert_to_timestamp (award -> 'contractPeriod' ->> 'maxExtentDate') AS award_contractPeriod_maxExtentDate,
-    convert_to_numeric (award -> 'contractPeriod' ->> 'durationInDays') AS award_contractPeriod_durationInDays,
+    award ->> 'title' AS title,
+    award ->> 'status' AS status,
+    award ->> 'description' AS description,
+    convert_to_numeric (award -> 'value' ->> 'amount') AS value_amount,
+    award -> 'value' ->> 'currency' AS value_currency,
+    convert_to_timestamp (award ->> 'date') AS date,
+    convert_to_timestamp (award -> 'contractPeriod' ->> 'startDate') AS contractPeriod_startDate,
+    convert_to_timestamp (award -> 'contractPeriod' ->> 'endDate') AS contractPeriod_endDate,
+    convert_to_timestamp (award -> 'contractPeriod' ->> 'maxExtentDate') AS contractPeriod_maxExtentDate,
+    convert_to_numeric (award -> 'contractPeriod' ->> 'durationInDays') AS contractPeriod_durationInDays,
     CASE WHEN jsonb_typeof(award -> 'suppliers') = 'array' THEN
         jsonb_array_length(award -> 'suppliers')
     ELSE
         0
-    END AS suppliers_count,
-    documents_count,
+    END AS total_suppliers,
+    total_documents,
     documentType_counts,
-    items_count
+    total_items
 FROM
     tmp_awards_summary r
     LEFT JOIN (
         SELECT
             id,
             award_index,
-            jsonb_object_agg(coalesce(documentType, ''), documentType_count) documentType_counts,
-            count(*) documents_count
+            jsonb_object_agg(coalesce(documentType, ''), total_documentTypes) documentType_counts,
+            count(*) total_documents
         FROM (
             SELECT
                 id,
                 award_index,
                 documentType,
-                count(*) documentType_count
+                count(*) total_documentTypes
             FROM
                 award_documents_summary
             GROUP BY
@@ -53,7 +53,7 @@ FROM
         SELECT
             id,
             award_index,
-            count(*) items_count
+            count(*) total_items
         FROM
             award_items_summary
         GROUP BY

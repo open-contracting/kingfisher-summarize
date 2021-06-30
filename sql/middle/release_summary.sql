@@ -7,14 +7,14 @@ FROM
     LEFT JOIN (
         SELECT
             id,
-            documents_count AS total_planning_documents
+            total_documents AS total_planning_documents
         FROM
             planning_summary) AS planning_summary USING (id)
     LEFT JOIN tmp_planning_documents_aggregates USING (id)
     LEFT JOIN (
         SELECT
             id,
-            documents_count AS total_tender_documents
+            total_documents AS total_tender_documents
         FROM
             tender_summary) AS tender_summary USING (id)
     LEFT JOIN tmp_tender_documents_aggregates USING (id)
