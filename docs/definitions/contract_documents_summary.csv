@@ -1,13 +1,12 @@
 Column Name,Data Type,Description
-id,bigint,"Unique id representing a release, compiled_release or record"
-contract_index,bigint,Position of the contract in the contracts array
-document_index,bigint,Position of the document in the documents array
-release_type,text,"Either release, record, compiled_release or embedded_release. With ""release"", individual releases are read through the release table. With ""record"", a compiled release is read from a record's compiledRelease field through the record table. With ""compiled_release"", a compiled release is read through the compiled_release table, which is calculated by Kingfisher Process (for example, by merging a collection of releases). With ""embedded_releases"", individual releases are read from a record's releases array through the record table."
-collection_id,integer,id from Kingfisher collection table
-ocid,text,ocid from the data
-release_id,text,Release id from the data. Relevant for releases and not for compiled_releases or records
-data_id,integer,"id for the ""data"" table in Kingfisher that holds the original JSON data."
-document,jsonb,JSONB of the document
-documenttype,text,`documentType` field from the document object
-format,text,`format` field from the document object
-field_list,jsonb,"All JSON paths in the document object, excluding array indices, expressed as a JSONB object in which keys are paths and values are NULL. This column is only available if the --field-lists option was used."
+id,bigint,"An identifier for a row in the Kingfisher Process ``release``, ``record`` or ``compiled_release`` table"
+contract_index,bigint,Position of the contract in the ``contracts`` array
+document_index,bigint,Position of the document in the ``documents`` array
+release_type,text,"Either ""release"", ""record"", ""compiled_release"" or ""embedded_release"". If ""release"", the data was read from the ``release`` table. If ""record"", the data was read from a record's ``compiledRelease`` field in the ``record`` table. If ""compiled_release"", the data was read from the ``compiled_release`` table. If ""embedded_releases"", the data was read from a record's ``releases`` array in the ``record`` table."
+collection_id,integer,``id`` from the Kingfisher Process ``collection`` table
+ocid,text,Value of the ``ocid`` field in the release object
+release_id,text,"Value of the ``id`` field in the release object (``NULL`` if the ``release_type`` is ""record"" or ""compiled_release"")"
+data_id,integer,``id`` of the row in the Kingfisher Process ``data`` table
+document,jsonb,The document object
+documenttype,text,Value of the ``documentType`` field in the document object
+format,text,Value of the ``format`` field in the document object

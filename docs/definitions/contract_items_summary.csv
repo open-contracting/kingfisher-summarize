@@ -1,18 +1,17 @@
 Column Name,Data Type,Description
-id,bigint,"Unique id representing a release, compiled_release or record"
-contract_index,bigint,Position of the contract in the contracts array
-item_index,bigint,Position of the item in the items array
-release_type,text,"Either release, record, compiled_release or embedded_release. With ""release"", individual releases are read through the release table. With ""record"", a compiled release is read from a record's compiledRelease field through the record table. With ""compiled_release"", a compiled release is read through the compiled_release table, which is calculated by Kingfisher Process (for example, by merging a collection of releases). With ""embedded_releases"", individual releases are read from a record's releases array through the record table."
-collection_id,integer,id from Kingfisher collection table
-ocid,text,ocid from the data
-release_id,text,Release id from the data. Relevant for releases and not for compiled_releases or records
-data_id,integer,"id for the ""data"" table in Kingfisher that holds the original JSON data."
-item,jsonb,JSONB of item object
-item_id,text,`id` field in the item object
-quantity,numeric,`quantity` from the item object
-unit_value_amount,numeric,`amount` from the unit/value object
-unit_value_currency,text,`currency` from the unit/value object
+id,bigint,"An identifier for a row in the Kingfisher Process ``release``, ``record`` or ``compiled_release`` table"
+contract_index,bigint,Position of the contract in the ``contracts`` array
+item_index,bigint,Position of the item in the ``items`` array
+release_type,text,"Either ""release"", ""record"", ""compiled_release"" or ""embedded_release"". If ""release"", the data was read from the ``release`` table. If ""record"", the data was read from a record's ``compiledRelease`` field in the ``record`` table. If ""compiled_release"", the data was read from the ``compiled_release`` table. If ""embedded_releases"", the data was read from a record's ``releases`` array in the ``record`` table."
+collection_id,integer,``id`` from the Kingfisher Process ``collection`` table
+ocid,text,Value of the ``ocid`` field in the release object
+release_id,text,"Value of the ``id`` field in the release object (``NULL`` if the ``release_type`` is ""record"" or ""compiled_release"")"
+data_id,integer,``id`` of the row in the Kingfisher Process ``data`` table
+item,jsonb,The item object
+item_id,text,Value of the ``id`` field in the item object
+quantity,numeric,Value of the ``quantity`` field in the item object
+unit_value_amount,numeric,Value of the ``unit/value/amount`` field in the item object
+unit_value_currency,text,Value of the ``unit/value/currency`` field in the item object
 classification,text,Concatenation of classification/scheme and classification/id
 additionalidentifiers_ids,jsonb,JSONB list of the concatenation of additionalClassification/scheme and additionalClassification/id
-total_additionalclassifications,integer,Count of additional classifications
-field_list,jsonb,"All JSON paths in the item object, excluding array indices, expressed as a JSONB object in which keys are paths and values are NULL. This column is only available if the --field-lists option was used."
+total_additionalclassifications,integer,Length of the ``additionalClassifications`` array in the item object

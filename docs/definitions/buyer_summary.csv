@@ -1,18 +1,17 @@
 Column Name,Data Type,Description
-id,bigint,"Unique id representing a release, compiled_release or record"
-release_type,text,"Either release, record, compiled_release or embedded_release. With ""release"", individual releases are read through the release table. With ""record"", a compiled release is read from a record's compiledRelease field through the record table. With ""compiled_release"", a compiled release is read through the compiled_release table, which is calculated by Kingfisher Process (for example, by merging a collection of releases). With ""embedded_releases"", individual releases are read from a record's releases array through the record table."
-collection_id,integer,id from Kingfisher collection table
-ocid,text,ocid from the data
-release_id,text,Release id from the data. Relevant for releases and not for compiled_releases or records
-data_id,integer,"id for the ""data"" table in Kingfisher that holds the original JSON data."
-buyer,jsonb,JSONB of buyer object
-parties_id,text,`id` from buyer object
-name,text,`name` from buyer object
-identifier,text,Concatenation of `scheme` and `id` from `identifier` object in the form `<scheme>-<id>`
-unique_identifier_attempt,text,"The `id` from buyer object if it exists, otherwise the identifier described above if it exists, otherwise the party name"
+id,bigint,"An identifier for a row in the Kingfisher Process ``release``, ``record`` or ``compiled_release`` table"
+release_type,text,"Either ""release"", ""record"", ""compiled_release"" or ""embedded_release"". If ""release"", the data was read from the ``release`` table. If ""record"", the data was read from a record's ``compiledRelease`` field in the ``record`` table. If ""compiled_release"", the data was read from the ``compiled_release`` table. If ""embedded_releases"", the data was read from a record's ``releases`` array in the ``record`` table."
+collection_id,integer,``id`` from the Kingfisher Process ``collection`` table
+ocid,text,Value of the ``ocid`` field in the release object
+release_id,text,"Value of the ``id`` field in the release object (``NULL`` if the ``release_type`` is ""record"" or ""compiled_release"")"
+data_id,integer,``id`` of the row in the Kingfisher Process ``data`` table
+buyer,jsonb,The buyer object
+parties_id,text,Value of the ``id`` field in the buyer object
+name,text,Value of the ``name`` field in the buyer object
+identifier,text,Concatenation of ``scheme`` and ``id`` from ``identifier`` object in the form `<scheme>-<id>`
+unique_identifier_attempt,text,"The ``id`` from buyer object if it exists, otherwise the identifier described above if it exists, otherwise the party name"
 additionalidentifiers_ids,jsonb,JSONB list of the concatenation of scheme and id of all additionalIdentifier objects
-total_additionalidentifiers,integer,Count of additional identifiers
-link_to_parties,integer,"Does this buyer link to a party in the parties array using the `id` field from buyer object linking to the `id` field in a party object? If this is true then 1, otherwise 0"
-link_with_role,integer,If there is a link does the parties object have `buyer` in its roles list? If it does then 1 otherwise 0
-party_index,bigint,If there is a link what is the index of the party in the `parties` array then this can be used for joining to the `parties_summary` table
-field_list,jsonb,"All JSON paths in the buyer object, excluding array indices, expressed as a JSONB object in which keys are paths and values are NULL. This column is only available if the --field-lists option was used."
+total_additionalidentifiers,integer,Length of the ``additionalIdentifiers`` array in the buyer object
+link_to_parties,integer,"Does this buyer link to a party in the parties array using the ``id`` from buyer object linking to the ``id`` field in a party object? If this is true then 1, otherwise 0"
+link_with_role,integer,If there is a link does the parties object have ``buyer`` in its roles list? If it does then 1 otherwise 0
+party_index,bigint,If there is a link what is the index of the party in the ``parties`` array then this can be used for joining to the ``parties_summary`` table
