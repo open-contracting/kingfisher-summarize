@@ -47,11 +47,11 @@ Documentation files
 Update the database tables reference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:doc:`../database` displays the CSV files in the `docs/definitions/ <https://github.com/open-contracting/kingfisher-summarize/tree/main/docs/definitions>`__ directory. To create and/or update the CSV files, run (replacing ``COLLECTION_NAME`` below):
+:doc:`../database` displays the CSV files in the `docs/definitions/ <https://github.com/open-contracting/kingfisher-summarize/tree/main/docs/definitions>`__ directory. To create and/or update the CSV files, run (replacing ``NAME`` below):
 
 .. code-block:: bash
 
-   ./manage.py dev docs-table-ref COLLECTION_NAME
+   ./manage.py dev docs-table-ref NAME
 
 Then, for any new CSV file, manually add a new sub-section to ``docs/database.rst`` under an appropriate section.
 
