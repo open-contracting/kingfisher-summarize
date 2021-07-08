@@ -1,6 +1,37 @@
 Changelog
 =========
 
+2021-07-08
+----------
+
+Changed
+~~~~~~~
+
+-  Rename ``total_documenttype_counts`` to ``documenttype_counts``.
+-  Rename ``additionalidentifiers_ids`` to ``additionalclassifications_ids`` where appropriate.
+
+Fixed
+~~~~~
+
+-  ``unique_identifier_attempt`` uses party fields instead of deprecated fields.
+
+2021-06-30
+----------
+
+Changed
+~~~~~~~
+
+-  Columns are `renamed <https://docs.google.com/spreadsheets/d/1UdPZXmiuir_mFQDYJHTWbwgdWnORzMTlbKUEsspxK54/edit#gid=855843256>`__ for consistency.
+
+2021-05-21
+----------
+
+Added
+~~~~~
+
+-  ``dev stale`` command
+-  ``--quiet`` option
+
 2021-02-25
 ----------
 
@@ -70,12 +101,12 @@ Changed
 Added
 ~~~~~
 
--  ``add-view``: Add ``--no-field-counts`` option.
+-  ``add-view`` command: Add ``--no-field-counts`` option.
 
 Changed
 ~~~~~~~
 
--  ``add-view``: Remove ``--threads`` option.
--  ``refresh-views``: Remove command.
--  ``field-counts``: Remove command.
+-  ``add-view`` command: Remove ``--threads`` option.
+-  Remove ``refresh-views`` command.
+-  Remove ``field-counts`` command.
 -  Improve performance.
