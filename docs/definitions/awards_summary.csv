@@ -22,3 +22,4 @@ total_documents,bigint,Length of the ``documents`` array in the award object
 documenttype_counts,jsonb,JSONB object with the keys as unique documentTypes and the values as count of the appearances of that ``documentType`` in the ``documents`` array
 total_items,bigint,Length of the ``items`` array in the award object
 award,jsonb,The award object
+field_list,jsonb,"All JSON paths in the award object, excluding array indices, expressed as a JSONB object in which keys are paths and values are NULL. This column is only available if the --field-lists option is used."

@@ -14,3 +14,4 @@ total_additionalidentifiers,integer,Length of the ``additionalIdentifiers`` arra
 link_to_parties,integer,"Does this procuringEntity link to a party in the parties array using the ``id`` from buyer object linking to the ``id`` field in a party object? If this is true then 1, otherwise 0"
 link_with_role,integer,If there is a link does the parties object have ``procuringEntity`` in its roles list? If it does then 1 otherwise 0
 party_index,bigint,If there is a link what is the index of the party in the ``parties`` array then this can be used for joining to the ``parties_summary`` table
+field_list,jsonb,"All JSON paths in the procuringentity object, excluding array indices, expressed as a JSONB object in which keys are paths and values are NULL. This column is only available if the --field-lists option is used."

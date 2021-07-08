@@ -11,3 +11,4 @@ milestone,jsonb,The milestone object
 type,text,Value of the ``type`` field in the milestone object
 code,text,Value of the ``code`` field in the milestone object
 status,text,Value of the ``status`` field in the milestone object
+field_list,jsonb,"All JSON paths in the milestone object, excluding array indices, expressed as a JSONB object in which keys are paths and values are NULL. This column is only available if the --field-lists option is used."
