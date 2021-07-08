@@ -32,7 +32,7 @@ WITH all_document_types AS (
 )
 SELECT
     id,
-    jsonb_object_agg( coalesce(documentType, ''), total_documentTypes) total_documentType_counts,
+    jsonb_object_agg( coalesce(documentType, ''), total_documentTypes) documentType_counts,
     sum( total_documentTypes) total_documents
 FROM (
     SELECT
