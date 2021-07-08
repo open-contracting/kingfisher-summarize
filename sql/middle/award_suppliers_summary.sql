@@ -22,7 +22,7 @@ SELECT DISTINCT ON ( r.id, award_index, supplier_index)
     supplier,
     supplier ->> 'id' AS supplier_id,
     ps.identifier AS identifier,
-    ps.unique_identifier_attempt,
+    coalesce(supplier ->> 'id', ps.unique_identifier_attempt, supplier ->> 'name') AS unique_identifier_attempt,
     ps.additionalIdentifiers_ids AS additionalIdentifiers_ids,
     ps.total_additionalIdentifiers AS total_additionalIdentifiers,
     CAST(ps.id IS NOT NULL AS integer

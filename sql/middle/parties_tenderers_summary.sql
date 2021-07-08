@@ -21,7 +21,7 @@ SELECT DISTINCT ON ( r.id, tenderer_index)
     tenderer,
     tenderer ->> 'id' AS parties_id,
     ps.identifier AS identifier,
-    ps.unique_identifier_attempt,
+    coalesce(tenderer ->> 'id', ps.unique_identifier_attempt, tenderer ->> 'name') AS unique_identifier_attempt,
     ps.additionalIdentifiers_ids AS additionalIdentifiers_ids,
     ps.total_additionalIdentifiers AS total_additionalIdentifiers,
     CAST(ps.id IS NOT NULL AS integer
