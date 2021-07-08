@@ -1,23 +1,23 @@
 Column Name,Data Type,Description
-id,bigint,"An identifier for a row in the Kingfisher Process ``release``, ``record`` or ``compiled_release`` table"
-release_type,text,"Either ""release"", ""record"", ""compiled_release"" or ""embedded_release"". If ""release"", the data was read from the ``release`` table. If ""record"", the data was read from a record's ``compiledRelease`` field in the ``record`` table. If ""compiled_release"", the data was read from the ``compiled_release`` table. If ""embedded_releases"", the data was read from a record's ``releases`` array in the ``record`` table."
-table_id,integer,"``id`` of the row in the Kingfisher Process ``release``, ``record`` or ``compiled_release`` table"
+id,bigint,"An identifier for a row in the Kingfisher Process ``release``, ``compiled_release`` or ``record`` table"
+release_type,text,"Either ""release"", ""compiled_release"", ""record"" or ""embedded_release"". If ""release"", the data was read from the ``release`` table. If ""compiled_release"", the data was read from the ``compiled_release`` table. If ""record"", the data was read from a record's ``compiledRelease`` field in the ``record`` table. If ""embedded_releases"", the data was read from a record's ``releases`` array in the ``record`` table."
+table_id,integer,"``id`` from the Kingfisher Process ``release``, ``compiled_release`` or ``record`` table"
 collection_id,integer,``id`` from the Kingfisher Process ``collection`` table
 ocid,text,Value of the ``ocid`` field in the release object
-release_id,text,"Value of the ``id`` field in the release object (``NULL`` if the ``release_type`` is ""record"" or ""compiled_release"")"
-data_id,integer,``id`` of the row in the Kingfisher Process ``data`` table
+release_id,text,"Value of the ``id`` field in the release object (``NULL`` if the ``release_type`` is ""compiled_release"" or ""record"")"
+data_id,integer,``id`` from the Kingfisher Process ``data`` table
 package_data_id,integer,``id`` from the Kingfisher Process ``package_data`` table
-package_version,text,Value of the ``version`` field in the package
+package_version,text,"Value of the ``version`` field in the package, or ""1.0"" if not set"
 date,timestamp,Value of the ``date`` field in the release object
 tag,jsonb,Value of the ``tag`` array in the release object
 language,text,Value of the ``language`` field in the release object
-parties_role_counts,jsonb,JSONB object with the keys as unique ``roles`` and the values as count of the appearances of those `roles`
-total_parties_roles,numeric,Total amount of roles specified across all parties
+parties_role_counts,jsonb,JSONB object in which each key is a unique ``roles`` entry and each value is its number of occurrences across all ``parties`` arrays
+total_parties_roles,numeric,Cumulative length of all ``parties/roles`` arrays
 total_parties,bigint,Length of the ``parties`` array
 total_planning_documents,bigint,Length of the ``planning/documents`` array
-planning_documenttype_counts,jsonb,Count of planning document types
+planning_documenttype_counts,jsonb,JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``planning/documents`` array
 total_tender_documents,bigint,Length of the ``tender/documents`` array
-tender_documenttype_counts,jsonb,Count of tender document types
+tender_documenttype_counts,jsonb,JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``tender/documents`` array
 total_awards,bigint,Length of the ``awards`` array
 first_award_date,timestamp,Earliest ``date`` across all award objects
 last_award_date,timestamp,Latest ``date`` across all award objects
@@ -26,22 +26,22 @@ total_award_items,numeric,Cumulative length of all ``awards/items`` arrays
 total_award_suppliers,bigint,Cumulative length of all ``awards/suppliers`` arrays
 sum_awards_value_amount,numeric,Total of all value/amount across awards. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway
 total_unique_award_suppliers,bigint,"A count of distinct suppliers for all awards for this release, based on the ``unique_identifier_attempt`` field"
-award_documenttype_counts,jsonb,JSONB object with the keys as unique awards/documents/documentType and the values as count of the appearances of those documentTypes
+award_documenttype_counts,jsonb,JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences across all ``awards/documents`` arrays
 total_contracts,bigint,Length of the ``contracts`` array
 total_contract_link_to_awards,bigint,Count of all contracts that have link to awards through awardID field
 sum_contracts_value_amount,numeric,Total of all value/amount across contracts. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway
-first_contract_datesigned,timestamp,First ``dateSigned`` across all contracts
-last_contract_datesigned,timestamp,Last ``dateSigned`` across all contracts
+first_contract_datesigned,timestamp,Earliest ``dateSigned`` across all contract objects
+last_contract_datesigned,timestamp,Latest ``dateSigned`` across all contract objects
 total_contract_documents,numeric,Cumulative length of all ``contracts/documents`` arrays
 total_contract_milestones,numeric,Cumulative length of all ``contracts/milestones`` arrays
 total_contract_items,numeric,Cumulative length of all ``contracts/items`` arrays
 total_contract_implementation_documents,numeric,Cumulative length of all ``contracts/implementation/documents`` arrays
 total_contract_implementation_milestones,numeric,Cumulative length of all ``contracts/implementation/milestones`` arrays
-contract_documenttype_counts,jsonb,JSONB object with the keys as unique contracts/documents/documentType and the values as count of the appearances of those documentTypes
-contract_implementation_documenttype_counts,jsonb,JSONB object with the keys as unique contracts/implementation/documents/documentType and the values as count of the appearances of those documentTypes
-contract_milestonetype_counts,jsonb,JSONB object with the keys as unique contracts/milestone/milestoneType and the values as count of the appearances of those milestoneTypes
-contract_implementation_milestonetype_counts,jsonb,JSONB object with the keys as unique contracts/implementation/documents/milestoneType and the values as count of the appearances of those milestoneTypes
-total_documenttype_counts,jsonb,JSONB object with the keys as unique documentTypes from all documents in the release and the values as count of the appearances of those documentTypes
+contract_documenttype_counts,jsonb,JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences across all ``contracts/documents`` arrays
+contract_implementation_documenttype_counts,jsonb,JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences across all ``contracts/implementation/documents`` arrays
+contract_milestonetype_counts,jsonb,JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences across all ``contracts/milestones`` arrays
+contract_implementation_milestonetype_counts,jsonb,JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences across all ``contracts/implementation/milestones`` arrays
+documenttype_counts,jsonb,JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences across all document arrays
 total_documents,numeric,Cumulative length of all document arrays
-milestonetype_counts,jsonb,JSONB object with the keys as unique milestoneTypes from all milestones in the release and the values as count of the appearances of those milestoneTypes
+milestonetype_counts,jsonb,JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences across all milestone arrays
 total_milestones,numeric,Cumulative length of all milestone arrays

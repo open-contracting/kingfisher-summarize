@@ -1,12 +1,12 @@
 Column Name,Data Type,Description
-id,bigint,"An identifier for a row in the Kingfisher Process ``release``, ``record`` or ``compiled_release`` table"
+id,bigint,"An identifier for a row in the Kingfisher Process ``release``, ``compiled_release`` or ``record`` table"
 contract_index,bigint,Position of the contract in the ``contracts`` array
 document_index,bigint,Position of the document in the ``documents`` array
-release_type,text,"Either ""release"", ""record"", ""compiled_release"" or ""embedded_release"". If ""release"", the data was read from the ``release`` table. If ""record"", the data was read from a record's ``compiledRelease`` field in the ``record`` table. If ""compiled_release"", the data was read from the ``compiled_release`` table. If ""embedded_releases"", the data was read from a record's ``releases`` array in the ``record`` table."
+release_type,text,"Either ""release"", ""compiled_release"", ""record"" or ""embedded_release"". If ""release"", the data was read from the ``release`` table. If ""compiled_release"", the data was read from the ``compiled_release`` table. If ""record"", the data was read from a record's ``compiledRelease`` field in the ``record`` table. If ""embedded_releases"", the data was read from a record's ``releases`` array in the ``record`` table."
 collection_id,integer,``id`` from the Kingfisher Process ``collection`` table
 ocid,text,Value of the ``ocid`` field in the release object
-release_id,text,"Value of the ``id`` field in the release object (``NULL`` if the ``release_type`` is ""record"" or ""compiled_release"")"
-data_id,integer,``id`` of the row in the Kingfisher Process ``data`` table
+release_id,text,"Value of the ``id`` field in the release object (``NULL`` if the ``release_type`` is ""compiled_release"" or ""record"")"
+data_id,integer,``id`` from the Kingfisher Process ``data`` table
 document,jsonb,The document object
 documenttype,text,Value of the ``documentType`` field in the document object
 format,text,Value of the ``format`` field in the document object

@@ -463,15 +463,15 @@ def field_counts(name):
     db.execute("COMMENT ON COLUMN field_counts.collection_id IS "
                "'``id`` from the Kingfisher Process ``collection`` table'")
     db.execute("COMMENT ON COLUMN field_counts.release_type IS "
-               """'Either "release", "record", "compiled_release" or "embedded_release"'""")
+               """'Either "release", "compiled_release", "record" or "embedded_release"'""")
     db.execute("COMMENT ON COLUMN field_counts.path IS "
-               "'The JSON path of the field, excluding array indices'")
+               "'JSON path of the field, excluding array indices'")
     db.execute("COMMENT ON COLUMN field_counts.object_property IS "
-               "'The number of occurrences of the field, across all array entries and all releases'")
+               "'Number of occurrences of the field, across all array entries and all releases'")
     db.execute("COMMENT ON COLUMN field_counts.array_count IS "
-               "'If the field is an array, the cumulative length of the field, across all releases'")
+               "'Cumulative length of all occurrences of the field, if it is an array, across all array entries and all releases'")
     db.execute("COMMENT ON COLUMN field_counts.distinct_releases IS "
-               "'The number of distinct releases in which the field occurs'")
+               "'Number of releases in which the field occurs'")
     db.commit()
 
     logger.info('Total time: %ss', time() - start)
