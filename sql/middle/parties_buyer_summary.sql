@@ -17,8 +17,7 @@ SELECT DISTINCT ON ( r.id)
     buyer ->> 'id' AS parties_id,
     buyer ->> 'name' AS name,
     ps.identifier AS identifier,
-    coalesce(buyer ->> 'id', hyphenate(buyer -> 'identifier' ->> 'scheme', buyer -> 'identifier' ->> 'id'), buyer ->> 'name'
-) AS unique_identifier_attempt,
+    ps.unique_identifier_attempt,
     ps.additionalIdentifiers_ids AS additionalIdentifiers_ids,
     ps.total_additionalIdentifiers AS total_additionalIdentifiers,
     CAST(ps.id IS NOT NULL AS integer
