@@ -128,7 +128,8 @@ def test_docs():
 
                 if column in kingfisher:
                     candidates = [f"``{column}`` from the Kingfisher Process ``collection`` table"]
-                elif column in ('link_with_role', 'party_index', 'unique_identifier_attempt', 'identifier', 'classification'):
+                elif column in ('link_with_role', 'party_index', 'unique_identifier_attempt', 'identifier',
+                                'classification'):
                     # TODO (break into separate if branches)
                     pass
                 elif column.endswith('_index'):
