@@ -24,7 +24,7 @@ SELECT
                     '[]'::jsonb
                 END) additionalclassification
         WHERE
-            additionalclassification ?& ARRAY['scheme', 'id']) additionalIdentifiers_ids,
+            additionalclassification ?& ARRAY['scheme', 'id']) additionalclassifications_ids,
     CASE WHEN jsonb_typeof(value -> 'additionalClassifications') = 'array' THEN
         jsonb_array_length(value -> 'additionalClassifications')
     ELSE
