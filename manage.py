@@ -468,8 +468,8 @@ def field_counts(name):
                "'JSON path of the field, excluding array indices'")
     db.execute("COMMENT ON COLUMN field_counts.object_property IS "
                "'Number of occurrences of the field, across all array entries and all releases'")
-    db.execute("COMMENT ON COLUMN field_counts.array_count IS "
-               "'Cumulative length of all occurrences of the field, if it is an array, across all array entries and all releases'")
+    db.execute("COMMENT ON COLUMN field_counts.array_count IS 'Cumulative length "
+               "of all occurrences of the field, if it is an array, across all array entries and all releases'")
     db.execute("COMMENT ON COLUMN field_counts.distinct_releases IS "
                "'Number of releases in which the field occurs'")
     db.commit()

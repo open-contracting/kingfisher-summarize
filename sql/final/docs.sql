@@ -48,8 +48,8 @@ BEGIN
     COMMENT ON COLUMN %1$s.quantity IS 'Value of the ``quantity`` field in the item object';
     COMMENT ON COLUMN %1$s.unit_value_amount IS 'Value of the ``unit/value/amount`` field in the item object';
     COMMENT ON COLUMN %1$s.unit_value_currency IS 'Value of the ``unit/value/currency`` field in the item object';
-    COMMENT ON COLUMN %1$s.classification IS 'Concatenation of classification/scheme and classification/id';
-    COMMENT ON COLUMN %1$s.additionalclassifications_ids IS 'The hyphenation of ``scheme`` and ``id`` for each entry of the ``additionalClassifications`` array in the item object';
+    COMMENT ON COLUMN %1$s.classification IS 'Hyphenation ``classification/scheme`` and ``classification/id`` in the party object';
+    COMMENT ON COLUMN %1$s.additionalclassifications_ids IS 'Hyphenation of ``scheme`` and ``id`` for each entry of the ``additionalClassifications`` array in the item object';
     COMMENT ON COLUMN %1$s.total_additionalclassifications IS 'Length of the ``additionalClassifications`` array in the item object';
     $template$;
     EXECUTE format(TEMPLATE, table_name);
@@ -83,11 +83,11 @@ COMMENT ON COLUMN parties_summary.parties_id IS 'Value of the ``id`` field in th
 
 COMMENT ON COLUMN parties_summary.roles IS 'Value of the ``roles`` array in the party object';
 
-COMMENT ON COLUMN parties_summary.identifier IS 'Concatenation of ``scheme`` and ``id`` from ``identifier`` object in the form `<scheme>-<id>`';
+COMMENT ON COLUMN parties_summary.identifier IS 'Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the party object';
 
-COMMENT ON COLUMN parties_summary.unique_identifier_attempt IS 'The ``id`` from party object if it exists, otherwise the identifier described above if it exists, otherwise the party name';
+COMMENT ON COLUMN parties_summary.unique_identifier_attempt IS 'Value of the ``id`` field in the party object if set, otherwise the identifier if set as above, otherwise the value of the ``name`` field in the party object';
 
-COMMENT ON COLUMN parties_summary.additionalidentifiers_ids IS 'The hyphenation of ``scheme`` and ``id`` for each entry of the ``additionalIdentifiers`` array in the party object';
+COMMENT ON COLUMN parties_summary.additionalidentifiers_ids IS 'Hyphenation of ``scheme`` and ``id`` for each entry of the ``additionalIdentifiers`` array in the party object';
 
 COMMENT ON COLUMN parties_summary.total_additionalidentifiers IS 'Length of the ``additionalIdentifiers`` array in the party object';
 
@@ -102,19 +102,19 @@ COMMENT ON COLUMN buyer_summary.parties_id IS 'Value of the ``id`` field in the 
 
 COMMENT ON COLUMN buyer_summary.name IS 'Value of the ``name`` field in the buyer object';
 
-COMMENT ON COLUMN buyer_summary.identifier IS 'Concatenation of ``scheme`` and ``id`` from ``identifier`` object in the form `<scheme>-<id>`';
+COMMENT ON COLUMN buyer_summary.identifier IS 'Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the buyer''s entry in the parties array';
 
-COMMENT ON COLUMN buyer_summary.unique_identifier_attempt IS 'The ``id`` from buyer object if it exists, otherwise the identifier described above if it exists, otherwise the party name';
+COMMENT ON COLUMN buyer_summary.unique_identifier_attempt IS 'Value of the ``id`` field in the buyer object if set, otherwise the identifier if set as above, otherwise the value of the ``name`` field in the buyer''s entry in the parties array, otherwise the value of the ``name`` field in the buyer object';
 
-COMMENT ON COLUMN buyer_summary.additionalidentifiers_ids IS 'The hyphenation of ``scheme`` and ``id`` for each entry of the ``additionalIdentifiers`` array in the buyer''s entry in the parties array';
+COMMENT ON COLUMN buyer_summary.additionalidentifiers_ids IS 'Hyphenation of ``scheme`` and ``id`` for each entry of the ``additionalIdentifiers`` array in the buyer''s entry in the parties array';
 
 COMMENT ON COLUMN buyer_summary.total_additionalidentifiers IS 'Length of the ``additionalIdentifiers`` array in the buyer''s entry in the parties array';
 
-COMMENT ON COLUMN buyer_summary.link_to_parties IS 'Does this buyer link to a party in the parties array using the ``id`` from buyer object linking to the ``id`` field in a party object? If this is true then 1, otherwise 0';
+COMMENT ON COLUMN buyer_summary.link_to_parties IS '1 if any ``parties/id`` value matches this buyer''s ``id`` value, otherwise 0';
 
-COMMENT ON COLUMN buyer_summary.link_with_role IS 'If there is a link does the parties object have ``buyer`` in its roles list? If it does then 1 otherwise 0';
+COMMENT ON COLUMN buyer_summary.link_with_role IS '1 if the buyer''s entry in the parties array has ''buyer'' in its ``roles`` array, otherwise 0';
 
-COMMENT ON COLUMN buyer_summary.party_index IS 'If there is a link what is the index of the party in the ``parties`` array then this can be used for joining to the ``parties_summary`` table';
+COMMENT ON COLUMN buyer_summary.party_index IS 'Position of the buyer in the ``parties`` array';
 
 SELECT
     common_comments ('procuringentity_summary');
@@ -123,19 +123,19 @@ COMMENT ON COLUMN procuringentity_summary.procuringentity IS 'The procuring enti
 
 COMMENT ON COLUMN procuringentity_summary.parties_id IS 'Value of the ``id`` field in the procuring entity object';
 
-COMMENT ON COLUMN procuringentity_summary.identifier IS 'Concatenation of ``scheme`` and ``id`` from ``identifier`` object in the form `<scheme>-<id>`';
+COMMENT ON COLUMN procuringentity_summary.identifier IS 'Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the procuring entity''s entry in the parties array';
 
-COMMENT ON COLUMN procuringentity_summary.unique_identifier_attempt IS 'The ``id`` from procuring entity object if it exists, otherwise the identifier described above if it exists, otherwise the party name';
+COMMENT ON COLUMN procuringentity_summary.unique_identifier_attempt IS 'Value of the ``id`` field in the procuring entity object if set, otherwise the identifier if set as above, otherwise the value of the ``name`` field in the procuring entity''s entry in the parties array, otherwise the value of the ``name`` field in the procuring entity object';
 
-COMMENT ON COLUMN procuringentity_summary.additionalidentifiers_ids IS 'The hyphenation of ``scheme`` and ``id`` for each entry of the ``additionalIdentifiers`` array in the procuring entity''s entry in the parties array';
+COMMENT ON COLUMN procuringentity_summary.additionalidentifiers_ids IS 'Hyphenation of ``scheme`` and ``id`` for each entry of the ``additionalIdentifiers`` array in the procuring entity''s entry in the parties array';
 
 COMMENT ON COLUMN procuringentity_summary.total_additionalidentifiers IS 'Length of the ``additionalIdentifiers`` array in the procuring entity''s entry in the parties array';
 
-COMMENT ON COLUMN procuringentity_summary.link_to_parties IS 'Does this procuringEntity link to a party in the parties array using the ``id`` from buyer object linking to the ``id`` field in a party object? If this is true then 1, otherwise 0';
+COMMENT ON COLUMN procuringentity_summary.link_to_parties IS '1 if any ``parties/id`` value matches this procuring entity''s ``id`` value, otherwise 0';
 
-COMMENT ON COLUMN procuringentity_summary.link_with_role IS 'If there is a link does the parties object have ``procuringEntity`` in its roles list? If it does then 1 otherwise 0';
+COMMENT ON COLUMN procuringentity_summary.link_with_role IS '1 if the procuring entity''s entry in the parties array has ''procuringEntity'' in its ``roles`` array, otherwise 0';
 
-COMMENT ON COLUMN procuringentity_summary.party_index IS 'If there is a link what is the index of the party in the ``parties`` array then this can be used for joining to the ``parties_summary`` table';
+COMMENT ON COLUMN procuringentity_summary.party_index IS 'Position of the procuring entity in the ``parties`` array';
 
 SELECT
     common_comments ('tenderers_summary');
@@ -146,19 +146,19 @@ COMMENT ON COLUMN tenderers_summary.tenderer IS 'The tenderer object';
 
 COMMENT ON COLUMN tenderers_summary.parties_id IS 'Value of the ``id`` field in the tenderer object';
 
-COMMENT ON COLUMN tenderers_summary.identifier IS 'Concatenation of ``scheme`` and ``id`` from ``identifier`` object in the form `<scheme>-<id>`';
+COMMENT ON COLUMN tenderers_summary.identifier IS 'Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the tenderer''s entry in the parties array';
 
-COMMENT ON COLUMN tenderers_summary.unique_identifier_attempt IS 'The ``id`` from tenderer object if it exists, otherwise the identifier described above if it exists, otherwise the party name';
+COMMENT ON COLUMN tenderers_summary.unique_identifier_attempt IS 'Value of the ``id`` field in the tenderer object if set, otherwise the identifier if set as above, otherwise the value of the ``name`` field in the tenderer''s entry in the parties array, otherwise the value of the ``name`` field in the tenderer object';
 
-COMMENT ON COLUMN tenderers_summary.additionalidentifiers_ids IS 'The hyphenation of ``scheme`` and ``id`` for each entry of the ``additionalIdentifiers`` array in the tenderer''s entry in the parties array';
+COMMENT ON COLUMN tenderers_summary.additionalidentifiers_ids IS 'Hyphenation of ``scheme`` and ``id`` for each entry of the ``additionalIdentifiers`` array in the tenderer''s entry in the parties array';
 
 COMMENT ON COLUMN tenderers_summary.total_additionalidentifiers IS 'Length of the ``additionalIdentifiers`` array in the tenderer''s entry in the parties array';
 
-COMMENT ON COLUMN tenderers_summary.link_to_parties IS 'Does this tenderer link to a party in the parties array using the ``id`` from buyer object linking to the ``id`` field in a party object? If this is true then 1, otherwise 0';
+COMMENT ON COLUMN tenderers_summary.link_to_parties IS '1 if any ``parties/id`` value matches this tenderer''s ``id`` value, otherwise 0';
 
-COMMENT ON COLUMN tenderers_summary.link_with_role IS 'If there is a link does the parties object have ``tenderers`` in its roles list? If it does then 1 otherwise 0';
+COMMENT ON COLUMN tenderers_summary.link_with_role IS '1 if the tenderer''s entry in the parties array has ''tenderer'' in its ``roles`` array, otherwise 0';
 
-COMMENT ON COLUMN tenderers_summary.party_index IS 'If there is a link what is the index of the party in the ``parties`` array. This can be used for joining to the ``parties_summary`` table';
+COMMENT ON COLUMN tenderers_summary.party_index IS 'Position of the tenderer in the ``parties`` array';
 
 SELECT
     common_comments ('planning_documents_summary');
@@ -294,19 +294,19 @@ COMMENT ON COLUMN award_suppliers_summary.supplier IS 'The supplier object';
 
 COMMENT ON COLUMN award_suppliers_summary.supplier_id IS 'Value of the ``id`` field in the supplier object';
 
-COMMENT ON COLUMN award_suppliers_summary.identifier IS 'Concatenation of ``scheme`` and ``id`` from ``identifier`` object in the form `<scheme>-<id>`';
+COMMENT ON COLUMN award_suppliers_summary.identifier IS 'Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the supplier''s entry in the parties array';
 
-COMMENT ON COLUMN award_suppliers_summary.unique_identifier_attempt IS 'The ``id`` from party object if it exists, otherwise the identifier described above if it exists, otherwise the party name';
+COMMENT ON COLUMN award_suppliers_summary.unique_identifier_attempt IS 'Value of the ``id`` field in the supplier object if set, otherwise the identifier if set as above, otherwise the value of the ``name`` field in the supplier''s entry in the parties array, otherwise the value of the ``name`` field in the supplier object';
 
-COMMENT ON COLUMN award_suppliers_summary.additionalidentifiers_ids IS 'The hyphenation of ``scheme`` and ``id`` for each entry of the ``additionalIdentifiers`` array in the supplier''s entry in the parties array';
+COMMENT ON COLUMN award_suppliers_summary.additionalidentifiers_ids IS 'Hyphenation of ``scheme`` and ``id`` for each entry of the ``additionalIdentifiers`` array in the supplier''s entry in the parties array';
 
 COMMENT ON COLUMN award_suppliers_summary.total_additionalidentifiers IS 'Length of the ``additionalIdentifiers`` array in the supplier''s entry in the parties array';
 
-COMMENT ON COLUMN award_suppliers_summary.link_to_parties IS 'Does this buyer link to a party in the parties array using the ``id`` from buyer object linking to the ``id`` field in a party object? If this is true then 1, otherwise 0';
+COMMENT ON COLUMN award_suppliers_summary.link_to_parties IS '1 if any ``parties/id`` value matches this supplier''s ``id`` value, otherwise 0';
 
-COMMENT ON COLUMN award_suppliers_summary.link_with_role IS 'If there is a link does the parties object have ``suppliers`` in its roles list? If it does then 1 otherwise 0';
+COMMENT ON COLUMN award_suppliers_summary.link_with_role IS '1 if the supplier''s entry in the parties array has ''supplier'' in its ``roles`` array, otherwise 0';
 
-COMMENT ON COLUMN award_suppliers_summary.party_index IS 'Position of the party in the ``parties`` array';
+COMMENT ON COLUMN award_suppliers_summary.party_index IS 'Position of the supplier in the ``parties`` array';
 
 SELECT
     common_comments ('awards_summary');
@@ -405,7 +405,7 @@ COMMENT ON COLUMN contracts_summary.contract_index IS 'Position of the contract 
 
 COMMENT ON COLUMN contracts_summary.awardid IS 'Value of the ``awardID`` field in the contract object';
 
-COMMENT ON COLUMN contracts_summary.link_to_awards IS 'If there is an award with the above ``awardID`` then 1 otherwise 0';
+COMMENT ON COLUMN contracts_summary.link_to_awards IS '1 if any ``awards/id`` value matches this contract''s ``awardID`` value, otherwise 0';
 
 COMMENT ON COLUMN contracts_summary.contract_id IS 'Value of the ``id`` field in the contract object';
 
@@ -472,12 +472,12 @@ BEGIN
     COMMENT ON COLUMN %1$s.total_award_documents IS 'Cumulative length of all ``awards/documents`` arrays';
     COMMENT ON COLUMN %1$s.total_award_items IS 'Cumulative length of all ``awards/items`` arrays';
     COMMENT ON COLUMN %1$s.total_award_suppliers IS 'Cumulative length of all ``awards/suppliers`` arrays';
-    COMMENT ON COLUMN %1$s.sum_awards_value_amount IS 'Total of all value/amount across awards. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway';
-    COMMENT ON COLUMN %1$s.total_unique_award_suppliers IS 'A count of distinct suppliers for all awards for this release, based on the ``unique_identifier_attempt`` field';
+    COMMENT ON COLUMN %1$s.sum_awards_value_amount IS 'Sum of all ``awards/value/amount`` values (NOTE: This ignores any differences in currency)';
+    COMMENT ON COLUMN %1$s.total_unique_award_suppliers IS 'Number of distinct suppliers across all award objects, using the ``unique_identifier_attempt`` field';
     COMMENT ON COLUMN %1$s.award_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences across all ``awards/documents`` arrays';
     COMMENT ON COLUMN %1$s.total_contracts IS 'Length of the ``contracts`` array';
-    COMMENT ON COLUMN %1$s.total_contract_link_to_awards IS 'Count of all contracts that have link to awards through awardID field';
-    COMMENT ON COLUMN %1$s.sum_contracts_value_amount IS 'Total of all value/amount across contracts. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway';
+    COMMENT ON COLUMN %1$s.total_contract_link_to_awards IS 'Number of ``contracts/awardID`` values that match an ``awards/id`` value';
+    COMMENT ON COLUMN %1$s.sum_contracts_value_amount IS 'Sum of all ``contracts/value/amount`` values (NOTE: This ignores any differences in currency)';
     COMMENT ON COLUMN %1$s.first_contract_datesigned IS 'Earliest ``dateSigned`` across all contract objects';
     COMMENT ON COLUMN %1$s.last_contract_datesigned IS 'Latest ``dateSigned`` across all contract objects';
     COMMENT ON COLUMN %1$s.total_contract_documents IS 'Cumulative length of all ``contracts/documents`` arrays';

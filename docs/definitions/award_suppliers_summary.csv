@@ -9,11 +9,11 @@ release_id,text,"Value of the ``id`` field in the release object (``NULL`` if th
 data_id,integer,``id`` from the Kingfisher Process ``data`` table
 supplier,jsonb,The supplier object
 supplier_id,text,Value of the ``id`` field in the supplier object
-identifier,text,Concatenation of ``scheme`` and ``id`` from ``identifier`` object in the form `<scheme>-<id>`
-unique_identifier_attempt,text,"The ``id`` from party object if it exists, otherwise the identifier described above if it exists, otherwise the party name"
-additionalidentifiers_ids,jsonb,The hyphenation of ``scheme`` and ``id`` for each entry of the ``additionalIdentifiers`` array in the supplier's entry in the parties array
+identifier,text,Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the supplier's entry in the parties array
+unique_identifier_attempt,text,"Value of the ``id`` field in the supplier object if set, otherwise the identifier if set as above, otherwise the value of the ``name`` field in the supplier's entry in the parties array, otherwise the value of the ``name`` field in the supplier object"
+additionalidentifiers_ids,jsonb,Hyphenation of ``scheme`` and ``id`` for each entry of the ``additionalIdentifiers`` array in the supplier's entry in the parties array
 total_additionalidentifiers,integer,Length of the ``additionalIdentifiers`` array in the supplier's entry in the parties array
-link_to_parties,integer,"Does this buyer link to a party in the parties array using the ``id`` from buyer object linking to the ``id`` field in a party object? If this is true then 1, otherwise 0"
-link_with_role,integer,If there is a link does the parties object have ``suppliers`` in its roles list? If it does then 1 otherwise 0
-party_index,bigint,Position of the party in the ``parties`` array
+link_to_parties,integer,"1 if any ``parties/id`` value matches this supplier's ``id`` value, otherwise 0"
+link_with_role,integer,"1 if the supplier's entry in the parties array has 'supplier' in its ``roles`` array, otherwise 0"
+party_index,bigint,Position of the supplier in the ``parties`` array
 field_list,jsonb,"All JSON paths in the supplier object, excluding array indices, expressed as a JSONB object in which keys are paths and values are NULL. This column is only available if the --field-lists option is used."

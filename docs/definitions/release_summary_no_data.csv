@@ -24,12 +24,12 @@ last_award_date,timestamp,Latest ``date`` across all award objects
 total_award_documents,numeric,Cumulative length of all ``awards/documents`` arrays
 total_award_items,numeric,Cumulative length of all ``awards/items`` arrays
 total_award_suppliers,bigint,Cumulative length of all ``awards/suppliers`` arrays
-sum_awards_value_amount,numeric,Total of all value/amount across awards. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway
-total_unique_award_suppliers,bigint,"A count of distinct suppliers for all awards for this release, based on the ``unique_identifier_attempt`` field"
+sum_awards_value_amount,numeric,Sum of all ``awards/value/amount`` values (NOTE: This ignores any differences in currency)
+total_unique_award_suppliers,bigint,"Number of distinct suppliers across all award objects, using the ``unique_identifier_attempt`` field"
 award_documenttype_counts,jsonb,JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences across all ``awards/documents`` arrays
 total_contracts,bigint,Length of the ``contracts`` array
-total_contract_link_to_awards,bigint,Count of all contracts that have link to awards through awardID field
-sum_contracts_value_amount,numeric,Total of all value/amount across contracts. NOTE: This ignores the fact that amounts could be of different currencies and sums them anyway
+total_contract_link_to_awards,bigint,Number of ``contracts/awardID`` values that match an ``awards/id`` value
+sum_contracts_value_amount,numeric,Sum of all ``contracts/value/amount`` values (NOTE: This ignores any differences in currency)
 first_contract_datesigned,timestamp,Earliest ``dateSigned`` across all contract objects
 last_contract_datesigned,timestamp,Latest ``dateSigned`` across all contract objects
 total_contract_documents,numeric,Cumulative length of all ``contracts/documents`` arrays

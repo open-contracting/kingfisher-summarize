@@ -7,7 +7,7 @@ ocid,text,Value of the ``ocid`` field in the release object
 release_id,text,"Value of the ``id`` field in the release object (``NULL`` if the ``release_type`` is ""compiled_release"" or ""record"")"
 data_id,integer,``id`` from the Kingfisher Process ``data`` table
 awardid,text,Value of the ``awardID`` field in the contract object
-link_to_awards,integer,If there is an award with the above ``awardID`` then 1 otherwise 0
+link_to_awards,integer,"1 if any ``awards/id`` value matches this contract's ``awardID`` value, otherwise 0"
 contract_id,text,Value of the ``id`` field in the contract object
 title,text,Value of the ``title`` field in the contract object
 status,text,Value of the ``status`` field in the contract object
