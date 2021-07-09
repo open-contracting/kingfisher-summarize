@@ -1,6 +1,14 @@
 Database tables reference
 =========================
 
+.. raw:: html
+
+   <style>
+   .wy-nav-content {
+     max-width: none;
+   }
+   </style>
+
 Introduction
 ------------
 
