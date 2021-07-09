@@ -213,8 +213,8 @@ def test_docs():
 
                 elif column == 'link_with_role':
                     candidates = [
-                        f"1 if the {subject}'s entry in the parties array has '{machine_subject}' in its ``roles`` array, "
-                        f"otherwise 0"
+                        f"1 if the {subject}'s entry in the parties array has '{machine_subject}' in its ``roles`` "
+                        f"array, otherwise 0"
                     ]
 
                 elif column == 'identifier':
