@@ -6,7 +6,7 @@ import pytest
 from click.testing import CliRunner
 from psycopg2 import sql
 
-from manage import cli, SUMMARIES
+from manage import SUMMARIES, cli
 from tests import assert_bad_argument, assert_log_records, assert_log_running, fixture, noop
 
 command = 'add'
