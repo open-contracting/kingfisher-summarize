@@ -350,7 +350,7 @@ def summary_tables(name, tables_only=False, skip=()):
 
     if skip:
         for basename in skip:
-            graph.pop(f'middle:{basename}')
+            del graph[f'middle:{basename}']
         files['final'] = {}
 
     def run(directory):
@@ -369,7 +369,7 @@ def summary_tables(name, tables_only=False, skip=()):
         :param str identifier: the identifier of a SQL file
         """
         if not graph[identifier]:
-            graph.pop(identifier)
+            del graph[identifier]
             futures[executor.submit(_run_summary_tables, name, identifier, files['middle'][identifier])] = identifier
 
     # The initial files are fast, and don't need multiprocessing.
