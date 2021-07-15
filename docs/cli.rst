@@ -84,7 +84,7 @@ If you need to summarize more than five collections, then you must :ref:`customi
 Create persistent tables for all summary tables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-By default, some summary tables are database `views <https://www.postgresql.org/docs/current/sql-createview.html>`__ and not persistent `tables <https://www.postgresql.org/docs/current/sql-createtable.html>`__, in order to save disk space.  Use the ``--tables-only`` option to make all summary tables into persistent tables.
+By default, some summary tables are database `views <https://www.postgresql.org/docs/current/sql-createview.html>`__ and not persistent `tables <https://www.postgresql.org/docs/current/sql-createtable.html>`__, in order to save disk space.  Use the ``--tables-only`` option to make all summary tables into persistent tables (similar to `materialized views <https://www.postgresql.org/docs/11/rules-materializedviews.html>`__).
 
 .. code-block:: bash
 
@@ -92,6 +92,7 @@ By default, some summary tables are database `views <https://www.postgresql.org/
 
 Use this option if:
 
+-  The summaries are large (tables are faster to query than views)
 -  You want to allow a user to access the schema's tables, but not Kingfisher Process' tables
 -  You want to make it easier for a user to discover the foreign key relationships between tables (for example, using ``\d <table>`` instead of ``\d+ <view>`` followed by ``\d <table>``)
 -  You are :ref:`creating the Entity Relationship Diagram<create_erd>`
