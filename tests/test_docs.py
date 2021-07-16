@@ -259,9 +259,6 @@ def test_docs():
 
                 elif column.endswith('_id'):
                     candidates = [f"Value of the ``id`` field in the {subject} object"]
-                    # XXX: The column's prefix is expected to match the object's name, unless the column is
-                    # "parties_id", which is exceptionally used for all organization reference fields.
-                    assert column.rsplit('_', 1)[0] in (subject, 'parties')
 
                 elif column.endswith('_ids'):
                     if subject in party_objects:

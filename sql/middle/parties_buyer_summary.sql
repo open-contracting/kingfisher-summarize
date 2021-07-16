@@ -14,7 +14,7 @@ SELECT DISTINCT ON ( r.id)
     r.release_id,
     r.data_id,
     buyer,
-    buyer ->> 'id' AS parties_id,
+    buyer ->> 'id' AS buyer_id,
     buyer ->> 'name' AS name,
     ps.identifier AS identifier,
     coalesce(buyer ->> 'id', ps.unique_identifier_attempt, buyer ->> 'name') AS unique_identifier_attempt,
@@ -28,7 +28,7 @@ SELECT DISTINCT ON ( r.id)
 FROM
     r
     LEFT JOIN parties_summary ps ON r.id = ps.id
-        AND (buyer ->> 'id') = ps.parties_id
+        AND (buyer ->> 'id') = ps.party_id
 WHERE
     buyer IS NOT NULL;
 

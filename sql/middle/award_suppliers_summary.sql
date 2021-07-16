@@ -34,7 +34,7 @@ SELECT DISTINCT ON ( r.id, award_index, supplier_index)
 FROM
     r
     LEFT JOIN parties_summary ps ON r.id = ps.id
-        AND (supplier ->> 'id') = ps.parties_id
+        AND (supplier ->> 'id') = ps.party_id
 WHERE
     supplier IS NOT NULL;
 

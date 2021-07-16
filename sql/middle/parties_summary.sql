@@ -7,7 +7,7 @@ SELECT
     ocid,
     release_id,
     data_id,
-    value ->> 'id' AS parties_id,
+    value ->> 'id' AS party_id,
     value ->> 'name' AS name,
     value -> 'roles' AS roles,
     hyphenate(value -> 'identifier' ->> 'scheme', value -> 'identifier' ->> 'id') AS identifier,
@@ -42,7 +42,7 @@ CREATE INDEX parties_summary_no_data_data_id ON parties_summary_no_data (data_id
 
 CREATE INDEX parties_summary_no_data_collection_id ON parties_summary_no_data (collection_id);
 
-CREATE INDEX parties_summary_no_data_party_id ON parties_summary_no_data (id, parties_id);
+CREATE INDEX parties_summary_no_data_party_id ON parties_summary_no_data (id, party_id);
 
 -- Note: The `party` column is the last column, unlike in other tables.
 CREATE VIEW parties_summary AS
@@ -69,7 +69,7 @@ BEGIN
     query := $query$ CREATE UNIQUE INDEX parties_summary_id ON parties_summary (id, party_index);
     CREATE INDEX parties_summary_data_id ON parties_summary (data_id);
     CREATE INDEX parties_summary_collection_id ON parties_summary (collection_id);
-    CREATE INDEX parties_summary_party_id ON parties_summary (id, parties_id);
+    CREATE INDEX parties_summary_party_id ON parties_summary (id, party_id);
     $query$;
     EXECUTE query;
 EXCEPTION

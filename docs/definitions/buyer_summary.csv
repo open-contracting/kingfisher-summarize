@@ -6,7 +6,7 @@ ocid,text,Value of the ``ocid`` field in the release object
 release_id,text,"Value of the ``id`` field in the release object (``NULL`` if the ``release_type`` is ""compiled_release"" or ""record"")"
 data_id,integer,``id`` from the Kingfisher Process ``data`` table
 buyer,jsonb,The buyer object
-parties_id,text,Value of the ``id`` field in the buyer object
+buyer_id,text,Value of the ``id`` field in the buyer object
 name,text,Value of the ``name`` field in the buyer object
 identifier,text,Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the buyer's entry in the parties array
 unique_identifier_attempt,text,"Value of the ``id`` field in the buyer object if set, otherwise the identifier if set as above, otherwise the value of the ``name`` field in the buyer's entry in the parties array, otherwise the value of the ``name`` field in the buyer object"

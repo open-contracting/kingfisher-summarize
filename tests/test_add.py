@@ -174,7 +174,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, capl
                 collection_id,
                 ocid,
                 release_id,
-                parties_id,
+                party_id,
                 roles,
                 identifier,
                 unique_identifier_attempt,
@@ -190,7 +190,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, capl
             1,  # collection_id
             'dolore',  # ocid
             'ex laborumsit autein magna veniam',  # release_id
-            'voluptate officia tempor dolor',  # parties_id
+            'voluptate officia tempor dolor',  # party_id
             [
                 'ex ',
                 'in est exercitation nulla Excepteur',

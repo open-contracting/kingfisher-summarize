@@ -6,7 +6,7 @@ collection_id,integer,``id`` from the Kingfisher Process ``collection`` table
 ocid,text,Value of the ``ocid`` field in the release object
 release_id,text,"Value of the ``id`` field in the release object (``NULL`` if the ``release_type`` is ""compiled_release"" or ""record"")"
 data_id,integer,``id`` from the Kingfisher Process ``data`` table
-parties_id,text,Value of the ``id`` field in the party object
+party_id,text,Value of the ``id`` field in the party object
 name,text,Value of the ``name`` field in the party object
 roles,jsonb,Value of the ``roles`` array in the party object
 identifier,text,Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the party object

@@ -79,7 +79,7 @@ SELECT
 
 COMMENT ON COLUMN parties_summary.party_index IS 'Position of the party in the ``parties`` array';
 
-COMMENT ON COLUMN parties_summary.parties_id IS 'Value of the ``id`` field in the party object';
+COMMENT ON COLUMN parties_summary.party_id IS 'Value of the ``id`` field in the party object';
 
 COMMENT ON COLUMN parties_summary.name IS 'Value of the ``name`` field in the party object';
 
@@ -100,7 +100,7 @@ SELECT
 
 COMMENT ON COLUMN buyer_summary.buyer IS 'The buyer object';
 
-COMMENT ON COLUMN buyer_summary.parties_id IS 'Value of the ``id`` field in the buyer object';
+COMMENT ON COLUMN buyer_summary.buyer_id IS 'Value of the ``id`` field in the buyer object';
 
 COMMENT ON COLUMN buyer_summary.name IS 'Value of the ``name`` field in the buyer object';
 
@@ -123,7 +123,7 @@ SELECT
 
 COMMENT ON COLUMN procuringentity_summary.procuringentity IS 'The procuring entity object';
 
-COMMENT ON COLUMN procuringentity_summary.parties_id IS 'Value of the ``id`` field in the procuring entity object';
+COMMENT ON COLUMN procuringentity_summary.procuringentity_id IS 'Value of the ``id`` field in the procuring entity object';
 
 COMMENT ON COLUMN procuringentity_summary.name IS 'Value of the ``name`` field in the procuring entity object';
 
@@ -148,7 +148,7 @@ COMMENT ON COLUMN tenderers_summary.tenderer_index IS 'Position of the tenderer 
 
 COMMENT ON COLUMN tenderers_summary.tenderer IS 'The tenderer object';
 
-COMMENT ON COLUMN tenderers_summary.parties_id IS 'Value of the ``id`` field in the tenderer object';
+COMMENT ON COLUMN tenderers_summary.tenderer_id IS 'Value of the ``id`` field in the tenderer object';
 
 COMMENT ON COLUMN tenderers_summary.name IS 'Value of the ``name`` field in the tenderer object';
 

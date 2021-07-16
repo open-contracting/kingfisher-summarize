@@ -19,7 +19,7 @@ SELECT DISTINCT ON ( r.id, tenderer_index)
     r.release_id,
     r.data_id,
     tenderer,
-    tenderer ->> 'id' AS parties_id,
+    tenderer ->> 'id' AS tenderer_id,
     tenderer ->> 'name' AS name,
     ps.identifier AS identifier,
     coalesce(tenderer ->> 'id', ps.unique_identifier_attempt, tenderer ->> 'name') AS unique_identifier_attempt,
@@ -33,7 +33,7 @@ SELECT DISTINCT ON ( r.id, tenderer_index)
 FROM
     r
     LEFT JOIN parties_summary ps ON r.id = ps.id
-        AND (tenderer ->> 'id') = ps.parties_id
+        AND (tenderer ->> 'id') = ps.party_id
 WHERE
     tenderer IS NOT NULL;
 

@@ -7,7 +7,7 @@ ocid,text,Value of the ``ocid`` field in the release object
 release_id,text,"Value of the ``id`` field in the release object (``NULL`` if the ``release_type`` is ""compiled_release"" or ""record"")"
 data_id,integer,``id`` from the Kingfisher Process ``data`` table
 tenderer,jsonb,The tenderer object
-parties_id,text,Value of the ``id`` field in the tenderer object
+tenderer_id,text,Value of the ``id`` field in the tenderer object
 name,text,Value of the ``name`` field in the tenderer object
 identifier,text,Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the tenderer's entry in the parties array
 unique_identifier_attempt,text,"Value of the ``id`` field in the tenderer object if set, otherwise the identifier if set as above, otherwise the value of the ``name`` field in the tenderer's entry in the parties array, otherwise the value of the ``name`` field in the tenderer object"
