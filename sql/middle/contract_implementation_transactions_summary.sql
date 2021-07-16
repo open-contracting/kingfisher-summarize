@@ -8,9 +8,10 @@ SELECT
     r.ocid,
     r.release_id,
     r.data_id,
+    value AS transaction,
+    value ->> 'date' AS date,
     convert_to_numeric (coalesce(value -> 'value' ->> 'amount', value -> 'amount' ->> 'amount')) value_amount,
-    coalesce(value -> 'value' ->> 'currency', value -> 'amount' ->> 'currency') value_currency,
-    value AS transaction
+    coalesce(value -> 'value' ->> 'currency', value -> 'amount' ->> 'currency') value_currency
 FROM
     tmp_contracts_summary r
     CROSS JOIN jsonb_array_elements(contract -> 'implementation' -> 'transactions')

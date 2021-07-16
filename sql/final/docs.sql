@@ -384,11 +384,13 @@ COMMENT ON COLUMN contract_implementation_transactions_summary.contract_index IS
 
 COMMENT ON COLUMN contract_implementation_transactions_summary.transaction_index IS 'Position of the transaction in the ``transactions`` array';
 
+COMMENT ON COLUMN contract_implementation_transactions_summary.transaction IS 'The transaction object';
+
+COMMENT ON COLUMN contract_implementation_transactions_summary.date IS 'Value of the ``date`` field in the transaction object';
+
 COMMENT ON COLUMN contract_implementation_transactions_summary.value_amount IS 'Value of the ``value/amount`` field, or the deprecated ``amount/amount`` field, in the transaction object';
 
 COMMENT ON COLUMN contract_implementation_transactions_summary.value_currency IS 'Value of the ``value/currency`` field, or the deprecated ``amount/currency`` field, in the transaction object';
-
-COMMENT ON COLUMN contract_implementation_transactions_summary.transaction IS 'The transaction object';
 
 SELECT
     common_comments ('contract_items_summary');
