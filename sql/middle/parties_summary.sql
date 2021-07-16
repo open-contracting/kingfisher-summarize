@@ -8,6 +8,7 @@ SELECT
     release_id,
     data_id,
     value ->> 'id' AS parties_id,
+    value ->> 'name' AS name,
     value -> 'roles' AS roles,
     hyphenate(value -> 'identifier' ->> 'scheme', value -> 'identifier' ->> 'id') AS identifier,
     coalesce(value ->> 'id', hyphenate(value -> 'identifier' ->> 'scheme', value -> 'identifier' ->> 'id'), value ->> 'name') AS unique_identifier_attempt,

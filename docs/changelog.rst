@@ -1,6 +1,14 @@
 Changelog
 =========
 
+2021-07-16
+----------
+
+Added
+~~~~~
+
+-  Add a ``name`` column to the ``parties_summary``, ``procuringentity_summary``, ``tenderers_summary`` and ``award_suppliers_summary`` tables.
+
 2021-07-08
 ----------
 

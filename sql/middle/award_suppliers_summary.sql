@@ -21,6 +21,7 @@ SELECT DISTINCT ON ( r.id, award_index, supplier_index)
     r.data_id,
     supplier,
     supplier ->> 'id' AS supplier_id,
+    supplier ->> 'name' AS name,
     ps.identifier AS identifier,
     coalesce(supplier ->> 'id', ps.unique_identifier_attempt, supplier ->> 'name') AS unique_identifier_attempt,
     ps.additionalIdentifiers_ids AS additionalIdentifiers_ids,

@@ -81,6 +81,8 @@ COMMENT ON COLUMN parties_summary.party_index IS 'Position of the party in the `
 
 COMMENT ON COLUMN parties_summary.parties_id IS 'Value of the ``id`` field in the party object';
 
+COMMENT ON COLUMN parties_summary.name IS 'Value of the ``name`` field in the party object';
+
 COMMENT ON COLUMN parties_summary.roles IS 'Value of the ``roles`` array in the party object';
 
 COMMENT ON COLUMN parties_summary.identifier IS 'Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the party object';
@@ -123,6 +125,8 @@ COMMENT ON COLUMN procuringentity_summary.procuringentity IS 'The procuring enti
 
 COMMENT ON COLUMN procuringentity_summary.parties_id IS 'Value of the ``id`` field in the procuring entity object';
 
+COMMENT ON COLUMN procuringentity_summary.name IS 'Value of the ``name`` field in the procuring entity object';
+
 COMMENT ON COLUMN procuringentity_summary.identifier IS 'Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the procuring entity''s entry in the parties array';
 
 COMMENT ON COLUMN procuringentity_summary.unique_identifier_attempt IS 'Value of the ``id`` field in the procuring entity object if set, otherwise the identifier if set as above, otherwise the value of the ``name`` field in the procuring entity''s entry in the parties array, otherwise the value of the ``name`` field in the procuring entity object';
@@ -145,6 +149,8 @@ COMMENT ON COLUMN tenderers_summary.tenderer_index IS 'Position of the tenderer 
 COMMENT ON COLUMN tenderers_summary.tenderer IS 'The tenderer object';
 
 COMMENT ON COLUMN tenderers_summary.parties_id IS 'Value of the ``id`` field in the tenderer object';
+
+COMMENT ON COLUMN tenderers_summary.name IS 'Value of the ``name`` field in the tenderer object';
 
 COMMENT ON COLUMN tenderers_summary.identifier IS 'Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the tenderer''s entry in the parties array';
 
@@ -293,6 +299,8 @@ COMMENT ON COLUMN award_suppliers_summary.supplier_index IS 'Position of the sup
 COMMENT ON COLUMN award_suppliers_summary.supplier IS 'The supplier object';
 
 COMMENT ON COLUMN award_suppliers_summary.supplier_id IS 'Value of the ``id`` field in the supplier object';
+
+COMMENT ON COLUMN award_suppliers_summary.name IS 'Value of the ``name`` field in the supplier object';
 
 COMMENT ON COLUMN award_suppliers_summary.identifier IS 'Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the supplier''s entry in the parties array';
 

@@ -20,6 +20,7 @@ SELECT DISTINCT ON ( r.id, tenderer_index)
     r.data_id,
     tenderer,
     tenderer ->> 'id' AS parties_id,
+    tenderer ->> 'name' AS name,
     ps.identifier AS identifier,
     coalesce(tenderer ->> 'id', ps.unique_identifier_attempt, tenderer ->> 'name') AS unique_identifier_attempt,
     ps.additionalIdentifiers_ids AS additionalIdentifiers_ids,

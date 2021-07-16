@@ -15,6 +15,7 @@ SELECT DISTINCT ON ( r.id)
     r.data_id,
     procuringEntity,
     procuringEntity ->> 'id' AS parties_id,
+    procuringEntity ->> 'name' AS name,
     ps.identifier AS identifier,
     coalesce(procuringEntity ->> 'id', ps.unique_identifier_attempt, procuringEntity ->> 'name') AS unique_identifier_attempt,
     ps.additionalIdentifiers_ids AS additionalIdentifiers_ids,
