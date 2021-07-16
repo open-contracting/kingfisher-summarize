@@ -23,8 +23,8 @@ FROM
     LEFT JOIN tmp_award_documents_aggregates USING (id)
     LEFT JOIN tmp_release_contracts_aggregates USING (id)
     LEFT JOIN tmp_contract_documents_aggregates USING (id)
-    LEFT JOIN tmp_contract_implementation_documents_aggregates USING (id)
     LEFT JOIN tmp_contract_milestones_aggregates USING (id)
+    LEFT JOIN tmp_contract_implementation_documents_aggregates USING (id)
     LEFT JOIN tmp_contract_implementation_milestones_aggregates USING (id)
     LEFT JOIN tmp_release_documents_aggregates USING (id)
     LEFT JOIN tmp_release_milestones_aggregates USING (id);

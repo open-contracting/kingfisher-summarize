@@ -44,6 +44,7 @@ CREATE INDEX parties_summary_no_data_collection_id ON parties_summary_no_data (c
 
 CREATE INDEX parties_summary_no_data_party_id ON parties_summary_no_data (id, parties_id);
 
+-- Note: The `party` column is the last column, unlike in other tables.
 CREATE VIEW parties_summary AS
 SELECT
     parties_summary_no_data.*,
