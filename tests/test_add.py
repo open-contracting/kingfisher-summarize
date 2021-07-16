@@ -132,7 +132,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, capl
                 contractperiod_durationindays,
                 total_suppliers,
                 total_documents,
-                documenttype_counts,
+                document_documenttype_counts,
                 total_items
             FROM view_data_collection_1.awards_summary
             ORDER BY id, award_index
@@ -162,7 +162,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, capl
                 'proident exercitation in': 1,
                 'ut magna dolore velit aute': 1,
                 'veniam enim aliqua d': 1,
-            },  # documenttype_counts
+            },  # document_documenttype_counts
             5,  # total_items
         )
         assert len(rows) == 301

@@ -9,8 +9,8 @@ budget_amount_amount,numeric,Value of the ``budget/amount/amount`` field in the 
 budget_amount_currency,text,Value of the ``budget/amount/currency`` field in the planning object
 budget_projectid,text,Value of the ``budget/projectID`` field in the planning object
 total_documents,bigint,Length of the ``documents`` array in the planning object
-documenttype_counts,jsonb,JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``documents`` array of the planning object
+document_documenttype_counts,jsonb,JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``documents`` array of the planning object
 total_milestones,bigint,Length of the ``milestones`` array in the planning object
-milestonetype_counts,jsonb,JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences in the ``milestones`` array of the planning object
+milestone_type_counts,jsonb,JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences in the ``milestones`` array of the planning object
 planning,jsonb,The planning object
 field_list,jsonb,"All JSON paths in the planning object, excluding array indices, expressed as a JSONB object in which keys are paths and values are NULL. This column is only available if the --field-lists option is used."

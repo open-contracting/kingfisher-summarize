@@ -21,7 +21,7 @@ CREATE UNIQUE INDEX tmp_release_contracts_aggregates_id ON tmp_release_contracts
 CREATE TABLE tmp_contract_documents_aggregates AS
 SELECT
     id,
-    jsonb_object_agg(coalesce(documentType, ''), total_documentTypes) contract_documentType_counts
+    jsonb_object_agg(coalesce(documentType, ''), total_documentTypes) contract_document_documenttype_counts
 FROM (
     SELECT
         id,
@@ -40,7 +40,7 @@ CREATE UNIQUE INDEX tmp_contract_documents_aggregates_id ON tmp_contract_documen
 CREATE TABLE tmp_contract_implementation_documents_aggregates AS
 SELECT
     id,
-    jsonb_object_agg(coalesce(documentType, ''), total_documentTypes) contract_implementation_documenttype_counts
+    jsonb_object_agg(coalesce(documentType, ''), total_documentTypes) contract_implementation_document_documenttype_counts
 FROM (
     SELECT
         id,
@@ -59,7 +59,7 @@ CREATE UNIQUE INDEX tmp_contract_implementation_documents_aggregates_id ON tmp_c
 CREATE TABLE tmp_contract_milestones_aggregates AS
 SELECT
     id,
-    jsonb_object_agg(coalesce(TYPE, ''), total_milestoneTypes) contract_milestoneType_counts
+    jsonb_object_agg(coalesce(TYPE, ''), total_milestoneTypes) contract_milestone_type_counts
 FROM (
     SELECT
         id,
@@ -78,7 +78,7 @@ CREATE UNIQUE INDEX tmp_contract_milestones_aggregates_id ON tmp_contract_milest
 CREATE TABLE tmp_contract_implementation_milestones_aggregates AS
 SELECT
     id,
-    jsonb_object_agg(coalesce(TYPE, ''), total_milestoneTypes) contract_implementation_milestoneType_counts
+    jsonb_object_agg(coalesce(TYPE, ''), total_milestoneTypes) contract_implementation_milestone_type_counts
 FROM (
     SELECT
         id,

@@ -29,7 +29,7 @@ CREATE UNIQUE INDEX tmp_release_award_suppliers_aggregates_id ON tmp_release_awa
 CREATE TABLE tmp_award_documents_aggregates AS
 SELECT
     id,
-    jsonb_object_agg(coalesce(documentType, ''), total_documentTypes) award_documentType_counts
+    jsonb_object_agg(coalesce(documentType, ''), total_documentTypes) award_document_documenttype_counts
 FROM (
     SELECT
         id,

@@ -189,11 +189,11 @@ COMMENT ON COLUMN planning_summary.budget_projectid IS 'Value of the ``budget/pr
 
 COMMENT ON COLUMN planning_summary.total_documents IS 'Length of the ``documents`` array in the planning object';
 
-COMMENT ON COLUMN planning_summary.documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``documents`` array of the planning object';
+COMMENT ON COLUMN planning_summary.document_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``documents`` array of the planning object';
 
 COMMENT ON COLUMN planning_summary.total_milestones IS 'Length of the ``milestones`` array in the planning object';
 
-COMMENT ON COLUMN planning_summary.milestonetype_counts IS 'JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences in the ``milestones`` array of the planning object';
+COMMENT ON COLUMN planning_summary.milestone_type_counts IS 'JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences in the ``milestones`` array of the planning object';
 
 COMMENT ON COLUMN planning_summary.planning IS 'The planning object';
 
@@ -255,9 +255,9 @@ BEGIN
     COMMENT ON COLUMN %1$s.numberoftenderers IS 'Value of the ``numberOfTenderers`` field in the tender object';
     COMMENT ON COLUMN %1$s.total_tenderers IS 'Length of the ``tenderers`` array in the tender object';
     COMMENT ON COLUMN %1$s.total_documents IS 'Length of the ``documents`` array in the tender object';
-    COMMENT ON COLUMN %1$s.documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``documents`` array of the tender object';
+    COMMENT ON COLUMN %1$s.document_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``documents`` array of the tender object';
     COMMENT ON COLUMN %1$s.total_milestones IS 'Length of the ``milestones`` array in the tender object';
-    COMMENT ON COLUMN %1$s.milestonetype_counts IS 'JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences in the ``milestones`` array of the tender object';
+    COMMENT ON COLUMN %1$s.milestone_type_counts IS 'JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences in the ``milestones`` array of the tender object';
     COMMENT ON COLUMN %1$s.total_items IS 'Length of the ``items`` array in the tender object';
     $template$;
     EXECUTE format(TEMPLATE, 'tender_summary_no_data');
@@ -347,7 +347,7 @@ COMMENT ON COLUMN awards_summary.total_suppliers IS 'Length of the ``suppliers``
 
 COMMENT ON COLUMN awards_summary.total_documents IS 'Length of the ``documents`` array in the award object';
 
-COMMENT ON COLUMN awards_summary.documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``documents`` array of the award object';
+COMMENT ON COLUMN awards_summary.document_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``documents`` array of the award object';
 
 COMMENT ON COLUMN awards_summary.total_items IS 'Length of the ``items`` array in the award object';
 
@@ -441,21 +441,21 @@ COMMENT ON COLUMN contracts_summary.period_durationindays IS 'Value of the ``per
 
 COMMENT ON COLUMN contracts_summary.total_documents IS 'Length of the ``documents`` array in the contract object';
 
-COMMENT ON COLUMN contracts_summary.documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``documents`` array of the contract object';
+COMMENT ON COLUMN contracts_summary.document_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``documents`` array of the contract object';
 
 COMMENT ON COLUMN contracts_summary.total_milestones IS 'Length of the ``milestones`` array in the contract object';
 
-COMMENT ON COLUMN contracts_summary.milestonetype_counts IS 'JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences in the ``milestones`` array of the contract object';
+COMMENT ON COLUMN contracts_summary.milestone_type_counts IS 'JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences in the ``milestones`` array of the contract object';
 
 COMMENT ON COLUMN contracts_summary.total_items IS 'Length of the ``items`` array in the contract object';
 
 COMMENT ON COLUMN contracts_summary.total_implementation_documents IS 'Length of the ``implementation/documents`` array in the contract object';
 
-COMMENT ON COLUMN contracts_summary.implementation_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``implementation/documents`` array of the contract object';
+COMMENT ON COLUMN contracts_summary.implementation_document_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``implementation/documents`` array of the contract object';
 
 COMMENT ON COLUMN contracts_summary.total_implementation_milestones IS 'Length of the ``implementation/milestones`` array in the contract object';
 
-COMMENT ON COLUMN contracts_summary.implementation_milestonetype_counts IS 'JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences in the ``implementation/milestones`` array of the contract object';
+COMMENT ON COLUMN contracts_summary.implementation_milestone_type_counts IS 'JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences in the ``implementation/milestones`` array of the contract object';
 
 COMMENT ON COLUMN contracts_summary.contract IS 'The contract object';
 
@@ -473,9 +473,9 @@ BEGIN
     COMMENT ON COLUMN %1$s.total_parties_roles IS 'Cumulative length of all ``parties/roles`` arrays';
     COMMENT ON COLUMN %1$s.total_parties IS 'Length of the ``parties`` array';
     COMMENT ON COLUMN %1$s.total_planning_documents IS 'Length of the ``planning/documents`` array';
-    COMMENT ON COLUMN %1$s.planning_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``planning/documents`` array';
+    COMMENT ON COLUMN %1$s.planning_document_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``planning/documents`` array';
     COMMENT ON COLUMN %1$s.total_tender_documents IS 'Length of the ``tender/documents`` array';
-    COMMENT ON COLUMN %1$s.tender_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``tender/documents`` array';
+    COMMENT ON COLUMN %1$s.tender_document_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``tender/documents`` array';
     COMMENT ON COLUMN %1$s.total_awards IS 'Length of the ``awards`` array';
     COMMENT ON COLUMN %1$s.first_award_date IS 'Earliest ``date`` across all award objects';
     COMMENT ON COLUMN %1$s.last_award_date IS 'Latest ``date`` across all award objects';
@@ -484,7 +484,7 @@ BEGIN
     COMMENT ON COLUMN %1$s.total_award_suppliers IS 'Cumulative length of all ``awards/suppliers`` arrays';
     COMMENT ON COLUMN %1$s.sum_awards_value_amount IS 'Sum of all ``awards/value/amount`` values (NOTE: This ignores any differences in currency)';
     COMMENT ON COLUMN %1$s.total_unique_award_suppliers IS 'Number of distinct suppliers across all award objects, using the ``unique_identifier_attempt`` field';
-    COMMENT ON COLUMN %1$s.award_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences across all ``awards/documents`` arrays';
+    COMMENT ON COLUMN %1$s.award_document_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences across all ``awards/documents`` arrays';
     COMMENT ON COLUMN %1$s.total_contracts IS 'Length of the ``contracts`` array';
     COMMENT ON COLUMN %1$s.total_contract_link_to_awards IS 'Number of ``contracts/awardID`` values that match an ``awards/id`` value';
     COMMENT ON COLUMN %1$s.sum_contracts_value_amount IS 'Sum of all ``contracts/value/amount`` values (NOTE: This ignores any differences in currency)';
@@ -495,13 +495,13 @@ BEGIN
     COMMENT ON COLUMN %1$s.total_contract_items IS 'Cumulative length of all ``contracts/items`` arrays';
     COMMENT ON COLUMN %1$s.total_contract_implementation_documents IS 'Cumulative length of all ``contracts/implementation/documents`` arrays';
     COMMENT ON COLUMN %1$s.total_contract_implementation_milestones IS 'Cumulative length of all ``contracts/implementation/milestones`` arrays';
-    COMMENT ON COLUMN %1$s.contract_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences across all ``contracts/documents`` arrays';
-    COMMENT ON COLUMN %1$s.contract_implementation_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences across all ``contracts/implementation/documents`` arrays';
-    COMMENT ON COLUMN %1$s.contract_milestonetype_counts IS 'JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences across all ``contracts/milestones`` arrays';
-    COMMENT ON COLUMN %1$s.contract_implementation_milestonetype_counts IS 'JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences across all ``contracts/implementation/milestones`` arrays';
-    COMMENT ON COLUMN %1$s.documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences across all document arrays';
+    COMMENT ON COLUMN %1$s.contract_document_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences across all ``contracts/documents`` arrays';
+    COMMENT ON COLUMN %1$s.contract_implementation_document_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences across all ``contracts/implementation/documents`` arrays';
+    COMMENT ON COLUMN %1$s.contract_milestone_type_counts IS 'JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences across all ``contracts/milestones`` arrays';
+    COMMENT ON COLUMN %1$s.contract_implementation_milestone_type_counts IS 'JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences across all ``contracts/implementation/milestones`` arrays';
+    COMMENT ON COLUMN %1$s.document_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences across all document arrays';
     COMMENT ON COLUMN %1$s.total_documents IS 'Cumulative length of all document arrays';
-    COMMENT ON COLUMN %1$s.milestonetype_counts IS 'JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences across all milestone arrays';
+    COMMENT ON COLUMN %1$s.milestone_type_counts IS 'JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences across all milestone arrays';
     COMMENT ON COLUMN %1$s.total_milestones IS 'Cumulative length of all milestone arrays';
     $template$;
     EXECUTE format(TEMPLATE, 'release_summary_no_data');

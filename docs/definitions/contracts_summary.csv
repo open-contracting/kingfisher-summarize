@@ -20,13 +20,13 @@ period_enddate,timestamp,Value of the ``period/endDate`` field in the contract o
 period_maxextentdate,timestamp,Value of the ``period/maxExtentDate`` field in the contract object
 period_durationindays,numeric,Value of the ``period/durationInDays`` field in the contract object
 total_documents,bigint,Length of the ``documents`` array in the contract object
-documenttype_counts,jsonb,JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``documents`` array of the contract object
+document_documenttype_counts,jsonb,JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``documents`` array of the contract object
 total_milestones,bigint,Length of the ``milestones`` array in the contract object
-milestonetype_counts,jsonb,JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences in the ``milestones`` array of the contract object
+milestone_type_counts,jsonb,JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences in the ``milestones`` array of the contract object
 total_items,bigint,Length of the ``items`` array in the contract object
 total_implementation_documents,bigint,Length of the ``implementation/documents`` array in the contract object
-implementation_documenttype_counts,jsonb,JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``implementation/documents`` array of the contract object
+implementation_document_documenttype_counts,jsonb,JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``implementation/documents`` array of the contract object
 total_implementation_milestones,bigint,Length of the ``implementation/milestones`` array in the contract object
-implementation_milestonetype_counts,jsonb,JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences in the ``implementation/milestones`` array of the contract object
+implementation_milestone_type_counts,jsonb,JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences in the ``implementation/milestones`` array of the contract object
 contract,jsonb,The contract object
 field_list,jsonb,"All JSON paths in the contract object, excluding array indices, expressed as a JSONB object in which keys are paths and values are NULL. This column is only available if the --field-lists option is used."

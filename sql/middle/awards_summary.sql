@@ -24,7 +24,7 @@ SELECT
         0
     END AS total_suppliers,
     total_documents,
-    documentType_counts,
+    document_documenttype_counts,
     total_items
 FROM
     tmp_awards_summary r
@@ -32,7 +32,7 @@ FROM
         SELECT
             id,
             award_index,
-            jsonb_object_agg(coalesce(documentType, ''), total_documentTypes) documentType_counts,
+            jsonb_object_agg(coalesce(documentType, ''), total_documentTypes) document_documenttype_counts,
             count(*) total_documents
         FROM (
             SELECT
@@ -48,7 +48,7 @@ FROM
                 documentType) AS d
         GROUP BY
             id,
-            award_index) documentType_counts USING (id, award_index)
+            award_index) document_documenttype_counts USING (id, award_index)
     LEFT JOIN (
         SELECT
             id,

@@ -68,18 +68,18 @@ Example: Add an aggregate
 
 We want to add the number of ``Document`` objects (in total and for each ``documentType`` value) across all ``Planning`` objects to the :ref:`release_summary` view. (Note: This is already done.)
 
-``tender_documentType_counts`` and ``total_tender_documents`` columns already exist for ``Tender`` objects. We can follow their example to add ``planning_documentType_counts`` and ``total_planning_documents`` columns.
+``tender_document_documenttype_counts`` and ``total_tender_documents`` columns already exist for ``Tender`` objects. We can follow their example to add ``planning_document_documenttype_counts`` and ``total_planning_documents`` columns.
 
 This example demonstrates how temporary (``tmp_*``) tables are used to build final tables.
 
-#. The ``tender_documentType_counts`` term occurs in the ``agg_tender.sql`` file, which populates a ``tmp_tender_documents_aggregates`` table with that column. Following this template, we create this file:
+#. The ``tender_document_documenttype_counts`` term occurs in the ``agg_tender.sql`` file, which populates a ``tmp_tender_documents_aggregates`` table with that column. Following this template, we create this file:
 
    .. code-block:: sql
 
       CREATE TABLE tmp_planning_documents_aggregates AS
       SELECT
           id,
-          jsonb_object_agg(coalesce(documentType, ''), documentType_count) planning_documentType_counts
+          jsonb_object_agg(coalesce(documentType, ''), documentType_count) planning_document_documenttype_counts
       FROM (
           SELECT
               id,
@@ -151,16 +151,16 @@ The tests won't pass if you don't document the new columns!
       -- For the "Add a column" example
 
       ...
-      COMMENT ON COLUMN %1$s.tender_id IS '`id` from `tender` object';
-      COMMENT ON COLUMN %1$s.tender_title IS '`title` from `tender` object';
-      COMMENT ON COLUMN %1$s.tender_status IS '`status` from `tender` object';
-      COMMENT ON COLUMN %1$s.tender_description IS '`description` from `tender` object'; -- OUR ADDITION
+      COMMENT ON COLUMN %1$s.tender_id IS 'Value of the ``id`` field in the tender object';
+      COMMENT ON COLUMN %1$s.tender_title IS 'Value of the ``title`` field in the tender object';
+      COMMENT ON COLUMN %1$s.tender_status IS 'Value of the ``status`` field in the tender object';
+      COMMENT ON COLUMN %1$s.tender_description IS 'Value of the ``description`` field in the tender object'; -- OUR ADDITION
       ...
 
       -- For the "Add an aggregate" example
 
-      COMMENT ON COLUMN %1$s.total_planning_documents IS 'Count of planning documents in this release';
-      COMMENT ON COLUMN %1$s.planning_documenttype_counts IS 'JSONB object with the keys as unique planning/documents/documentType and the values as count of the appearances of those documentTypes';
+      COMMENT ON COLUMN %1$s.total_planning_documents IS 'Length of the ``planning/documents`` array';
+      COMMENT ON COLUMN %1$s.planning_document_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``planning/documents`` array';
 
 #. Run the :ref:`add` command (replacing ``COLLECTION_ID`` below):
 

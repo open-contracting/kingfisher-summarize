@@ -10,15 +10,15 @@ SELECT
     planning -> 'budget' -> 'amount' ->> 'currency' budget_amount_currency,
     planning -> 'budget' ->> 'projectID' budget_projectID,
     total_documents,
-    documentType_counts,
+    document_documenttype_counts,
     total_milestones,
-    milestoneType_counts
+    milestone_type_counts
 FROM
     tmp_planning_summary r
     LEFT JOIN (
         SELECT
             id,
-            jsonb_object_agg(coalesce(documentType, ''), total_documentTypes) documentType_counts,
+            jsonb_object_agg(coalesce(documentType, ''), total_documentTypes) document_documenttype_counts,
             count(*) total_documents
         FROM (
             SELECT
@@ -31,11 +31,11 @@ FROM
                 id,
                 documentType) AS d
         GROUP BY
-            id) documentType_counts USING (id)
+            id) document_documenttype_counts USING (id)
     LEFT JOIN (
         SELECT
             id,
-            jsonb_object_agg(coalesce(TYPE, ''), total_milestoneTypes) milestoneType_counts,
+            jsonb_object_agg(coalesce(TYPE, ''), total_milestoneTypes) milestone_type_counts,
             count(*) total_milestones
         FROM (
             SELECT
@@ -48,7 +48,7 @@ FROM
                 id,
                 TYPE) AS d
         GROUP BY
-            id) milestoneType_counts USING (id);
+            id) milestone_type_counts USING (id);
 
 CREATE UNIQUE INDEX planning_summary_no_data_id ON planning_summary_no_data (id);
 

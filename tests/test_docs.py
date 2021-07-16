@@ -8,10 +8,12 @@ plurals = {
     'party': 'parties',
     # Never plural.
     'amount': 'amount',
+    'documentType': 'documentType',
     'implementation': 'implementation',
     'planning': 'planning',
     'tag': 'tag',
     'tender': 'tender',
+    'type': 'type',
     'value': 'value',
 }
 singulars = {
@@ -154,11 +156,6 @@ def test_docs():
         'type': 'milestones',
     }
 
-    # XXX: Inconsistencies in column naming.
-    overrides = {
-        'milestonetype': 'type',
-    }
-
     for filename in glob(os.path.join(basedir, 'docs', 'definitions', '*.csv')):
         basename = os.path.splitext(os.path.basename(filename))[0]
 
@@ -195,7 +192,6 @@ def test_docs():
                         ancestors, field_name = field_name.rsplit('_', 1)
                 else:
                     field_name = column
-                field_name = overrides.get(field_name, field_name)
 
                 path = column_to_path(field_name)
                 singular_path = singularize(path)
@@ -298,23 +294,30 @@ def test_docs():
                             f"its number of occurrences across all ``{parents[plural_path]}`` arrays",
                         ]
                     elif subject == 'release':
-                        array = parents[path]
-                        if ancestors:  # contract_milestonetype_counts, contract_implementation_documenttype_counts
-                            array = f"{pluralize_path_components(ancestors)}/{array}"
+                        # contract_milestone_type_counts, contract_implementation_document_documenttype_counts
+                        if ancestors:
+                            array = f"{pluralize_path_components(ancestors)}"
+                        else:  # e.g. parties_role
+                            array = parents[path]
                         candidates = [
-                            f"JSONB object in which each key is a unique ``{path}`` value and each value is "
-                            f"its number of occurrences in the ``{array}`` array",  # planning_documenttype_counts
-                            f"JSONB object in which each key is a unique ``{path}`` value and each value is "
-                            f"its number of occurrences across all ``{array}`` arrays",  # award_documenttype_counts
-                            f"JSONB object in which each key is a unique ``{path}`` value and each value is "
-                            f"its number of occurrences across all {singularize(array)} arrays",  # documenttype_counts
+                            # planning_document_documenttype_counts
+                            f"JSONB object in which each key is a unique ``{plural_path}`` value and each value is "
+                            f"its number of occurrences in the ``{array}`` array",
+                            # award_document_documenttype_counts
+                            f"JSONB object in which each key is a unique ``{plural_path}`` value and each value is "
+                            f"its number of occurrences across all ``{array}`` arrays",
+                            # document_documenttype_counts
+                            f"JSONB object in which each key is a unique ``{plural_path}`` value and each value is "
+                            f"its number of occurrences across all {singularize(array)} arrays",
                         ]
                     else:
-                        array = parents[path]
-                        if ancestors:  # e.g. implementation_documenttype_counts
-                            array = f"{pluralize_path_components(ancestors)}/{array}"
+                        # e.g. implementation_document_documenttype_counts
+                        if ancestors:
+                            array = f"{pluralize_path_components(ancestors)}"
+                        else:
+                            array = parents[path]
                         candidates = [
-                            f"JSONB object in which each key is a unique ``{path}`` value and each value is "
+                            f"JSONB object in which each key is a unique ``{plural_path}`` value and each value is "
                             f"its number of occurrences in the ``{array}`` array of the {subject} object",
                         ]
 

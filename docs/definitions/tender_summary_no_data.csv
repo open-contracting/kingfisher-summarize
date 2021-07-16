@@ -39,7 +39,7 @@ contractperiod_durationindays,numeric,Value of the ``contractPeriod/durationInDa
 numberoftenderers,numeric,Value of the ``numberOfTenderers`` field in the tender object
 total_tenderers,integer,Length of the ``tenderers`` array in the tender object
 total_documents,bigint,Length of the ``documents`` array in the tender object
-documenttype_counts,jsonb,JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``documents`` array of the tender object
+document_documenttype_counts,jsonb,JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``documents`` array of the tender object
 total_milestones,bigint,Length of the ``milestones`` array in the tender object
-milestonetype_counts,jsonb,JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences in the ``milestones`` array of the tender object
+milestone_type_counts,jsonb,JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences in the ``milestones`` array of the tender object
 total_items,bigint,Length of the ``items`` array in the tender object

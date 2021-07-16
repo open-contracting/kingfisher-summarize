@@ -9,14 +9,33 @@ Added
 
 -  Add a ``name`` column to the ``parties_summary``, ``procuringentity_summary``, ``tenderers_summary`` and ``award_suppliers_summary`` tables.
 
+Changed
+~~~~~~~
+
+-  Rename:
+
+   -  ``documenttype_counts`` to ``document_documenttype_counts``
+   -  ``milestonetype_counts`` to ``milestone_type_counts``
+   -  ``planning_documenttype_counts`` to ``planning_document_documenttype_counts``
+   -  ``tender_documenttype_counts`` to ``tender_document_documenttype_counts``
+   -  ``award_documenttype_counts`` to ``award_document_documenttype_counts``
+   -  ``contract_documenttype_counts`` to ``contract_document_documenttype_counts``
+   -  ``contract_milestonetype_counts`` to ``contract_milestone_type_counts``
+   -  ``contract_implementation_documenttype_counts`` to ``contract_implementation_document_documenttype_counts``
+   -  ``contract_implementation_milestonetype_counts`` to ``contract_implementation_milestone_type_counts``
+   -  ``implementation_documenttype_counts`` to ``implementation_document_documenttype_counts``
+   -  ``implementation_milestonetype_counts`` to ``implementation_milestone_type_counts``
+
 2021-07-08
 ----------
 
 Changed
 ~~~~~~~
 
--  Rename ``total_documenttype_counts`` to ``documenttype_counts``.
--  Rename ``additionalidentifiers_ids`` to ``additionalclassifications_ids`` where appropriate.
+-  Rename:
+
+   -  ``total_documenttype_counts`` to ``documenttype_counts``
+   -  ``additionalidentifiers_ids`` to ``additionalclassifications_ids`` where appropriate
 
 Fixed
 ~~~~~
