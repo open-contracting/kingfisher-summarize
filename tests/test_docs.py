@@ -1,7 +1,6 @@
 import csv
 import os.path
 import re
-import warnings
 from glob import glob
 
 plurals = {
@@ -51,13 +50,6 @@ for value in ('minValue',):
 paths = {word.lower(): word for word in words}
 
 cwd = os.getcwd()
-
-
-def custom_warning_formatter(message, category, filename, lineno, line=None):
-    return str(message).replace(cwd + os.sep, '')
-
-
-warnings.formatwarning = custom_warning_formatter
 
 
 def humanize(word):
@@ -176,7 +168,8 @@ def test_docs():
 
             for row in reader:
                 column = row['Column Name']
-                if not row['Description'] or column in skip:  # some _no_data tables have no descriptions
+                description = row['Description']
+                if not description or column in skip:  # some _no_data tables have no descriptions
                     continue
 
                 ancestors = None
@@ -325,7 +318,5 @@ def test_docs():
                         f"Value of the ``{path}`` {infix} in the {subject} object",
                     ]
 
-                if not candidates:
-                    warnings.warn(f"{basename}.{column}: No candidates for \"{row['Description']}\"")
-                elif row['Description'] not in candidates:
-                    warnings.warn(f"{basename}.{column} ({subject}): {row['Description']} not in {candidates}")
+                assert candidates, f"{basename}.{column} ({subject}): no candidates for \"{description}\""
+                assert description in candidates, f"{basename}.{column} ({subject}): {description} not in {candidates}"
