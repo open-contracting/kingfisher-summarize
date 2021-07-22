@@ -129,6 +129,9 @@ def dependency_graph(files):
         # The set of tables/views this file requires, minus temporary tables, created tables and common dependencies.
         for object_name in re.findall(r'\b(?:FROM|JOIN)\s+(\w+)', content, flags=re.MULTILINE):
             imports[identifier].add(object_name)
+        for export_object_name, import_object_name in re.findall(r'\bformat\(\w+_query, \'(\w+)\', \'(\w+)\'', content, flags=re.MULTILINE):
+            exports.add(export_object_name)
+            imports[identifier].add(import_object_name)
         for object_name in re.findall(r'\bWITH\s+(\w+)\s+AS', content, flags=re.MULTILINE):
             imports[identifier].discard(object_name)
         imports[identifier].difference_update(exports | ignore)
