@@ -43,7 +43,7 @@ Changed
 ~~~~~~~
 
 -  Rename ``total_documenttype_counts`` to ``documenttype_counts``.
--  Rename``additionalidentifiers_ids`` to ``additionalclassifications_ids`` on ``*_items_summary`` tables
+-  Rename ``additionalidentifiers_ids`` to ``additionalclassifications_ids`` on ``*_items_summary`` tables
 
 Fixed
 ~~~~~
