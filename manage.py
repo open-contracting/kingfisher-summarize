@@ -131,9 +131,13 @@ def dependency_graph(files):
             imports[identifier].add(object_name)
         for sub_group_name, object_name, group_name in re.findall(r'\bcreate_(\w+)\(\'(\w+)\', \'(\w+)\'',
                                                                   content, flags=re.MULTILINE):
-            export_object_name = f'{object_name}_{sub_group_name}_summary'
+            if sub_group_name == 'parties':
+                export_object_name = f'{group_name}_summary'
+                import_object_name = 'parties_summary'
+            else:
+                export_object_name = f'{object_name}_{sub_group_name}_summary'
+                import_object_name = f'tmp_{group_name}_summary'
             exports.add(export_object_name)
-            import_object_name = f'tmp_{group_name}_summary'
             imports[identifier].add(import_object_name)
         for object_name in re.findall(r'\bWITH\s+(\w+)\s+AS', content, flags=re.MULTILINE):
             imports[identifier].discard(object_name)
@@ -613,6 +617,12 @@ def docs_table_ref(name):
         for table in re.findall(r'^CREATE\s+(?:TABLE|VIEW)\s+(\S+)', content, flags=flags):
             if not table.startswith('tmp_'):
                 tables.append(table)
+        for sub_group_name, object_name, group_name in re.findall(r'\bcreate_(\w+)\(\'(\w+)\', \'(\w+)\'',
+                                                                  content, flags=re.MULTILINE):
+            if sub_group_name == 'parties':
+                tables.append(f'{group_name}_summary')
+            else:
+                tables.append(f'{object_name}_{sub_group_name}_summary')
     tables.append('field_counts')
 
     headers = ['Column Name', 'Data Type', 'Description']

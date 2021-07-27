@@ -128,3 +128,50 @@ BEGIN
 END
 $$
 LANGUAGE plpgsql;
+
+
+CREATE FUNCTION create_parties (object_name text, group_name text, sql_fragment text, sub_query text)
+RETURNS void
+AS $$
+DECLARE
+    parties_query text;
+BEGIN
+    parties_query := $parties_query$
+        CREATE TABLE %2$s_summary AS
+        WITH r AS (%4$s)
+        SELECT DISTINCT ON (%3$s r.id)
+            r.id,
+            %3$s
+            r.release_type,
+            r.collection_id,
+            r.ocid,
+            r.release_id,
+            r.data_id,
+            %1$s,
+            %1$s ->> 'id' AS %1$s_id,
+            %1$s ->> 'name' AS name,
+            ps.identifier AS identifier,
+            coalesce(%1$s ->> 'id', ps.unique_identifier_attempt, %1$s ->> 'name') AS unique_identifier_attempt,
+            ps.additionalIdentifiers_ids AS additionalIdentifiers_ids,
+            ps.total_additionalIdentifiers AS total_additionalIdentifiers,
+            CAST(ps.id IS NOT NULL AS integer
+        ) AS link_to_parties,
+            CAST(ps.id IS NOT NULL AND (ps.party -> 'roles') ? '%1$s' AS integer
+        ) AS link_with_role,
+            ps.party_index
+        FROM
+            r
+            LEFT JOIN parties_summary ps ON r.id = ps.id
+                AND (%1$s ->> 'id') = ps.party_id
+        WHERE
+            %1$s IS NOT NULL;
+
+        CREATE UNIQUE INDEX %2$s_summary_id ON %2$s_summary (%3$s id);
+        CREATE INDEX %2$s_summary_data_id ON %2$s_summary (data_id);
+        CREATE INDEX %2$s_summary_collection_id ON %2$s_summary (collection_id);
+    $parties_query$;
+
+    EXECUTE format(parties_query, object_name, group_name, sql_fragment, sub_query);
+END
+$$
+LANGUAGE plpgsql;
