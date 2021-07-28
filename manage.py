@@ -112,7 +112,7 @@ def dependency_graph(files):
         'release',
         'release_check',
         # Kingfisher Summarize
-        'selected_collections',
+        'summaries',
     }
 
     # The key is a table/view, and the value is the file by which it is created.
@@ -240,18 +240,27 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
         name = f"collection_{'_'.join(str(_id) for _id in sorted(collections))}"
 
     schema = f'view_data_{name}'
+
+    db.execute('CREATE SCHEMA IF NOT EXISTS summaries')
+    db.set_search_path(["summaries"])
+    db.execute('''CREATE TABLE IF NOT EXISTS selected_collections
+                  (id SERIAL, schema TEXT NOT NULL, collection_id INTEGER NOT NULL)''')
+    db.execute('CREATE UNIQUE INDEX IF NOT EXISTS selected_collections_id ON selected_collections (id)')
+    db.execute("""CREATE UNIQUE INDEX IF NOT EXISTS selected_collections_schema_collection_id
+                  ON selected_collections (schema, collection_id)""")
+    db.execute_values('INSERT INTO selected_collections (schema, collection_id) VALUES %s',
+                      [(schema, _id,) for _id in collections])
+
+    # https://github.com/open-contracting/kingfisher-summarize/issues/92
+    db.execute('ANALYZE selected_collections')
+
     db.execute('CREATE SCHEMA {schema}', schema=schema)
     db.set_search_path([schema])
-
-    db.execute('CREATE TABLE selected_collections (id INTEGER PRIMARY KEY)')
-    db.execute_values('INSERT INTO selected_collections (id) VALUES %s', [(_id,) for _id in collections])
 
     db.execute('CREATE TABLE note (id SERIAL, note TEXT NOT NULL, created_at TIMESTAMP WITHOUT TIME ZONE)')
     db.execute('INSERT INTO note (note, created_at) VALUES (%(note)s, %(created_at)s)',
                {'note': note, 'created_at': datetime.utcnow()})
 
-    # https://github.com/open-contracting/kingfisher-summarize/issues/92
-    db.execute('ANALYZE selected_collections')
     db.commit()
 
     logger.info('Added %s', name)
@@ -287,6 +296,8 @@ def remove(name):
     logger = logging.getLogger('ocdskingfisher.summarize.remove')
     logger.info('Arguments: name=%s', name)
 
+    db.execute('DELETE FROM summaries.selected_collections WHERE schema=%(schema)s', {'schema': name})
+
     # `CASCADE` drops all objects (tables, functions, etc.) in the schema.
     statement = db.format('DROP SCHEMA {schema} CASCADE', schema=name)
     db.execute(statement)
@@ -307,7 +318,8 @@ def index():
     for schema in db.schemas():
         db.set_search_path([schema])
 
-        collections = map(str, db.pluck('SELECT id FROM selected_collections ORDER BY id'))
+        statement = 'SELECT collection_id FROM summaries.selected_collections WHERE schema=%(schema)s ORDER BY id'
+        collections = map(str, db.pluck(statement, {'schema': schema}))
         notes = db.all('SELECT note, created_at FROM note ORDER BY created_at')
 
         table.append([schema[10:], ', '.join(collections), format_note(notes[0])])
@@ -454,7 +466,8 @@ def field_counts(name):
     """)
     db.commit()
 
-    selected_collections = db.pluck('SELECT id FROM selected_collections')
+    selected_collections = db.pluck('SELECT collection_id FROM summaries.selected_collections WHERE schema=%(schema)s',
+                                    {"schema": name})
     with concurrent.futures.ProcessPoolExecutor() as executor:
         futures = [executor.submit(_run_field_counts, name, collection) for collection in selected_collections]
         for future in concurrent.futures.as_completed(futures):
@@ -588,11 +601,14 @@ def stale():
     skip = os.getenv('KINGFISHER_SUMMARIZE_PROTECT_SCHEMA', '').split(',')
 
     statement = """
-        SELECT 1 FROM {schema}.selected_collections sc JOIN collection c ON sc.id = c.id WHERE deleted_at IS NULL
+        SELECT DISTINCT schema
+        FROM summaries.selected_collections sc
+        JOIN collection c ON sc.collection_id = c.id
+        WHERE deleted_at IS NOT NULL
     """
 
-    for schema in db.schemas():
-        if schema not in skip and not db.one(statement, schema=schema):
+    for schema in db.pluck(statement):
+        if schema not in skip:
             print(schema[10:])
 
 
