@@ -2,9 +2,9 @@ CREATE FUNCTION create_items (object_name text, group_name text, sql_fragment te
 RETURNS void
 AS $$
 DECLARE
-    items_query text;
+    query text;
 BEGIN
-    items_query := $items_query$
+    query := $query$
         CREATE TABLE %1$s_items_summary AS
             SELECT
                 r.id,
@@ -47,9 +47,9 @@ BEGIN
         CREATE UNIQUE INDEX %1$s_items_summary_id ON %1$s_items_summary (id, %3$s item_index);
         CREATE INDEX %1$s_items_summary_data_id ON %1$s_items_summary (data_id);
         CREATE INDEX %1$s_items_summary_collection_id ON %1$s_items_summary (collection_id);
-    $items_query$;
+    $query$;
 
-    EXECUTE format(items_query, object_name, group_name, sql_fragment);
+    EXECUTE format(query, object_name, group_name, sql_fragment);
 END
 $$
 LANGUAGE plpgsql;
@@ -59,9 +59,9 @@ CREATE FUNCTION create_documents (object_name text, group_name text, sql_fragmen
 RETURNS void
 AS $$
 DECLARE
-    documents_query text;
+    query text;
 BEGIN
-    documents_query := $documents_query$
+    query := $query$
         CREATE TABLE %1$s_documents_summary AS
             SELECT
                 r.id,
@@ -84,9 +84,9 @@ BEGIN
         CREATE UNIQUE INDEX %1$s_documents_summary_id ON %1$s_documents_summary (id, %3$s document_index);
         CREATE INDEX %1$s_documents_summary_data_id ON %1$s_documents_summary (data_id);
         CREATE INDEX %1$s_documents_summary_collection_id ON %1$s_documents_summary (collection_id);
-    $documents_query$;
+    $query$;
 
-    EXECUTE format(documents_query, object_name, group_name, sql_fragment);
+    EXECUTE format(query, object_name, group_name, sql_fragment);
 END
 $$
 LANGUAGE plpgsql;
@@ -96,9 +96,9 @@ CREATE FUNCTION create_milestones (object_name text, group_name text, sql_fragme
 RETURNS void
 AS $$
 DECLARE
-    milestones_query text;
+    query text;
 BEGIN
-    milestones_query := $milestones_query$
+    query := $query$
         CREATE TABLE %1$s_milestones_summary AS
             SELECT
                 r.id,
@@ -122,9 +122,9 @@ BEGIN
         CREATE UNIQUE INDEX %1$s_milestones_summary_id ON %1$s_milestones_summary (id, %3$s milestone_index);
         CREATE INDEX %1$s_milestones_summary_data_id ON %1$s_milestones_summary (data_id);
         CREATE INDEX %1$s_milestones_summary_collection_id ON %1$s_milestones_summary (collection_id);
-    $milestones_query$;
+    $query$;
 
-    EXECUTE format(milestones_query, object_name, group_name, sql_fragment);
+    EXECUTE format(query, object_name, group_name, sql_fragment);
 END
 $$
 LANGUAGE plpgsql;
@@ -134,9 +134,9 @@ CREATE FUNCTION create_parties (object_name text, group_name text, sql_fragment 
 RETURNS void
 AS $$
 DECLARE
-    parties_query text;
+    query text;
 BEGIN
-    parties_query := $parties_query$
+    query := $query$
         CREATE TABLE %2$s_summary AS
         WITH r AS (%4$s)
         SELECT DISTINCT ON (%3$s r.id)
@@ -169,9 +169,9 @@ BEGIN
         CREATE UNIQUE INDEX %2$s_summary_id ON %2$s_summary (%3$s id);
         CREATE INDEX %2$s_summary_data_id ON %2$s_summary (data_id);
         CREATE INDEX %2$s_summary_collection_id ON %2$s_summary (collection_id);
-    $parties_query$;
+    $query$;
 
-    EXECUTE format(parties_query, object_name, group_name, sql_fragment, sub_query);
+    EXECUTE format(query, object_name, group_name, sql_fragment, sub_query);
 END
 $$
 LANGUAGE plpgsql;
