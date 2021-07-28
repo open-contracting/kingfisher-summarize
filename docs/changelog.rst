@@ -7,7 +7,7 @@ Changelog
 Changed
 ~~~~~~~
 
-- Replaced some similar tables with templated queries. This should not affect behaviour.
+-  Replaced similar tables with templated queries. This should not affect behavior.
 
 2021-07-16
 ----------
