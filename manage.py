@@ -89,6 +89,21 @@ def sql_files(directory, tables_only=False):
     return files
 
 
+def _get_export_import_tables_from_functions(content):
+    exports, imports = [], []
+
+    matches = re.findall(r'\bcreate_(\w+)\(\'(\w+)\', \'(\w+)\'', content, flags=re.MULTILINE)
+    for sub_group_name, object_name, group_name in matches:
+        if sub_group_name == 'parties':
+            exports.append(f'{group_name}_summary')
+            imports.append('parties_summary')
+        else:
+            exports.append(f'{object_name}_{sub_group_name}_summary')
+            imports.append(f'tmp_{group_name}_summary')
+
+    return exports, imports
+
+
 def dependency_graph(files):
     """
     Returns a dict in which the key is the identifier of a SQL file and the value is the set of identifiers of SQL
@@ -121,24 +136,19 @@ def dependency_graph(files):
     # The key is a file, and the value is the set of tables/views it requires.
     imports = defaultdict(set)
     for identifier, content in files.items():
+        exports_from_function, imports_from_function = _get_export_import_tables_from_functions(content)
+
         # The set of tables/views this file creates.
         exports = set()
         for object_name in re.findall(r'\bCREATE\s+(?:TABLE|VIEW)\s+(\w+)', content, flags=flags):
             exports.add(object_name)
+        exports.update(exports_from_function)
 
         # The set of tables/views this file requires, minus temporary tables, created tables and common dependencies.
         for object_name in re.findall(r'\b(?:FROM|JOIN)\s+(\w+)', content, flags=re.MULTILINE):
             imports[identifier].add(object_name)
-        for sub_group_name, object_name, group_name in re.findall(r'\bcreate_(\w+)\(\'(\w+)\', \'(\w+)\'',
-                                                                  content, flags=re.MULTILINE):
-            if sub_group_name == 'parties':
-                export_object_name = f'{group_name}_summary'
-                import_object_name = 'parties_summary'
-            else:
-                export_object_name = f'{object_name}_{sub_group_name}_summary'
-                import_object_name = f'tmp_{group_name}_summary'
-            exports.add(export_object_name)
-            imports[identifier].add(import_object_name)
+        imports[identifier].update(imports_from_function)
+
         for object_name in re.findall(r'\bWITH\s+(\w+)\s+AS', content, flags=re.MULTILINE):
             imports[identifier].discard(object_name)
         imports[identifier].difference_update(exports | ignore)
@@ -614,15 +624,10 @@ def docs_table_ref(name):
     """
     tables = []
     for content in sql_files('middle').values():
-        for table in re.findall(r'^CREATE\s+(?:TABLE|VIEW)\s+(\S+)', content, flags=flags):
+        for table in re.findall(r'\bCREATE\s+(?:TABLE|VIEW)\s+(\w+)', content, flags=flags):
             if not table.startswith('tmp_'):
                 tables.append(table)
-        for sub_group_name, object_name, group_name in re.findall(r'\bcreate_(\w+)\(\'(\w+)\', \'(\w+)\'',
-                                                                  content, flags=re.MULTILINE):
-            if sub_group_name == 'parties':
-                tables.append(f'{group_name}_summary')
-            else:
-                tables.append(f'{object_name}_{sub_group_name}_summary')
+        tables.extend(_get_export_import_tables_from_functions(content)[0])
     tables.append('field_counts')
 
     headers = ['Column Name', 'Data Type', 'Description']
