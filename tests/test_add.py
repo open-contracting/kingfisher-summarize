@@ -71,9 +71,7 @@ def test_command_name(kwargs, name, collections, db, caplog):
     with fixture(db, **kwargs) as result:
         assert db.schema_exists(schema)
         assert db.all('SELECT collection_id, schema FROM summaries.selected_collections WHERE schema=%(schema)s',
-                      {'schema': schema}) == [
-            (collection, schema,) for collection in collections
-        ]
+                      {'schema': schema}) == [(collection, schema,) for collection in collections]
         assert db.all(sql.SQL('SELECT id, note FROM {schema}.note').format(schema=identifier)) == [
             (1, 'Default'),
         ]
