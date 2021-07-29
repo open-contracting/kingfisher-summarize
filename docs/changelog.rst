@@ -1,6 +1,14 @@
 Changelog
 =========
 
+2021-07-28
+----------
+
+Changed
+~~~~~~~
+
+-  Replaced similar tables with templated queries. This should not affect behavior.
+
 2021-07-16
 ----------
 
