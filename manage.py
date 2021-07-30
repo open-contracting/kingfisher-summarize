@@ -260,16 +260,17 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
 
     schema = f'view_data_{name}'
 
+    # Create the summaries.selected_collections table, if it doesn't exist.
     db.execute('CREATE SCHEMA IF NOT EXISTS summaries')
-    db.set_search_path(["summaries"])
+    db.set_search_path(['summaries'])
     db.execute("""CREATE TABLE IF NOT EXISTS selected_collections
                   (schema TEXT NOT NULL, collection_id INTEGER NOT NULL)""")
     db.execute("""CREATE UNIQUE INDEX IF NOT EXISTS selected_collections_schema_collection_id
                   ON selected_collections (schema, collection_id)""")
 
+    # Add the new summary's collections to the summaries.selected_collections table.
     db.execute_values('INSERT INTO selected_collections (schema, collection_id) VALUES %s',
                       [(schema, _id,) for _id in collections])
-
     # https://github.com/open-contracting/kingfisher-summarize/issues/92
     db.execute('ANALYZE selected_collections')
 
@@ -626,7 +627,7 @@ def stale():
 
     statement = """
         SELECT 1 FROM summaries.selected_collections sc JOIN collection c ON sc.collection_id = c.id
-        WHERE deleted_at IS NULL AND schema=%(schema)s
+        WHERE deleted_at IS NULL AND schema = %(schema)s
     """
 
     for schema in db.schemas():
