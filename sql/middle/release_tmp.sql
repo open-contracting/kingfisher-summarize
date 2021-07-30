@@ -47,7 +47,7 @@ FROM
 WHERE
     collection_id IN (
         SELECT
-            id
+            collection_id
         FROM
             summaries.selected_collections
         WHERE
@@ -73,7 +73,7 @@ FROM
 WHERE
     collection_id IN (
         SELECT
-            id
+            collection_id
         FROM
             summaries.selected_collections
         WHERE
@@ -104,7 +104,7 @@ WHERE
     (value -> 'id') IS NOT NULL
     AND collection_id IN (
         SELECT
-            id
+            collection_id
         FROM
             summaries.selected_collections
         WHERE
