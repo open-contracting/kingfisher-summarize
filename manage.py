@@ -325,6 +325,13 @@ def remove(name):
     logger.info(statement.as_string(db.connection))
 
 
+def _get_selected_collections(schema):
+    statement = """
+        SELECT collection_id FROM summaries.selected_collections WHERE schema = %(schema)s ORDER BY collection_id
+    """
+    return db.pluck(statement, {'schema': schema})
+
+
 @cli.command()
 def index():
     """
@@ -337,10 +344,7 @@ def index():
     for schema in db.schemas():
         db.set_search_path([schema])
 
-        statement = """
-            SELECT collection_id FROM summaries.selected_collections WHERE schema = %(schema)s ORDER BY collection_id
-        """
-        collections = map(str, db.pluck(statement, {'schema': schema}))
+        collections = map(str, _get_selected_collections(schema))
         notes = db.all('SELECT note, created_at FROM note ORDER BY created_at')
 
         table.append([schema[10:], ', '.join(collections), format_note(notes[0])])
@@ -487,9 +491,7 @@ def field_counts(name):
     """)
     db.commit()
 
-    selected_collections = db.pluck(
-        'SELECT collection_id FROM summaries.selected_collections WHERE schema = %(schema)s',
-        {"schema": name})
+    selected_collections = _get_selected_collections(name)
     with concurrent.futures.ProcessPoolExecutor() as executor:
         futures = [executor.submit(_run_field_counts, name, collection) for collection in selected_collections]
         for future in concurrent.futures.as_completed(futures):
