@@ -25,11 +25,11 @@ class Database:
         """
         return self.one('SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = %(schema)s)', {'schema': schema})[0]
 
-    def pluck(self, statement, variables=None):
+    def pluck(self, statement, variables=None, **kwargs):
         """
         Returns the first value from all the results.
         """
-        return [row[0] for row in self.all(statement, variables)]
+        return [row[0] for row in self.all(statement, variables, **kwargs)]
 
     def schemas(self):
         """
