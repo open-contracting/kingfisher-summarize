@@ -625,14 +625,12 @@ def stale():
     skip = os.getenv('KINGFISHER_SUMMARIZE_PROTECT_SCHEMA', '').split(',')
 
     statement = """
-        SELECT DISTINCT schema
-        FROM summaries.selected_collections sc
-        JOIN collection c ON sc.collection_id = c.id
-        WHERE deleted_at IS NOT NULL
+        SELECT 1 FROM summaries.selected_collections sc JOIN collection c ON sc.collection_id = c.id
+        WHERE deleted_at IS NULL AND schema=%(schema)s
     """
 
-    for schema in db.pluck(statement):
-        if schema not in skip:
+    for schema in db.schemas():
+        if schema not in skip and not db.one(statement, {'schema': schema}):
             print(schema[10:])
 
 
