@@ -28,7 +28,7 @@ def migrate():
             collections = db.pluck('SELECT id FROM selected_collections')
         except UndefinedTable as e:
             print(f'ERROR: undefined {schema}.selected_collections table: {e}', file=sys.stderr)
-            db.commit()
+            db.connection.rollback()
             continue
         db.execute_values('INSERT INTO summaries.selected_collections (schema, collection_id) VALUES %s',
                           [(schema, _id,) for _id in collections])
