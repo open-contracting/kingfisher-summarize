@@ -544,3 +544,7 @@ COMMENT ON COLUMN release_summary.release IS '``data`` from the Kingfisher Proce
 
 COMMENT ON COLUMN release_summary.package_data IS '``data`` from the Kingfisher Process ``package_data`` table. This is the package metadata from the release package or record package. ``NULL`` if the ``release_type`` is "compiled_release".';
 
+
+COMMENT ON COLUMN note.id IS 'An auto-incrementing integer';
+COMMENT ON COLUMN note.note IS 'A user-assigned note';
+COMMENT ON COLUMN note.created_at IS 'The UTC time at which the note was created';

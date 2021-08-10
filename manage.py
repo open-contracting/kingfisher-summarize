@@ -648,6 +648,7 @@ def docs_table_ref(name):
                 tables.append(table)
         tables.extend(_get_export_import_tables_from_functions(content)[0])
     tables.append('field_counts')
+    tables.append('note')
 
     headers = ['Column Name', 'Data Type', 'Description']
 
