@@ -30,7 +30,7 @@ SELECT
     r.id AS table_id,
     collection_id,
     ocid,
-    NULL AS release_id,
+    d.data -> 'compiledRelease' ->> 'id' AS release_id,
     data_id,
     package_data_id,
     coalesce(pd.data ->> 'version', '1.0') AS package_version,
