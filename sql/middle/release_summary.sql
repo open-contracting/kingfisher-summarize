@@ -51,7 +51,7 @@ SELECT
     CASE WHEN release_type = 'record' THEN
         d.data -> 'compiledRelease'
     WHEN release_type = 'embedded_release' THEN
-        d.data -> 'releases' -> (mod(r.id / 10, 1000000)::integer)
+        d.data -> 'releases' -> (mod(rs.id / 10, 1000000)::integer)
     ELSE
         d.data
     END AS release,
