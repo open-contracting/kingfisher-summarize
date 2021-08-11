@@ -75,7 +75,7 @@ SELECT
         d.data -> 'releases' -> (mod(s.id / 10, 1000000)::integer)
     ELSE
         d.data
-    END -> 'awards' -> award_index AS award
+    END -> 'awards' -> award_index::integer AS award
 FROM
     awards_summary_no_data s
     JOIN data d ON d.id = s.data_id;

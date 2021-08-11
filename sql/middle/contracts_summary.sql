@@ -143,7 +143,7 @@ SELECT
         d.data -> 'releases' -> (mod(s.id / 10, 1000000)::integer)
     ELSE
         d.data
-    END -> 'contracts' -> contract_index AS contract
+    END -> 'contracts' -> contract_index::integer AS contract
 FROM
     contracts_summary_no_data s
     JOIN data d ON d.id = s.data_id;

@@ -54,7 +54,7 @@ SELECT
         d.data -> 'releases' -> (mod(s.id / 10, 1000000)::integer)
     ELSE
         d.data
-    END -> 'parties' -> party_index AS party
+    END -> 'parties' -> party_index::integer AS party
 FROM
     parties_summary_no_data s
     JOIN data d ON d.id = s.data_id;
