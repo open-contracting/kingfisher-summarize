@@ -101,11 +101,17 @@ CREATE INDEX tender_summary_no_data_collection_id ON tender_summary_no_data (col
 
 CREATE VIEW tender_summary AS
 SELECT
-    tender_summary_no_data.*,
-    data -> 'tender' AS tender
+    s.*,
+    CASE WHEN release_type = 'record' THEN
+        d.data -> 'compiledRelease'
+    WHEN release_type = 'embedded_release' THEN
+        d.data -> 'releases' -> (mod(s.id / 10, 1000000)::integer)
+    ELSE
+        d.data
+    END -> 'tender' AS tender
 FROM
-    tender_summary_no_data
-    JOIN data d ON d.id = tender_summary_no_data.data_id;
+    tender_summary_no_data s
+    JOIN data d ON d.id = s.data_id;
 
 -- The following pgpsql makes indexes on tender_summary only if it is a table and not a view,
 -- you will need to run --tables-only command line parameter to allow this to run.

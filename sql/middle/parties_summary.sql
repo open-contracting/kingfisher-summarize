@@ -47,17 +47,17 @@ CREATE INDEX parties_summary_no_data_party_id ON parties_summary_no_data (id, pa
 -- Note: The `party` column is the last column, unlike in other tables.
 CREATE VIEW parties_summary AS
 SELECT
-    parties_summary_no_data.*,
+    s.*,
     CASE WHEN release_type = 'record' THEN
-        data #> ARRAY['compiledRelease', 'parties', party_index::text]
+        d.data -> 'compiledRelease'
     WHEN release_type = 'embedded_release' THEN
-        data -> 'releases' -> (mod(parties_summary_no_data.id / 10, 1000000)::integer) -> 'parties' -> party_index::integer
+        d.data -> 'releases' -> (mod(s.id / 10, 1000000)::integer)
     ELSE
-        data #> ARRAY['parties', party_index::text]
-    END AS party
+        d.data
+    END -> 'parties' -> party_index AS party
 FROM
-    parties_summary_no_data
-    JOIN data ON data.id = data_id;
+    parties_summary_no_data s
+    JOIN data d ON d.id = s.data_id;
 
 -- The following pgpsql makes indexes on parties_summary only if it is a table and not a view,
 -- you will need to run --tables-only command line parameter to allow this to run.
