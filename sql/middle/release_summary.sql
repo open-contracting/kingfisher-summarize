@@ -48,7 +48,9 @@ SELECT
     c.transform_type,
     c.transform_from_collection_id,
     c.deleted_at,
-    CASE WHEN release_type = 'embedded_release' THEN
+    CASE WHEN release_type = 'record' THEN
+        d.data -> 'compiledRelease'
+    WHEN release_type = 'embedded_release' THEN
         d.data -> 'releases' -> (mod(rs.id / 10, 1000000)::integer)
     ELSE
         d.data

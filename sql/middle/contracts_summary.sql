@@ -136,11 +136,17 @@ CREATE INDEX contracts_summary_no_data_awardid ON contracts_summary_no_data (id,
 
 CREATE VIEW contracts_summary AS
 SELECT
-    contracts_summary_no_data.*,
-    data #> ARRAY['contracts', contract_index::text] AS contract
+    s.*,
+    CASE WHEN release_type = 'record' THEN
+        d.data -> 'compiledRelease'
+    WHEN release_type = 'embedded_release' THEN
+        d.data -> 'releases' -> (mod(s.id / 10, 1000000)::integer)
+    ELSE
+        d.data
+    END -> 'contracts' -> contract_index::integer AS contract
 FROM
-    contracts_summary_no_data
-    JOIN data ON data.id = data_id;
+    contracts_summary_no_data s
+    JOIN data d ON d.id = s.data_id;
 
 -- The following pgpsql makes indexes on contracts_summary only if it is a table and not a view,
 -- you will need to run --tables-only command line parameter to allow this to run.
