@@ -24,7 +24,7 @@ WHERE
         FROM
             summaries.selected_collections
         WHERE
-            schema=schema)
+            schema=current_schema())
 UNION
 SELECT
     r.id::bigint * 10 + 1 AS id,
@@ -51,7 +51,7 @@ WHERE
         FROM
             summaries.selected_collections
         WHERE
-            schema=schema)
+            schema=current_schema())
 UNION
 SELECT
     r.id::bigint * 10 + 2 AS id,
@@ -77,7 +77,7 @@ WHERE
         FROM
             summaries.selected_collections
         WHERE
-            schema=schema)
+            schema=current_schema())
 UNION
 SELECT
     (r.id::bigint * 1000000 + (ORDINALITY - 1)) * 10 + 3 AS id,
@@ -108,7 +108,7 @@ WHERE
         FROM
             summaries.selected_collections
         WHERE
-            schema=schema);
+            schema=current_schema());
 
 CREATE UNIQUE INDEX tmp_release_summary_id ON tmp_release_summary (id);
 

@@ -98,11 +98,15 @@ def test_command_name(kwargs, name, collections, db, caplog):
      TABLES | FIELD_LIST_TABLES | NO_FIELD_LIST_TABLES | SUMMARY_TABLES | SUMMARY_VIEWS | NO_FIELD_LIST_VIEWS, set()),
 ])
 def test_command(db, tables_only, field_counts, field_lists, tables, views, caplog):
-    with fixture(db, tables_only=tables_only, field_counts=field_counts, field_lists=field_lists) as result:
+    # Load collection 2 first, to check that existing collections aren't accidentally
+    # included when we load collection 1
+    with fixture(db, collections='2', tables_only=tables_only, field_counts=field_counts, field_lists=field_lists
+                 ), fixture(db, tables_only=tables_only, field_counts=field_counts, field_lists=field_lists) as result:
+        assert db.schema_exists('view_data_collection_2')
+
         # Check existence of schema, tables and views.
         if field_counts:
             tables.add('field_counts')
-
         assert db.schema_exists('view_data_collection_1')
         assert set(db.pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
                             "AND table_type = 'BASE TABLE'", {'schema': 'view_data_collection_1'})) == tables
@@ -282,15 +286,17 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, capl
                                                isc.ordinal_position) IS NULL
         """, {'schema': 'view_data_collection_1'})
 
-        expected = [
-            f'Arguments: collections=(1,) note=Default name=None tables_only={tables_only!r}',
-            'Added collection_1',
-            'Running summary-tables routine',
-        ]
-        if field_counts:
-            expected.append('Running field-counts routine')
-        if field_lists:
-            expected.append('Running field-lists routine')
+        expected = []
+        for collection_id in [2, 1]:
+            expected += [
+                f'Arguments: collections=({collection_id},) note=Default name=None tables_only={tables_only!r}',
+                f'Added collection_{collection_id}',
+                'Running summary-tables routine',
+            ]
+            if field_counts:
+                expected.append('Running field-counts routine')
+            if field_lists:
+                expected.append('Running field-lists routine')
 
         assert result.exit_code == 0
         assert result.output == ''
