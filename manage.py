@@ -649,6 +649,7 @@ def docs_table_ref(name):
         tables.extend(_get_export_import_tables_from_functions(content)[0])
     tables.append('field_counts')
     tables.append('note')
+    tables.append('summaries.selected_collections')
 
     headers = ['Column Name', 'Data Type', 'Description']
 
@@ -657,8 +658,11 @@ def docs_table_ref(name):
         with open(filename.format(table), 'w') as f:
             writer = csv.writer(f, lineterminator='\n')
             writer.writerow(headers)
-
-            for row in db.all(COLUMN_COMMENTS_SQL, {'schema': name, 'table': table}):
+            if '.' in table:
+                sql_variables = {'schema': table.split('.')[0], 'table': table.split('.')[1]}
+            else:
+                sql_variables = {'schema': name, 'table': table}
+            for row in db.all(COLUMN_COMMENTS_SQL, sql_variables):
                 # Change "timestamp without time zone" (and  "timestamp with time zone") to "timestamp".
                 if 'timestamp' in row[1]:
                     row = list(row)

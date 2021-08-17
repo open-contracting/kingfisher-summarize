@@ -1,0 +1,3 @@
+Column Name,Data Type,Description
+schema,text,A Postgres schema name
+collection_id,integer,A Kingfisher Process collection ID

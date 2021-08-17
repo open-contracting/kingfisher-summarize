@@ -192,7 +192,7 @@ If the new version of Kingfisher Summarize makes changes to SQL statements, you 
 
    .. code-block:: sql
 
-      SELECT id from view_data_collection_4_5_6.selected_collections;
+      SELECT collection_id from summaries.selected_collections WHERE schema = 'view_data_collection_4_5_6';
 
 #. Remove the schema, for example:
 
