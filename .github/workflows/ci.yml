@@ -33,19 +33,7 @@ jobs:
       - run: pip install -r requirements_dev.txt
       - run: curl -s -S --retry 3 $BASEDIR/tests/script.sh | bash -
       - run: pytest /tmp/test_requirements.py
-      - name: Install Kingfisher Process
-        run: |
-          git clone https://github.com/open-contracting/kingfisher-process.git /tmp/kingfisher-process
-          pip install -r /tmp/kingfisher-process/requirements.txt
-      - name: Setup Kingfisher Process database
-        run: |
-          python /tmp/kingfisher-process/ocdskingfisher-process-cli upgrade-database
-          python /tmp/kingfisher-process/ocdskingfisher-process-cli new-collection 'one' '2000-01-01 00:00:00'
-          python /tmp/kingfisher-process/ocdskingfisher-process-cli new-collection 'two' '2000-01-01 00:00:00'
-          python /tmp/kingfisher-process/ocdskingfisher-process-cli local-load 1 tests/fixtures release_package
-          python /tmp/kingfisher-process/ocdskingfisher-process-cli local-load 2 tests/fixtures release_package
-        env:
-          KINGFISHER_PROCESS_DB_URI: postgresql://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres
+      - run: pg_restore postgresql://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres tests/fixtures/kingfisher-process.sql
       - run: pytest --cov ocdskingfishersummarize --cov manage
         if: always()
         env:

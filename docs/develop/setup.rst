@@ -10,13 +10,11 @@ Load data
 
 To test your changes, you need to have some data loaded. The `test data <https://github.com/open-contracting/kingfisher-summarize/tree/main/tests/fixtures>`__ covers common fields, but you might have specific data that you want to test against.
 
-#. Change to Kingfisher Process's directory, and activate its virtual environment. Then, set up Kingfisher Process' database, create a collection, and load the test data into it (replacing ``COLLECTION_NAME`` below):
+#. Load test data, as created by Kingfisher Process:
 
    .. code-block:: bash
 
-      python ocdskingfisher-process-cli upgrade-database
-      python ocdskingfisher-process-cli new-collection COLLECTION_NAME '2000-01-01 00:00:00'
-      python ocdskingfisher-process-cli local-load 1 ../views/tests/fixtures release_package
+      pg_restore tests/fixtures/kingfisher-process.sql
 
 #. Change to Kingfisher Summarize's directory, and activate its virtual environment. Then, summarize collection 1:
 
