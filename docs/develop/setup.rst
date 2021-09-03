@@ -14,7 +14,7 @@ To test your changes, you need to have some data loaded. The `test data <https:/
 
    .. code-block:: bash
 
-      pg_restore tests/fixtures/kingfisher-process.sql
+      psql -f tests/fixtures/kingfisher-process.sql
 
 #. Change to Kingfisher Summarize's directory, and activate its virtual environment. Then, summarize collection 1:
 
