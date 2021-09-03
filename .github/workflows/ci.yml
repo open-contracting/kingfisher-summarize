@@ -33,7 +33,7 @@ jobs:
       - run: pip install -r requirements_dev.txt
       - run: curl -s -S --retry 3 $BASEDIR/tests/script.sh | bash -
       - run: pytest /tmp/test_requirements.py
-      - run: pg_restore postgresql://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres tests/fixtures/kingfisher-process.sql
+      - run: pg_restore -d postgresql://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres tests/fixtures/kingfisher-process.sql
       - run: pytest --cov ocdskingfishersummarize --cov manage
         if: always()
         env:
