@@ -70,17 +70,17 @@ Metadata
 
 These tables are created and populated by the :ref:`add` command.
 
-selected_collections
-~~~~~~~~~~~~~~~~~~~~
+summaries.selected_collections
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This table contains the collection IDs that the user provided when creating the schema.
+This table is created (if it doesn't exist)  by the :ref:`add` command, in a separate ``summaries`` schema. It is a many-to-many relationship between the schema name, and each of the collection IDs that the user provided when creating each schema. It is not removed by the :ref:`remove` command, but the entries for that schema are removed.
 
 If you need to change the collections to be summarized, remove the schema with the :ref:`remove` command and re-create it with the :ref:`add` command. This ensures that the schema's name reflects its contents.
 
 .. csv-table::
    :header-rows: 1
    :widths: auto
-   :file: definitions/selected_collections.csv
+   :file: definitions/summaries.selected_collections.csv
 
 note
 ~~~~

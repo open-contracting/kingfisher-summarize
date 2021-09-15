@@ -20,9 +20,11 @@ FROM
 WHERE
     collection_id IN (
         SELECT
-            id
+            collection_id
         FROM
-            selected_collections)
+            summaries.selected_collections
+        WHERE
+            schema=current_schema())
 UNION
 SELECT
     r.id::bigint * 10 + 1 AS id,
@@ -45,9 +47,11 @@ FROM
 WHERE
     collection_id IN (
         SELECT
-            id
+            collection_id
         FROM
-            selected_collections)
+            summaries.selected_collections
+        WHERE
+            schema=current_schema())
 UNION
 SELECT
     r.id::bigint * 10 + 2 AS id,
@@ -69,9 +73,11 @@ FROM
 WHERE
     collection_id IN (
         SELECT
-            id
+            collection_id
         FROM
-            selected_collections)
+            summaries.selected_collections
+        WHERE
+            schema=current_schema())
 UNION
 SELECT
     (r.id::bigint * 1000000 + (ORDINALITY - 1)) * 10 + 3 AS id,
@@ -98,9 +104,11 @@ WHERE
     (value -> 'id') IS NOT NULL
     AND collection_id IN (
         SELECT
-            id
+            collection_id
         FROM
-            selected_collections);
+            summaries.selected_collections
+        WHERE
+            schema=current_schema());
 
 CREATE UNIQUE INDEX tmp_release_summary_id ON tmp_release_summary (id);
 

@@ -104,6 +104,8 @@ def test_docs():
         # note table
         'note',
         'created_at',
+        # selected_collections table
+        'schema',
         # release_summary table
         'table_id',
         'package_data_id',
