@@ -57,12 +57,8 @@ Then, for any new CSV file, manually add a new sub-section to ``docs/database.rs
 
 .. _create_erd:
 
-Create the Entity Relationship Diagram
+Update the Entity Relationship Diagram
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-#. Install `SchemaSpy <https://schemaspy.readthedocs.io/en/latest/installation.html>`__
-#. Download the `PostgreSQL JDBC Driver <https://jdbc.postgresql.org/>`__
-#. Move and rename the JAR files into the repository's directory as ``schemaspy.jar`` and ``postgresql.jar``
 
 Add a schema with the ``--tables-only`` option:
 
@@ -70,10 +66,4 @@ Add a schema with the ``--tables-only`` option:
 
     ./manage.py add 123 diagram --tables-only
 
-Run SchemaSpy, using appropriate values for the ``-db`` (database name), ``-`` (schema) ``-u`` (user) and ``-p`` (password, optional) arguments:
-
-.. code-block:: bash
-
-   java -jar schemaspy.jar -t pgsql -dp postgresql.jar -host localhost -db ocdskingfisher -s view_data_collection_123 -u ocdskingfisher --password ocdskingfisher -o schemaspy -norows
-
-In the directory that results, copy ``schemaspy/diagrams/summary/relationships.real.compact.png`` to ``docs/_static/erd.png``.
+`Use SchemaSpy <https://ocp-software-handbook.readthedocs.io/en/latest/services/postgresql.html#entity-relationship-diagram>`__ to generate a diagram, copying the output to ``docs/_static/erd.png``.
