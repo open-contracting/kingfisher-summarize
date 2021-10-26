@@ -5,6 +5,7 @@ from glob import glob
 
 plurals = {
     'party': 'parties',
+    'relatedProcess': 'relatedProcesses',
     # Never plural.
     'amount': 'amount',
     'documentType': 'documentType',
@@ -14,7 +15,6 @@ plurals = {
     'tender': 'tender',
     'type': 'type',
     'value': 'value',
-    'relatedProcess': 'relatedProcesses',
 }
 singulars = {
     'parties': 'party',
