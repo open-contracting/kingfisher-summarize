@@ -47,6 +47,7 @@ SUMMARIES = [
     Summary('planning_milestones_summary', ['id', 'milestone_index'], 'milestone', True),
     Summary('planning_summary', ['id'], 'planning', False),
     Summary('procuringentity_summary', ['id'], 'procuringentity', True),
+    Summary('relatedprocesses_summary', ['id', 'relatedprocess_index'], 'relatedprocess', True),
     Summary('release_summary', ['id'], 'release', False),
     Summary('tender_documents_summary', ['id'], 'document', True),
     Summary('tender_items_summary', ['id', 'item_index'], 'item', True),

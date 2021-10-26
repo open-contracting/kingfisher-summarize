@@ -14,9 +14,12 @@ plurals = {
     'tender': 'tender',
     'type': 'type',
     'value': 'value',
+    'relatedProcess': 'relatedProcesses',
 }
 singulars = {
     'parties': 'party',
+    'relatedProcess': 'relatedProcess',
+    'relatedprocesses': 'relatedProcess',
 }
 words = [
     'additionalClassifications',
@@ -34,6 +37,7 @@ words = [
     'procurementMethod',
     'procuringEntity',
     'submissionMethod',
+    'relatedProcess',
 ]
 for period in ('awardPeriod', 'contractPeriod', 'enquiryPeriod', 'period', 'tenderPeriod'):
     words.extend([
@@ -208,7 +212,7 @@ def test_docs():
                         f"array, otherwise 0"
                     ]
 
-                elif column == 'identifier':
+                elif column == 'identifier' and subject != 'related process':
                     if subject == 'party':
                         candidates = [
                             f"Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the party object"

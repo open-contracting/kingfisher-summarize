@@ -347,3 +347,14 @@ contract_implementation_milestones_summary
    :header-rows: 1
    :widths: auto
    :file: definitions/contract_implementation_milestones_summary.csv
+
+Related processes section
+-------------------------
+
+relatedprocesses_summary
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. csv-table::
+   :header-rows: 1
+   :widths: auto
+   :file: definitions/relatedprocesses_summary.csv

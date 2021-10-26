@@ -459,6 +459,19 @@ COMMENT ON COLUMN contracts_summary.implementation_milestone_type_counts IS 'JSO
 
 COMMENT ON COLUMN contracts_summary.contract IS 'The contract object';
 
+SELECT
+    common_comments ('relatedprocesses_summary');
+
+COMMENT ON COLUMN relatedprocesses_summary.relatedprocess_index IS 'Position of the relatedProcess in the ``relatedProcesses`` array';
+COMMENT ON COLUMN relatedprocesses_summary.relatedprocess IS 'The related process object';
+COMMENT ON COLUMN relatedprocesses_summary.relatedprocess_id IS 'Value of the ``id`` field in the related process object';
+COMMENT ON COLUMN relatedprocesses_summary.relationship IS 'Value of the ``relationship`` field in the related process object';
+COMMENT ON COLUMN relatedprocesses_summary.title IS 'Value of the ``title`` field in the related process object';
+COMMENT ON COLUMN relatedprocesses_summary.scheme IS 'Value of the ``scheme`` field in the related process object';
+COMMENT ON COLUMN relatedprocesses_summary.identifier IS 'Value of the ``identifier`` field in the related process object';
+COMMENT ON COLUMN relatedprocesses_summary.uri IS 'Value of the ``uri`` field in the related process object';
+
+
 DO $$
 DECLARE
     TEMPLATE text;
