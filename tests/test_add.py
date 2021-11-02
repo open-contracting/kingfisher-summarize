@@ -255,6 +255,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, capl
                 'planning_milestones_summary': 29,
                 'planning_summary': 61,
                 'procuringentity_summary': 32,
+                'relatedprocesses_summary': 6,
                 'release_summary': 1046,
                 'tender_documents_summary': 15,
                 'tender_items_summary': 25,
