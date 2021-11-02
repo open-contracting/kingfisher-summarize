@@ -6,7 +6,7 @@ import pytest
 from click.testing import CliRunner
 from psycopg2 import sql
 
-from manage import SUMMARIES, cli
+from manage import SUMMARIES, cli, construct_extra_where_clause
 from tests import assert_bad_argument, assert_log_records, assert_log_running, fixture, noop
 
 command = 'add'
@@ -30,6 +30,16 @@ for summary_table in SUMMARIES:
         SUMMARY_VIEWS.add(summary_table.name)
         NO_FIELD_LIST_VIEWS.add(f'{summary_table.name}_no_field_list')
         TABLES.add(f'{summary_table.name}_no_data')
+
+
+def test_construct_extra_where_clause(db):
+    assert construct_extra_where_clause(db.cursor, 'a', 'z') == "AND d.data->>'a' = 'z'"
+    assert construct_extra_where_clause(db.cursor, 'a.b', 'z') == "AND d.data->'a'->>'b' = 'z'"
+    assert construct_extra_where_clause(db.cursor, 'a.b.c', 'z') == "AND d.data->'a'->'b'->>'c' = 'z'"
+    assert construct_extra_where_clause(db.cursor, 'a.b.c.d', 'z') == "AND d.data->'a'->'b'->'c'->>'d' = 'z'"
+
+    assert construct_extra_where_clause(db.cursor, 'a.b.c', '') == "AND d.data->'a'->'b'->>'c' = ''"
+    assert construct_extra_where_clause(db.cursor, '', 'z') == "AND d.data->>'' = 'z'"
 
 
 @pytest.mark.parametrize('collections, message', [
@@ -79,7 +89,8 @@ def test_command_name(kwargs, name, collections, db, caplog):
         assert result.exit_code == 0
         assert result.output == ''
         assert_log_records(caplog, command, [
-            f'Arguments: collections={collections!r} note=Default name={kwargs.get("name")} tables_only=False',
+            f'Arguments: collections={collections!r} note=Default name={kwargs.get("name")} tables_only=False '
+            'filter_tuple=()',
             f'Added {name}',
             'Running summary-tables routine',
             'Running field-counts routine',
@@ -87,6 +98,7 @@ def test_command_name(kwargs, name, collections, db, caplog):
         ])
 
 
+@pytest.mark.parametrize('filter_tuple', [(), ('ocid', 'dolore')])
 @pytest.mark.parametrize('tables_only, field_counts, field_lists, tables, views', [
     (False, True, False,
      TABLES | SUMMARY_TABLES, SUMMARY_VIEWS),
@@ -97,10 +109,11 @@ def test_command_name(kwargs, name, collections, db, caplog):
     (True, False, True,
      TABLES | FIELD_LIST_TABLES | NO_FIELD_LIST_TABLES | SUMMARY_TABLES | SUMMARY_VIEWS | NO_FIELD_LIST_VIEWS, set()),
 ])
-def test_command(db, tables_only, field_counts, field_lists, tables, views, caplog):
+def test_command(db, tables_only, field_counts, field_lists, tables, views, filter_tuple, caplog):
     # Load collection 2 first, to check that existing collections aren't included when we load collection 1.
-    with fixture(db, collections='2', tables_only=tables_only, field_counts=field_counts, field_lists=field_lists
-                 ), fixture(db, tables_only=tables_only, field_counts=field_counts, field_lists=field_lists) as result:
+    with fixture(db, collections='2', tables_only=tables_only, field_counts=field_counts, field_lists=field_lists,
+                 filter_tuple=filter_tuple), fixture(db, tables_only=tables_only, field_counts=field_counts,
+                                                     field_lists=field_lists, filter_tuple=filter_tuple) as result:
         # Check existence of schema, tables and views.
         if field_counts:
             tables.add('field_counts')
@@ -166,7 +179,10 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, capl
             },  # document_documenttype_counts
             5,  # total_items
         )
-        assert len(rows) == 301
+        if filter_tuple:
+            assert len(rows) == 4
+        else:
+            assert len(rows) == 301
 
         rows = db.all("""
             SELECT
@@ -209,14 +225,21 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, capl
             5,  # total_additionalidentifiers
 
         )
-        assert len(rows) == 296
+        if filter_tuple:
+            assert len(rows) == 4
+        else:
+            assert len(rows) == 296
 
         if field_counts:
             # Check contents of field_counts table.
             rows = db.all('SELECT * FROM view_data_collection_1.field_counts')
 
-            assert len(rows) == 65235
-            assert rows[0] == (1, 'release', 'awards', 100, 301, 100)
+            if filter_tuple:
+                assert len(rows) == 1046
+                assert rows[0] == (1, 'release', 'awards', 1, 4, 1)
+            else:
+                assert len(rows) == 65235
+                assert rows[0] == (1, 'release', 'awards', 100, 301, 100)
 
         if field_lists:
             # Check the count of keys in the field_list field for the lowest primary keys in each summary relation.
@@ -289,7 +312,8 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, capl
         expected = []
         for collection_id in [2, 1]:
             expected.extend([
-                f'Arguments: collections=({collection_id},) note=Default name=None tables_only={tables_only!r}',
+                f'Arguments: collections=({collection_id},) note=Default name=None tables_only={tables_only!r} '
+                f'filter_tuple={filter_tuple!r}',
                 f'Added collection_{collection_id}',
                 'Running summary-tables routine',
             ])

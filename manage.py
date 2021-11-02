@@ -69,7 +69,7 @@ COLUMN_COMMENTS_SQL = """
 """
 
 
-def sql_files(directory, tables_only=False):
+def sql_files(directory, tables_only=False, extra_where_clause=''):
     """
     Returns a dict in which the key is the identifier of a SQL file and the value is its content.
 
@@ -85,6 +85,7 @@ def sql_files(directory, tables_only=False):
             content = f.read()
         if tables_only:
             content = re.sub(r'^(CREATE|DROP) VIEW', r'\1 TABLE', content, flags=flags)
+        content = content.replace('EXTRAWHERECLAUSE', extra_where_clause)
         files[identifier] = content
 
     return files
@@ -205,6 +206,20 @@ def validate_schema(ctx, param, value):
     return schema
 
 
+def construct_extra_where_clause(cursor, filter_field, filter_value):
+    """
+    Returns part of a sql where clause, for given filter parameters.
+
+    :param str cursor: a pschopg2 database cursor
+    :param str filter_field: a period seperated field name, e.g. "tender.procurementMethod"
+    :param str filter_value: the value of the specified field, e.g. "direct"
+    """
+    path = [f"'{x}'" for x in filter_field.split('.')]
+    sql = 'AND d.data->' + '%s->'*(len(path)-1) + '>%s = %s'
+    escaped_sql = cursor.mogrify(sql, filter_field.split('.') + [filter_value])
+    return escaped_sql.decode()
+
+
 @click.group()
 @click.option('-q', '--quiet', is_flag=True, help='Change the log level to warning')
 @click.pass_context
@@ -241,8 +256,10 @@ def cli(ctx, quiet):
               help="Whether to add a field_list column to all summary tables (default false).")
 @click.option('--skip', multiple=True,
               help="Any SQL files to skip. Dependent files and final files will be skipped.")
+@click.option('--filter', "filter_tuple", nargs=2,
+              help="")
 @click.pass_context
-def add(ctx, collections, note, name, tables_only, field_counts_option, field_lists_option, skip):
+def add(ctx, collections, note, name, tables_only, field_counts_option, field_lists_option, skip, filter_tuple):
     """
     Creates a schema containing summary tables about one or more collections.
 
@@ -251,13 +268,18 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
     NOTE is your name and a description of your purpose
     """
     logger = logging.getLogger('ocdskingfisher.summarize.add')
-    logger.info('Arguments: collections=%s note=%s name=%s tables_only=%s',
-                collections, note, name, tables_only)
+    logger.info('Arguments: collections=%s note=%s name=%s tables_only=%s filter_tuple=%s',
+                collections, note, name, tables_only, filter_tuple)
 
     if not name:
         if len(collections) > 5:
             raise click.UsageError('--name is required for more than 5 collections')
         name = f"collection_{'_'.join(str(_id) for _id in sorted(collections))}"
+
+    if filter_tuple:
+        extra_where_clause = construct_extra_where_clause(db.cursor, *filter_tuple)
+    else:
+        extra_where_clause = ''
 
     schema = f'view_data_{name}'
 
@@ -287,7 +309,7 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
     logger.info('Added %s', name)
 
     logger.info('Running summary-tables routine')
-    summary_tables(schema, tables_only=tables_only, skip=skip)
+    summary_tables(schema, tables_only=tables_only, skip=skip, extra_where_clause=extra_where_clause)
 
     if field_counts_option:
         logger.info('Running field-counts routine')
@@ -372,19 +394,21 @@ def _run_summary_tables(name, identifier, content):
     logger.info('%s: %ss', identifier, time() - start)
 
 
-def summary_tables(name, tables_only=False, skip=()):
+def summary_tables(name, tables_only=False, skip=(), extra_where_clause=''):
     """
     Creates the summary tables in a schema.
 
     :param str name: the schema's name
     :param boolean tables_only: whether to create SQL tables instead of SQL views
     :param tuple skip: any SQL files to skip
+    :param str extra_where_clause: an extra clause to use when selecting the data
     """
     logger = logging.getLogger('ocdskingfisher.summarize.summary-tables')
 
     start = time()
 
-    files = {directory: sql_files(directory, tables_only=tables_only) for directory in ('initial', 'middle', 'final')}
+    files = {directory: sql_files(directory, tables_only=tables_only, extra_where_clause=extra_where_clause)
+             for directory in ('initial', 'middle', 'final')}
     graph = dependency_graph(files['middle'])
 
     if skip:

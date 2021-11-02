@@ -25,6 +25,7 @@ WHERE
             summaries.selected_collections
         WHERE
             schema=current_schema())
+        EXTRAWHERECLAUSE
 UNION
 SELECT
     r.id::bigint * 10 + 1 AS id,
@@ -52,6 +53,7 @@ WHERE
             summaries.selected_collections
         WHERE
             schema=current_schema())
+        EXTRAWHERECLAUSE
 UNION
 SELECT
     r.id::bigint * 10 + 2 AS id,
@@ -78,6 +80,7 @@ WHERE
             summaries.selected_collections
         WHERE
             schema=current_schema())
+        EXTRAWHERECLAUSE
 UNION
 SELECT
     (r.id::bigint * 1000000 + (ORDINALITY - 1)) * 10 + 3 AS id,
@@ -108,7 +111,8 @@ WHERE
         FROM
             summaries.selected_collections
         WHERE
-            schema=current_schema());
+            schema=current_schema())
+        EXTRAWHERECLAUSE;
 
 CREATE UNIQUE INDEX tmp_release_summary_id ON tmp_release_summary (id);
 
