@@ -174,7 +174,7 @@ def validate_collections(ctx, param, value):
     try:
         ids = tuple(int(_id) for _id in value.split(','))
     except ValueError:
-        raise click.BadParameter(f'Collection IDs must be integers')
+        raise click.BadParameter('Collection IDs must be integers')
 
     difference = set(ids) - set(db.pluck('SELECT id FROM collection WHERE id IN %(ids)s', {'ids': ids}))
     if difference:
@@ -188,7 +188,7 @@ def validate_name(ctx, param, value):
     Returns a schema suffix. Raises an error if the suffix isn't lowercase.
     """
     if value and value != value.lower():
-        raise click.BadParameter(f'value must be lowercase')
+        raise click.BadParameter('value must be lowercase')
 
     return value
 

@@ -29,7 +29,7 @@ def test_command(db, caplog):
 
         result = runner.invoke(cli, [command])
 
-        text = dedent(f"""\
+        text = dedent("""\
         | Name         | Collections   | Note                          |
         |--------------|---------------|-------------------------------|
         | collection_1 | 1             | Default (202""")
@@ -46,13 +46,13 @@ def test_command_multiple(db, caplog):
         runner = CliRunner()
 
         statement = sql.SQL("INSERT INTO {table} (note, created_at) VALUES (%(note)s, %(created_at)s)").format(
-            table=sql.Identifier(f'view_data_collection_1_2', 'note'))
+            table=sql.Identifier('view_data_collection_1_2', 'note'))
         db.execute(statement, {'note': 'Another', 'created_at': datetime(2000, 1, 1)})
         db.commit()
 
         result = runner.invoke(cli, [command])
 
-        text = dedent(f"""\
+        text = dedent("""\
         | Name           | Collections   | Note                          |
         |----------------|---------------|-------------------------------|
         | collection_1_2 | 1, 2          | Another (2000-01-01 00:00:00) |
