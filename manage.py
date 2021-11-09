@@ -215,10 +215,10 @@ def construct_where_fragment(cursor, filter_field, filter_value):
     :param str filter_field: a period-separated field name, e.g. "tender.procurementMethod"
     :param str filter_value: the value of the specified field, e.g. "direct"
     """
-    path = [f"'{x}'" for x in filter_field.split('.')]
-    sql = 'AND d.data' + '->%s' * (len(path) - 1) + '->>%s = %s'
-    escaped_sql = cursor.mogrify(sql, filter_field.split('.') + [filter_value])
-    return escaped_sql.decode()
+    path = filter_field.split('.')
+    format_string = 'AND d.data' + '->%s' * (len(path) - 1) + '->>%s = %s'
+    where_fragment = cursor.mogrify(format_string, path + [filter_value])
+    return where_fragment.decode()
 
 
 @click.group()
