@@ -208,14 +208,14 @@ def validate_schema(ctx, param, value):
 
 def construct_extra_where_clause(cursor, filter_field, filter_value):
     """
-    Returns part of a sql where clause, for given filter parameters.
+    Returns part of a WHERE clause, for the given filter parameters.
 
-    :param str cursor: a pschopg2 database cursor
-    :param str filter_field: a period seperated field name, e.g. "tender.procurementMethod"
+    :param cursor: a psycopg2 database cursor
+    :param str filter_field: a period-separated field name, e.g. "tender.procurementMethod"
     :param str filter_value: the value of the specified field, e.g. "direct"
     """
     path = [f"'{x}'" for x in filter_field.split('.')]
-    sql = 'AND d.data->' + '%s->'*(len(path)-1) + '>%s = %s'
+    sql = 'AND d.data' + '->%s' * (len(path) - 1) + '->>%s = %s'
     escaped_sql = cursor.mogrify(sql, filter_field.split('.') + [filter_value])
     return escaped_sql.decode()
 
