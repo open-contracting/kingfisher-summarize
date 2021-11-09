@@ -69,7 +69,7 @@ COLUMN_COMMENTS_SQL = """
 """
 
 
-def sql_files(directory, tables_only=False, extra_where_clause=''):
+def sql_files(directory, tables_only=False, where_fragment=None):
     """
     Returns a dict in which the key is the identifier of a SQL file and the value is its content.
 
@@ -85,7 +85,8 @@ def sql_files(directory, tables_only=False, extra_where_clause=''):
             content = f.read()
         if tables_only:
             content = re.sub(r'^(CREATE|DROP) VIEW', r'\1 TABLE', content, flags=flags)
-        content = content.replace('EXTRAWHERECLAUSE', extra_where_clause)
+        if where_fragment:
+            content = content.replace('--  WHEREFRAGMENT', where_fragment)
         files[identifier] = content
 
     return files
@@ -206,7 +207,7 @@ def validate_schema(ctx, param, value):
     return schema
 
 
-def construct_extra_where_clause(cursor, filter_field, filter_value):
+def construct_where_fragment(cursor, filter_field, filter_value):
     """
     Returns part of a WHERE clause, for the given filter parameters.
 
@@ -277,9 +278,9 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
         name = f"collection_{'_'.join(str(_id) for _id in sorted(collections))}"
 
     if filter_tuple:
-        extra_where_clause = construct_extra_where_clause(db.cursor, *filter_tuple)
+        where_fragment = construct_where_fragment(db.cursor, *filter_tuple)
     else:
-        extra_where_clause = ''
+        where_fragment = None
 
     schema = f'view_data_{name}'
 
@@ -309,7 +310,7 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
     logger.info('Added %s', name)
 
     logger.info('Running summary-tables routine')
-    summary_tables(schema, tables_only=tables_only, skip=skip, extra_where_clause=extra_where_clause)
+    summary_tables(schema, tables_only=tables_only, skip=skip, where_fragment=where_fragment)
 
     if field_counts_option:
         logger.info('Running field-counts routine')
@@ -394,20 +395,20 @@ def _run_summary_tables(name, identifier, content):
     logger.info('%s: %ss', identifier, time() - start)
 
 
-def summary_tables(name, tables_only=False, skip=(), extra_where_clause=''):
+def summary_tables(name, tables_only=False, skip=(), where_fragment=None):
     """
     Creates the summary tables in a schema.
 
     :param str name: the schema's name
     :param boolean tables_only: whether to create SQL tables instead of SQL views
     :param tuple skip: any SQL files to skip
-    :param str extra_where_clause: an extra clause to use when selecting the data
+    :param str where_fragment: an extra clause to use when selecting the data
     """
     logger = logging.getLogger('ocdskingfisher.summarize.summary-tables')
 
     start = time()
 
-    files = {directory: sql_files(directory, tables_only=tables_only, extra_where_clause=extra_where_clause)
+    files = {directory: sql_files(directory, tables_only=tables_only, where_fragment=where_fragment)
              for directory in ('initial', 'middle', 'final')}
     graph = dependency_graph(files['middle'])
 
