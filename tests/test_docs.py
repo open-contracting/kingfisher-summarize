@@ -215,7 +215,7 @@ def test_docs():
                 elif column == 'identifier' and subject != 'related process':
                     if subject == 'party':
                         candidates = [
-                            f"Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the party object"
+                            "Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the party object"
                         ]
                     else:
                         candidates = [
