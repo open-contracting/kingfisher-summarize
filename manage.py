@@ -359,7 +359,7 @@ def index():
 
 def _run_summary_tables(name, identifier, content):
     logger = logging.getLogger('ocdskingfisher.summarize.summary-tables')
-    logger.info(f'Processing {identifier}')
+    logger.info('Processing %s', identifier)
 
     start = time()
 
@@ -518,7 +518,7 @@ def field_counts(name):
 
 def _run_field_lists(name, table, tables_only):
     logger = logging.getLogger('ocdskingfisher.summarize.field-lists')
-    logger.info(f'Processing {table.name}')
+    logger.info('Processing %s', table.name)
 
     start = time()
 
