@@ -325,3 +325,230 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
         assert result.exit_code == 0
         assert result.output == ''
         assert_log_records(caplog, command, expected)
+
+
+@pytest.mark.parametrize('filter_tuple', [('tender.procurementMethod', 'direct')])
+@pytest.mark.parametrize('tables_only, field_counts, field_lists, tables, views', [
+    (False, True, False,
+     TABLES | SUMMARY_TABLES, SUMMARY_VIEWS),
+    (True, True, False,
+     TABLES | SUMMARY_TABLES | SUMMARY_VIEWS, set()),
+    (False, False, True,
+     TABLES | FIELD_LIST_TABLES | NO_FIELD_LIST_TABLES, SUMMARY_TABLES | SUMMARY_VIEWS | NO_FIELD_LIST_VIEWS),
+    (True, False, True,
+     TABLES | FIELD_LIST_TABLES | NO_FIELD_LIST_TABLES | SUMMARY_TABLES | SUMMARY_VIEWS | NO_FIELD_LIST_VIEWS, set()),
+])
+def test_command_filter(db, tables_only, field_counts, field_lists, tables, views, filter_tuple, caplog):
+    # Load collection 2 first, to check that existing collections aren't included when we load collection 1.
+    with fixture(db, collections='2', tables_only=tables_only, field_counts=field_counts, field_lists=field_lists,
+                 filter_tuple=filter_tuple), fixture(db, tables_only=tables_only, field_counts=field_counts,
+                                                     field_lists=field_lists, filter_tuple=filter_tuple) as result:
+        # Check existence of schema, tables and views.
+        if field_counts:
+            tables.add('field_counts')
+
+        assert db.schema_exists('view_data_collection_1')
+        assert db.schema_exists('view_data_collection_2')
+        assert set(db.pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
+                            "AND table_type = 'BASE TABLE'", {'schema': 'view_data_collection_1'})) == tables
+        assert set(db.pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
+                            "AND table_type = 'VIEW'", {'schema': 'view_data_collection_1'})) == views
+
+        # Check that the tender_summary table only has correctly filtered items
+        rows = db.all("""
+            SELECT
+                procurementmethod
+            FROM view_data_collection_1.tender_summary
+        """)
+        for row in rows:
+            assert row[0] == 'direct'
+
+        # Check data_id's in the summary against the data table
+        # This allows us to check that missing data doesn't have the filtered value
+        assert len(rows) == 19
+        rows = db.all("""
+            SELECT
+                data_id
+            FROM view_data_collection_1.release_summary
+        """)
+        assert len(rows) == 19
+        data_ids = [row[0] for row in rows]
+        rows = db.all("""
+            SELECT data.id, data.data->'tender'->'procurementMethod' FROM data
+            JOIN release ON release.data_id=data.id
+            WHERE release.collection_id=1
+        """)
+        for row in rows:
+            if row[1] == 'direct':
+                assert row[0] in data_ids
+            else:
+                assert row[0] not in data_ids
+
+        # Check contents of summary relations.
+        rows = db.all("""
+            SELECT
+                award_index,
+                release_type,
+                collection_id,
+                ocid,
+                release_id,
+                award_id,
+                title,
+                status,
+                description,
+                value_amount,
+                value_currency,
+                date,
+                contractperiod_startdate,
+                contractperiod_enddate,
+                contractperiod_maxextentdate,
+                contractperiod_durationindays,
+                total_suppliers,
+                total_documents,
+                document_documenttype_counts,
+                total_items
+            FROM view_data_collection_1.awards_summary
+            ORDER BY id, award_index
+        """)
+
+        assert rows[0] == (
+            0,  # award_index
+            'release',  # release_type
+            1,  # collection_id
+            'officia dolore non',  # ocid
+            'laborum irure consectetur fugiat',  # release_id
+            'dolorLorem fugiat ut',  # award_id
+            'et',  # award_title
+            'pending',  # award_status
+            'adipisicing ame',  # award_description
+            decimal.Decimal('-7139109'),  # award_value_amount
+            'AUD',  # award_value_currency
+            datetime.datetime(3672, 10, 26, 4, 38, 28, 786000),  # award_date
+            datetime.datetime(2192, 8, 27, 0, 9, 1, 626000),  # award_contractperiod_startdate
+            datetime.datetime(4204, 1, 22, 22, 4, 18, 268000),  # award_contractperiod_enddate
+            datetime.datetime(5117, 12, 26, 11, 33, 27, 496000),  # award_contractperiod_maxextentdate
+            decimal.Decimal('-30383739'),  # award_contractperiod_durationindays
+            5,  # total_suppliers
+            4,  # total_documents
+            {
+                'in sint enim labore': 1,
+                'mollit labore Lorem': 1,
+                'minim incididunt sed ipsum': 1,
+                'ad reprehenderit sit dolor enim': 1
+            },  # document_documenttype_counts
+            5,  # total_items
+        )
+        assert len(rows) == 55
+
+        rows = db.all("""
+            SELECT
+                party_index,
+                release_type,
+                collection_id,
+                ocid,
+                release_id,
+                party_id,
+                roles,
+                identifier,
+                unique_identifier_attempt,
+                additionalidentifiers_ids,
+                total_additionalidentifiers
+            FROM view_data_collection_1.parties_summary
+            ORDER BY id, party_index
+        """)
+
+        assert rows[0] == (
+            0,  # party_index
+            'release',  # release_type
+            1,  # collection_id
+            'officia dolore non',  # ocid
+            'laborum irure consectetur fugiat',  # release_id
+            'eu voluptateeiusmod ipsum ea',  # party_id
+            [
+                'laborum',
+                'tempor',
+            ],  # roles
+            'cupidatat consequat in ullamco-in incididunt commodo elit',  # identifier
+            'eu voluptateeiusmod ipsum ea',  # unique_identifier_attempt
+            [
+                'non ei-commododolor laborum',
+            ],  # additionalidentifiers_ids
+            1,  # total_additionalidentifiers
+
+        )
+        assert len(rows) == 56
+
+        if field_counts:
+            # Check contents of field_counts table.
+            rows = db.all('SELECT * FROM view_data_collection_1.field_counts')
+
+            assert len(rows) == 13077
+            assert rows[0] == (1, 'release', 'awards', 19, 55, 19)
+
+        if field_lists:
+            # Check the count of keys in the field_list field for the lowest primary keys in each summary relation.
+            statement = """
+                SELECT
+                    count(*)
+                FROM
+                    (SELECT
+                        jsonb_each(field_list)
+                    FROM (
+                        SELECT
+                            field_list
+                        FROM
+                            view_data_collection_1.{table}
+                        ORDER BY
+                            {primary_keys}
+                        LIMIT 1) AS field_list
+                    ) AS each
+            """
+
+            expected = {
+                'award_documents_summary': 11,
+                'award_items_summary': 29,
+                'award_suppliers_summary': 30,
+                'awards_summary': 164,
+                'buyer_summary': 31,
+                'contract_documents_summary': 11,
+                'contract_implementation_documents_summary': 11,
+                'contract_implementation_milestones_summary': 23,
+                'contract_implementation_transactions_summary': 83,
+                'contract_items_summary': 26,
+                'contract_milestones_summary': 26,
+                'contracts_summary': 327,
+                'parties_summary': 30,
+                'planning_documents_summary': 11,
+                'planning_milestones_summary': 27,
+                'planning_summary': 99,
+                'procuringentity_summary': 30,
+                'relatedprocesses_summary': 6,
+                'release_summary': 987,
+                'tender_documents_summary': 13,
+                'tender_items_summary': 28,
+                'tender_milestones_summary': 27,
+                'tender_summary': 265,
+                'tenderers_summary': 32,
+            }
+
+            for table in SUMMARIES:
+                count = db.one(db.format(statement, table=table.name, primary_keys=table.primary_keys))[0]
+
+                assert count == expected[table.name], f'{table.name}: {count} != {expected[table.name]}'
+
+        expected = []
+        for collection_id in [2, 1]:
+            expected.extend([
+                f'Arguments: collections=({collection_id},) note=Default name=None tables_only={tables_only!r} '
+                f'filter_tuple={filter_tuple!r}',
+                f'Added collection_{collection_id}',
+                'Running summary-tables routine',
+            ])
+            if field_counts:
+                expected.append('Running field-counts routine')
+            if field_lists:
+                expected.append('Running field-lists routine')
+
+        assert result.exit_code == 0
+        assert result.output == ''
+        assert_log_records(caplog, command, expected)
