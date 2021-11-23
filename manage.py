@@ -402,7 +402,7 @@ def summary_tables(name, tables_only=False, skip=(), where_fragment=None):
     :param str name: the schema's name
     :param boolean tables_only: whether to create SQL tables instead of SQL views
     :param tuple skip: any SQL files to skip
-    :param str where_fragment: an extra clause to use when selecting the data
+    :param str where_fragment: part of a WHERE clause to use when selecting the data
     """
     logger = logging.getLogger('ocdskingfisher.summarize.summary-tables')
 
