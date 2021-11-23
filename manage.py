@@ -262,7 +262,7 @@ def cli(ctx, quiet):
 @click.pass_context
 def add(ctx, collections, note, name, tables_only, field_counts_option, field_lists_option, skip, filter_tuple):
     """
-    Creates a schema containing summary tables about one or more collections.
+    Create a schema containing summary tables about one or more collections.
 
     \b
     COLLECTIONS is one or more comma-separated collection IDs
@@ -333,7 +333,7 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
 @click.argument('name', callback=validate_schema)
 def remove(name):
     """
-    Drops a schema.
+    Drop a schema.
 
     NAME is the last part of a schema's name after "view_data_".
     """
@@ -360,7 +360,7 @@ def _get_selected_collections(schema):
 @cli.command()
 def index():
     """
-    Lists the schemas, with collection IDs and creator's notes.
+    List the schemas, with collection IDs and creator's notes.
     """
     def format_note(note):
         return f"{note[0]} ({note[1].strftime('%Y-%m-%d %H:%M:%S')})"
@@ -382,7 +382,7 @@ def index():
 
 def _run_summary_tables(name, identifier, content):
     logger = logging.getLogger('ocdskingfisher.summarize.summary-tables')
-    logger.info(f'Processing {identifier}')
+    logger.info('Processing %s', identifier)
 
     start = time()
 
@@ -543,7 +543,7 @@ def field_counts(name):
 
 def _run_field_lists(name, table, tables_only):
     logger = logging.getLogger('ocdskingfisher.summarize.field-lists')
-    logger.info(f'Processing {table.name}')
+    logger.info('Processing %s', table.name)
 
     start = time()
 
@@ -647,7 +647,7 @@ def dev():
 @dev.command()
 def stale():
     """
-    Prints schemas summarizing deleted collections.
+    Print schemas summarizing deleted collections.
     """
     skip = os.getenv('KINGFISHER_SUMMARIZE_PROTECT_SCHEMA', '').split(',')
 
@@ -665,7 +665,7 @@ def stale():
 @click.argument('name', callback=validate_schema)
 def docs_table_ref(name):
     """
-    Creates or updates the CSV files in docs/definitions.
+    Create or update the CSV files in docs/definitions.
     """
     tables = []
     for content in sql_files('middle').values():
