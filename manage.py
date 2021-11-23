@@ -207,7 +207,7 @@ def validate_schema(ctx, param, value):
     return schema
 
 
-def construct_where_fragment_from_filter(cursor, filter_field, filter_value):
+def construct_where_fragment(cursor, filter_field, filter_value):
     """
     Returns part of a WHERE clause, for the given filter parameters.
 
@@ -219,20 +219,6 @@ def construct_where_fragment_from_filter(cursor, filter_field, filter_value):
     format_string = ' AND d.data' + '->%s' * (len(path) - 1) + '->>%s = %s'
     where_fragment = cursor.mogrify(format_string, path + [filter_value])
     return where_fragment.decode()
-
-
-def construct_where_fragment_from_filters(cursor, filters):
-    """
-    Returns part of a WHERE clause, for the given filters.
-
-    :param cursor: a psycopg2 database cursor
-    :param filters: an iterable of filter_field, filter_value pairs
-    """
-
-    where_fragment = ''
-    for filter_field, filter_value in filters:
-        where_fragment += construct_where_fragment_from_filter(cursor, filter_field, filter_value)
-    return where_fragment
 
 
 @click.group()
@@ -292,7 +278,7 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
         name = f"collection_{'_'.join(str(_id) for _id in sorted(collections))}"
 
     if filters:
-        where_fragment = construct_where_fragment_from_filters(db.cursor, filters)
+        where_fragment = ''.join(construct_where_fragment(db.cursor, field, value) for field, value in filters)
     else:
         where_fragment = None
 
