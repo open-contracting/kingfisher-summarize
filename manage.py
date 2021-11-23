@@ -207,7 +207,7 @@ def validate_schema(ctx, param, value):
     return schema
 
 
-def construct_where_fragment(cursor, filter_field, filter_value):
+def construct_where_fragment_from_filter(cursor, filter_field, filter_value):
     """
     Returns part of a WHERE clause, for the given filter parameters.
 
@@ -216,9 +216,23 @@ def construct_where_fragment(cursor, filter_field, filter_value):
     :param str filter_value: the value of the specified field, e.g. "direct"
     """
     path = filter_field.split('.')
-    format_string = 'AND d.data' + '->%s' * (len(path) - 1) + '->>%s = %s'
+    format_string = ' AND d.data' + '->%s' * (len(path) - 1) + '->>%s = %s'
     where_fragment = cursor.mogrify(format_string, path + [filter_value])
     return where_fragment.decode()
+
+
+def construct_where_fragment_from_filters(cursor, filters):
+    """
+    Returns part of a WHERE clause, for the given filters.
+
+    :param cursor: a psycopg2 database cursor
+    :param filters: an iterable of filter_field, filter_value pairs
+    """
+
+    where_fragment = ''
+    for filter_field, filter_value in filters:
+        where_fragment += construct_where_fragment_from_filter(cursor, filter_field, filter_value)
+    return where_fragment
 
 
 @click.group()
@@ -257,10 +271,10 @@ def cli(ctx, quiet):
               help="Whether to add a field_list column to all summary tables (default false).")
 @click.option('--skip', multiple=True,
               help="Any SQL files to skip. Dependent files and final files will be skipped.")
-@click.option('--filter', "filter_tuple", nargs=2,
-              help="")
+@click.option('--filter', "filters", nargs=2, multiple=True,
+              help="A field and value to filter by, like --filter tender.procurementMethod direct")
 @click.pass_context
-def add(ctx, collections, note, name, tables_only, field_counts_option, field_lists_option, skip, filter_tuple):
+def add(ctx, collections, note, name, tables_only, field_counts_option, field_lists_option, skip, filters):
     """
     Create a schema containing summary tables about one or more collections.
 
@@ -269,16 +283,16 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
     NOTE is your name and a description of your purpose
     """
     logger = logging.getLogger('ocdskingfisher.summarize.add')
-    logger.info('Arguments: collections=%s note=%s name=%s tables_only=%s filter=%s',
-                collections, note, name, tables_only, filter_tuple)
+    logger.info('Arguments: collections=%s note=%s name=%s tables_only=%s filters=%s',
+                collections, note, name, tables_only, filters)
 
     if not name:
         if len(collections) > 5:
             raise click.UsageError('--name is required for more than 5 collections')
         name = f"collection_{'_'.join(str(_id) for _id in sorted(collections))}"
 
-    if filter_tuple:
-        where_fragment = construct_where_fragment(db.cursor, *filter_tuple)
+    if filters:
+        where_fragment = construct_where_fragment_from_filters(db.cursor, filters)
     else:
         where_fragment = None
 

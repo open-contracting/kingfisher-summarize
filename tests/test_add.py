@@ -6,7 +6,7 @@ import pytest
 from click.testing import CliRunner
 from psycopg2 import sql
 
-from manage import SUMMARIES, cli, construct_where_fragment
+from manage import SUMMARIES, cli, construct_where_fragment_from_filter
 from tests import assert_bad_argument, assert_log_records, assert_log_running, fixture, noop
 
 command = 'add'
@@ -32,14 +32,14 @@ for summary_table in SUMMARIES:
         TABLES.add(f'{summary_table.name}_no_data')
 
 
-def test_construct_where_fragment(db):
-    assert construct_where_fragment(db.cursor, 'a', 'z') == "AND d.data->>'a' = 'z'"
-    assert construct_where_fragment(db.cursor, 'a.b', 'z') == "AND d.data->'a'->>'b' = 'z'"
-    assert construct_where_fragment(db.cursor, 'a.b.c', 'z') == "AND d.data->'a'->'b'->>'c' = 'z'"
-    assert construct_where_fragment(db.cursor, 'a.b.c.d', 'z') == "AND d.data->'a'->'b'->'c'->>'d' = 'z'"
+def test_construct_where_fragment_from_filter(db):
+    assert construct_where_fragment_from_filter(db.cursor, 'a', 'z') == " AND d.data->>'a' = 'z'"
+    assert construct_where_fragment_from_filter(db.cursor, 'a.b', 'z') == " AND d.data->'a'->>'b' = 'z'"
+    assert construct_where_fragment_from_filter(db.cursor, 'a.b.c', 'z') == " AND d.data->'a'->'b'->>'c' = 'z'"
+    assert construct_where_fragment_from_filter(db.cursor, 'a.b.c.d', 'z') == " AND d.data->'a'->'b'->'c'->>'d' = 'z'"
 
-    assert construct_where_fragment(db.cursor, 'a.b.c', '') == "AND d.data->'a'->'b'->>'c' = ''"
-    assert construct_where_fragment(db.cursor, '', 'z') == "AND d.data->>'' = 'z'"
+    assert construct_where_fragment_from_filter(db.cursor, 'a.b.c', '') == " AND d.data->'a'->'b'->>'c' = ''"
+    assert construct_where_fragment_from_filter(db.cursor, '', 'z') == " AND d.data->>'' = 'z'"
 
 
 @pytest.mark.parametrize('collections, message', [
@@ -90,7 +90,7 @@ def test_command_name(kwargs, name, collections, db, caplog):
         assert result.output == ''
         assert_log_records(caplog, command, [
             f'Arguments: collections={collections!r} note=Default name={kwargs.get("name")} tables_only=False '
-            'filter=()',
+            'filters=()',
             f'Added {name}',
             'Running summary-tables routine',
             'Running field-counts routine',
@@ -98,7 +98,7 @@ def test_command_name(kwargs, name, collections, db, caplog):
         ])
 
 
-@pytest.mark.parametrize('filter_tuple', [(), ('ocid', 'dolore')])
+@pytest.mark.parametrize('filters', [(), (('ocid', 'dolore'),)])
 @pytest.mark.parametrize('tables_only, field_counts, field_lists, tables, views', [
     (False, True, False,
      TABLES | SUMMARY_TABLES, SUMMARY_VIEWS),
@@ -109,11 +109,11 @@ def test_command_name(kwargs, name, collections, db, caplog):
     (True, False, True,
      TABLES | FIELD_LIST_TABLES | NO_FIELD_LIST_TABLES | SUMMARY_TABLES | SUMMARY_VIEWS | NO_FIELD_LIST_VIEWS, set()),
 ])
-def test_command(db, tables_only, field_counts, field_lists, tables, views, filter_tuple, caplog):
+def test_command(db, tables_only, field_counts, field_lists, tables, views, filters, caplog):
     # Load collection 2 first, to check that existing collections aren't included when we load collection 1.
     with fixture(db, collections='2', tables_only=tables_only, field_counts=field_counts, field_lists=field_lists,
-                 filter_tuple=filter_tuple), fixture(db, tables_only=tables_only, field_counts=field_counts,
-                                                     field_lists=field_lists, filter_tuple=filter_tuple) as result:
+                 filters=filters), fixture(db, tables_only=tables_only, field_counts=field_counts,
+                                           field_lists=field_lists, filters=filters) as result:
         # Check existence of schema, tables and views.
         if field_counts:
             tables.add('field_counts')
@@ -179,7 +179,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
             },  # document_documenttype_counts
             5,  # total_items
         )
-        if filter_tuple:
+        if filters:
             assert len(rows) == 4
         else:
             assert len(rows) == 301
@@ -225,7 +225,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
             5,  # total_additionalidentifiers
 
         )
-        if filter_tuple:
+        if filters:
             assert len(rows) == 4
         else:
             assert len(rows) == 296
@@ -234,7 +234,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
             # Check contents of field_counts table.
             rows = db.all('SELECT * FROM view_data_collection_1.field_counts')
 
-            if filter_tuple:
+            if filters:
                 assert len(rows) == 1046
                 assert rows[0] == (1, 'release', 'awards', 1, 4, 1)
             else:
@@ -313,7 +313,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
         for collection_id in [2, 1]:
             expected.extend([
                 f'Arguments: collections=({collection_id},) note=Default name=None tables_only={tables_only!r} '
-                f'filter={filter_tuple!r}',
+                f'filters={filters!r}',
                 f'Added collection_{collection_id}',
                 'Running summary-tables routine',
             ])
@@ -327,7 +327,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
         assert_log_records(caplog, command, expected)
 
 
-@pytest.mark.parametrize('filter_tuple', [('tender.procurementMethod', 'direct')])
+@pytest.mark.parametrize('filters', [(('tender.procurementMethod', 'direct'),)])
 @pytest.mark.parametrize('tables_only, field_counts, field_lists, tables, views', [
     (False, True, False,
      TABLES | SUMMARY_TABLES, SUMMARY_VIEWS),
@@ -338,11 +338,11 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
     (True, False, True,
      TABLES | FIELD_LIST_TABLES | NO_FIELD_LIST_TABLES | SUMMARY_TABLES | SUMMARY_VIEWS | NO_FIELD_LIST_VIEWS, set()),
 ])
-def test_command_filter(db, tables_only, field_counts, field_lists, tables, views, filter_tuple, caplog):
+def test_command_filter(db, tables_only, field_counts, field_lists, tables, views, filters, caplog):
     # Load collection 2 first, to check that existing collections aren't included when we load collection 1.
     with fixture(db, collections='2', tables_only=tables_only, field_counts=field_counts, field_lists=field_lists,
-                 filter_tuple=filter_tuple), fixture(db, tables_only=tables_only, field_counts=field_counts,
-                                                     field_lists=field_lists, filter_tuple=filter_tuple) as result:
+                 filters=filters), fixture(db, tables_only=tables_only, field_counts=field_counts,
+                                           field_lists=field_lists, filters=filters) as result:
         # Check existence of schema, tables and views.
         if field_counts:
             tables.add('field_counts')
@@ -540,7 +540,7 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
         for collection_id in [2, 1]:
             expected.extend([
                 f'Arguments: collections=({collection_id},) note=Default name=None tables_only={tables_only!r} '
-                f'filter={filter_tuple!r}',
+                f'filters={filters!r}',
                 f'Added collection_{collection_id}',
                 'Running summary-tables routine',
             ])
