@@ -269,7 +269,7 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
     NOTE is your name and a description of your purpose
     """
     logger = logging.getLogger('ocdskingfisher.summarize.add')
-    logger.info('Arguments: collections=%s note=%s name=%s tables_only=%s filter_tuple=%s',
+    logger.info('Arguments: collections=%s note=%s name=%s tables_only=%s filter=%s',
                 collections, note, name, tables_only, filter_tuple)
 
     if not name:

@@ -90,7 +90,7 @@ def test_command_name(kwargs, name, collections, db, caplog):
         assert result.output == ''
         assert_log_records(caplog, command, [
             f'Arguments: collections={collections!r} note=Default name={kwargs.get("name")} tables_only=False '
-            'filter_tuple=()',
+            'filter=()',
             f'Added {name}',
             'Running summary-tables routine',
             'Running field-counts routine',
@@ -313,7 +313,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
         for collection_id in [2, 1]:
             expected.extend([
                 f'Arguments: collections=({collection_id},) note=Default name=None tables_only={tables_only!r} '
-                f'filter_tuple={filter_tuple!r}',
+                f'filter={filter_tuple!r}',
                 f'Added collection_{collection_id}',
                 'Running summary-tables routine',
             ])
@@ -540,7 +540,7 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
         for collection_id in [2, 1]:
             expected.extend([
                 f'Arguments: collections=({collection_id},) note=Default name=None tables_only={tables_only!r} '
-                f'filter_tuple={filter_tuple!r}',
+                f'filter={filter_tuple!r}',
                 f'Added collection_{collection_id}',
                 'Running summary-tables routine',
             ])
