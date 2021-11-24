@@ -69,7 +69,7 @@ COLUMN_COMMENTS_SQL = """
 """
 
 
-def sql_files(directory, tables_only=False):
+def sql_files(directory, tables_only=False, where_fragment=None):
     """
     Returns a dict in which the key is the identifier of a SQL file and the value is its content.
 
@@ -85,6 +85,8 @@ def sql_files(directory, tables_only=False):
             content = f.read()
         if tables_only:
             content = re.sub(r'^(CREATE|DROP) VIEW', r'\1 TABLE', content, flags=flags)
+        if where_fragment:
+            content = content.replace('--  WHEREFRAGMENT', where_fragment)
         files[identifier] = content
 
     return files
@@ -205,6 +207,20 @@ def validate_schema(ctx, param, value):
     return schema
 
 
+def construct_where_fragment(cursor, filter_field, filter_value):
+    """
+    Returns part of a WHERE clause, for the given filter parameters.
+
+    :param cursor: a psycopg2 database cursor
+    :param str filter_field: a period-separated field name, e.g. "tender.procurementMethod"
+    :param str filter_value: the value of the specified field, e.g. "direct"
+    """
+    path = filter_field.split('.')
+    format_string = ' AND d.data' + '->%s' * (len(path) - 1) + '->>%s = %s'
+    where_fragment = cursor.mogrify(format_string, path + [filter_value])
+    return where_fragment.decode()
+
+
 @click.group()
 @click.option('-q', '--quiet', is_flag=True, help='Change the log level to warning')
 @click.pass_context
@@ -241,8 +257,10 @@ def cli(ctx, quiet):
               help="Whether to add a field_list column to all summary tables (default false).")
 @click.option('--skip', multiple=True,
               help="Any SQL files to skip. Dependent files and final files will be skipped.")
+@click.option('--filter', "filters", nargs=2, multiple=True,
+              help="A field and value to filter by, like --filter tender.procurementMethod direct")
 @click.pass_context
-def add(ctx, collections, note, name, tables_only, field_counts_option, field_lists_option, skip):
+def add(ctx, collections, note, name, tables_only, field_counts_option, field_lists_option, skip, filters):
     """
     Create a schema containing summary tables about one or more collections.
 
@@ -251,13 +269,18 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
     NOTE is your name and a description of your purpose
     """
     logger = logging.getLogger('ocdskingfisher.summarize.add')
-    logger.info('Arguments: collections=%s note=%s name=%s tables_only=%s',
-                collections, note, name, tables_only)
+    logger.info('Arguments: collections=%s note=%s name=%s tables_only=%s filters=%s',
+                collections, note, name, tables_only, filters)
 
     if not name:
         if len(collections) > 5:
             raise click.UsageError('--name is required for more than 5 collections')
         name = f"collection_{'_'.join(str(_id) for _id in sorted(collections))}"
+
+    if filters:
+        where_fragment = ''.join(construct_where_fragment(db.cursor, field, value) for field, value in filters)
+    else:
+        where_fragment = None
 
     schema = f'view_data_{name}'
 
@@ -287,7 +310,7 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
     logger.info('Added %s', name)
 
     logger.info('Running summary-tables routine')
-    summary_tables(schema, tables_only=tables_only, skip=skip)
+    summary_tables(schema, tables_only=tables_only, skip=skip, where_fragment=where_fragment)
 
     if field_counts_option:
         logger.info('Running field-counts routine')
@@ -372,19 +395,21 @@ def _run_summary_tables(name, identifier, content):
     logger.info('%s: %ss', identifier, time() - start)
 
 
-def summary_tables(name, tables_only=False, skip=()):
+def summary_tables(name, tables_only=False, skip=(), where_fragment=None):
     """
     Creates the summary tables in a schema.
 
     :param str name: the schema's name
     :param boolean tables_only: whether to create SQL tables instead of SQL views
     :param tuple skip: any SQL files to skip
+    :param str where_fragment: part of a WHERE clause to use when selecting the data
     """
     logger = logging.getLogger('ocdskingfisher.summarize.summary-tables')
 
     start = time()
 
-    files = {directory: sql_files(directory, tables_only=tables_only) for directory in ('initial', 'middle', 'final')}
+    files = {directory: sql_files(directory, tables_only=tables_only, where_fragment=where_fragment)
+             for directory in ('initial', 'middle', 'final')}
     graph = dependency_graph(files['middle'])
 
     if skip:
