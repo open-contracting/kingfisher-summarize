@@ -75,6 +75,7 @@ def sql_files(directory, tables_only=False, where_fragment=None):
 
     :param str directory: a sub-directory containing SQL files
     :param bool tables_only: whether to create SQL tables instead of SQL views
+    :param str where_fragment: part of a WHERE clause to use when selecting the data
     """
     files = {}
 
