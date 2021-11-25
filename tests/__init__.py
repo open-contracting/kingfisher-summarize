@@ -11,7 +11,8 @@ def noop(*args, **kwargs):
 
 
 @contextmanager
-def fixture(db, collections='1', name=None, tables_only=None, field_counts=True, field_lists=True, filters=()):
+def fixture(db, collections='1', name=None, tables_only=None, field_counts=True, field_lists=True, filters=(),
+            filters_sql_json_path=()):
     runner = CliRunner()
 
     args = ['add', collections, 'Default']
@@ -27,6 +28,8 @@ def fixture(db, collections='1', name=None, tables_only=None, field_counts=True,
         args.append('--field-lists')
     for filter_ in filters:
         args.extend(['--filter', *filter_])
+    for filter_sjp in filters_sql_json_path:
+        args.extend(['--filter-sql-json-path', filter_sjp])
 
     result = runner.invoke(cli, args)
 

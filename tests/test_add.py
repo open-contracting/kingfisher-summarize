@@ -89,7 +89,7 @@ def test_command_name(kwargs, name, collections, db, caplog):
         assert result.output == ''
         assert_log_records(caplog, command, [
             f'Arguments: collections={collections!r} note=Default name={kwargs.get("name")} tables_only=False '
-            'filters=()',
+            'filters=() filters_sql_json_path=()',
             f'Added {name}',
             'Running summary-tables routine',
             'Running field-counts routine',
@@ -312,7 +312,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
         for collection_id in [2, 1]:
             expected.extend([
                 f'Arguments: collections=({collection_id},) note=Default name=None tables_only={tables_only!r} '
-                f'filters={filters!r}',
+                f'filters={filters!r} filters_sql_json_path=()',
                 f'Added collection_{collection_id}',
                 'Running summary-tables routine',
             ])
@@ -326,9 +326,13 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
         assert_log_records(caplog, command, expected)
 
 
-@pytest.mark.parametrize('filters', [
-    (('tender.procurementMethod', 'direct'),),
-    (('tender.procurementMethod', 'direct'), ('tender.status', 'planned'),),
+@pytest.mark.parametrize('filters, filters_sql_json_path', [
+    ((('tender.procurementMethod', 'direct',),), ()),
+    ((('tender.procurementMethod', 'direct',), ('tender.status', 'planned',),), ()),
+    ((), ('$.tender.procurementMethod == "direct"',)),
+    ((), ('$.tender.procurementMethod == "direct"', '$.tender.status == "planned"')),
+    ((('tender.status', 'planned',),), ('$.tender.procurementMethod == "direct"',)),
+    ((('tender.procurementMethod', 'direct',),), ('$.tender.status == "planned"',)),
 ])
 @pytest.mark.parametrize('tables_only, field_counts, field_lists, tables, views', [
     (False, True, False,
@@ -340,11 +344,13 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
     (True, False, True,
      TABLES | FIELD_LIST_TABLES | NO_FIELD_LIST_TABLES | SUMMARY_TABLES | SUMMARY_VIEWS | NO_FIELD_LIST_VIEWS, set()),
 ])
-def test_command_filter(db, tables_only, field_counts, field_lists, tables, views, filters, caplog):
+def test_command_filter(db, tables_only, field_counts, field_lists, tables, views, filters, filters_sql_json_path,
+                        caplog):
     # Load collection 2 first, to check that existing collections aren't included when we load collection 1.
     with fixture(db, collections='2', tables_only=tables_only, field_counts=field_counts, field_lists=field_lists,
-                 filters=filters), fixture(db, tables_only=tables_only, field_counts=field_counts,
-                                           field_lists=field_lists, filters=filters) as result:
+                 filters=filters, filters_sql_json_path=filters_sql_json_path), \
+         fixture(db, tables_only=tables_only, field_counts=field_counts, field_lists=field_lists, filters=filters,
+                 filters_sql_json_path=filters_sql_json_path) as result:
         # Check existence of schema, tables and views.
         if field_counts:
             tables.add('field_counts')
@@ -364,7 +370,7 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
         """)
         for row in rows:
             assert row[0] == 'direct'
-        if len(filters) > 1:
+        if len(filters + filters_sql_json_path) > 1:
             assert len(rows) == 2
         else:
             assert len(rows) == 19
@@ -376,7 +382,7 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
                 data_id
             FROM view_data_collection_1.release_summary
         """)
-        if len(filters) > 1:
+        if len(filters + filters_sql_json_path) > 1:
             assert len(rows) == 2
         else:
             assert len(rows) == 19
@@ -391,7 +397,7 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
             WHERE release.collection_id=1
         """)
         for row in rows:
-            if row[1] == 'direct' and (len(filters) == 1 or row[2] == 'planned'):
+            if row[1] == 'direct' and (len(filters + filters_sql_json_path) == 1 or row[2] == 'planned'):
                 assert row[0] in data_ids
             else:
                 assert row[0] not in data_ids
@@ -450,7 +456,7 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
             },  # document_documenttype_counts
             5,  # total_items
         )
-        if len(filters) > 1:
+        if len(filters + filters_sql_json_path) > 1:
             assert len(rows) == 7
         else:
             assert len(rows) == 55
@@ -491,7 +497,7 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
             1,  # total_additionalidentifiers
 
         )
-        if len(filters) > 1:
+        if len(filters + filters_sql_json_path) > 1:
             assert len(rows) == 5
         else:
             assert len(rows) == 56
@@ -500,7 +506,7 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
             # Check contents of field_counts table.
             rows = db.all('SELECT * FROM view_data_collection_1.field_counts')
 
-            if len(filters) > 1:
+            if len(filters + filters_sql_json_path) > 1:
                 assert len(rows) == 1515
                 assert rows[0] == (1, 'release', 'awards', 2, 7, 2)
             else:
@@ -562,7 +568,7 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
         for collection_id in [2, 1]:
             expected.extend([
                 f'Arguments: collections=({collection_id},) note=Default name=None tables_only={tables_only!r} '
-                f'filters={filters!r}',
+                f'filters={filters!r} filters_sql_json_path={filters_sql_json_path!r}',
                 f'Added collection_{collection_id}',
                 'Running summary-tables routine',
             ])

@@ -222,6 +222,17 @@ def construct_where_fragment(cursor, filter_field, filter_value):
     return where_fragment.decode()
 
 
+def construct_where_fragment_sql_json_path(cursor, filter_sql_json_path):
+    """
+    Returns part of a WHERE clause, to filter on the given SQL/JSON Path Language expression.
+
+    :param cursor: a psycopg2 database cursor
+    :param str filter_sql_json_path: a SQL/JSON Path Language expression, e.g. '$.tender.procurementMethod == "direct"'
+    """
+    where_fragment = cursor.mogrify(' AND jsonb_path_match(d.data,  %s)', [filter_sql_json_path])
+    return where_fragment.decode()
+
+
 @click.group()
 @click.option('-q', '--quiet', is_flag=True, help='Change the log level to warning')
 @click.pass_context
@@ -260,8 +271,11 @@ def cli(ctx, quiet):
               help="Any SQL files to skip. Dependent files and final files will be skipped.")
 @click.option('--filter', "filters", nargs=2, multiple=True,
               help="A field and value to filter by, like --filter tender.procurementMethod direct")
+@click.option('--filter-sql-json-path', "filters_sql_json_path", multiple=True,
+              help="A SQL/JSON Path Language expression to filter by, e.g. '$.tender.procurementMethod == \"direct\"'")
 @click.pass_context
-def add(ctx, collections, note, name, tables_only, field_counts_option, field_lists_option, skip, filters):
+def add(ctx, collections, note, name, tables_only, field_counts_option, field_lists_option, skip, filters,
+        filters_sql_json_path):
     """
     Create a schema containing summary tables about one or more collections.
 
@@ -270,18 +284,17 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
     NOTE is your name and a description of your purpose
     """
     logger = logging.getLogger('ocdskingfisher.summarize.add')
-    logger.info('Arguments: collections=%s note=%s name=%s tables_only=%s filters=%s',
-                collections, note, name, tables_only, filters)
+    logger.info('Arguments: collections=%s note=%s name=%s tables_only=%s filters=%s filters_sql_json_path=%s',
+                collections, note, name, tables_only, filters, filters_sql_json_path)
 
     if not name:
         if len(collections) > 5:
             raise click.UsageError('--name is required for more than 5 collections')
         name = f"collection_{'_'.join(str(_id) for _id in sorted(collections))}"
 
-    if filters:
-        where_fragment = ''.join(construct_where_fragment(db.cursor, field, value) for field, value in filters)
-    else:
-        where_fragment = None
+    where_fragment = ''.join(construct_where_fragment(db.cursor, field, value) for field, value in filters)
+    where_fragment += ''.join(construct_where_fragment_sql_json_path(db.cursor, filter_sjp)
+                              for filter_sjp in filters_sql_json_path)
 
     schema = f'view_data_{name}'
 
