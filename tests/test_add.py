@@ -97,7 +97,12 @@ def test_command_name(kwargs, name, collections, db, caplog):
         ])
 
 
-@pytest.mark.parametrize('filters', [(), (('ocid', 'dolore'),)])
+@pytest.mark.parametrize('filters, filters_sql_json_path', [
+    ((), ()),
+    ((('ocid', 'dolore'),), ()),
+    ((('id', '川蝉'),), ()),
+    ((), ('$.id == "川蝉"',)),
+])
 @pytest.mark.parametrize('tables_only, field_counts, field_lists, tables, views', [
     (False, True, False,
      TABLES | SUMMARY_TABLES, SUMMARY_VIEWS),
@@ -108,11 +113,12 @@ def test_command_name(kwargs, name, collections, db, caplog):
     (True, False, True,
      TABLES | FIELD_LIST_TABLES | NO_FIELD_LIST_TABLES | SUMMARY_TABLES | SUMMARY_VIEWS | NO_FIELD_LIST_VIEWS, set()),
 ])
-def test_command(db, tables_only, field_counts, field_lists, tables, views, filters, caplog):
+def test_command(db, tables_only, field_counts, field_lists, tables, views, filters, filters_sql_json_path, caplog):
     # Load collection 2 first, to check that existing collections aren't included when we load collection 1.
     with fixture(db, collections='2', tables_only=tables_only, field_counts=field_counts, field_lists=field_lists,
-                 filters=filters), fixture(db, tables_only=tables_only, field_counts=field_counts,
-                                           field_lists=field_lists, filters=filters) as result:
+                 filters=filters, filters_sql_json_path=filters_sql_json_path), \
+         fixture(db, tables_only=tables_only, field_counts=field_counts, field_lists=field_lists, filters=filters,
+                 filters_sql_json_path=filters_sql_json_path) as result:
         # Check existence of schema, tables and views.
         if field_counts:
             tables.add('field_counts')
@@ -178,7 +184,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
             },  # document_documenttype_counts
             5,  # total_items
         )
-        if filters:
+        if filters or filters_sql_json_path:
             assert len(rows) == 4
         else:
             assert len(rows) == 301
@@ -224,7 +230,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
             5,  # total_additionalidentifiers
 
         )
-        if filters:
+        if filters or filters_sql_json_path:
             assert len(rows) == 4
         else:
             assert len(rows) == 296
@@ -233,7 +239,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
             # Check contents of field_counts table.
             rows = db.all('SELECT * FROM view_data_collection_1.field_counts')
 
-            if filters:
+            if filters or filters_sql_json_path:
                 assert len(rows) == 1046
                 assert rows[0] == (1, 'release', 'awards', 1, 4, 1)
             else:
@@ -312,7 +318,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
         for collection_id in [2, 1]:
             expected.extend([
                 f'Arguments: collections=({collection_id},) note=Default name=None tables_only={tables_only!r} '
-                f'filters={filters!r} filters_sql_json_path=()',
+                f'filters={filters!r} filters_sql_json_path={filters_sql_json_path!r}',
                 f'Added collection_{collection_id}',
                 'Running summary-tables routine',
             ])
