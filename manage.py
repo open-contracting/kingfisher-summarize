@@ -292,9 +292,10 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
             raise click.UsageError('--name is required for more than 5 collections')
         name = f"collection_{'_'.join(str(_id) for _id in sorted(collections))}"
 
-    where_fragment = ''.join(construct_where_fragment(db.cursor, field, value) for field, value in filters)
-    where_fragment += ''.join(construct_where_fragment_sql_json_path(db.cursor, filter_sjp)
-                              for filter_sjp in filters_sql_json_path)
+    where_fragment = ''.join(
+        [construct_where_fragment(db.cursor, field, value) for field, value in filters] +
+        [construct_where_fragment_sql_json_path(db.cursor, filter_sjp) for filter_sjp in filters_sql_json_path]
+    )
 
     schema = f'view_data_{name}'
 
