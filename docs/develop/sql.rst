@@ -146,7 +146,7 @@ The tests won't pass if you don't document the new columns!
 
    -  The comments should be in the same order as the corresponding columns in the tables. You can use other comments for similar columns as a template.
 
-   .. code-block:: sql
+   .. code-block:: none
 
       -- For the "Add a column" example
 
