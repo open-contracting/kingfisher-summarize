@@ -47,7 +47,7 @@ pip-tools==6.4.0
     # via -r requirements_dev.in
 pluggy==0.13.1
     # via pytest
-psycopg2==2.8.4
+psycopg2==2.9.2
     # via -r requirements.txt
 py==1.10.0
     # via pytest
