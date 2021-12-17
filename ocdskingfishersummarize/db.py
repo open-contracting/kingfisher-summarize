@@ -61,7 +61,11 @@ class Database:
             if isinstance(value, sql.Composable):
                 objects[key] = value
             elif isinstance(value, list):
-                objects[key] = sql.SQL(', ').join(sql.Identifier(entry) for entry in value)
+                entries = []
+                for entry in value:
+                    entries.append(sql.SQL('.').join([sql.Identifier(part) for part in entry.split(".")]))
+
+                objects[key] = sql.SQL(', ').join(entries)
             else:
                 objects[key] = sql.Identifier(value)
         return sql.SQL(statement).format(**objects)

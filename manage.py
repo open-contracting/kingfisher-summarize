@@ -554,6 +554,7 @@ def _run_field_lists(name, table, tables_only):
     summary_table = table.name
     field_list_table = f'{summary_table}_field_list'
     no_field_list_table = f'{summary_table}_no_field_list'
+    variables = []
 
     if tables_only:
         no_field_list_type = sql.SQL('TABLE')
@@ -562,25 +563,84 @@ def _run_field_lists(name, table, tables_only):
         no_field_list_type = sql.SQL('TABLE' if table.is_table else 'VIEW')
         final_summary_type = sql.SQL('VIEW')
 
-    # Create a *_field_list table, add a unique index, rename the *_summary table to *_no_field_list, and re-create
-    # the *_summary table. Then, copy the comments from the old to the new *_summary table.
-
-    # Use jsonb_object_agg instead of array_agg so that paths are unique, and so that queries against the field use the
-    # faster "in" operator for objects (?&) than for arrays (@>).
-    statement = """
-        CREATE TABLE {field_list_table} AS
+    counts_per_path_select = """
         SELECT
             {primary_keys},
-            jsonb_object_agg(path, NULL) AS field_list
+            path,
+            GREATEST(sum(array_item), sum(object_property)) path_count
         FROM
             {summary_table}
         CROSS JOIN
             flatten({summary_table}.{data_column})
         GROUP BY
-            {primary_keys}
+            {primary_keys}, path
     """
-    db.execute(statement, summary_table=summary_table, field_list_table=field_list_table,
-               data_column=table.data_column, primary_keys=table.primary_keys)
+
+    # for contracts and award add paths across the awardID join.
+    if summary_table in ('contracts_summary', 'awards_summary'):
+        if summary_table == 'contracts_summary':
+            variables.extend(['awards/', 'awards'])
+        else:
+            variables.extend(['contracts/', 'contract'])
+
+        counts_per_path_select += """
+        UNION ALL
+
+        SELECT
+            {qualified_primary_keys}, %s || path, GREATEST(sum(array_item), sum(object_property)) path_count
+        FROM
+            awards_summary
+        JOIN
+            contracts_summary
+        ON
+            awards_summary.id = contracts_summary.id AND
+            awards_summary.award_id = contracts_summary.awardid
+        CROSS JOIN
+            flatten(contracts_summary.contract)
+        GROUP BY
+            {qualified_primary_keys}, path
+
+        UNION ALL
+
+        SELECT
+            {qualified_primary_keys}, %s as path, count(*) path_count
+        FROM
+            awards_summary
+        JOIN
+            contracts_summary
+        ON
+            awards_summary.id = contracts_summary.id AND
+            awards_summary.award_id = contracts_summary.awardid
+        GROUP BY {qualified_primary_keys}
+    """
+
+    # Create a *_field_list table, add a unique index, rename the *_summary table to *_no_field_list, and re-create
+    # the *_summary table. Then, copy the comments from the old to the new *_summary table.
+    statement = """
+        CREATE TABLE {field_list_table} AS
+        WITH path_counts AS (
+            {inner_select}
+        )
+        SELECT
+            {primary_keys},
+            jsonb_object_agg(path, path_count) AS field_list
+        FROM
+            path_counts
+        GROUP BY
+            {primary_keys}
+    """.replace("{inner_select}", counts_per_path_select)  # a replace here as formatting should be done in db.execute.
+
+    qualified_primary_keys = [f"{summary_table}.{field}" for field in table.primary_keys]
+
+    db.execute(
+        statement,
+        variables=variables,
+        summary_table=summary_table,
+        field_list_table=field_list_table,
+        data_column=table.data_column,
+        primary_keys=table.primary_keys,
+        qualified_primary_keys=qualified_primary_keys
+    )
 
     statement = 'CREATE UNIQUE INDEX {index} ON {field_list_table}({primary_keys})'
     db.execute(statement, index=f'{field_list_table}_id', field_list_table=field_list_table,
@@ -616,6 +676,7 @@ def _run_field_lists(name, table, tables_only):
     db.commit()
 
     logger.info('%s: %ss', table.name, time() - start)
+    return table.name
 
 
 def field_lists(name, tables_only=False):
@@ -629,10 +690,16 @@ def field_lists(name, tables_only=False):
 
     start = time()
 
+    # contract_summary and award_summery field lists can not be run at the same time as they cause deadlocks
     with concurrent.futures.ProcessPoolExecutor() as executor:
-        futures = [executor.submit(_run_field_lists, name, table, tables_only) for table in SUMMARIES]
+        futures = [executor.submit(_run_field_lists, name, table, tables_only)
+                   for table in SUMMARIES if table.name != 'contracts_summary']  # ignore contract summary initially
         for future in concurrent.futures.as_completed(futures):
-            future.result()
+            result = future.result()
+            if result == 'awards_summary':
+                # run contract_summary as soon as awards are complete
+                contract_summary_table = next(table for table in SUMMARIES if table.name == 'contracts_summary')
+                _run_field_lists(name, contract_summary_table, tables_only)
 
     logger.info('Total time: %ss', time() - start)
 
