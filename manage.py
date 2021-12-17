@@ -576,18 +576,20 @@ def _run_field_lists(name, table, tables_only):
             {primary_keys}, path
     """
 
-    # for contracts and award add paths across the awardID join.
+    # Allow users to measure co-occurrence of fields across related award and contract objects.
     if summary_table in ('contracts_summary', 'awards_summary'):
         if summary_table == 'contracts_summary':
             variables.extend(['awards/', 'awards'])
         else:
-            variables.extend(['contracts/', 'contract'])
+            variables.extend(['contracts/', 'contracts'])
 
         counts_per_path_select += """
         UNION ALL
 
         SELECT
-            {qualified_primary_keys}, %s || path, GREATEST(sum(array_item), sum(object_property)) path_count
+            {qualified_primary_keys},
+            %s || '/' || path AS path,
+            GREATEST(sum(array_item), sum(object_property)) path_count
         FROM
             awards_summary
         JOIN
@@ -603,7 +605,9 @@ def _run_field_lists(name, table, tables_only):
         UNION ALL
 
         SELECT
-            {qualified_primary_keys}, %s as path, count(*) path_count
+            {qualified_primary_keys},
+            %s AS path,
+            count(*) path_count
         FROM
             awards_summary
         JOIN
@@ -619,7 +623,7 @@ def _run_field_lists(name, table, tables_only):
     statement = """
         CREATE TABLE {field_list_table} AS
         WITH path_counts AS (
-            {inner_select}
+            INNER_SELECT
         )
         SELECT
             {primary_keys},
@@ -628,7 +632,7 @@ def _run_field_lists(name, table, tables_only):
             path_counts
         GROUP BY
             {primary_keys}
-    """.replace("{inner_select}", counts_per_path_select)  # a replace here as formatting should be done in db.execute.
+    """.replace("INNER_SELECT", counts_per_path_select)
 
     db.execute(
         statement,
