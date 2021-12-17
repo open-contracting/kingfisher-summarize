@@ -24,37 +24,38 @@ global db
 flags = re.MULTILINE | re.IGNORECASE
 basedir = os.path.dirname(os.path.realpath(__file__))
 
-Summary = namedtuple('Summary', 'name primary_keys data_column is_table')
+Summary = namedtuple('Summary', 'primary_keys data_column is_table')
 
-SUMMARIES = [
-    Summary('award_documents_summary', ['id', 'award_index', 'document_index'], 'document', True),
-    Summary('award_items_summary', ['id', 'award_index', 'item_index'], 'item', True),
-    Summary('award_suppliers_summary', ['id', 'award_index', 'supplier_index'], 'supplier', True),
-    Summary('awards_summary', ['id', 'award_index'], 'award', False),
-    Summary('buyer_summary', ['id'], 'buyer', True),
-    Summary('contract_documents_summary', ['id', 'contract_index', 'document_index'], 'document', True),
-    Summary('contract_implementation_documents_summary',
-            ['id', 'contract_index', 'document_index'], 'document', True),
-    Summary('contract_implementation_milestones_summary',
-            ['id', 'contract_index', 'milestone_index'], 'milestone', True),
-    Summary('contract_implementation_transactions_summary',
-            ['id', 'contract_index', 'transaction_index'], 'transaction', True),
-    Summary('contract_items_summary', ['id', 'contract_index', 'item_index'], 'item', True),
-    Summary('contract_milestones_summary', ['id', 'contract_index', 'milestone_index'], 'milestone', True),
-    Summary('contracts_summary', ['id', 'contract_index'], 'contract', False),
-    Summary('parties_summary', ['id', 'party_index'], 'party', False),
-    Summary('planning_documents_summary', ['id', 'document_index'], 'document', True),
-    Summary('planning_milestones_summary', ['id', 'milestone_index'], 'milestone', True),
-    Summary('planning_summary', ['id'], 'planning', False),
-    Summary('procuringentity_summary', ['id'], 'procuringentity', True),
-    Summary('relatedprocesses_summary', ['id', 'relatedprocess_index'], 'relatedprocess', True),
-    Summary('release_summary', ['id'], 'release', False),
-    Summary('tender_documents_summary', ['id'], 'document', True),
-    Summary('tender_items_summary', ['id', 'item_index'], 'item', True),
-    Summary('tender_milestones_summary', ['id', 'milestone_index'], 'milestone', True),
-    Summary('tender_summary', ['id'], 'tender', False),
-    Summary('tenderers_summary', ['id', 'tenderer_index'], 'tenderer', True),
-]
+SUMMARIES = {
+    'award_documents_summary': Summary(['id', 'award_index', 'document_index'], 'document', True),
+    'award_items_summary': Summary(['id', 'award_index', 'item_index'], 'item', True),
+    'award_suppliers_summary': Summary(['id', 'award_index', 'supplier_index'], 'supplier', True),
+    'awards_summary': Summary(['id', 'award_index'], 'award', False),
+    'buyer_summary': Summary(['id'], 'buyer', True),
+    'contract_documents_summary': Summary(['id', 'contract_index', 'document_index'], 'document', True),
+    'contract_implementation_documents_summary': Summary(['id', 'contract_index', 'document_index'], 'document', True),
+    'contract_implementation_milestones_summary': Summary(
+        ['id', 'contract_index', 'milestone_index'], 'milestone', True
+    ),
+    'contract_implementation_transactions_summary': Summary(
+        ['id', 'contract_index', 'transaction_index'], 'transaction', True
+    ),
+    'contract_items_summary': Summary(['id', 'contract_index', 'item_index'], 'item', True),
+    'contract_milestones_summary': Summary(['id', 'contract_index', 'milestone_index'], 'milestone', True),
+    'parties_summary': Summary(['id', 'party_index'], 'party', False),
+    'planning_documents_summary': Summary(['id', 'document_index'], 'document', True),
+    'planning_milestones_summary': Summary(['id', 'milestone_index'], 'milestone', True),
+    'planning_summary': Summary(['id'], 'planning', False),
+    'procuringentity_summary': Summary(['id'], 'procuringentity', True),
+    'relatedprocesses_summary': Summary(['id', 'relatedprocess_index'], 'relatedprocess', True),
+    'release_summary': Summary(['id'], 'release', False),
+    'tender_documents_summary': Summary(['id'], 'document', True),
+    'tender_items_summary': Summary(['id', 'item_index'], 'item', True),
+    'tender_milestones_summary': Summary(['id', 'milestone_index'], 'milestone', True),
+    'tender_summary': Summary(['id'], 'tender', False),
+    'tenderers_summary': Summary(['id', 'tenderer_index'], 'tenderer', True),
+    'contracts_summary': Summary(['id', 'contract_index'], 'contract', False),
+}
 
 COLUMN_COMMENTS_SQL = """
     SELECT
@@ -168,6 +169,43 @@ def dependency_graph(files):
         graph[identifier] = set(sources[object_name] for object_name in object_names)
 
     return graph
+
+
+def run_concurrently(graph, function, function_args):
+    """
+    Runs functions concurrently, following a dependency graph.
+
+    :param dict graph: a dict in which the key is a node and the value is the set of nodes on which it depends
+    :param function: The function to call
+    :param function_args: A function that returns the arguments for the function to call
+    """
+
+    def submit(node):
+        """
+        If a node's dependencies are met, removes it from the dependency graph and submits it.
+
+        :param str node: the node in the graph
+        """
+        if not graph[node]:
+            del graph[node]
+            futures.add(executor.submit(function, *function_args(node)))
+
+    futures = set()
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        # Submit files whose dependencies are met.
+        for node in list(graph):
+            submit(node)
+
+        # The for-loop terminates after its given futures, so it needs to start again with new futures.
+        while futures:
+            for future in concurrent.futures.as_completed(futures):
+                result = future.result()
+                futures.remove(future)
+
+                # Update dependencies, and submit files whose dependencies are met.
+                for node in list(graph):
+                    graph[node].discard(result)
+                    submit(node)
 
 
 def validate_collections(ctx, param, value):
@@ -394,6 +432,7 @@ def _run_summary_tables(name, identifier, content):
     db.commit()
 
     logger.info('%s: %ss', identifier, time() - start)
+    return identifier
 
 
 def summary_tables(name, tables_only=False, skip=(), where_fragment=None):
@@ -427,35 +466,10 @@ def summary_tables(name, tables_only=False, skip=(), where_fragment=None):
         for identifier, content in files[directory].items():
             _run_summary_tables(name, identifier, content)
 
-    def submit(identifier):
-        """
-        If a file's dependencies are met, removes it from the dependency graph and submits it.
-
-        :param str identifier: the identifier of a SQL file
-        """
-        if not graph[identifier]:
-            del graph[identifier]
-            futures[executor.submit(_run_summary_tables, name, identifier, files['middle'][identifier])] = identifier
-
     # The initial files are fast, and don't need multiprocessing.
     run('initial')
 
-    futures = {}
-    with concurrent.futures.ProcessPoolExecutor() as executor:
-        # Submit files whose dependencies are met.
-        for identifier in list(graph):
-            submit(identifier)
-
-        # The for-loop terminates after its given futures, so it needs to start again with new futures.
-        while futures:
-            for future in concurrent.futures.as_completed(futures):
-                future.result()
-                done = futures.pop(future)
-
-                # Update dependencies, and submit files whose dependencies are met.
-                for identifier in list(graph):
-                    graph[identifier].discard(done)
-                    submit(identifier)
+    run_concurrently(graph, _run_summary_tables, lambda node: (name, node, files['middle'][node]))
 
     # The final files are fast, and can also deadlock.
     run('final')
@@ -542,18 +556,19 @@ def field_counts(name):
     logger.info('Total time: %ss', time() - start)
 
 
-def _run_field_lists(name, table, tables_only):
+def _run_field_lists(name, summary_table, tables_only):
     logger = logging.getLogger('ocdskingfisher.summarize.field-lists')
-    logger.info('Processing %s', table.name)
+    logger.info('Processing %s', summary_table)
 
     start = time()
 
     db = Database()
     db.set_search_path([name, 'public'])
 
-    summary_table = table.name
+    table = SUMMARIES[summary_table]
     field_list_table = f'{summary_table}_field_list'
     no_field_list_table = f'{summary_table}_no_field_list'
+    qualified_primary_keys = [(summary_table, field) for field in table.primary_keys]
     variables = {}
 
     if tables_only:
@@ -632,17 +647,10 @@ def _run_field_lists(name, table, tables_only):
             path_counts
         GROUP BY
             {primary_keys}
-    """.replace("INNER_SELECT", counts_per_path_select)
-
-    db.execute(
-        statement,
-        variables=variables,
-        summary_table=summary_table,
-        field_list_table=field_list_table,
-        data_column=table.data_column,
-        primary_keys=table.primary_keys,
-        qualified_primary_keys=[(summary_table, field) for field in table.primary_keys]
-    )
+    """.replace('INNER_SELECT', counts_per_path_select)
+    db.execute(statement, variables=variables, summary_table=summary_table, field_list_table=field_list_table,
+               data_column=table.data_column, primary_keys=table.primary_keys,
+               qualified_primary_keys=qualified_primary_keys)
 
     statement = 'CREATE UNIQUE INDEX {index} ON {field_list_table}({primary_keys})'
     db.execute(statement, index=f'{field_list_table}_id', field_list_table=field_list_table,
@@ -666,19 +674,19 @@ def _run_field_lists(name, table, tables_only):
                no_field_list_table=no_field_list_table, field_list_table=field_list_table,
                primary_keys=table.primary_keys)
 
-    for row in db.all(COLUMN_COMMENTS_SQL, {'schema': name, 'table': f'{table.name}_no_field_list'}):
+    for row in db.all(COLUMN_COMMENTS_SQL, {'schema': name, 'table': f'{summary_table}_no_field_list'}):
         statement = 'COMMENT ON COLUMN {table}.{column} IS %(comment)s'
-        db.execute(statement, {'comment': row[2]}, table=table.name, column=row[0])
+        db.execute(statement, {'comment': row[2]}, table=summary_table, column=row[0])
 
     comment = f'All JSON paths in the {table.data_column} object, excluding array indices, expressed as a JSONB ' \
               'object in which keys are paths and values are NULL. This column is only available if the --field-' \
               'lists option is used.'
-    db.execute('COMMENT ON COLUMN {table}.field_list IS %(comment)s', {'comment': comment}, table=table.name)
+    db.execute('COMMENT ON COLUMN {table}.field_list IS %(comment)s', {'comment': comment}, table=summary_table)
 
     db.commit()
 
-    logger.info('%s: %ss', table.name, time() - start)
-    return table.name
+    logger.info('%s: %ss', summary_table, time() - start)
+    return summary_table
 
 
 def field_lists(name, tables_only=False):
@@ -692,16 +700,11 @@ def field_lists(name, tables_only=False):
 
     start = time()
 
-    # contract_summary and award_summery field lists can not be run at the same time as they cause deadlocks
-    with concurrent.futures.ProcessPoolExecutor() as executor:
-        futures = [executor.submit(_run_field_lists, name, table, tables_only)
-                   for table in SUMMARIES if table.name != 'contracts_summary']  # ignore contract summary initially
-        for future in concurrent.futures.as_completed(futures):
-            result = future.result()
-            if result == 'awards_summary':
-                # run contract_summary as soon as awards are complete
-                contract_summary_table = next(table for table in SUMMARIES if table.name == 'contracts_summary')
-                _run_field_lists(name, contract_summary_table, tables_only)
+    graph = {table_name: set() for table_name in SUMMARIES}
+    # field_lists() for awards_summary and contracts_summary cause deadlocks if they are run concurrently.
+    graph['contracts_summary'] = {'awards_summary'}
+
+    run_concurrently(graph, _run_field_lists, lambda table_name: (name, table_name, tables_only))
 
     logger.info('Total time: %ss', time() - start)
 

@@ -66,7 +66,7 @@ class Database:
                 objects[key] = self.identify(value)
         return sql.SQL(statement).format(**objects)
 
-    def identify(value):
+    def identify(self, value):
         """
         Returns the value as a SQL identifier. If the value is a tuple, the SQL identifier will be dot-separated.
         """

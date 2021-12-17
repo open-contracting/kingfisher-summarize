@@ -20,16 +20,16 @@ FIELD_LIST_TABLES = set()
 NO_FIELD_LIST_TABLES = set()
 NO_FIELD_LIST_VIEWS = set()
 
-for summary_table in SUMMARIES:
-    FIELD_LIST_TABLES.add(f'{summary_table.name}_field_list')
+for table_name, table in SUMMARIES.items():
+    FIELD_LIST_TABLES.add(f'{table_name}_field_list')
 
-    if summary_table.is_table:
-        SUMMARY_TABLES.add(summary_table.name)
-        NO_FIELD_LIST_TABLES.add(f'{summary_table.name}_no_field_list')
+    if table.is_table:
+        SUMMARY_TABLES.add(table_name)
+        NO_FIELD_LIST_TABLES.add(f'{table_name}_no_field_list')
     else:
-        SUMMARY_VIEWS.add(summary_table.name)
-        NO_FIELD_LIST_VIEWS.add(f'{summary_table.name}_no_field_list')
-        TABLES.add(f'{summary_table.name}_no_data')
+        SUMMARY_VIEWS.add(table_name)
+        NO_FIELD_LIST_VIEWS.add(f'{table_name}_no_field_list')
+        TABLES.add(f'{table_name}_no_data')
 
 
 def test_construct_where_fragment(db):
@@ -286,10 +286,10 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
                 'tenderers_summary': 31,
             }
 
-            for table in SUMMARIES:
-                count = db.one(db.format(statement, table=table.name, primary_keys=table.primary_keys))[0]
+            for table_name, table in SUMMARIES.items():
+                count = db.one(db.format(statement, table=table_name, primary_keys=table.primary_keys))[0]
 
-                assert count == expected[table.name], f'{table.name}: {count} != {expected[table.name]}'
+                assert count == expected[table_name], f'{table_name}: {count} != {expected[table_name]}'
 
         # All columns have comments.
         assert not db.all("""
@@ -553,10 +553,10 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
                 'tenderers_summary': 32,
             }
 
-            for table in SUMMARIES:
-                count = db.one(db.format(statement, table=table.name, primary_keys=table.primary_keys))[0]
+            for table_name, table in SUMMARIES.items():
+                count = db.one(db.format(statement, table=table_name, primary_keys=table.primary_keys))[0]
 
-                assert count == expected[table.name], f'{table.name}: {count} != {expected[table.name]}'
+                assert count == expected[table_name], f'{table_name}: {count} != {expected[table_name]}'
 
         expected = []
         for collection_id in [2, 1]:
