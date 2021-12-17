@@ -469,7 +469,7 @@ def summary_tables(name, tables_only=False, skip=(), where_fragment=None):
     # The initial files are fast, and don't need multiprocessing.
     run('initial')
 
-    run_concurrently(graph, _run_summary_tables, lambda node: (name, node, files['middle'][node]))
+    run_concurrently(graph, _run_summary_tables, lambda identifier: (name, identifier, files['middle'][identifier]))
 
     # The final files are fast, and can also deadlock.
     run('final')
