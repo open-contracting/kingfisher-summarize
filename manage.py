@@ -554,7 +554,7 @@ def _run_field_lists(name, table, tables_only):
     summary_table = table.name
     field_list_table = f'{summary_table}_field_list'
     no_field_list_table = f'{summary_table}_no_field_list'
-    variables = []
+    variables = {}
 
     if tables_only:
         no_field_list_type = sql.SQL('TABLE')
@@ -579,16 +579,16 @@ def _run_field_lists(name, table, tables_only):
     # Allow users to measure co-occurrence of fields across related award and contract objects.
     if summary_table in ('contracts_summary', 'awards_summary'):
         if summary_table == 'contracts_summary':
-            variables.extend(['awards/', 'awards'])
+            variables['path_prefix'] = 'awards'
         else:
-            variables.extend(['contracts/', 'contracts'])
+            variables['path_prefix'] = 'contracts'
 
         counts_per_path_select += """
         UNION ALL
 
         SELECT
             {qualified_primary_keys},
-            %s || '/' || path AS path,
+            %(path_prefix)s || '/' || path AS path,
             GREATEST(sum(array_item), sum(object_property)) path_count
         FROM
             awards_summary
@@ -606,7 +606,7 @@ def _run_field_lists(name, table, tables_only):
 
         SELECT
             {qualified_primary_keys},
-            %s AS path,
+            %(path_prefix)s AS path,
             count(*) path_count
         FROM
             awards_summary
@@ -755,10 +755,10 @@ def docs_table_ref(name):
             writer = csv.writer(f, lineterminator='\n')
             writer.writerow(headers)
             if '.' in table:
-                sql_variables = {'schema': table.split('.')[0], 'table': table.split('.')[1]}
+                variables = {'schema': table.split('.')[0], 'table': table.split('.')[1]}
             else:
-                sql_variables = {'schema': name, 'table': table}
-            for row in db.all(COLUMN_COMMENTS_SQL, sql_variables):
+                variables = {'schema': name, 'table': table}
+            for row in db.all(COLUMN_COMMENTS_SQL, variables):
                 # Change "timestamp without time zone" (and  "timestamp with time zone") to "timestamp".
                 if 'timestamp' in row[1]:
                     row = list(row)
