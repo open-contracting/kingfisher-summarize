@@ -630,8 +630,6 @@ def _run_field_lists(name, table, tables_only):
             {primary_keys}
     """.replace("{inner_select}", counts_per_path_select)  # a replace here as formatting should be done in db.execute.
 
-    qualified_primary_keys = [f"{summary_table}.{field}" for field in table.primary_keys]
-
     db.execute(
         statement,
         variables=variables,
@@ -639,7 +637,7 @@ def _run_field_lists(name, table, tables_only):
         field_list_table=field_list_table,
         data_column=table.data_column,
         primary_keys=table.primary_keys,
-        qualified_primary_keys=qualified_primary_keys
+        qualified_primary_keys=[(summary_table, field) for field in table.primary_keys]
     )
 
     statement = 'CREATE UNIQUE INDEX {index} ON {field_list_table}({primary_keys})'
