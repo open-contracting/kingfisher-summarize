@@ -566,9 +566,7 @@ def _run_field_lists(name, summary_table, tables_only):
     db.set_search_path([name, 'public'])
 
     table = SUMMARIES[summary_table]
-    field_list_table = f'{summary_table}_field_list'
-    no_field_list_table = f'{summary_table}_no_field_list'
-    qualified_primary_keys = [(summary_table, field) for field in table.primary_keys]
+
     variables = {}
 
     if tables_only:
@@ -577,6 +575,19 @@ def _run_field_lists(name, summary_table, tables_only):
     else:
         no_field_list_type = sql.SQL('TABLE' if table.is_table else 'VIEW')
         final_summary_type = sql.SQL('VIEW')
+
+    field_list_table = f'{summary_table}_field_list'
+    format_kwargs = dict(
+        summary_table=summary_table,
+        field_list_table=field_list_table,
+        no_field_list_table=f'{summary_table}_no_field_list',
+        qualified_primary_keys=[(summary_table, field) for field in table.primary_keys],
+        no_field_list_type=no_field_list_type,
+        final_summary_type=final_summary_type,
+        data_column=table.data_column,
+        primary_keys=table.primary_keys,
+        index=f'{field_list_table}_id'
+    )
 
     counts_per_path_select = """
         SELECT
@@ -595,8 +606,10 @@ def _run_field_lists(name, summary_table, tables_only):
     if summary_table in ('contracts_summary', 'awards_summary'):
         if summary_table == 'contracts_summary':
             variables['path_prefix'] = 'awards'
+            format_kwargs['other_data_column'] = 'award'
         else:
             variables['path_prefix'] = 'contracts'
+            format_kwargs['other_data_column'] = 'contract'
 
         counts_per_path_select += """
         UNION ALL
@@ -613,7 +626,7 @@ def _run_field_lists(name, summary_table, tables_only):
             awards_summary.id = contracts_summary.id AND
             awards_summary.award_id = contracts_summary.awardid
         CROSS JOIN
-            flatten(contracts_summary.contract)
+            flatten({other_data_column})
         GROUP BY
             {qualified_primary_keys}, path
 
@@ -648,17 +661,13 @@ def _run_field_lists(name, summary_table, tables_only):
         GROUP BY
             {primary_keys}
     """.replace('INNER_SELECT', counts_per_path_select)
-    db.execute(statement, variables=variables, summary_table=summary_table, field_list_table=field_list_table,
-               data_column=table.data_column, primary_keys=table.primary_keys,
-               qualified_primary_keys=qualified_primary_keys)
+    db.execute(statement, variables=variables, **format_kwargs)
 
     statement = 'CREATE UNIQUE INDEX {index} ON {field_list_table}({primary_keys})'
-    db.execute(statement, index=f'{field_list_table}_id', field_list_table=field_list_table,
-               primary_keys=table.primary_keys)
+    db.execute(statement, **format_kwargs)
 
     statement = 'ALTER {no_field_list_type} {summary_table} RENAME TO {no_field_list_table}'
-    db.execute(statement, no_field_list_type=no_field_list_type, summary_table=summary_table,
-               no_field_list_table=no_field_list_table)
+    db.execute(statement, **format_kwargs)
 
     statement = """
         CREATE {final_summary_type} {summary_table} AS
@@ -670,9 +679,7 @@ def _run_field_lists(name, summary_table, tables_only):
         JOIN
             {field_list_table} USING ({primary_keys})
     """
-    db.execute(statement, final_summary_type=final_summary_type, summary_table=summary_table,
-               no_field_list_table=no_field_list_table, field_list_table=field_list_table,
-               primary_keys=table.primary_keys)
+    db.execute(statement, **format_kwargs)
 
     for row in db.all(COLUMN_COMMENTS_SQL, {'schema': name, 'table': f'{summary_table}_no_field_list'}):
         statement = 'COMMENT ON COLUMN {table}.{column} IS %(comment)s'
