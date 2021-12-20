@@ -293,8 +293,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
 
             def result_dict(statement):
                 result = db.one(statement)
-                return dict((column.name, result) for
-                            (column, result) in zip(db.cursor.description, result))
+                return {column.name: result for column, result in zip(db.cursor.description, result)}
 
             statement = """
                 SELECT
@@ -308,17 +307,21 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
             """
 
             if filters:
-                assert result_dict(statement) == {'awards': 1,
-                                                  'awards_amount': 1,
-                                                  'awards_id': 1,
-                                                  'contracts': 0,
-                                                  'total': 1}
+                assert result_dict(statement) == {
+                    'awards': 1,
+                    'awards_amount': 1,
+                    'awards_id': 1,
+                    'contracts': 0,
+                    'total': 1,
+                }
             else:
-                assert result_dict(statement) == {'awards': 213,
-                                                  'awards_amount': 213,
-                                                  'awards_id': 213,
-                                                  'contracts': 0,
-                                                  'total': 285}
+                assert result_dict(statement) == {
+                    'awards': 213,
+                    'awards_amount': 213,
+                    'awards_id': 213,
+                    'contracts': 0,
+                    'total': 285,
+                }
 
             statement = """
                 SELECT
@@ -332,17 +335,21 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
             """
 
             if filters:
-                assert result_dict(statement) == {'contracts': 1,
-                                                  'contracts_amount': 1,
-                                                  'contracts_id': 1,
-                                                  'awards': 0,
-                                                  'total': 4}
+                assert result_dict(statement) == {
+                    'contracts': 1,
+                    'contracts_amount': 1,
+                    'contracts_id': 1,
+                    'awards': 0,
+                    'total': 4,
+                }
             else:
-                assert result_dict(statement) == {'contracts': 213,
-                                                  'contracts_amount': 213,
-                                                  'contracts_id': 213,
-                                                  'awards': 0,
-                                                  'total': 301}
+                assert result_dict(statement) == {
+                    'contracts': 213,
+                    'contracts_amount': 213,
+                    'contracts_id': 213,
+                    'awards': 0,
+                    'total': 301,
+                }
 
         # All columns have comments.
         assert not db.all("""

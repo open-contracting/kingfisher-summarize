@@ -577,17 +577,17 @@ def _run_field_lists(name, summary_table, tables_only):
         final_summary_type = sql.SQL('VIEW')
 
     field_list_table = f'{summary_table}_field_list'
-    format_kwargs = dict(
-        summary_table=summary_table,
-        field_list_table=field_list_table,
-        no_field_list_table=f'{summary_table}_no_field_list',
-        qualified_primary_keys=[(summary_table, field) for field in table.primary_keys],
-        no_field_list_type=no_field_list_type,
-        final_summary_type=final_summary_type,
-        data_column=table.data_column,
-        primary_keys=table.primary_keys,
-        index=f'{field_list_table}_id'
-    )
+    format_kwargs = {
+        'summary_table': summary_table,
+        'field_list_table': field_list_table,
+        'no_field_list_table': f'{summary_table}_no_field_list',
+        'no_field_list_type': no_field_list_type,
+        'final_summary_type': final_summary_type,
+        'data_column': table.data_column,
+        'primary_keys': table.primary_keys,
+        'qualified_primary_keys': [(summary_table, field) for field in table.primary_keys],
+        'index': f'{field_list_table}_id',
+    }
 
     counts_per_path_select = """
         SELECT
