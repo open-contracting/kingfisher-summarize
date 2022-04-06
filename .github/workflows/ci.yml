@@ -18,6 +18,7 @@ jobs:
       - run: pip install -r requirements_dev.txt
       - run: psql postgresql://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres -f tests/fixtures/kingfisher-process.sql
       - env:
+          PYTHONWARNINGS: error
           KINGFISHER_SUMMARIZE_DATABASE_URL: postgresql://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres
         run: pytest --cov ocdskingfishersummarize --cov manage
       - env:
