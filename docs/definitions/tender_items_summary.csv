@@ -14,4 +14,4 @@ unit_value_currency,text,Value of the ``unit/value/currency`` field in the item 
 classification,text,Hyphenation ``classification/scheme`` and ``classification/id`` in the party object
 additionalclassifications_ids,jsonb,Hyphenation of ``scheme`` and ``id`` for each entry of the ``additionalClassifications`` array in the item object
 total_additionalclassifications,integer,Length of the ``additionalClassifications`` array in the item object
-field_list,jsonb,"All JSON paths in the item object, excluding array indices, expressed as a JSONB object in which keys are paths and values are NULL. This column is only available if the --field-lists option is used."
+field_list,jsonb,"All JSON paths in the item object, excluding array indices, expressed as a JSONB object in which keys are paths and values are numbers of occurrences. This column is only available if the --field-lists option is used."

@@ -59,4 +59,4 @@ release_check,jsonb,`Data Review Tool output <https://github.com/open-contractin
 release_check11,jsonb,"Data Review Tool output, forcing OCDS 1.1"
 record_check,jsonb,`Data Review Tool output <https://github.com/open-contracting/lib-cove-ocds#output-json-format>`__
 record_check11,jsonb,"Data Review Tool output, forcing OCDS 1.1"
-field_list,jsonb,"All JSON paths in the release object, excluding array indices, expressed as a JSONB object in which keys are paths and values are NULL. This column is only available if the --field-lists option is used."
+field_list,jsonb,"All JSON paths in the release object, excluding array indices, expressed as a JSONB object in which keys are paths and values are numbers of occurrences. This column is only available if the --field-lists option is used."

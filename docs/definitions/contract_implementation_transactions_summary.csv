@@ -11,4 +11,4 @@ transaction,jsonb,The transaction object
 date,text,Value of the ``date`` field in the transaction object
 value_amount,numeric,"Value of the ``value/amount`` field, or the deprecated ``amount/amount`` field, in the transaction object"
 value_currency,text,"Value of the ``value/currency`` field, or the deprecated ``amount/currency`` field, in the transaction object"
-field_list,jsonb,"All JSON paths in the transaction object, excluding array indices, expressed as a JSONB object in which keys are paths and values are NULL. This column is only available if the --field-lists option is used."
+field_list,jsonb,"All JSON paths in the transaction object, excluding array indices, expressed as a JSONB object in which keys are paths and values are numbers of occurrences. This column is only available if the --field-lists option is used."

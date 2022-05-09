@@ -352,7 +352,7 @@ Related processes section
 -------------------------
 
 relatedprocesses_summary
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. csv-table::
    :header-rows: 1

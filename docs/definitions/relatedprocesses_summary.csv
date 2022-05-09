@@ -13,4 +13,4 @@ title,text,Value of the ``title`` field in the related process object
 scheme,text,Value of the ``scheme`` field in the related process object
 identifier,text,Value of the ``identifier`` field in the related process object
 uri,text,Value of the ``uri`` field in the related process object
-field_list,jsonb,"All JSON paths in the relatedprocess object, excluding array indices, expressed as a JSONB object in which keys are paths and values are NULL. This column is only available if the --field-lists option is used."
+field_list,jsonb,"All JSON paths in the relatedprocess object, excluding array indices, expressed as a JSONB object in which keys are paths and values are numbers of occurrences. This column is only available if the --field-lists option is used."
