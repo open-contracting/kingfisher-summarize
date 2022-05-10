@@ -686,8 +686,8 @@ def _run_field_lists(name, summary_table, tables_only):
         db.execute(statement, {'comment': row[2]}, table=summary_table, column=row[0])
 
     comment = f'All JSON paths in the {table.data_column} object, excluding array indices, expressed as a JSONB ' \
-              'object in which keys are paths and values are NULL. This column is only available if the --field-' \
-              'lists option is used.'
+              'object in which keys are paths and values are numbers of occurrences. This column is only available ' \
+              'if the --field-lists option is used.'
     db.execute('COMMENT ON COLUMN {table}.field_list IS %(comment)s', {'comment': comment}, table=summary_table)
 
     db.commit()
