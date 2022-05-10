@@ -687,12 +687,12 @@ def _run_field_lists(name, summary_table, tables_only):
 
     if summary_table == 'contracts_summary':
         comment = f"All JSON paths in the {table.data_column} object as well as in the related award's " \
-                  f"{format_kwargs['other_data_column']} column (prefixed by {variables['path_prefix']}/), " \
+                  f"{format_kwargs['other_data_column']} object (prefixed by {variables['path_prefix']}/), " \
                   "expressed as a JSONB object in which keys are paths and values are numbers of occurrences. " \
                   "Paths exclude array indices."
     elif summary_table == 'awards_summary':
         comment = f"All JSON paths in the {table.data_column} object as well as in the related contracts' " \
-                  f"{format_kwargs['other_data_column']} column (prefixed by {variables['path_prefix']}/), " \
+                  f"{format_kwargs['other_data_column']} object (prefixed by {variables['path_prefix']}/), " \
                   "expressed as a JSONB object in which keys are paths and values are numbers of occurrences. " \
                   "Paths exclude array indices."
     else:
