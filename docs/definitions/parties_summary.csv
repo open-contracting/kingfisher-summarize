@@ -14,4 +14,4 @@ unique_identifier_attempt,text,"Value of the ``id`` field in the party object if
 additionalidentifiers_ids,jsonb,Hyphenation of ``scheme`` and ``id`` for each entry of the ``additionalIdentifiers`` array in the party object
 total_additionalidentifiers,integer,Length of the ``additionalIdentifiers`` array in the party object
 party,jsonb,The party object
-field_list,jsonb,"All JSON paths in the party object, excluding array indices, expressed as a JSONB object in which keys are paths and values are numbers of occurrences. This column is only available if the --field-lists option is used."
+field_list,jsonb,"All JSON paths in the party object, expressed as a JSONB object in which keys are paths and values are numbers of occurrences. Paths exclude array indices.This column is only available if the --field-lists option is used."

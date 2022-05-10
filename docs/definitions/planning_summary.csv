@@ -13,4 +13,4 @@ document_documenttype_counts,jsonb,JSONB object in which each key is a unique ``
 total_milestones,bigint,Length of the ``milestones`` array in the planning object
 milestone_type_counts,jsonb,JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences in the ``milestones`` array of the planning object
 planning,jsonb,The planning object
-field_list,jsonb,"All JSON paths in the planning object, excluding array indices, expressed as a JSONB object in which keys are paths and values are numbers of occurrences. This column is only available if the --field-lists option is used."
+field_list,jsonb,"All JSON paths in the planning object, expressed as a JSONB object in which keys are paths and values are numbers of occurrences. Paths exclude array indices.This column is only available if the --field-lists option is used."

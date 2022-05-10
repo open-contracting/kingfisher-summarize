@@ -685,9 +685,20 @@ def _run_field_lists(name, summary_table, tables_only):
         statement = 'COMMENT ON COLUMN {table}.{column} IS %(comment)s'
         db.execute(statement, {'comment': row[2]}, table=summary_table, column=row[0])
 
-    comment = f'All JSON paths in the {table.data_column} object, excluding array indices, expressed as a JSONB ' \
-              'object in which keys are paths and values are numbers of occurrences. This column is only available ' \
-              'if the --field-lists option is used.'
+    if summary_table == 'contracts_summary':
+        comment = f"All JSON paths in the {table.data_column} object as well as in the related award's " \
+                  f"{format_kwargs['other_data_column']} column (prefixed by {variables['path_prefix']}/), " \
+                  "expressed as a JSONB object in which keys are paths and values are numbers of occurrences. " \
+                  "Paths exclude array indices."
+    elif summary_table == 'awards_summary':
+        comment = f"All JSON paths in the {table.data_column} object as well as in the related contracts' " \
+                  f"{format_kwargs['other_data_column']} column (prefixed by {variables['path_prefix']}/), " \
+                  "expressed as a JSONB object in which keys are paths and values are numbers of occurrences. " \
+                  "Paths exclude array indices."
+    else:
+        comment = f"All JSON paths in the {table.data_column} object, expressed as a JSONB object in which keys are " \
+                  "paths and values are numbers of occurrences. Paths exclude array indices."
+    comment += 'This column is only available if the --field-lists option is used.'
     db.execute('COMMENT ON COLUMN {table}.field_list IS %(comment)s', {'comment': comment}, table=summary_table)
 
     db.commit()

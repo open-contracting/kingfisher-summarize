@@ -10,4 +10,4 @@ data_id,integer,``id`` from the Kingfisher Process ``data`` table
 document,jsonb,The document object
 documenttype,text,Value of the ``documentType`` field in the document object
 format,text,Value of the ``format`` field in the document object
-field_list,jsonb,"All JSON paths in the document object, excluding array indices, expressed as a JSONB object in which keys are paths and values are numbers of occurrences. This column is only available if the --field-lists option is used."
+field_list,jsonb,"All JSON paths in the document object, expressed as a JSONB object in which keys are paths and values are numbers of occurrences. Paths exclude array indices.This column is only available if the --field-lists option is used."
