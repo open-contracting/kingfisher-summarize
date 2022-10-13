@@ -547,8 +547,8 @@ def field_counts(name):
                "'JSON path of the field, excluding array indices'")
     db.execute("COMMENT ON COLUMN field_counts.object_property IS "
                "'Number of occurrences of the field, across all array entries and all releases'")
-    db.execute("COMMENT ON COLUMN field_counts.array_count IS 'Cumulative length "
-               "of all occurrences of the field, if it is an array, across all array entries and all releases'")
+    db.execute("COMMENT ON COLUMN field_counts.array_count IS 'If the field is an array, "
+               "cumulative length of its occurrences, across all array entries and all releases'")
     db.execute("COMMENT ON COLUMN field_counts.distinct_releases IS "
                "'Number of releases in which the field occurs'")
     db.commit()
@@ -698,7 +698,7 @@ def _run_field_lists(name, summary_table, tables_only):
     else:
         comment = f"All JSON paths in the {table.data_column} object, expressed as a JSONB object in which keys are " \
                   "paths and values are numbers of occurrences. Paths exclude array indices."
-    comment += 'This column is only available if the --field-lists option is used.'
+    comment += ' This column is only available if the --field-lists option is used.'
     db.execute('COMMENT ON COLUMN {table}.field_list IS %(comment)s', {'comment': comment}, table=summary_table)
 
     db.commit()

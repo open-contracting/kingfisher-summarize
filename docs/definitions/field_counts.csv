@@ -3,5 +3,5 @@ collection_id,bigint,``id`` from the Kingfisher Process ``collection`` table
 release_type,text,"Either ""release"", ""compiled_release"", ""record"" or ""embedded_release"""
 path,text,"JSON path of the field, excluding array indices"
 object_property,bigint,"Number of occurrences of the field, across all array entries and all releases"
-array_count,bigint,"Cumulative length of all occurrences of the field, if it is an array, across all array entries and all releases"
+array_count,bigint,"If the field is an array, cumulative length of its occurrences, across all array entries and all releases"
 distinct_releases,bigint,Number of releases in which the field occurs
