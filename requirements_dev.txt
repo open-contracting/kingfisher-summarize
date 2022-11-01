@@ -14,7 +14,7 @@ click==7.1.2
     # via
     #   -r requirements.txt
     #   pip-tools
-coverage==5.0.3
+coverage[toml]==5.5
     # via
     #   coveralls
     #   pytest-cov
@@ -61,7 +61,7 @@ pytest==7.0.1
     # via
     #   -r requirements_dev.in
     #   pytest-cov
-pytest-cov==2.8.1
+pytest-cov==4.0.0
     # via -r requirements_dev.in
 python-dotenv==0.15.0
     # via -r requirements.txt
@@ -71,6 +71,8 @@ six==1.15.0
     # via packaging
 tabulate==0.8.7
     # via -r requirements.txt
+toml==0.10.2
+    # via coverage
 tomli==1.2.3
     # via
     #   pep517
