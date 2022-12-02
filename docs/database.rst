@@ -79,7 +79,6 @@ If you need to change the collections to be summarized, remove the schema with t
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/summaries.selected_collections.csv
 
 note
@@ -89,7 +88,6 @@ This table contains the note that the user provided when creating the schema.
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/note.csv
 
 .. _fields:
@@ -104,7 +102,6 @@ field_counts
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/field_counts.csv
 
 .. _db-releases:
@@ -119,7 +116,6 @@ release_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/release_summary.csv
 
 release_summary_no_data
@@ -127,7 +123,6 @@ release_summary_no_data
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/release_summary_no_data.csv
 
 .. _db-parties:
@@ -140,7 +135,6 @@ parties_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/parties_summary.csv
 
 buyer_summary
@@ -148,7 +142,6 @@ buyer_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/buyer_summary.csv
 
 procuringEntity_summary
@@ -156,7 +149,6 @@ procuringEntity_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/procuringEntity_summary.csv
 
 tenderers_summary
@@ -164,7 +156,6 @@ tenderers_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/tenderers_summary.csv
 
 .. _db-planning:
@@ -177,7 +168,6 @@ planning_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/planning_summary.csv
 
 planning_documents_summary
@@ -185,7 +175,6 @@ planning_documents_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/planning_documents_summary.csv
 
 planning_milestones_summary
@@ -193,7 +182,6 @@ planning_milestones_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/planning_milestones_summary.csv
 
 .. _db-tender:
@@ -208,7 +196,6 @@ tender_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/tender_summary.csv
 
 tender_summary_no_data
@@ -216,7 +203,6 @@ tender_summary_no_data
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/tender_summary_no_data.csv
 
 tender_items_summary
@@ -224,7 +210,6 @@ tender_items_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/tender_items_summary.csv
 
 tender_documents_summary
@@ -232,7 +217,6 @@ tender_documents_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/tender_documents_summary.csv
 
 tender_milestones_summary
@@ -240,7 +224,6 @@ tender_milestones_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/tender_milestones_summary.csv
 
 .. _db-awards:
@@ -255,7 +238,6 @@ awards_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/awards_summary.csv
 
 award_suppliers_summary
@@ -263,7 +245,6 @@ award_suppliers_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/award_suppliers_summary.csv
 
 award_items_summary
@@ -271,7 +252,6 @@ award_items_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/award_items_summary.csv
 
 award_documents_summary
@@ -279,7 +259,6 @@ award_documents_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/award_documents_summary.csv
 
 .. _db-contracts:
@@ -292,7 +271,6 @@ contracts_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/contracts_summary.csv
 
 contract_items_summary
@@ -300,7 +278,6 @@ contract_items_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/contract_items_summary.csv
 
 contract_documents_summary
@@ -308,7 +285,6 @@ contract_documents_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/contract_documents_summary.csv
 
 contract_milestones_summary
@@ -316,7 +292,6 @@ contract_milestones_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/contract_milestones_summary.csv
 
 .. _db-contract-implementation:
@@ -329,7 +304,6 @@ contract_implementation_transactions_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/contract_implementation_transactions_summary.csv
 
 contract_implementation_documents_summary
@@ -337,7 +311,6 @@ contract_implementation_documents_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/contract_implementation_documents_summary.csv
 
 contract_implementation_milestones_summary
@@ -345,7 +318,6 @@ contract_implementation_milestones_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/contract_implementation_milestones_summary.csv
 
 Related processes section
@@ -356,5 +328,4 @@ relatedprocesses_summary
 
 .. csv-table::
    :header-rows: 1
-   :widths: auto
    :file: definitions/relatedprocesses_summary.csv
