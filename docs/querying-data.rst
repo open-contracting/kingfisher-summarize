@@ -55,8 +55,6 @@ The following query lists the collections in the current schema, with the name o
       release_type
   FROM
       release_summary
-  JOIN
-      collection ON release_summary.collection_id = collection.id
   ORDER BY
       collection_id DESC;
 
