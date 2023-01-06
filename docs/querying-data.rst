@@ -55,8 +55,6 @@ The following query lists the collections in the current schema, with the name o
       release_type
   FROM
       release_summary
-  JOIN
-      collection ON release_summary.collection_id = collection.id
   ORDER BY
       collection_id DESC;
 
@@ -119,7 +117,7 @@ To learn more about the summaries and aggregates in the ``tender_summary`` table
 
   The ``tender``, ``awards`` and ``contracts`` objects in OCDS all have a ``.status`` field.
 
-  Kingfisher Summarize stores these status fields in the ``tender_summary.tender_status``, ``awards_summary.award_status`` and ``contracts_summary.contract_status`` columns.
+  Kingfisher Summarize stores these status fields in the ``tender_summary.status``, ``awards_summary.status`` and ``contracts_summary.status`` columns.
 
   Consider which statuses you want to include or exclude from your analysis; for example, you might want to exclude pending and cancelled contracts when calculating the total value of contracts for each buyer.
 
