@@ -166,7 +166,7 @@ def dependency_graph(files):
     # Build the dependency graph between files.
     graph = {}
     for identifier, object_names in imports.items():
-        graph[identifier] = set(sources[object_name] for object_name in object_names)
+        graph[identifier] = {sources[object_name] for object_name in object_names}
 
     return graph
 
