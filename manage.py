@@ -27,6 +27,9 @@ basedir = os.path.dirname(os.path.realpath(__file__))
 
 Summary = namedtuple('Summary', 'primary_keys data_column is_table')
 
+SCHEMA_PREFIX = 'summary_'
+SCHEMA_PREFIX_LENGTH = len(SCHEMA_PREFIX)
+
 SUMMARIES = {
     'award_documents_summary': Summary(['id', 'award_index', 'document_index'], 'document', True),
     'award_items_summary': Summary(['id', 'award_index', 'item_index'], 'item', True),
@@ -239,7 +242,7 @@ def validate_schema(ctx, param, value):
     """
     Returns a schema name. Raises an error if the schema isn't in the database.
     """
-    schema = f'summary_{value}'
+    schema = f'{SCHEMA_PREFIX}{value}'
 
     if not db.schema_exists(schema):
         raise click.BadParameter(f'SQL schema "{schema}" not found')
@@ -300,7 +303,7 @@ def cli(ctx, quiet):
 @click.argument('collections', callback=validate_collections)
 @click.argument('note')
 @click.option('--name', callback=validate_name,
-              help='A custom name for the SQL schema ("summary_" will be prepended).')
+              help=f'A custom name for the SQL schema ("{SCHEMA_PREFIX}" will be prepended).')
 @click.option('--tables-only', is_flag=True, help='Create SQL tables instead of SQL views.')
 @click.option('--field-counts/--no-field-counts', 'field_counts_option', default=True,
               help="Whether to create the field_counts table (default true).")
@@ -336,7 +339,7 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
         [construct_where_fragment_sql_json_path(db.cursor, filter_sjp) for filter_sjp in filters_sql_json_path]
     )
 
-    schema = f'summary_{name}'
+    schema = f'{SCHEMA_PREFIX}{name}'
 
     # Create the summaries.selected_collections table, if it doesn't exist.
     db.execute('CREATE SCHEMA IF NOT EXISTS summaries')
@@ -386,10 +389,10 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
 @cli.command()
 @click.argument('name', callback=validate_schema)
 def remove(name):
-    """
+    f"""
     Drop a schema.
 
-    NAME is the last part of a schema's name after "summary_".
+    NAME is the last part of a schema's name after "{SCHEMA_PREFIX}".
     """
     logger = logging.getLogger('ocdskingfisher.summarize.remove')
     logger.info('Arguments: name=%s', name)
@@ -426,7 +429,7 @@ def index():
         collections = map(str, _get_selected_collections(schema))
         notes = db.all('SELECT note, created_at FROM note ORDER BY created_at')
 
-        table.append([schema[10:], ', '.join(collections), format_note(notes[0])])
+        table.append([schema[SCHEMA_PREFIX_LENGTH:], ', '.join(collections), format_note(notes[0])])
         for note in notes[1:]:
             table.append([None, None, format_note(note)])
 
@@ -764,7 +767,7 @@ def stale():
 
     for schema in db.schemas():
         if schema not in skip and not db.one(statement, {'schema': schema}):
-            click.echo(schema[10:])
+            click.echo(schema[SCHEMA_PREFIX_LENGTH:])
 
 
 @dev.command()
