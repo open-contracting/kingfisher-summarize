@@ -28,7 +28,6 @@ basedir = os.path.dirname(os.path.realpath(__file__))
 Summary = namedtuple('Summary', 'primary_keys data_column is_table')
 
 SCHEMA_PREFIX = 'summary_'
-SCHEMA_PREFIX_LENGTH = len(SCHEMA_PREFIX)
 
 SUMMARIES = {
     'award_documents_summary': Summary(['id', 'award_index', 'document_index'], 'document', True),
@@ -429,7 +428,7 @@ def index():
         collections = map(str, _get_selected_collections(schema))
         notes = db.all('SELECT note, created_at FROM note ORDER BY created_at')
 
-        table.append([schema[SCHEMA_PREFIX_LENGTH:], ', '.join(collections), format_note(notes[0])])
+        table.append([schema.removeprefix(SCHEMA_PREFIX), ', '.join(collections), format_note(notes[0])])
         for note in notes[1:]:
             table.append([None, None, format_note(note)])
 
@@ -767,7 +766,7 @@ def stale():
 
     for schema in db.schemas():
         if schema not in skip and not db.one(statement, {'schema': schema}):
-            click.echo(schema[SCHEMA_PREFIX_LENGTH:])
+            click.echo(schema.removeprefix(SCHEMA_PREFIX))
 
 
 @dev.command()
