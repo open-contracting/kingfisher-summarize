@@ -74,7 +74,7 @@ def test_validate_name(caplog):
     ({'name': 'custom'}, 'custom', (1,)),
 ])
 def test_command_name(kwargs, name, collections, db, caplog):
-    schema = f'view_data_{name}'
+    schema = f'summary_{name}'
     identifier = sql.Identifier(schema)
 
     with fixture(db, **kwargs) as result:
@@ -123,12 +123,12 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
         if field_counts:
             tables.add('field_counts')
 
-        assert db.schema_exists('view_data_collection_1')
-        assert db.schema_exists('view_data_collection_2')
+        assert db.schema_exists('summary_collection_1')
+        assert db.schema_exists('summary_collection_2')
         assert set(db.pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
-                            "AND table_type = 'BASE TABLE'", {'schema': 'view_data_collection_1'})) == tables
+                            "AND table_type = 'BASE TABLE'", {'schema': 'summary_collection_1'})) == tables
         assert set(db.pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
-                            "AND table_type = 'VIEW'", {'schema': 'view_data_collection_1'})) == views
+                            "AND table_type = 'VIEW'", {'schema': 'summary_collection_1'})) == views
 
         # Check contents of summary relations.
         rows = db.all("""
@@ -153,7 +153,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
                 total_documents,
                 document_documenttype_counts,
                 total_items
-            FROM view_data_collection_1.awards_summary
+            FROM summary_collection_1.awards_summary
             ORDER BY id, award_index
         """)
 
@@ -202,7 +202,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
                 unique_identifier_attempt,
                 additionalidentifiers_ids,
                 total_additionalidentifiers
-            FROM view_data_collection_1.parties_summary
+            FROM summary_collection_1.parties_summary
             ORDER BY id, party_index
         """)
 
@@ -237,7 +237,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
 
         if field_counts:
             # Check contents of field_counts table.
-            rows = db.all('SELECT * FROM view_data_collection_1.field_counts')
+            rows = db.all('SELECT * FROM summary_collection_1.field_counts')
 
             if filters or filters_sql_json_path:
                 assert len(rows) == 1046
@@ -258,7 +258,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
                         SELECT
                             field_list
                         FROM
-                            view_data_collection_1.{table}
+                            summary_collection_1.{table}
                         ORDER BY
                             {primary_keys}
                         LIMIT 1) AS field_list
@@ -309,7 +309,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
                     sum(coalesce((field_list ->> 'awards/id')::int, 0)) awards_id,
                     sum(coalesce((field_list ->> 'awards/value/amount')::int, 0)) awards_amount
                 FROM
-                    view_data_collection_1.contracts_summary
+                    summary_collection_1.contracts_summary
             """
 
             if filters:
@@ -337,7 +337,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
                     sum(coalesce((field_list ->> 'contracts/id')::int, 0)) contracts_id,
                     sum(coalesce((field_list ->> 'contracts/value/amount')::int, 0)) contracts_amount
                 FROM
-                    view_data_collection_1.awards_summary
+                    summary_collection_1.awards_summary
             """
 
             if filters:
@@ -372,7 +372,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
                 AND LOWER(isc.table_name) NOT LIKE '%%_field_list'
                 AND pg_catalog.col_description(format('%%s.%%s',isc.table_schema,isc.table_name)::regclass::oid,
                                                isc.ordinal_position) IS NULL
-        """, {'schema': 'view_data_collection_1'})
+        """, {'schema': 'summary_collection_1'})
 
         expected = []
         for collection_id in [2, 1]:
@@ -421,18 +421,18 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
         if field_counts:
             tables.add('field_counts')
 
-        assert db.schema_exists('view_data_collection_1')
-        assert db.schema_exists('view_data_collection_2')
+        assert db.schema_exists('summary_collection_1')
+        assert db.schema_exists('summary_collection_2')
         assert set(db.pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
-                            "AND table_type = 'BASE TABLE'", {'schema': 'view_data_collection_1'})) == tables
+                            "AND table_type = 'BASE TABLE'", {'schema': 'summary_collection_1'})) == tables
         assert set(db.pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
-                            "AND table_type = 'VIEW'", {'schema': 'view_data_collection_1'})) == views
+                            "AND table_type = 'VIEW'", {'schema': 'summary_collection_1'})) == views
 
         # Check that the tender_summary table only has correctly filtered items
         rows = db.all("""
             SELECT
                 procurementmethod
-            FROM view_data_collection_1.tender_summary
+            FROM summary_collection_1.tender_summary
         """)
         for row in rows:
             assert row[0] == 'direct'
@@ -446,7 +446,7 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
         rows = db.all("""
             SELECT
                 data_id
-            FROM view_data_collection_1.release_summary
+            FROM summary_collection_1.release_summary
         """)
         if len(filters + filters_sql_json_path) > 1:
             assert len(rows) == 2
@@ -491,7 +491,7 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
                 total_documents,
                 document_documenttype_counts,
                 total_items
-            FROM view_data_collection_1.awards_summary
+            FROM summary_collection_1.awards_summary
             ORDER BY id, award_index
         """)
 
@@ -540,7 +540,7 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
                 unique_identifier_attempt,
                 additionalidentifiers_ids,
                 total_additionalidentifiers
-            FROM view_data_collection_1.parties_summary
+            FROM summary_collection_1.parties_summary
             ORDER BY id, party_index
         """)
 
@@ -570,7 +570,7 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
 
         if field_counts:
             # Check contents of field_counts table.
-            rows = db.all('SELECT * FROM view_data_collection_1.field_counts')
+            rows = db.all('SELECT * FROM summary_collection_1.field_counts')
 
             if len(filters + filters_sql_json_path) > 1:
                 assert len(rows) == 1515
@@ -591,7 +591,7 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
                         SELECT
                             field_list
                         FROM
-                            view_data_collection_1.{table}
+                            summary_collection_1.{table}
                         ORDER BY
                             {primary_keys}
                         LIMIT 1) AS field_list

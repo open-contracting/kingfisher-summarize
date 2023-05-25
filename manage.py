@@ -239,7 +239,7 @@ def validate_schema(ctx, param, value):
     """
     Returns a schema name. Raises an error if the schema isn't in the database.
     """
-    schema = f'view_data_{value}'
+    schema = f'summary_{value}'
 
     if not db.schema_exists(schema):
         raise click.BadParameter(f'SQL schema "{schema}" not found')
@@ -300,7 +300,7 @@ def cli(ctx, quiet):
 @click.argument('collections', callback=validate_collections)
 @click.argument('note')
 @click.option('--name', callback=validate_name,
-              help='A custom name for the SQL schema ("view_data_" will be prepended).')
+              help='A custom name for the SQL schema ("summary_" will be prepended).')
 @click.option('--tables-only', is_flag=True, help='Create SQL tables instead of SQL views.')
 @click.option('--field-counts/--no-field-counts', 'field_counts_option', default=True,
               help="Whether to create the field_counts table (default true).")
@@ -336,7 +336,7 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
         [construct_where_fragment_sql_json_path(db.cursor, filter_sjp) for filter_sjp in filters_sql_json_path]
     )
 
-    schema = f'view_data_{name}'
+    schema = f'summary_{name}'
 
     # Create the summaries.selected_collections table, if it doesn't exist.
     db.execute('CREATE SCHEMA IF NOT EXISTS summaries')
@@ -389,7 +389,7 @@ def remove(name):
     """
     Drop a schema.
 
-    NAME is the last part of a schema's name after "view_data_".
+    NAME is the last part of a schema's name after "summary_".
     """
     logger = logging.getLogger('ocdskingfisher.summarize.remove')
     logger.info('Arguments: name=%s', name)

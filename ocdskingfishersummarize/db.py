@@ -33,9 +33,9 @@ class Database:
 
     def schemas(self):
         """
-        Returns a list of schema names that start with "view_data_".
+        Returns a list of schema names that start with "summary_".
         """
-        return self.pluck("SELECT schema_name FROM information_schema.schemata WHERE schema_name LIKE 'view_data_%'")
+        return self.pluck("SELECT schema_name FROM information_schema.schemata WHERE schema_name LIKE 'summary_%'")
 
     def all(self, statement, variables=None, **kwargs):
         """

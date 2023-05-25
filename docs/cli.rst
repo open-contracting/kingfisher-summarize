@@ -49,20 +49,20 @@ For example:
 
    ./manage.py add 123 "Created by Morgan A. to measure procurement indicators"
 
-This creates a schema named ``view_data_collection_123``.
+This creates a schema named ``summary_collection_123``.
 
 .. _set-schema-name:
 
 Customize the schema's name
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To customize the last part of the schema's name (for example, ``collection_123`` in ``view_data_collection_123``), set the ``--name`` argument to `a string of letters, numbers and/or underscores <https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS>`__. For example:
+To customize the last part of the schema's name (for example, ``collection_123`` in ``summary_collection_123``), set the ``--name`` argument to `a string of letters, numbers and/or underscores <https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS>`__. For example:
 
 .. code-block:: bash
 
     ./manage.py add 123 "The note" --name the_name
 
-This creates a schema named ``view_data_the_name``.
+This creates a schema named ``summary_the_name``.
 
 .. _summarize-many-collections:
 
@@ -75,7 +75,7 @@ Instead of passing one collection ID, you can pass many collection IDs, separate
 
    ./manage.py add 4,5,6 "Created by Morgan A. to compare field coverage"
 
-This creates a schema named ``view_data_collection_4_5_6``.
+This creates a schema named ``summary_collection_4_5_6``.
 
 If you need to summarize more than five collections, then you must :ref:`customize the schema's name<set-schema-name>`.
 
@@ -112,13 +112,13 @@ This can be used to check for the presence of multiple fields.  For example, to 
 
 .. code-block:: sql
 
-   SELECT count(*) FROM view_data_collection_1.awards_summary WHERE field_list ?& ARRAY['documents/id', 'items/id'];
+   SELECT count(*) FROM summary_collection_1.awards_summary WHERE field_list ?& ARRAY['documents/id', 'items/id'];
 
 This could also be written as:
 
 .. code-block:: sql
 
-   SELECT count(*) FROM view_data_collection_1.awards_summary WHERE field_list ? 'documents/id' AND field_list ? 'items/id';
+   SELECT count(*) FROM summary_collection_1.awards_summary WHERE field_list ? 'documents/id' AND field_list ? 'items/id';
 
 The ``?&`` operator tests whether *all* keys in the right-hand array exist in the left-hand object.  The ``?`` operator tests whether one key exists in the left-hand object.
 
@@ -126,13 +126,13 @@ To count the number of awards that have either at least one document with an ``i
 
 .. code-block:: sql
 
-   SELECT count(*) FROM view_data_collection_1.awards_summary WHERE field_list ?| ARRAY['documents/id', 'items/id'];
+   SELECT count(*) FROM summary_collection_1.awards_summary WHERE field_list ?| ARRAY['documents/id', 'items/id'];
 
 This could also be written as:
 
 .. code-block:: sql
 
-   SELECT count(*) FROM view_data_collection_1.awards_summary WHERE field_list ? 'documents/id' OR field_list ? 'items/id';
+   SELECT count(*) FROM summary_collection_1.awards_summary WHERE field_list ? 'documents/id' OR field_list ? 'items/id';
 
 The ``?|`` operator tests whether *any* key in the right-hand array exists in the left-hand object.
 
@@ -143,7 +143,7 @@ remove
 
 Drops a schema.
 
-Replace ``NAME`` with the last part of a schema's name (the part after ``view_data_``), and run:
+Replace ``NAME`` with the last part of a schema's name (the part after ``summary_``), and run:
 
 .. code-block:: bash
 
@@ -153,7 +153,7 @@ This is equivalent to:
 
 .. code-block:: sql
 
-  DROP SCHEMA view_data_NAME CASCADE;
+  DROP SCHEMA summary_NAME CASCADE;
 
 .. _index:
 
@@ -192,7 +192,7 @@ If the new version of Kingfisher Summarize makes changes to SQL statements, you 
 
    .. code-block:: sql
 
-      SELECT collection_id from summaries.selected_collections WHERE schema = 'view_data_collection_4_5_6';
+      SELECT collection_id from summaries.selected_collections WHERE schema = 'summary_collection_4_5_6';
 
 #. Remove the schema, for example:
 

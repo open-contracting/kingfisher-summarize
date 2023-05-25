@@ -14,7 +14,7 @@ from tests import fixture
 ])
 def test_convert_to_numeric(db, text, expected):
     with fixture(db, field_counts=False):
-        value = db.one('SELECT view_data_collection_1.convert_to_numeric(%(text)s)', {'text': text})[0]
+        value = db.one('SELECT summary_collection_1.convert_to_numeric(%(text)s)', {'text': text})[0]
 
         assert value == expected
 
@@ -27,7 +27,7 @@ def test_convert_to_numeric(db, text, expected):
 ])
 def test_convert_to_timestamp(db, text, expected):
     with fixture(db, field_counts=False):
-        value = db.one('SELECT view_data_collection_1.convert_to_timestamp(%(text)s)', {'text': text})[0]
+        value = db.one('SELECT summary_collection_1.convert_to_timestamp(%(text)s)', {'text': text})[0]
 
         assert value == expected
 
@@ -41,6 +41,6 @@ def test_convert_to_timestamp(db, text, expected):
 ])
 def test_hyphenate(db, scheme, id_, expected):
     with fixture(db, field_counts=False):
-        value = db.one('SELECT view_data_collection_1.hyphenate(%(scheme)s, %(id)s)', {'scheme': scheme, 'id': id_})[0]
+        value = db.one('SELECT summary_collection_1.hyphenate(%(scheme)s, %(id)s)', {'scheme': scheme, 'id': id_})[0]
 
         assert value == expected

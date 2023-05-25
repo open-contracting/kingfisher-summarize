@@ -24,5 +24,5 @@ To test your changes, you need to have some data loaded. The `test data <https:/
 
 #. Look at the data that has been created, so you have something to compare against when you make changes.
 
-   -  Select from tables in the ``view_data_collection_1`` schema
+   -  Select from tables in the ``summary_collection_1`` schema
    -  Select from the view ``release_summary``
