@@ -312,7 +312,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
                     summary_collection_1.contracts_summary
             """
 
-            if filters:
+            if filters or filters_sql_json_path:
                 assert result_dict(statement) == {
                     'awards': 1,
                     'awards_amount': 1,
@@ -340,7 +340,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
                     summary_collection_1.awards_summary
             """
 
-            if filters:
+            if filters or filters_sql_json_path:
                 assert result_dict(statement) == {
                     'contracts': 1,
                     'contracts_amount': 1,
