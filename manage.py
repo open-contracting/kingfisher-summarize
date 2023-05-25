@@ -805,7 +805,8 @@ def hash_md5():
 
             if section == 'data':
                 pk, hash_md5, data = line.split('\t')
-                append = '\t'.join([pk, hashlib.md5(json.dumps(data, sort_keys=True).encode('utf-8')).hexdigest(), data])
+                hash_md5 = hashlib.md5(json.dumps(data, sort_keys=True).encode('utf-8')).hexdigest()
+                append = '\t'.join([pk, hash_md5, data])
             else:
                 append = line
 
