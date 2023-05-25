@@ -2,6 +2,7 @@
 import concurrent.futures
 import csv
 import glob
+import hashlib
 import json
 import logging
 import logging.config
@@ -749,7 +750,7 @@ def stale():
 
     for schema in db.schemas():
         if schema not in skip and not db.one(statement, {'schema': schema}):
-            print(schema[10:])
+            click.echo(schema[10:])
 
 
 @dev.command()
@@ -785,6 +786,40 @@ def docs_table_ref(name):
                     row = list(row)
                     row[1] = 'timestamp'
                 writer.writerow(row)
+
+
+@dev.command()
+def hash_md5():
+    """
+    Sort the data table fixture by the id column and update the hash_md5 column.
+    """
+    path = os.path.join(basedir, 'tests', 'fixtures', 'kingfisher-process.sql')
+
+    sections = {'before': [], 'data': [], 'after': []}
+
+    section = 'before'
+    with open(path) as f:
+        for line in f:
+            if section == 'data' and '\\.' in line:
+                section = 'after'
+
+            if section == 'data':
+                pk, hash_md5, data = line.split('\t')
+                append = '\t'.join([pk, hashlib.md5(json.dumps(data, sort_keys=True).encode('utf-8')).hexdigest(), data])
+            else:
+                append = line
+
+            sections[section].append(append)
+
+            if section == 'before' and 'COPY public.data' in line:
+                section = 'data'
+
+    sections['data'].sort(key=lambda line: int(line.split('\t', 1)[0]))
+
+    with open(path, 'w') as f:
+        for section in sections.values():
+            for line in section:
+                f.write(line)
 
 
 if __name__ == '__main__':
