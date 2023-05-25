@@ -1,6 +1,6 @@
 -- Inspired by https://github.com/csikfer/lanview2/blob/master/database/update-1.9.sql
--- https://www.postgresql.org/docs/11/sql-createfunction.html
--- https://www.postgresql.org/docs/11/parallel-safety.html
+-- https://www.postgresql.org/docs/current/sql-createfunction.html
+-- https://www.postgresql.org/docs/current/parallel-safety.html
 
 CREATE FUNCTION convert_to_numeric (text)
 RETURNS numeric
@@ -18,7 +18,7 @@ STRICT
 PARALLEL SAFE;
 
 -- UNSAFE due to EXCEPTION block.
--- https://www.postgresql.org/docs/11/errcodes-appendix.html
+-- https://www.postgresql.org/docs/current/errcodes-appendix.html
 CREATE FUNCTION convert_to_timestamp (text)
 RETURNS timestamp
 AS $$
