@@ -102,7 +102,7 @@ Use this option if:
 Calculate JSON paths in each JSON object in each summary table
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``--field-lists`` option adds a ``field_list`` column to each summary table, which contains all JSON paths (excluding array indices) in the object that the row describes. For example, a ``field_list`` value in the ``awards_summary`` table will contain the JSON paths in an award object. A ``field_list`` value is a JSONB object in which keys are paths and values are ``NULL``.
+The ``--field-lists`` option adds a ``field_list`` column to each summary table, which contains all JSON paths (excluding array indices) in the object that the row describes. For example, a ``field_list`` value in the ``awards_summary`` table will contain the JSON paths in an award object. A ``field_list`` value is a JSONB object in which keys are paths and values are numbers of occurrences.
 
 .. code-block:: bash
 

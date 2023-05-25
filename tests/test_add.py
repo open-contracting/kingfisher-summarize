@@ -20,16 +20,16 @@ FIELD_LIST_TABLES = set()
 NO_FIELD_LIST_TABLES = set()
 NO_FIELD_LIST_VIEWS = set()
 
-for summary_table in SUMMARIES:
-    FIELD_LIST_TABLES.add(f'{summary_table.name}_field_list')
+for table_name, table in SUMMARIES.items():
+    FIELD_LIST_TABLES.add(f'{table_name}_field_list')
 
-    if summary_table.is_table:
-        SUMMARY_TABLES.add(summary_table.name)
-        NO_FIELD_LIST_TABLES.add(f'{summary_table.name}_no_field_list')
+    if table.is_table:
+        SUMMARY_TABLES.add(table_name)
+        NO_FIELD_LIST_TABLES.add(f'{table_name}_no_field_list')
     else:
-        SUMMARY_VIEWS.add(summary_table.name)
-        NO_FIELD_LIST_VIEWS.add(f'{summary_table.name}_no_field_list')
-        TABLES.add(f'{summary_table.name}_no_data')
+        SUMMARY_VIEWS.add(table_name)
+        NO_FIELD_LIST_VIEWS.add(f'{table_name}_no_field_list')
+        TABLES.add(f'{table_name}_no_data')
 
 
 def test_construct_where_fragment(db):
@@ -269,7 +269,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
                 'award_documents_summary': 11,
                 'award_items_summary': 26,
                 'award_suppliers_summary': 28,
-                'awards_summary': 140,
+                'awards_summary': 469,
                 'buyer_summary': 28,
                 'contract_documents_summary': 11,
                 'contract_implementation_documents_summary': 11,
@@ -277,7 +277,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
                 'contract_implementation_transactions_summary': 83,
                 'contract_items_summary': 26,
                 'contract_milestones_summary': 27,
-                'contracts_summary': 328,
+                'contracts_summary': 469,
                 'parties_summary': 34,
                 'planning_documents_summary': 11,
                 'planning_milestones_summary': 29,
@@ -292,10 +292,70 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
                 'tenderers_summary': 31,
             }
 
-            for table in SUMMARIES:
-                count = db.one(db.format(statement, table=table.name, primary_keys=table.primary_keys))[0]
+            for table_name, table in SUMMARIES.items():
+                count = db.one(db.format(statement, table=table_name, primary_keys=table.primary_keys))[0]
 
-                assert count == expected[table.name], f'{table.name}: {count} != {expected[table.name]}'
+                assert count == expected[table_name], f'{table_name}: {count} != {expected[table_name]}'
+
+            def result_dict(statement):
+                result = db.one(statement)
+                return {column.name: result for column, result in zip(db.cursor.description, result)}
+
+            statement = """
+                SELECT
+                    count(*) total,
+                    sum(coalesce((field_list ->> 'contracts')::int, 0)) contracts,
+                    sum(coalesce((field_list ->> 'awards')::int, 0)) awards,
+                    sum(coalesce((field_list ->> 'awards/id')::int, 0)) awards_id,
+                    sum(coalesce((field_list ->> 'awards/value/amount')::int, 0)) awards_amount
+                FROM
+                    view_data_collection_1.contracts_summary
+            """
+
+            if filters:
+                assert result_dict(statement) == {
+                    'awards': 1,
+                    'awards_amount': 1,
+                    'awards_id': 1,
+                    'contracts': 0,
+                    'total': 1,
+                }
+            else:
+                assert result_dict(statement) == {
+                    'awards': 213,
+                    'awards_amount': 213,
+                    'awards_id': 213,
+                    'contracts': 0,
+                    'total': 285,
+                }
+
+            statement = """
+                SELECT
+                    count(*) total,
+                    sum(coalesce((field_list ->> 'awards')::int, 0)) awards,
+                    sum(coalesce((field_list ->> 'contracts')::int, 0)) contracts,
+                    sum(coalesce((field_list ->> 'contracts/id')::int, 0)) contracts_id,
+                    sum(coalesce((field_list ->> 'contracts/value/amount')::int, 0)) contracts_amount
+                FROM
+                    view_data_collection_1.awards_summary
+            """
+
+            if filters:
+                assert result_dict(statement) == {
+                    'contracts': 1,
+                    'contracts_amount': 1,
+                    'contracts_id': 1,
+                    'awards': 0,
+                    'total': 4,
+                }
+            else:
+                assert result_dict(statement) == {
+                    'contracts': 213,
+                    'contracts_amount': 213,
+                    'contracts_id': 213,
+                    'awards': 0,
+                    'total': 301,
+                }
 
         # All columns have comments.
         assert not db.all("""
@@ -542,7 +602,7 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
                 'award_documents_summary': 11,
                 'award_items_summary': 29,
                 'award_suppliers_summary': 30,
-                'awards_summary': 164,
+                'awards_summary': 492,
                 'buyer_summary': 31,
                 'contract_documents_summary': 11,
                 'contract_implementation_documents_summary': 11,
@@ -550,7 +610,7 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
                 'contract_implementation_transactions_summary': 83,
                 'contract_items_summary': 26,
                 'contract_milestones_summary': 26,
-                'contracts_summary': 327,
+                'contracts_summary': 492,
                 'parties_summary': 30,
                 'planning_documents_summary': 11,
                 'planning_milestones_summary': 27,
@@ -565,10 +625,10 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
                 'tenderers_summary': 32,
             }
 
-            for table in SUMMARIES:
-                count = db.one(db.format(statement, table=table.name, primary_keys=table.primary_keys))[0]
+            for table_name, table in SUMMARIES.items():
+                count = db.one(db.format(statement, table=table_name, primary_keys=table.primary_keys))[0]
 
-                assert count == expected[table.name], f'{table.name}: {count} != {expected[table.name]}'
+                assert count == expected[table_name], f'{table_name}: {count} != {expected[table_name]}'
 
         expected = []
         for collection_id in [2, 1]:

@@ -61,10 +61,18 @@ class Database:
             if isinstance(value, sql.Composable):
                 objects[key] = value
             elif isinstance(value, list):
-                objects[key] = sql.SQL(', ').join(sql.Identifier(entry) for entry in value)
+                objects[key] = sql.SQL(', ').join(self.identify(entry) for entry in value)
             else:
-                objects[key] = sql.Identifier(value)
+                objects[key] = self.identify(value)
         return sql.SQL(statement).format(**objects)
+
+    def identify(self, value):
+        """
+        Returns the value as a SQL identifier. If the value is a tuple, the SQL identifier will be dot-separated.
+        """
+        if not isinstance(value, tuple):
+            value = (value,)
+        return sql.Identifier(*value)
 
     def execute(self, statement, variables=None, **kwargs):
         """

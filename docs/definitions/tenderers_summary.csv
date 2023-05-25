@@ -16,4 +16,4 @@ total_additionalidentifiers,integer,Length of the ``additionalIdentifiers`` arra
 link_to_parties,integer,"1 if any ``parties/id`` value matches this tenderer's ``id`` value, otherwise 0"
 link_with_role,integer,"1 if the tenderer's entry in the parties array has 'tenderer' in its ``roles`` array, otherwise 0"
 party_index,bigint,Position of the tenderer in the ``parties`` array
-field_list,jsonb,"All JSON paths in the tenderer object, excluding array indices, expressed as a JSONB object in which keys are paths and values are NULL. This column is only available if the --field-lists option is used."
+field_list,jsonb,"All JSON paths in the tenderer object, expressed as a JSONB object in which keys are paths and values are numbers of occurrences. Paths exclude array indices. This column is only available if the --field-lists option is used."

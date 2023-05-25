@@ -55,8 +55,6 @@ The following query lists the collections in the current schema, with the name o
       release_type
   FROM
       release_summary
-  JOIN
-      collection ON release_summary.collection_id = collection.id
   ORDER BY
       collection_id DESC;
 
@@ -99,19 +97,19 @@ The following query calculates the total value of tenders disaggregated by curre
 .. code-block:: sql
 
   SELECT
-    tender_value_currency, -- return the currency of the tender value, values in OCDS have an amount and a currency, as datasets may contain values in multiple currencies
-    tender_status,
-    sum(tender_value_amount)
+    value_currency, -- return the currency of the tender value, values in OCDS have an amount and a currency, as datasets may contain values in multiple currencies
+    status,
+    sum(value_amount)
   FROM
     tender_summary
   WHERE
     collection_id = 1259
   GROUP BY
-    tender_value_currency,
-    tender_status
+    value_currency,
+    status
   ORDER BY
-    tender_value_currency,
-    tender_status;
+    value_currency,
+    status;
 
 To learn more about the summaries and aggregates in the ``tender_summary`` table, refer to the :ref:`tender_summary` documentation.
 
@@ -119,7 +117,7 @@ To learn more about the summaries and aggregates in the ``tender_summary`` table
 
   The ``tender``, ``awards`` and ``contracts`` objects in OCDS all have a ``.status`` field.
 
-  Kingfisher Summarize stores these status fields in the ``tender_summary.tender_status``, ``awards_summary.award_status`` and ``contracts_summary.contract_status`` columns.
+  Kingfisher Summarize stores these status fields in the ``tender_summary.status``, ``awards_summary.status`` and ``contracts_summary.status`` columns.
 
   Consider which statuses you want to include or exclude from your analysis; for example, you might want to exclude pending and cancelled contracts when calculating the total value of contracts for each buyer.
 
@@ -141,10 +139,10 @@ The following query calculates the top 10 buyers by award value for collection `
 .. code-block:: sql
 
   SELECT
-      buyer_identifier,
+      buyer_id,
       buyer -> 'name' AS buyer_name, -- extract the buyer name from the JSON
-      award_value_currency,
-      sum(award_value_amount) AS award_amount
+      value_currency,
+      sum(value_amount) AS award_amount
   FROM
       awards_summary
   JOIN
@@ -152,13 +150,13 @@ The following query calculates the top 10 buyers by award value for collection `
   WHERE
       awards_summary.collection_id = 1259
   AND
-      awards_summary.award_value_amount > 0 -- filter out awards with no value
+      awards_summary.value_amount > 0 -- filter out awards with no value
   AND
-      awards_summary.award_status = 'active'
+      awards_summary.status = 'active'
   GROUP BY
-      buyer_identifier,
+      buyer_id,
       buyer_name,
-      award_value_currency
+      value_currency
   ORDER BY
       award_amount DESC
   LIMIT 10;

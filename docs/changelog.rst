@@ -1,13 +1,53 @@
 Changelog
 =========
 
-2021-07-28
+2021-12-21
 ----------
 
 Changed
 ~~~~~~~
 
--  Replaced similar tables with templated queries. This should not affect behavior.
+-  The ``field_list`` column is now a JSONB object in which keys are paths and values are numbers of occurrences (instead of ``NULL``).
+
+2021-11-24
+----------
+
+Added
+~~~~~
+
+- Add a ``--filter`` option to the :ref:`add` command.
+
+2021-11-02
+----------
+
+Added
+~~~~~
+
+-  Add a ``relatedprocesses_summary`` table.
+
+2021-09-15
+----------
+
+Changed
+~~~~~~~
+
+-  Replace the ``selected_collections`` table in individual schema with a ``selected_collections`` table in the ``summaries`` schema.
+
+2021-08-10
+----------
+
+Fixed
+~~~~~
+
+-  Fix support for :ref:`release types<relationships>` of "embedded_release" and "record".
+
+2021-07-29
+----------
+
+Changed
+~~~~~~~
+
+-  Replace similar tables with templated queries. This does not affect behavior.
 
 2021-07-16
 ----------
