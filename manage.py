@@ -805,7 +805,7 @@ def docs_table_ref(name):
 
 
 @dev.command()
-def hash_md5():
+def hash_md5():  # pragma: no cover
     """
     Sort the data table fixture by the id column and update the hash_md5 column.
     """
