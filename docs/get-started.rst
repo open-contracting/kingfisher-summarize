@@ -51,7 +51,7 @@ Or, it can be set in a ``.env`` file in the ``kingfisher-summarize`` directory. 
 
    KINGFISHER_SUMMARIZE_DATABASE_URL=postgresql://user:password@localhost:5432/dbname
 
-If you prefer not to store the password in the ``.env`` file, you can use the `PostgreSQL Password File <https://www.postgresql.org/docs/11/libpq-pgpass.html>`__, ``~/.pgpass``.
+If you prefer not to store the password in the ``.env`` file, you can use the `PostgreSQL Password File <https://www.postgresql.org/docs/current/libpq-pgpass.html>`__, ``~/.pgpass``.
 
 The database user must have the `CREATE privilege <https://www.postgresql.org/docs/current/ddl-priv.html>`__ on the database used by Kingfisher Process. For example, for the default database connection settings:
 
@@ -70,6 +70,6 @@ Logging
 
    This step is optional.
 
-Logging from the :doc:`cli` can be configured with a ``logging.json`` file in a `configuration directory <https://click.palletsprojects.com/en/7.x/api/#click.get_app_dir>`__ appropriate to your operating system. Read more about :doc:`logging`.
+Logging from the :doc:`cli` can be configured with a ``logging.json`` file in a `configuration directory <https://click.palletsprojects.com/en/7.x/api/#click.get_app_dir>`__ appropriate to your operating system. Set the ``KINGFISHER_SUMMARIZE_LOGGING_JSON`` environment variable to override the default path. Read more about :doc:`logging`.
 
 You're now ready to :doc:`use Kingfisher Summarize<cli>`.

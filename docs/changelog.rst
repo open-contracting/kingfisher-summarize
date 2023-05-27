@@ -1,6 +1,15 @@
 Changelog
 =========
 
+2023-05-27
+----------
+
+Added
+~~~~~
+
+- ``KINGFISHER_SUMMARIZE_LOGGING_JSON`` environment variable
+- ``dev hash-md5`` command
+
 2021-12-21
 ----------
 

@@ -280,7 +280,10 @@ def construct_where_fragment_sql_json_path(cursor, filter_sql_json_path):
 def cli(ctx, quiet):
     load_dotenv()
 
-    path = os.path.join(click.get_app_dir('Kingfisher Summarize'), 'logging.json')
+    path = os.getenv(
+        'KINGFISHER_SUMMARIZE_LOGGING_JSON',
+        os.path.join(click.get_app_dir('Kingfisher Summarize'), 'logging.json')
+    )
     if os.path.isfile(path):
         with open(path) as f:
             logging.config.dictConfig(json.load(f))
