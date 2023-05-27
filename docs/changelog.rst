@@ -1,14 +1,28 @@
 Changelog
 =========
 
+2023-06-01
+----------
+
+Added
+~~~~~
+
+-  Add a ``--filter-sql-json-path`` option to the :ref:`add` command.
+
+Changed
+~~~~~~~
+
+-  Change schema prefix from ``view_data_`` to ``summary_``.
+-  Upgrade to Python 3.10 and PostgreSQL 15.
+
 2023-05-27
 ----------
 
 Added
 ~~~~~
 
-- ``KINGFISHER_SUMMARIZE_LOGGING_JSON`` environment variable
-- ``dev hash-md5`` command
+-  ``KINGFISHER_SUMMARIZE_LOGGING_JSON`` environment variable
+-  ``dev hash-md5`` command
 
 2021-12-21
 ----------
