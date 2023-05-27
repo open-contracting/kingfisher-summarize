@@ -70,6 +70,6 @@ Logging
 
    This step is optional.
 
-Logging from the :doc:`cli` can be configured with a ``logging.json`` file in a `configuration directory <https://click.palletsprojects.com/en/7.x/api/#click.get_app_dir>`__ appropriate to your operating system. Read more about :doc:`logging`.
+Logging from the :doc:`cli` can be configured with a ``logging.json`` file in a `configuration directory <https://click.palletsprojects.com/en/7.x/api/#click.get_app_dir>`__ appropriate to your operating system. Set the ``KINGFISHER_SUMMARIZE_LOGGING_JSON`` environment variable to override the default path. Read more about :doc:`logging`.
 
 You're now ready to :doc:`use Kingfisher Summarize<cli>`.
