@@ -4,7 +4,7 @@ How-to guides
 SQL files
 ---------
 
-The examples below use the ``view_data_NAME`` schema and the :ref:`default database connection settings<database-connection-settings>`. Change these as needed.
+The examples below use the ``summary_NAME`` schema and the :ref:`default database connection settings<database-connection-settings>`. Change these as needed.
 
 Run a specific file
 ~~~~~~~~~~~~~~~~~~~
@@ -13,7 +13,7 @@ To run, for example, the ``planning_tmp.sql`` file:
 
 .. code-block:: bash
 
-   psql 'dbname=ocdskingfisher user=ocdskingfisher options=--search-path=view_data_NAME' -f planning_tmp.sql
+   psql 'dbname=ocdskingfisher user=ocdskingfisher options=--search-path=summary_NAME' -f planning_tmp.sql
 
 .. note::
 
@@ -26,7 +26,7 @@ Add the ``-c '\timing'`` option to a ``psql`` command, before any ``-f`` options
 
 .. code-block:: bash
 
-   psql 'dbname=ocdskingfisher user=ocdskingfisher options=--search-path=view_data_NAME' -c '\timing' -f planning_tmp.sql
+   psql 'dbname=ocdskingfisher user=ocdskingfisher options=--search-path=summary_NAME' -c '\timing' -f planning_tmp.sql
 
 Drop tables and views
 ~~~~~~~~~~~~~~~~~~~~~

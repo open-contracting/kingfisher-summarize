@@ -27,6 +27,8 @@ basedir = os.path.dirname(os.path.realpath(__file__))
 
 Summary = namedtuple('Summary', 'primary_keys data_column is_table')
 
+SCHEMA_PREFIX = 'summary_'
+
 SUMMARIES = {
     'award_documents_summary': Summary(['id', 'award_index', 'document_index'], 'document', True),
     'award_items_summary': Summary(['id', 'award_index', 'item_index'], 'item', True),
@@ -239,7 +241,7 @@ def validate_schema(ctx, param, value):
     """
     Returns a schema name. Raises an error if the schema isn't in the database.
     """
-    schema = f'view_data_{value}'
+    schema = f'{SCHEMA_PREFIX}{value}'
 
     if not db.schema_exists(schema):
         raise click.BadParameter(f'SQL schema "{schema}" not found')
@@ -258,6 +260,17 @@ def construct_where_fragment(cursor, filter_field, filter_value):
     path = filter_field.split('.')
     format_string = ' AND d.data' + '->%s' * (len(path) - 1) + '->>%s = %s'
     where_fragment = cursor.mogrify(format_string, path + [filter_value])
+    return where_fragment.decode()
+
+
+def construct_where_fragment_sql_json_path(cursor, filter_sql_json_path):
+    """
+    Returns part of a WHERE clause, to filter on the given SQL/JSON Path Language expression.
+
+    :param cursor: a psycopg2 database cursor
+    :param str filter_sql_json_path: a SQL/JSON Path Language expression, e.g. '$.tender.procurementMethod == "direct"'
+    """
+    where_fragment = cursor.mogrify(' AND jsonb_path_match(d.data,  %s)', [filter_sql_json_path])
     return where_fragment.decode()
 
 
@@ -292,7 +305,7 @@ def cli(ctx, quiet):
 @click.argument('collections', callback=validate_collections)
 @click.argument('note')
 @click.option('--name', callback=validate_name,
-              help='A custom name for the SQL schema ("view_data_" will be prepended).')
+              help=f'A custom name for the SQL schema ("{SCHEMA_PREFIX}" will be prepended).')
 @click.option('--tables-only', is_flag=True, help='Create SQL tables instead of SQL views.')
 @click.option('--field-counts/--no-field-counts', 'field_counts_option', default=True,
               help="Whether to create the field_counts table (default true).")
@@ -302,8 +315,11 @@ def cli(ctx, quiet):
               help="Any SQL files to skip. Dependent files and final files will be skipped.")
 @click.option('--filter', "filters", nargs=2, multiple=True,
               help="A field and value to filter by, like --filter tender.procurementMethod direct")
+@click.option('--filter-sql-json-path', "filters_sql_json_path", multiple=True,
+              help="A SQL/JSON Path Language expression to filter by, e.g. '$.tender.procurementMethod == \"direct\"'")
 @click.pass_context
-def add(ctx, collections, note, name, tables_only, field_counts_option, field_lists_option, skip, filters):
+def add(ctx, collections, note, name, tables_only, field_counts_option, field_lists_option, skip, filters,
+        filters_sql_json_path):
     """
     Create a schema containing summary tables about one or more collections.
 
@@ -312,20 +328,20 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
     NOTE is your name and a description of your purpose
     """
     logger = logging.getLogger('ocdskingfisher.summarize.add')
-    logger.info('Arguments: collections=%s note=%s name=%s tables_only=%s filters=%s',
-                collections, note, name, tables_only, filters)
+    logger.info('Arguments: collections=%s note=%s name=%s tables_only=%s filters=%s filters_sql_json_path=%s',
+                collections, note, name, tables_only, filters, filters_sql_json_path)
 
     if not name:
         if len(collections) > 5:
             raise click.UsageError('--name is required for more than 5 collections')
         name = f"collection_{'_'.join(str(_id) for _id in sorted(collections))}"
 
-    if filters:
-        where_fragment = ''.join(construct_where_fragment(db.cursor, field, value) for field, value in filters)
-    else:
-        where_fragment = None
+    where_fragment = ''.join(
+        [construct_where_fragment(db.cursor, field, value) for field, value in filters] +
+        [construct_where_fragment_sql_json_path(db.cursor, filter_sjp) for filter_sjp in filters_sql_json_path]
+    )
 
-    schema = f'view_data_{name}'
+    schema = f'{SCHEMA_PREFIX}{name}'
 
     # Create the summaries.selected_collections table, if it doesn't exist.
     db.execute('CREATE SCHEMA IF NOT EXISTS summaries')
@@ -375,10 +391,10 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
 @cli.command()
 @click.argument('name', callback=validate_schema)
 def remove(name):
-    """
+    f"""
     Drop a schema.
 
-    NAME is the last part of a schema's name after "view_data_".
+    NAME is the last part of a schema's name after "{SCHEMA_PREFIX}".
     """
     logger = logging.getLogger('ocdskingfisher.summarize.remove')
     logger.info('Arguments: name=%s', name)
@@ -415,7 +431,7 @@ def index():
         collections = map(str, _get_selected_collections(schema))
         notes = db.all('SELECT note, created_at FROM note ORDER BY created_at')
 
-        table.append([schema[10:], ', '.join(collections), format_note(notes[0])])
+        table.append([schema.removeprefix(SCHEMA_PREFIX), ', '.join(collections), format_note(notes[0])])
         for note in notes[1:]:
             table.append([None, None, format_note(note)])
 
@@ -753,7 +769,7 @@ def stale():
 
     for schema in db.schemas():
         if schema not in skip and not db.one(statement, {'schema': schema}):
-            click.echo(schema[10:])
+            click.echo(schema.removeprefix(SCHEMA_PREFIX))
 
 
 @dev.command()
@@ -792,7 +808,7 @@ def docs_table_ref(name):
 
 
 @dev.command()
-def hash_md5():
+def hash_md5():  # pragma: no cover
     """
     Sort the data table fixture by the id column and update the hash_md5 column.
     """

@@ -29,14 +29,14 @@ The following query returns a list of schemas in the database:
 Set the schema to query
 -----------------------
 
-The following query sets the ``view_data_collection_1257_1259`` schema as the first item in the search path:
+The following query sets the ``summary_collection_1257_1259`` schema as the first item in the search path:
 
 .. code-block:: sql
 
   SET
     search_path
   TO
-    view_data_collection_1257_1259, public;
+    summary_collection_1257_1259, public;
 
 .. note::
 

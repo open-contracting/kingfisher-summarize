@@ -14,7 +14,7 @@ def test_validate_schema(caplog):
     result = runner.invoke(cli, [command, 'nonexistent'])
 
     assert result.exit_code == 2
-    assert_bad_argument(result, 'NAME', 'SQL schema "view_data_nonexistent" not found')
+    assert_bad_argument(result, 'NAME', 'SQL schema "summary_nonexistent" not found')
     assert_log_running(caplog, command)
 
 
@@ -24,7 +24,7 @@ def test_command(db, caplog):
     with fixture(db):
         runner = CliRunner()
 
-        schema = 'view_data_collection_1'
+        schema = 'summary_collection_1'
 
         assert db.schema_exists(schema)
 
@@ -35,6 +35,6 @@ def test_command(db, caplog):
         assert result.exit_code == 0
         assert result.output == ''
         assert_log_records(caplog, command, [
-            'Arguments: name=view_data_collection_1',
+            'Arguments: name=summary_collection_1',
             f'DROP SCHEMA "{schema}" CASCADE',
         ])

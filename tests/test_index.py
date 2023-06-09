@@ -46,7 +46,7 @@ def test_command_multiple(db, caplog):
         runner = CliRunner()
 
         statement = sql.SQL("INSERT INTO {table} (note, created_at) VALUES (%(note)s, %(created_at)s)").format(
-            table=sql.Identifier('view_data_collection_1_2', 'note'))
+            table=sql.Identifier('summary_collection_1_2', 'note'))
         db.execute(statement, {'note': 'Another', 'created_at': datetime(2000, 1, 1)})
         db.commit()
 

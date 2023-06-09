@@ -10,7 +10,7 @@ Kingfisher Summarize runs SQL statements to create `SQL schemas <https://www.pos
 
 A SQL schema is like a set of SQL tables in a common namespace. It is not like a set of constraints, like `XML schema <https://en.wikipedia.org/wiki/XML_schema>`__ or `JSON Schema <https://json-schema.org>`__.
 
-The schemas are created in the database used by Kingfisher Process, and the schemas' names start with ``view_data_``. (The default ``public`` schema contains the tables created by Kingfisher Process.)
+The schemas are created in the database used by Kingfisher Process, and the schemas' names start with ``summary_``. (The default ``public`` schema contains the tables created by Kingfisher Process.)
 
 Typical usage
 -------------
@@ -25,19 +25,19 @@ Once it's done, you can query the tables it created.
 Query its tables
 ~~~~~~~~~~~~~~~~
 
-As documented in the :ref:`add` command, the schema you created has a name starting with ``view_data_``, like ``view_data_collection_123`` or ``view_data_collection_4_5_6`` or ``view_data_the_name``. To learn more about each table in the schema, refer to the :doc:`database`.
+As documented in the :ref:`add` command, the schema you created has a name starting with ``summary_``, like ``summary_collection_123`` or ``summary_collection_4_5_6`` or ``summary_the_name``. To learn more about each table in the schema, refer to the :doc:`database`.
 
 To query a table in the schema you created, prefix the table name by the schema name and a period. For example:
 
 .. code-block:: sql
 
-   SELECT * FROM view_data_collection_123.release_summary;
+   SELECT * FROM summary_collection_123.release_summary;
 
 Instead of typing the schema name every time, you can set PostgreSQL's `search_path <https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-SEARCH-PATH>`__ to a comma-separated list of schemas in which to search for tables. For example, if you want to query both a Kingfisher Summarize schema and Kingfisher Process' tables, run this statement first:
 
 .. code-block:: sql
 
-   SET search_path = view_data_collection_123, public;
+   SET search_path = summary_collection_123, public;
 
 You can then run statements like:
 
