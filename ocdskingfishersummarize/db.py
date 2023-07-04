@@ -23,7 +23,8 @@ class Database:
         """
         Returns whether a schema exists.
         """
-        return self.one('SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = %(schema)s)', {'schema': schema})[0]
+        statement = 'SELECT EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = %(schema)s)'
+        return self.one(statement, {'schema': schema})[0]
 
     def pluck(self, statement, variables=None, **kwargs):
         """

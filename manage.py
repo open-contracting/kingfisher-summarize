@@ -344,7 +344,8 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
     schema = f'{SCHEMA_PREFIX}{name}'
 
     # Create the summaries.selected_collections table, if it doesn't exist.
-    db.execute('CREATE SCHEMA IF NOT EXISTS summaries')
+    if not db.schema_exists('summaries'):
+        db.execute('CREATE SCHEMA summaries')
     db.set_search_path(['summaries'])
     db.execute("""CREATE TABLE IF NOT EXISTS selected_collections
                   (schema TEXT NOT NULL, collection_id INTEGER NOT NULL)""")
