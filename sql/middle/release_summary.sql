@@ -57,24 +57,14 @@ SELECT
     END AS release,
     pd.data AS package_data,
     release_check.cove_output AS release_check,
-    release_check11.cove_output AS release_check11,
-    record_check.cove_output AS record_check,
-    record_check11.cove_output AS record_check11
+    record_check.cove_output AS record_check
 FROM
     release_summary_no_data rs
     JOIN data d ON d.id = rs.data_id
     JOIN collection c ON c.id = rs.collection_id
     LEFT JOIN release_check ON release_check.release_id = rs.table_id
-        AND release_check.override_schema_version = ''
-        AND release_type = 'release'
-    LEFT JOIN release_check release_check11 ON release_check11.release_id = rs.table_id
-        AND release_check11.override_schema_version = '1.1'
         AND release_type = 'release'
     LEFT JOIN record_check ON record_check.record_id = rs.table_id
-        AND record_check.override_schema_version = ''
-        AND release_type = 'record'
-    LEFT JOIN record_check record_check11 ON record_check11.record_id = rs.table_id
-        AND record_check11.override_schema_version = '1.1'
         AND release_type = 'record'
         --Kingfisher Process’ compiled_release table has no package_data_id column.
         --Therefore, any rows in release_summary_no_data sourced from that table will have a NULL package_data_id.

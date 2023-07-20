@@ -547,11 +547,7 @@ SELECT
 
 COMMENT ON COLUMN release_summary.release_check IS '`Data Review Tool output <https://github.com/open-contracting/lib-cove-ocds#output-json-format>`__';
 
-COMMENT ON COLUMN release_summary.release_check11 IS 'Data Review Tool output, forcing OCDS 1.1';
-
 COMMENT ON COLUMN release_summary.record_check IS '`Data Review Tool output <https://github.com/open-contracting/lib-cove-ocds#output-json-format>`__';
-
-COMMENT ON COLUMN release_summary.record_check11 IS 'Data Review Tool output, forcing OCDS 1.1';
 
 COMMENT ON COLUMN release_summary.release IS '``data`` from the Kingfisher Process ``data`` table. This is the release, compiled release, record or embedded release.';
 

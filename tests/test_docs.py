@@ -118,9 +118,7 @@ def test_docs():
         'total_unique_award_suppliers',
         'total_contract_link_to_awards',
         'release_check',
-        'release_check11',
         'record_check',
-        'record_check11',
         'release',
         'package_data',
         # contract_implementation_transactions_summary table
