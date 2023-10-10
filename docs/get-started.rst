@@ -8,8 +8,8 @@ To use Kingfisher Summarize, you need:
 
 -  Access to a `Unix-like shell <https://en.wikipedia.org/wiki/Shell_(computing)>`__ (some are available for Windows)
 -  `Git <https://git-scm.com>`__
--  `Python <https://www.python.org/>`__ 3.7 or greater
--  `PostgreSQL <https://www.postgresql.org>`__ 10 or greater
+-  `Python <https://www.python.org/>`__ (`supported versions <https://endoflife.date/python>`__)
+-  `PostgreSQL <https://www.postgresql.org>`__ (`supported versions <https://endoflife.date/postgresql>`__)
 -  `A Kingfisher Process database <https://kingfisher-process.readthedocs.io/en/latest/requirements-install.html>`__
 
 .. _install:
