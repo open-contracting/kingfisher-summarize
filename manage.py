@@ -363,7 +363,7 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
 
     db.execute('CREATE TABLE note (id SERIAL, note TEXT NOT NULL, created_at TIMESTAMP WITHOUT TIME ZONE)')
     db.execute('INSERT INTO note (note, created_at) VALUES (%(note)s, %(created_at)s)',
-               {'note': note, 'created_at': datetime.datetime.now(tz=datetime.UTC)})
+               {'note': note, 'created_at': datetime.datetime.now(tz=datetime.timezone.utc)})
 
     db.commit()
 
