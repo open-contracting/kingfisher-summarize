@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import concurrent.futures
 import csv
+import datetime
 import glob
 import hashlib
 import json
@@ -9,7 +10,6 @@ import logging.config
 import os
 import re
 from collections import defaultdict, namedtuple
-from datetime import datetime
 from time import time
 
 import click
@@ -363,7 +363,7 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
 
     db.execute('CREATE TABLE note (id SERIAL, note TEXT NOT NULL, created_at TIMESTAMP WITHOUT TIME ZONE)')
     db.execute('INSERT INTO note (note, created_at) VALUES (%(note)s, %(created_at)s)',
-               {'note': note, 'created_at': datetime.utcnow()})
+               {'note': note, 'created_at': datetime.datetime.now(tz=datetime.UTC)})
 
     db.commit()
 
