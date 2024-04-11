@@ -36,7 +36,7 @@ flake8==3.7.9
     # via -r requirements_dev.in
 identify==2.5.30
     # via pre-commit
-idna==2.8
+idna==3.7
     # via requests
 iniconfig==1.1.1
     # via pytest
