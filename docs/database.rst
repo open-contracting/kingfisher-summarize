@@ -1,5 +1,5 @@
-Database tables reference
-=========================
+Database tables
+===============
 
 .. raw:: html
 

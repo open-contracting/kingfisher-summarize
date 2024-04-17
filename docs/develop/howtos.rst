@@ -44,8 +44,8 @@ To undo the ``field_counts`` routine, run:
 Documentation files
 -------------------
 
-Update the database tables reference
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Update the Database tables page
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :doc:`../database` displays the CSV files in the `docs/definitions/ <https://github.com/open-contracting/kingfisher-summarize/tree/main/docs/definitions>`__ directory. To create and/or update the CSV files, run (replacing ``NAME`` below):
 
