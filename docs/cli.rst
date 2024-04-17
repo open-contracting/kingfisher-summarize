@@ -1,5 +1,5 @@
-Command-line tools
-==================
+Command-line interface
+======================
 
 The ``manage.py`` script at the root of the repository provides access to a suite of command-line tools to create and manage the :doc:`summary tables<database>` of one or more collections.
 
