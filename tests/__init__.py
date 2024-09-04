@@ -11,7 +11,7 @@ def noop(*args, **kwargs):
 
 
 @contextmanager
-def fixture(db, collections='1', name=None, tables_only=None, field_counts=True, field_lists=True, filters=(),
+def fixture(db, collections='1', name=None, tables_only=None, *, field_counts=True, field_lists=True, filters=(),
             filters_sql_json_path=()):
     runner = CliRunner()
 

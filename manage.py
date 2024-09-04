@@ -9,8 +9,9 @@ import logging
 import logging.config
 import os
 import re
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 from time import time
+from typing import NamedTuple
 
 import click
 from dotenv import load_dotenv
@@ -20,44 +21,51 @@ from tabulate import tabulate
 from ocdskingfishersummarize.db import Database
 from ocdskingfishersummarize.exceptions import AmbiguousSourceError
 
-global db
-
 flags = re.MULTILINE | re.IGNORECASE
 basedir = os.path.dirname(os.path.realpath(__file__))
 
-Summary = namedtuple('Summary', 'primary_keys data_column is_table')
+
+class Summary(NamedTuple):
+    primary_keys: list[str]
+    data_column: str
+    is_table: bool
+
 
 SCHEMA_PREFIX = 'summary_'
 
+MAX_COLLECTIONS = 5
+
 SUMMARIES = {
-    'award_documents_summary': Summary(['id', 'award_index', 'document_index'], 'document', True),
-    'award_items_summary': Summary(['id', 'award_index', 'item_index'], 'item', True),
-    'award_suppliers_summary': Summary(['id', 'award_index', 'supplier_index'], 'supplier', True),
-    'awards_summary': Summary(['id', 'award_index'], 'award', False),
-    'buyer_summary': Summary(['id'], 'buyer', True),
-    'contract_documents_summary': Summary(['id', 'contract_index', 'document_index'], 'document', True),
-    'contract_implementation_documents_summary': Summary(['id', 'contract_index', 'document_index'], 'document', True),
+    'award_documents_summary': Summary(['id', 'award_index', 'document_index'], 'document', is_table=True),
+    'award_items_summary': Summary(['id', 'award_index', 'item_index'], 'item', is_table=True),
+    'award_suppliers_summary': Summary(['id', 'award_index', 'supplier_index'], 'supplier', is_table=True),
+    'awards_summary': Summary(['id', 'award_index'], 'award', is_table=False),
+    'buyer_summary': Summary(['id'], 'buyer', is_table=True),
+    'contract_documents_summary': Summary(['id', 'contract_index', 'document_index'], 'document', is_table=True),
+    'contract_implementation_documents_summary': Summary(
+        ['id', 'contract_index', 'document_index'], 'document', is_table=True
+    ),
     'contract_implementation_milestones_summary': Summary(
-        ['id', 'contract_index', 'milestone_index'], 'milestone', True
+        ['id', 'contract_index', 'milestone_index'], 'milestone', is_table=True
     ),
     'contract_implementation_transactions_summary': Summary(
-        ['id', 'contract_index', 'transaction_index'], 'transaction', True
+        ['id', 'contract_index', 'transaction_index'], 'transaction', is_table=True
     ),
-    'contract_items_summary': Summary(['id', 'contract_index', 'item_index'], 'item', True),
-    'contract_milestones_summary': Summary(['id', 'contract_index', 'milestone_index'], 'milestone', True),
-    'parties_summary': Summary(['id', 'party_index'], 'party', False),
-    'planning_documents_summary': Summary(['id', 'document_index'], 'document', True),
-    'planning_milestones_summary': Summary(['id', 'milestone_index'], 'milestone', True),
-    'planning_summary': Summary(['id'], 'planning', False),
-    'procuringentity_summary': Summary(['id'], 'procuringentity', True),
-    'relatedprocesses_summary': Summary(['id', 'relatedprocess_index'], 'relatedprocess', True),
-    'release_summary': Summary(['id'], 'release', False),
-    'tender_documents_summary': Summary(['id'], 'document', True),
-    'tender_items_summary': Summary(['id', 'item_index'], 'item', True),
-    'tender_milestones_summary': Summary(['id', 'milestone_index'], 'milestone', True),
-    'tender_summary': Summary(['id'], 'tender', False),
-    'tenderers_summary': Summary(['id', 'tenderer_index'], 'tenderer', True),
-    'contracts_summary': Summary(['id', 'contract_index'], 'contract', False),
+    'contract_items_summary': Summary(['id', 'contract_index', 'item_index'], 'item', is_table=True),
+    'contract_milestones_summary': Summary(['id', 'contract_index', 'milestone_index'], 'milestone', is_table=True),
+    'parties_summary': Summary(['id', 'party_index'], 'party', is_table=False),
+    'planning_documents_summary': Summary(['id', 'document_index'], 'document', is_table=True),
+    'planning_milestones_summary': Summary(['id', 'milestone_index'], 'milestone', is_table=True),
+    'planning_summary': Summary(['id'], 'planning', is_table=False),
+    'procuringentity_summary': Summary(['id'], 'procuringentity', is_table=True),
+    'relatedprocesses_summary': Summary(['id', 'relatedprocess_index'], 'relatedprocess', is_table=True),
+    'release_summary': Summary(['id'], 'release', is_table=False),
+    'tender_documents_summary': Summary(['id'], 'document', is_table=True),
+    'tender_items_summary': Summary(['id', 'item_index'], 'item', is_table=True),
+    'tender_milestones_summary': Summary(['id', 'milestone_index'], 'milestone', is_table=True),
+    'tender_summary': Summary(['id'], 'tender', is_table=False),
+    'tenderers_summary': Summary(['id', 'tenderer_index'], 'tenderer', is_table=True),
+    'contracts_summary': Summary(['id', 'contract_index'], 'contract', is_table=False),
 }
 
 COLUMN_COMMENTS_SQL = """
@@ -73,9 +81,9 @@ COLUMN_COMMENTS_SQL = """
 """
 
 
-def sql_files(directory, tables_only=False, where_fragment=None):
+def sql_files(directory, *, tables_only=False, where_fragment=None):
     """
-    Returns a dict in which the key is the identifier of a SQL file and the value is its content.
+    Return a dict in which the key is the identifier of a SQL file and the value is its content.
 
     :param str directory: a sub-directory containing SQL files
     :param bool tables_only: whether to create SQL tables instead of SQL views
@@ -114,11 +122,12 @@ def _get_export_import_tables_from_functions(content):
 
 def dependency_graph(files):
     """
-    Returns a dict in which the key is the identifier of a SQL file and the value is the set of identifiers of SQL
-    files on which that SQL file depends.
+    Return each SQL file's dependencies, as a dict.
 
-    :param dict files: the identifiers and contents of SQL files, as returned by
-                       :func:`~manage.sql_files`
+    The key is the identifier of a SQL file and the value is the set of identifiers of SQL files
+    on which that SQL file depends.
+
+    :param dict files: the identifiers and contents of SQL files, as returned by :func:`~manage.sql_files`
     """
     # These dependencies are always met.
     ignore = {
@@ -176,7 +185,7 @@ def dependency_graph(files):
 
 def run_concurrently(graph, function, function_args):
     """
-    Runs functions concurrently, following a dependency graph.
+    Run functions concurrently, following a dependency graph.
 
     :param dict graph: a dict in which the key is a node and the value is the set of nodes on which it depends
     :param function: The function to call
@@ -185,7 +194,7 @@ def run_concurrently(graph, function, function_args):
 
     def submit(node):
         """
-        If a node's dependencies are met, removes it from the dependency graph and submits it.
+        If a node's dependencies are met, remove it from the dependency graph and submit it.
 
         :param str node: the node in the graph
         """
@@ -213,12 +222,12 @@ def run_concurrently(graph, function, function_args):
 
 def validate_collections(ctx, param, value):
     """
-    Returns a list of collection IDs. Raises an error if an ID isn't in the collection table.
+    Return a list of collection IDs. Raise an error if an ID isn't in the collection table.
     """
     try:
         ids = tuple(int(_id) for _id in value.split(','))
     except ValueError:
-        raise click.BadParameter('Collection IDs must be integers')
+        raise click.BadParameter('Collection IDs must be integers') from None
 
     difference = set(ids) - set(db.pluck('SELECT id FROM collection WHERE id IN %(ids)s', {'ids': ids}))
     if difference:
@@ -229,7 +238,7 @@ def validate_collections(ctx, param, value):
 
 def validate_name(ctx, param, value):
     """
-    Returns a schema suffix. Raises an error if the suffix isn't lowercase.
+    Return a schema suffix. Raise an error if the suffix isn't lowercase.
     """
     if value and value != value.lower():
         raise click.BadParameter('value must be lowercase')
@@ -239,7 +248,7 @@ def validate_name(ctx, param, value):
 
 def validate_schema(ctx, param, value):
     """
-    Returns a schema name. Raises an error if the schema isn't in the database.
+    Return a schema name. Raise an error if the schema isn't in the database.
     """
     schema = f'{SCHEMA_PREFIX}{value}'
 
@@ -251,7 +260,7 @@ def validate_schema(ctx, param, value):
 
 def construct_where_fragment(cursor, filter_field, filter_value):
     """
-    Returns part of a WHERE clause, for the given filter parameters.
+    Return part of a WHERE clause, for the given filter parameters.
 
     :param cursor: a psycopg2 database cursor
     :param str filter_field: a period-separated field name, e.g. "tender.procurementMethod"
@@ -259,13 +268,13 @@ def construct_where_fragment(cursor, filter_field, filter_value):
     """
     path = filter_field.split('.')
     format_string = ' AND d.data' + '->%s' * (len(path) - 1) + '->>%s = %s'
-    where_fragment = cursor.mogrify(format_string, path + [filter_value])
+    where_fragment = cursor.mogrify(format_string, [*path, filter_value])
     return where_fragment.decode()
 
 
 def construct_where_fragment_sql_json_path(cursor, filter_sql_json_path):
     """
-    Returns part of a WHERE clause, to filter on the given SQL/JSON Path Language expression.
+    Return part of a WHERE clause, to filter on the given SQL/JSON Path Language expression.
 
     :param cursor: a psycopg2 database cursor
     :param str filter_sql_json_path: a SQL/JSON Path Language expression, e.g. '$.tender.procurementMethod == "direct"'
@@ -278,6 +287,9 @@ def construct_where_fragment_sql_json_path(cursor, filter_sql_json_path):
 @click.option('-q', '--quiet', is_flag=True, help='Change the log level to warning')
 @click.pass_context
 def cli(ctx, quiet):
+    """
+    Configure the command-line interface.
+    """
     load_dotenv()
 
     path = os.getenv(
@@ -332,8 +344,8 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
                 collections, note, name, tables_only, filters, filters_sql_json_path)
 
     if not name:
-        if len(collections) > 5:
-            raise click.UsageError('--name is required for more than 5 collections')
+        if len(collections) > MAX_COLLECTIONS:
+            raise click.UsageError(f'--name is required for more than {MAX_COLLECTIONS} collections')
         name = f"collection_{'_'.join(str(_id) for _id in sorted(collections))}"
 
     where_fragment = ''.join(
@@ -392,11 +404,11 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
 @cli.command()
 @click.argument('name', callback=validate_schema)
 def remove(name):
-    f"""
+    """
     Drop a schema.
 
-    NAME is the last part of a schema's name after "{SCHEMA_PREFIX}".
-    """
+    NAME is the last part of a schema's name after "summary_".
+    """  # SCHEMA_PREFIX
     logger = logging.getLogger('ocdskingfisher.summarize.remove')
     logger.info('Arguments: name=%s', name)
 
@@ -433,8 +445,7 @@ def index():
         notes = db.all('SELECT note, created_at FROM note ORDER BY created_at')
 
         table.append([schema.removeprefix(SCHEMA_PREFIX), ', '.join(collections), format_note(notes[0])])
-        for note in notes[1:]:
-            table.append([None, None, format_note(note)])
+        table.extend([None, None, format_note(note)] for note in notes[1:])
 
     if table:
         click.echo(tabulate(table, headers=['Name', 'Collections', 'Note'], tablefmt='github', numalign='left'))
@@ -456,9 +467,9 @@ def _run_summary_tables(name, identifier, content):
     return identifier
 
 
-def summary_tables(name, tables_only=False, skip=(), where_fragment=None):
+def summary_tables(name, *, tables_only=False, skip=(), where_fragment=None):
     """
-    Creates the summary tables in a schema.
+    Create the summary tables in a schema.
 
     :param str name: the schema's name
     :param boolean tables_only: whether to create SQL tables instead of SQL views
@@ -480,7 +491,7 @@ def summary_tables(name, tables_only=False, skip=(), where_fragment=None):
 
     def run(directory):
         """
-        Runs the files in a directory in sequence.
+        Run the files in a directory in sequence.
 
         :param str directory: a sub-directory containing SQL files
         """
@@ -532,7 +543,7 @@ def _run_field_counts(name, collection_id):
 
 def field_counts(name):
     """
-    Creates the field_counts table in a schema.
+    Create the field_counts table in a schema.
 
     :param str name: the schema's name
     """
@@ -707,18 +718,24 @@ def _run_field_lists(name, summary_table, tables_only):
         db.execute(statement, {'comment': row[2]}, table=summary_table, column=row[0])
 
     if summary_table == 'contracts_summary':
-        comment = f"All JSON paths in the {table.data_column} object as well as in the related award's " \
-                  f"{format_kwargs['other_data_column']} object (prefixed by {variables['path_prefix']}/), " \
-                  "expressed as a JSONB object in which keys are paths and values are numbers of occurrences. " \
-                  "Paths exclude array indices."
+        comment = (
+            f"All JSON paths in the {table.data_column} object as well as in the related award's "
+            f"{format_kwargs['other_data_column']} object (prefixed by {variables['path_prefix']}/), "
+            "expressed as a JSONB object in which keys are paths and values are numbers of occurrences. "
+            "Paths exclude array indices."
+        )
     elif summary_table == 'awards_summary':
-        comment = f"All JSON paths in the {table.data_column} object as well as in the related contracts' " \
-                  f"{format_kwargs['other_data_column']} object (prefixed by {variables['path_prefix']}/), " \
-                  "expressed as a JSONB object in which keys are paths and values are numbers of occurrences. " \
-                  "Paths exclude array indices."
+        comment = (
+            f"All JSON paths in the {table.data_column} object as well as in the related contracts' "
+            f"{format_kwargs['other_data_column']} object (prefixed by {variables['path_prefix']}/), "
+            "expressed as a JSONB object in which keys are paths and values are numbers of occurrences. "
+            "Paths exclude array indices."
+        )
     else:
-        comment = f"All JSON paths in the {table.data_column} object, expressed as a JSONB object in which keys are " \
-                  "paths and values are numbers of occurrences. Paths exclude array indices."
+        comment = (
+            f"All JSON paths in the {table.data_column} object, expressed as a JSONB object in which keys are "
+            "paths and values are numbers of occurrences. Paths exclude array indices."
+        )
     comment += ' This column is only available if the --field-lists option is used.'
     db.execute('COMMENT ON COLUMN {table}.field_list IS %(comment)s', {'comment': comment}, table=summary_table)
 
@@ -728,9 +745,9 @@ def _run_field_lists(name, summary_table, tables_only):
     return summary_table
 
 
-def field_lists(name, tables_only=False):
+def field_lists(name, *, tables_only=False):
     """
-    Adds the field_list column on all summary tables.
+    Add the field_list column on all summary tables.
 
     :param str name: the schema's name
     :param bool tables_only: whether to create SQL tables instead of SQL views
@@ -753,7 +770,6 @@ def dev():
     """
     Commands for developers of Kingfisher Summarize.
     """
-    pass
 
 
 @dev.command()
@@ -781,13 +797,13 @@ def docs_table_ref(name):
     """
     tables = []
     for content in sql_files('middle').values():
-        for table in re.findall(r'\bCREATE\s+(?:TABLE|VIEW)\s+(\w+)', content, flags=flags):
-            if not table.startswith('tmp_'):
-                tables.append(table)
+        tables.extend(
+            table
+            for table in re.findall(r'\bCREATE\s+(?:TABLE|VIEW)\s+(\w+)', content, flags=flags)
+            if not table.startswith('tmp_')
+        )
         tables.extend(_get_export_import_tables_from_functions(content)[0])
-    tables.append('field_counts')
-    tables.append('note')
-    tables.append('summaries.selected_collections')
+    tables.extend(('field_counts', 'note', 'summaries.selected_collections'))
 
     headers = ['Column Name', 'Data Type', 'Description']
 
@@ -826,7 +842,7 @@ def hash_md5():  # pragma: no cover
             if section == 'data':
                 pk, hash_md5, data = line.split('\t')
                 hash_md5 = hashlib.md5(json.dumps(data, sort_keys=True).encode('utf-8')).hexdigest()
-                append = '\t'.join([pk, hash_md5, data])
+                append = f'{pk}\t{hash_md5}\t{data}'
             else:
                 append = line
 

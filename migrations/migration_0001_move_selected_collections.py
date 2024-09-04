@@ -1,9 +1,9 @@
 """
 Migrate from selected_collections inside the schema, to a global one in its own summaries schema.
-https://github.com/open-contracting/kingfisher-summarize/issues/197
 
 Run this with `python -m migrations.migration_0001_move_selected_collections` in the parent directory.
 """
+# https://github.com/open-contracting/kingfisher-summarize/issues/197
 import sys
 
 from psycopg2.errors import UndefinedTable

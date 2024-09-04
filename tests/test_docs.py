@@ -288,11 +288,9 @@ def test_docs():
                             f"its number of occurrences across all ``{parents[plural_path]}`` arrays",
                         ]
                     elif subject == 'release':
-                        # contract_milestone_type_counts, contract_implementation_document_documenttype_counts
-                        if ancestors:
-                            array = f"{pluralize_path_components(ancestors)}"
-                        else:  # e.g. parties_role
-                            array = parents[path]
+                        # Don't pluralize e.g. parties_role, but pluralize contract_milestone_type_counts
+                        # and contract_implementation_document_documenttype_counts
+                        array = f"{pluralize_path_components(ancestors)}" if ancestors else parents[path]
                         candidates = [
                             # planning_document_documenttype_counts
                             f"JSONB object in which each key is a unique ``{plural_path}`` value and each value is "
@@ -305,11 +303,8 @@ def test_docs():
                             f"its number of occurrences across all {singularize(array)} arrays",
                         ]
                     else:
-                        # e.g. implementation_document_documenttype_counts
-                        if ancestors:
-                            array = f"{pluralize_path_components(ancestors)}"
-                        else:
-                            array = parents[path]
+                        # Pluralize e.g. implementation_document_documenttype_counts
+                        array = f"{pluralize_path_components(ancestors)}" if ancestors else parents[path]
                         candidates = [
                             f"JSONB object in which each key is a unique ``{plural_path}`` value and each value is "
                             f"its number of occurrences in the ``{array}`` array of the {subject} object",

@@ -41,7 +41,7 @@ def test_construct_where_fragment(db):
     assert construct_where_fragment(db.cursor, '', 'z') == " AND d.data->>'' = 'z'"
 
 
-@pytest.mark.parametrize('collections, message', [
+@pytest.mark.parametrize(('collections', 'message'), [
     ('a', 'Collection IDs must be integers'),
     ('1,10,100', 'Collection IDs {10, 100} not found'),
 ])
@@ -68,7 +68,7 @@ def test_validate_name(caplog):
 @patch('manage.summary_tables', noop)
 @patch('manage.field_counts', noop)
 @patch('manage.field_lists', noop)
-@pytest.mark.parametrize('kwargs, name, collections', [
+@pytest.mark.parametrize(('kwargs', 'name', 'collections'), [
     ({}, 'collection_1', (1,)),
     ({'collections': '1,2'}, 'collection_1_2', (1, 2)),
     ({'name': 'custom'}, 'custom', (1,)),
@@ -97,13 +97,13 @@ def test_command_name(kwargs, name, collections, db, caplog):
         ])
 
 
-@pytest.mark.parametrize('filters, filters_sql_json_path', [
+@pytest.mark.parametrize(('filters', 'filters_sql_json_path'), [
     ((), ()),
     ((('ocid', 'dolore'),), ()),
     ((('id', '川蝉'),), ()),
     ((), ('$.id == "川蝉"',)),
 ])
-@pytest.mark.parametrize('tables_only, field_counts, field_lists, tables, views', [
+@pytest.mark.parametrize(('tables_only', 'field_counts', 'field_lists', 'tables', 'views'), [
     (False, True, False,
      TABLES | SUMMARY_TABLES, SUMMARY_VIEWS),
     (True, True, False,
@@ -228,7 +228,6 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
                 'ex-minim Ut consectetur',
             ],  # additionalidentifiers_ids
             5,  # total_additionalidentifiers
-
         )
         if filters or filters_sql_json_path:
             assert len(rows) == 4
@@ -299,7 +298,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
 
             def result_dict(statement):
                 result = db.one(statement)
-                return {column.name: result for column, result in zip(db.cursor.description, result)}
+                return {column.name: result for column, result in zip(db.cursor.description, result, strict=True)}
 
             statement = """
                 SELECT
@@ -392,7 +391,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
         assert_log_records(caplog, command, expected)
 
 
-@pytest.mark.parametrize('filters, filters_sql_json_path', [
+@pytest.mark.parametrize(('filters', 'filters_sql_json_path'), [
     ((('tender.procurementMethod', 'direct',),), ()),
     ((('tender.procurementMethod', 'direct',), ('tender.status', 'planned',),), ()),
     ((), ('$.tender.procurementMethod == "direct"',)),
@@ -400,7 +399,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
     ((('tender.status', 'planned',),), ('$.tender.procurementMethod == "direct"',)),
     ((('tender.procurementMethod', 'direct',),), ('$.tender.status == "planned"',)),
 ])
-@pytest.mark.parametrize('tables_only, field_counts, field_lists, tables, views', [
+@pytest.mark.parametrize(('tables_only', 'field_counts', 'field_lists', 'tables', 'views'), [
     (False, True, False,
      TABLES | SUMMARY_TABLES, SUMMARY_VIEWS),
     (True, True, False,
