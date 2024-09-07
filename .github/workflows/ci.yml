@@ -16,6 +16,7 @@ jobs:
       - env:
           KINGFISHER_SUMMARIZE_DATABASE_URL: postgresql://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres
         run: coverage run --source=ocdskingfishersummarize,manage -m pytest -W error
+      - run: coverage lcov
       - uses: coverallsapp/github-action@v2
     services:
       postgres:
