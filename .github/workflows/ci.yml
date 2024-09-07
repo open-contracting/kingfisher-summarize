@@ -15,10 +15,8 @@ jobs:
       - run: psql postgresql://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres -f tests/fixtures/kingfisher-process.sql
       - env:
           KINGFISHER_SUMMARIZE_DATABASE_URL: postgresql://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres
-        run: pytest -W error --cov ocdskingfishersummarize --cov manage
-      - env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: coveralls --service=github
+        run: coverage run --source=ocdskingfishersummarize,manage -m pytest -W error
+      - uses: coverallsapp/github-action@v2
     services:
       postgres:
         image: postgres:15

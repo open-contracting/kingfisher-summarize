@@ -1,6 +1,4 @@
 -r requirements.txt
-coveralls
+coverage
 pre-commit
 pytest
-pytest-cov
-ruff

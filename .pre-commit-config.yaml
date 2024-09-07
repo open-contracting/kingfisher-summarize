@@ -3,7 +3,7 @@ ci:
   skip: [pip-compile]
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.5.0
+    rev: v0.6.3
     hooks:
       - id: ruff
   - repo: https://github.com/astral-sh/uv-pre-commit
@@ -15,4 +15,4 @@ repos:
       - id: pip-compile
         name: pip-compile requirements_dev.in
         args: [requirements_dev.in, -o, requirements_dev.txt]
-        files: ^requirements_dev\.(in|txt)$
+        files: ^requirements(_dev)?\.(in|txt)$
