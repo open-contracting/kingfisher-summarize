@@ -4,12 +4,10 @@ cfgv==3.4.0
     # via pre-commit
 click==8.1.3
     # via -r requirements.txt
-coverage==6.5.0
+coverage==7.6.1
     # via -r requirements_dev.in
 distlib==0.3.7
     # via virtualenv
-exceptiongroup==1.2.2
-    # via pytest
 filelock==3.12.4
     # via virtualenv
 identify==2.5.30
@@ -38,7 +36,5 @@ setuptools==74.1.1
     # via nodeenv
 tabulate==0.9.0
     # via -r requirements.txt
-tomli==2.0.1
-    # via pytest
 virtualenv==20.24.6
     # via pre-commit
