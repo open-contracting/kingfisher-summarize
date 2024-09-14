@@ -317,5 +317,5 @@ def test_docs():
                         f"Value of the ``{path}`` {infix} in the {subject} object",
                     ]
 
-                assert candidates, f"{basename}.{column} ({subject}): no candidates for \"{description}\""
+                assert candidates, f'{basename}.{column} ({subject}): no candidates for "{description}"'
                 assert description in candidates, f"{basename}.{column} ({subject}): {description} not in {candidates}"

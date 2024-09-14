@@ -366,7 +366,7 @@ def add(ctx, collections, note, name, tables_only, field_counts_option, field_li
 
     # Add the new summary's collections to the summaries.selected_collections table.
     db.execute_values('INSERT INTO selected_collections (schema, collection_id) VALUES %s',
-                      [(schema, _id,) for _id in collections])
+                      [(schema, _id) for _id in collections])
     # https://github.com/open-contracting/kingfisher-summarize/issues/92
     db.execute('ANALYZE selected_collections')
 
@@ -841,7 +841,7 @@ def hash_md5():  # pragma: no cover
 
             if section == 'data':
                 pk, hash_md5, data = line.split('\t')
-                hash_md5 = hashlib.md5(json.dumps(data, sort_keys=True).encode('utf-8')).hexdigest()
+                hash_md5 = hashlib.md5(json.dumps(data, sort_keys=True).encode('utf-8')).hexdigest()  # noqa: S324
                 append = f'{pk}\t{hash_md5}\t{data}'
             else:
                 append = line

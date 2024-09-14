@@ -80,7 +80,7 @@ def test_command_name(kwargs, name, collections, db, caplog):
     with fixture(db, **kwargs) as result:
         assert db.schema_exists(schema)
         assert db.all('SELECT collection_id, schema FROM summaries.selected_collections WHERE schema=%(schema)s',
-                      {'schema': schema}) == [(collection, schema,) for collection in collections]
+                      {'schema': schema}) == [(collection, schema) for collection in collections]
         assert db.all(sql.SQL('SELECT id, note FROM {schema}.note').format(schema=identifier)) == [
             (1, 'Default'),
         ]
@@ -392,12 +392,12 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
 
 
 @pytest.mark.parametrize(('filters', 'filters_sql_json_path'), [
-    ((('tender.procurementMethod', 'direct',),), ()),
-    ((('tender.procurementMethod', 'direct',), ('tender.status', 'planned',),), ()),
+    ((('tender.procurementMethod', 'direct'),), ()),
+    ((('tender.procurementMethod', 'direct'), ('tender.status', 'planned')), ()),
     ((), ('$.tender.procurementMethod == "direct"',)),
     ((), ('$.tender.procurementMethod == "direct"', '$.tender.status == "planned"')),
-    ((('tender.status', 'planned',),), ('$.tender.procurementMethod == "direct"',)),
-    ((('tender.procurementMethod', 'direct',),), ('$.tender.status == "planned"',)),
+    ((('tender.status', 'planned'),), ('$.tender.procurementMethod == "direct"',)),
+    ((('tender.procurementMethod', 'direct'),), ('$.tender.status == "planned"',)),
 ])
 @pytest.mark.parametrize(('tables_only', 'field_counts', 'field_lists', 'tables', 'views'), [
     (False, True, False,

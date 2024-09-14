@@ -22,7 +22,6 @@ ignore = [
   "INP001",  # migrations directory
   "PLW0603",  # global db
   "PLW2901",  # row overwritten
-  "S324",  # md5 hash
   "TRY003",  # click exceptions
 ]
 

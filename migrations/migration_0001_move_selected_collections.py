@@ -4,8 +4,6 @@ Migrate from selected_collections inside the schema, to a global one in its own 
 Run this with `python -m migrations.migration_0001_move_selected_collections` in the parent directory.
 """
 # https://github.com/open-contracting/kingfisher-summarize/issues/197
-import sys
-
 from psycopg2.errors import UndefinedTable
 
 from ocdskingfishersummarize.db import Database
@@ -26,13 +24,14 @@ def migrate():
         db.set_search_path([schema])
         try:
             collections = db.pluck('SELECT id FROM selected_collections')
-        except UndefinedTable as e:
-            print(f'ERROR: undefined {schema}.selected_collections table: {e}', file=sys.stderr)
+        except UndefinedTable:
             db.connection.rollback()
-            continue
-        db.execute_values('INSERT INTO summaries.selected_collections (schema, collection_id) VALUES %s',
-                          [(schema, _id,) for _id in collections])
-        db.commit()
+        else:
+            db.execute_values(
+                'INSERT INTO summaries.selected_collections (schema, collection_id) VALUES %s',
+                [(schema, _id) for _id in collections],
+            )
+            db.commit()
 
 
 if __name__ == "__main__":
