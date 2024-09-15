@@ -841,7 +841,9 @@ def hash_md5():  # pragma: no cover
 
             if section == 'data':
                 pk, hash_md5, data = line.split('\t')
-                hash_md5 = hashlib.md5(json.dumps(data, sort_keys=True).encode('utf-8')).hexdigest()  # noqa: S324
+                hash_md5 = hashlib.md5(  # noqa: S324 # non-cryptographic
+                    json.dumps(data, sort_keys=True).encode('utf-8')
+                ).hexdigest()
                 append = f'{pk}\t{hash_md5}\t{data}'
             else:
                 append = line
