@@ -20,7 +20,6 @@ ignore = [
   "D100", "D101", "D104", # docstrings
   "D301",  # click escapes
   "INP001",  # migrations directory
-  "PLW0603",  # global db
   "PLW2901",  # row overwritten
   "TRY003",  # click exceptions
 ]

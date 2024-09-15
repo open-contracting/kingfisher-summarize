@@ -309,7 +309,7 @@ def cli(ctx, quiet):
     logger = logging.getLogger('ocdskingfisher.summarize.cli')
     logger.info('Running %s', ctx.invoked_subcommand)
 
-    global db
+    global db  # noqa: PLW0603
     db = Database()
 
 
