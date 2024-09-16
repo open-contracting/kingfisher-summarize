@@ -221,9 +221,7 @@ def run_concurrently(graph, function, function_args):
 
 
 def validate_collections(ctx, param, value):
-    """
-    Return a list of collection IDs. Raise an error if an ID isn't in the collection table.
-    """
+    """Return a list of collection IDs. Raise an error if an ID isn't in the collection table."""
     try:
         ids = tuple(int(_id) for _id in value.split(','))
     except ValueError:
@@ -237,9 +235,7 @@ def validate_collections(ctx, param, value):
 
 
 def validate_name(ctx, param, value):
-    """
-    Return a schema suffix. Raise an error if the suffix isn't lowercase.
-    """
+    """Return a schema suffix. Raise an error if the suffix isn't lowercase."""
     if value and value != value.lower():
         raise click.BadParameter('value must be lowercase')
 
@@ -247,9 +243,7 @@ def validate_name(ctx, param, value):
 
 
 def validate_schema(ctx, param, value):
-    """
-    Return a schema name. Raise an error if the schema isn't in the database.
-    """
+    """Return a schema name. Raise an error if the schema isn't in the database."""
     schema = f'{SCHEMA_PREFIX}{value}'
 
     if not db.schema_exists(schema):
@@ -287,9 +281,7 @@ def construct_where_fragment_sql_json_path(cursor, filter_sql_json_path):
 @click.option('-q', '--quiet', is_flag=True, help='Change the log level to warning')
 @click.pass_context
 def cli(ctx, quiet):
-    """
-    Configure the command-line interface.
-    """
+    """Configure the command-line interface."""
     load_dotenv()
 
     path = os.getenv(
@@ -431,9 +423,7 @@ def _get_selected_collections(schema):
 
 @cli.command()
 def index():
-    """
-    List the schemas, with collection IDs and creator's notes.
-    """
+    """List the schemas, with collection IDs and creator's notes."""
     def format_note(note):
         return f"{note[0]} ({note[1].strftime('%Y-%m-%d %H:%M:%S')})"
 
@@ -767,16 +757,12 @@ def field_lists(name, *, tables_only=False):
 
 @cli.group()
 def dev():
-    """
-    Commands for developers of Kingfisher Summarize.
-    """
+    """Commands for developers of Kingfisher Summarize."""
 
 
 @dev.command()
 def stale():
-    """
-    Print schemas summarizing deleted collections.
-    """
+    """Print schemas summarizing deleted collections."""
     skip = os.getenv('KINGFISHER_SUMMARIZE_PROTECT_SCHEMA', '').split(',')
 
     statement = """
@@ -792,9 +778,7 @@ def stale():
 @dev.command()
 @click.argument('name', callback=validate_schema)
 def docs_table_ref(name):
-    """
-    Create or update the CSV files in docs/definitions.
-    """
+    """Create or update the CSV files in docs/definitions."""
     tables = []
     for content in sql_files('middle').values():
         tables.extend(
@@ -826,9 +810,7 @@ def docs_table_ref(name):
 
 @dev.command()
 def hash_md5():  # pragma: no cover
-    """
-    Sort the data table fixture by the id column and update the hash_md5 column.
-    """
+    """Sort the data table fixture by the id column and update the hash_md5 column."""
     path = os.path.join(basedir, 'tests', 'fixtures', 'kingfisher-process.sql')
 
     sections = {'before': [], 'data': [], 'after': []}
