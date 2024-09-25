@@ -488,8 +488,12 @@ BEGIN
     COMMENT ON COLUMN %1$s.total_parties_roles IS 'Cumulative length of all ``parties/roles`` arrays';
     COMMENT ON COLUMN %1$s.total_parties IS 'Length of the ``parties`` array';
     COMMENT ON COLUMN %1$s.total_planning_documents IS 'Length of the ``planning/documents`` array';
+    COMMENT ON COLUMN %1$s.total_planning_milestones IS 'Length of the ``planning/milestones`` array';
     COMMENT ON COLUMN %1$s.planning_document_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``planning/documents`` array';
+    COMMENT ON COLUMN %1$s.total_tender_tenderers IS 'Length of the ``tender/tenderers`` array';
     COMMENT ON COLUMN %1$s.total_tender_documents IS 'Length of the ``tender/documents`` array';
+    COMMENT ON COLUMN %1$s.total_tender_milestones IS 'Length of the ``tender/milestones`` array';
+    COMMENT ON COLUMN %1$s.total_tender_items IS 'Length of the ``tender/items`` array';
     COMMENT ON COLUMN %1$s.tender_document_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``tender/documents`` array';
     COMMENT ON COLUMN %1$s.total_awards IS 'Length of the ``awards`` array';
     COMMENT ON COLUMN %1$s.first_award_date IS 'Earliest ``date`` across all award objects';
