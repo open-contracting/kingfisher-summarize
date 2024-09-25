@@ -9,9 +9,9 @@ Added
 
 -  ``contracts_summary.total_implementation_transactions``
 -  ``release_summary.total_planning_milestones``
--  ``release_summary.total_tenderer_tenderers``
--  ``release_summary.total_tenderer_milestones``
--  ``release_summary.total_tenderer_items``
+-  ``release_summary.total_tender_tenderers``
+-  ``release_summary.total_tender_milestones``
+-  ``release_summary.total_tender_items``
 -  ``release_summary.total_contract_implementation_transactions``
 
 Fixed
