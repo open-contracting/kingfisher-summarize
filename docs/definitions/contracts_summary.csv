@@ -28,5 +28,6 @@ total_implementation_documents,bigint,Length of the ``implementation/documents``
 implementation_document_documenttype_counts,jsonb,JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``implementation/documents`` array of the contract object
 total_implementation_milestones,bigint,Length of the ``implementation/milestones`` array in the contract object
 implementation_milestone_type_counts,jsonb,JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences in the ``implementation/milestones`` array of the contract object
+total_implementation_transactions,bigint,Length of the ``implementation/transactions`` array in the contract object
 contract,jsonb,The contract object
 field_list,jsonb,"All JSON paths in the contract object as well as in the related award's award object (prefixed by awards/), expressed as a JSONB object in which keys are paths and values are numbers of occurrences. Paths exclude array indices. This column is only available if the --field-lists option is used."

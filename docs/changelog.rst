@@ -1,6 +1,23 @@
 Changelog
 =========
 
+2024-09-25
+~~~~~~~~~~
+
+Added
+~~~~~
+
+-  ``release_summary.total_planning_milestones``
+-  ``release_summary.total_tenderer_tenderers``
+-  ``release_summary.total_tenderer_milestones``
+-  ``release_summary.total_tenderer_items``
+-  ``release_summary.total_contract_implementation_transactions``
+
+Fixed
+~~~~~
+
+-  If the OCDS data has ``parties.roles`` as a string, convert it to an array.
+
 2023-06-01
 ----------
 

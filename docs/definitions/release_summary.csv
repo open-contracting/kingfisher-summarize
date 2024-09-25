@@ -15,8 +15,12 @@ parties_role_counts,jsonb,JSONB object in which each key is a unique ``roles`` e
 total_parties_roles,numeric,Cumulative length of all ``parties/roles`` arrays
 total_parties,bigint,Length of the ``parties`` array
 total_planning_documents,bigint,Length of the ``planning/documents`` array
+total_planning_milestones,bigint,Length of the ``planning/milestones`` array
 planning_document_documenttype_counts,jsonb,JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``planning/documents`` array
+total_tender_tenderers,integer,Length of the ``tender/tenderers`` array
 total_tender_documents,bigint,Length of the ``tender/documents`` array
+total_tender_milestones,bigint,Length of the ``tender/milestones`` array
+total_tender_items,bigint,Length of the ``tender/items`` array
 tender_document_documenttype_counts,jsonb,JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences in the ``tender/documents`` array
 total_awards,bigint,Length of the ``awards`` array
 first_award_date,timestamp,Earliest ``date`` across all award objects
@@ -37,6 +41,7 @@ total_contract_items,numeric,Cumulative length of all ``contracts/items`` arrays
 sum_contracts_value_amount,numeric,Sum of all ``contracts/value/amount`` values (NOTE: This ignores any differences in currency)
 total_contract_implementation_documents,numeric,Cumulative length of all ``contracts/implementation/documents`` arrays
 total_contract_implementation_milestones,numeric,Cumulative length of all ``contracts/implementation/milestones`` arrays
+total_contract_implementation_transactions,numeric,Cumulative length of all ``contracts/implementation/transactions`` arrays
 contract_document_documenttype_counts,jsonb,JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences across all ``contracts/documents`` arrays
 contract_milestone_type_counts,jsonb,JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences across all ``contracts/milestones`` arrays
 contract_implementation_document_documenttype_counts,jsonb,JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences across all ``contracts/implementation/documents`` arrays
