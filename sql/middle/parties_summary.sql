@@ -9,7 +9,13 @@ SELECT
     data_id,
     value ->> 'id' AS party_id,
     value ->> 'name' AS name,
-    value -> 'roles' AS roles,
+    CASE WHEN jsonb_typeof(value -> 'roles') = 'string' THEN
+        to_jsonb(string_to_array(value ->> 'roles', ''))
+    WHEN jsonb_typeof(value -> 'roles') = 'array' THEN
+        value -> 'roles'
+    ELSE
+        '[]'::jsonb
+    END roles,
     hyphenate(value -> 'identifier' ->> 'scheme', value -> 'identifier' ->> 'id') AS identifier,
     coalesce(value ->> 'id', hyphenate(value -> 'identifier' ->> 'scheme', value -> 'identifier' ->> 'id'), value ->> 'name') AS unique_identifier_attempt,
     (
