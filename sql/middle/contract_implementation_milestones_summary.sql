@@ -9,7 +9,7 @@ SELECT
     r.release_id,
     r.data_id,
     value AS milestone,
-    value ->> 'type' AS TYPE,
+    value ->> 'type' AS "type",
     value ->> 'code' AS code,
     value ->> 'status' AS status
 FROM

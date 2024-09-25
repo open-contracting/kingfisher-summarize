@@ -59,17 +59,17 @@ CREATE UNIQUE INDEX tmp_contract_implementation_documents_aggregates_id ON tmp_c
 CREATE TABLE tmp_contract_milestones_aggregates AS
 SELECT
     id,
-    jsonb_object_agg(coalesce(TYPE, ''), total_milestoneTypes) contract_milestone_type_counts
+    jsonb_object_agg(coalesce("type", ''), total_milestoneTypes) contract_milestone_type_counts
 FROM (
     SELECT
         id,
-        TYPE,
+        "type",
         count(*) total_milestoneTypes
     FROM
         contract_milestones_summary
     GROUP BY
         id,
-        TYPE) AS d
+        "type") AS d
 GROUP BY
     id;
 
@@ -78,17 +78,17 @@ CREATE UNIQUE INDEX tmp_contract_milestones_aggregates_id ON tmp_contract_milest
 CREATE TABLE tmp_contract_implementation_milestones_aggregates AS
 SELECT
     id,
-    jsonb_object_agg(coalesce(TYPE, ''), total_milestoneTypes) contract_implementation_milestone_type_counts
+    jsonb_object_agg(coalesce("type", ''), total_milestoneTypes) contract_implementation_milestone_type_counts
 FROM (
     SELECT
         id,
-        TYPE,
+        "type",
         count(*) total_milestoneTypes
     FROM
         contract_implementation_milestones_summary
     GROUP BY
         id,
-        TYPE) AS d
+        "type") AS d
 GROUP BY
     id;
 

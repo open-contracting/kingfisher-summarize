@@ -87,20 +87,20 @@ FROM
         SELECT
             id,
             contract_index,
-            jsonb_object_agg(coalesce(TYPE, ''), total_milestoneTypes) milestone_type_counts,
+            jsonb_object_agg(coalesce("type", ''), total_milestoneTypes) milestone_type_counts,
             count(*) total_milestones
         FROM (
             SELECT
                 id,
                 contract_index,
-                TYPE,
+                "type",
                 count(*) total_milestoneTypes
             FROM
                 contract_milestones_summary
             GROUP BY
                 id,
                 contract_index,
-                TYPE) AS d
+                "type") AS d
         GROUP BY
             id,
             contract_index) milestone_type_counts USING (id, contract_index)
@@ -108,20 +108,20 @@ FROM
         SELECT
             id,
             contract_index,
-            jsonb_object_agg(coalesce(TYPE, ''), total_milestoneTypes) implementation_milestone_type_counts,
+            jsonb_object_agg(coalesce("type", ''), total_milestoneTypes) implementation_milestone_type_counts,
             count(*) total_implementation_milestones
         FROM (
             SELECT
                 id,
                 contract_index,
-                TYPE,
+                "type",
                 count(*) total_milestoneTypes
             FROM
                 contract_implementation_milestones_summary
             GROUP BY
                 id,
                 contract_index,
-                TYPE) AS d
+                "type") AS d
         GROUP BY
             id,
             contract_index) implementation_milestone_type_counts USING (id, contract_index);

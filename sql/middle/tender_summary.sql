@@ -70,18 +70,18 @@ FROM
     LEFT JOIN (
         SELECT
             id,
-            jsonb_object_agg(coalesce(TYPE, ''), total_milestoneTypes) milestone_type_counts,
+            jsonb_object_agg(coalesce("type", ''), total_milestoneTypes) milestone_type_counts,
             count(*) total_milestones
         FROM (
             SELECT
                 id,
-                TYPE,
+                "type",
                 count(*) total_milestoneTypes
             FROM
                 tender_milestones_summary
             GROUP BY
                 id,
-                TYPE) AS d
+                "type") AS d
         GROUP BY
             id) milestone_type_counts USING (id)
     LEFT JOIN (
