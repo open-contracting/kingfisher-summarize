@@ -1,4 +1,4 @@
-CREATE TABLE tmp_release_contracts_aggregates AS
+CREATE TABLE tmp_contracts_aggregates AS
 SELECT
     id,
     count(*) AS total_contracts,
@@ -17,7 +17,7 @@ FROM
 GROUP BY
     id;
 
-CREATE UNIQUE INDEX tmp_release_contracts_aggregates_id ON tmp_release_contracts_aggregates (id);
+CREATE UNIQUE INDEX tmp_contracts_aggregates_id ON tmp_contracts_aggregates (id);
 
 CREATE TABLE tmp_contract_documents_aggregates AS
 SELECT

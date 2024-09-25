@@ -18,10 +18,10 @@ FROM
         FROM
             tender_summary) AS tender_summary USING (id)
     LEFT JOIN tmp_tender_documents_aggregates USING (id)
-    LEFT JOIN tmp_release_awards_aggregates USING (id)
-    LEFT JOIN tmp_release_award_suppliers_aggregates USING (id)
+    LEFT JOIN tmp_awards_aggregates USING (id)
+    LEFT JOIN tmp_award_suppliers_aggregates USING (id)
     LEFT JOIN tmp_award_documents_aggregates USING (id)
-    LEFT JOIN tmp_release_contracts_aggregates USING (id)
+    LEFT JOIN tmp_contracts_aggregates USING (id)
     LEFT JOIN tmp_contract_documents_aggregates USING (id)
     LEFT JOIN tmp_contract_milestones_aggregates USING (id)
     LEFT JOIN tmp_contract_implementation_documents_aggregates USING (id)

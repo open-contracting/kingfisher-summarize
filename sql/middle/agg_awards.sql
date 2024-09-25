@@ -1,4 +1,4 @@
-CREATE TABLE tmp_release_awards_aggregates AS
+CREATE TABLE tmp_awards_aggregates AS
 SELECT
     id,
     count(*) AS total_awards,
@@ -13,9 +13,9 @@ FROM
 GROUP BY
     id;
 
-CREATE UNIQUE INDEX tmp_release_awards_aggregates_id ON tmp_release_awards_aggregates (id);
+CREATE UNIQUE INDEX tmp_awards_aggregates_id ON tmp_awards_aggregates (id);
 
-CREATE TABLE tmp_release_award_suppliers_aggregates AS
+CREATE TABLE tmp_award_suppliers_aggregates AS
 SELECT
     id,
     count(DISTINCT unique_identifier_attempt) AS total_unique_award_suppliers
@@ -24,7 +24,7 @@ FROM
 GROUP BY
     id;
 
-CREATE UNIQUE INDEX tmp_release_award_suppliers_aggregates_id ON tmp_release_award_suppliers_aggregates (id);
+CREATE UNIQUE INDEX tmp_award_suppliers_aggregates_id ON tmp_award_suppliers_aggregates (id);
 
 CREATE TABLE tmp_award_documents_aggregates AS
 SELECT
