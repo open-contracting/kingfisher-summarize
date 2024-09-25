@@ -7,6 +7,7 @@ Changelog
 Added
 ~~~~~
 
+-  ``contracts_summary.total_implementation_transactions``
 -  ``release_summary.total_planning_milestones``
 -  ``release_summary.total_tenderer_tenderers``
 -  ``release_summary.total_tenderer_milestones``
