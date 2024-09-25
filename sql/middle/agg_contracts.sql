@@ -10,7 +10,8 @@ SELECT
     sum(total_items) AS total_contract_items,
     sum(value_amount) sum_contracts_value_amount,
     sum(total_implementation_documents) AS total_contract_implementation_documents,
-    sum(total_implementation_milestones) AS total_contract_implementation_milestones
+    sum(total_implementation_milestones) AS total_contract_implementation_milestones,
+    sum(total_implementation_transactions) AS total_contract_implementation_transactions
 FROM
     contracts_summary
 GROUP BY

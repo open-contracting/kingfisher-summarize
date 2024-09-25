@@ -457,6 +457,8 @@ COMMENT ON COLUMN contracts_summary.total_implementation_milestones IS 'Length o
 
 COMMENT ON COLUMN contracts_summary.implementation_milestone_type_counts IS 'JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences in the ``implementation/milestones`` array of the contract object';
 
+COMMENT ON COLUMN contracts_summary.total_implementation_transactions IS 'Length of the ``implementation/transactions`` array in the contract object';
+
 COMMENT ON COLUMN contracts_summary.contract IS 'The contract object';
 
 SELECT
@@ -508,6 +510,7 @@ BEGIN
     COMMENT ON COLUMN %1$s.total_contract_items IS 'Cumulative length of all ``contracts/items`` arrays';
     COMMENT ON COLUMN %1$s.total_contract_implementation_documents IS 'Cumulative length of all ``contracts/implementation/documents`` arrays';
     COMMENT ON COLUMN %1$s.total_contract_implementation_milestones IS 'Cumulative length of all ``contracts/implementation/milestones`` arrays';
+    COMMENT ON COLUMN %1$s.total_contract_implementation_transactions IS 'Cumulative length of all ``contracts/implementation/transactions`` arrays';
     COMMENT ON COLUMN %1$s.contract_document_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences across all ``contracts/documents`` arrays';
     COMMENT ON COLUMN %1$s.contract_implementation_document_documenttype_counts IS 'JSONB object in which each key is a unique ``documentType`` value and each value is its number of occurrences across all ``contracts/implementation/documents`` arrays';
     COMMENT ON COLUMN %1$s.contract_milestone_type_counts IS 'JSONB object in which each key is a unique ``type`` value and each value is its number of occurrences across all ``contracts/milestones`` arrays';

@@ -27,10 +27,31 @@ CREATE TABLE contracts_summary_no_data AS SELECT DISTINCT ON (r.id, r.contract_i
     total_implementation_documents,
     implementation_document_documenttype_counts,
     total_implementation_milestones,
-    implementation_milestone_type_counts
+    implementation_milestone_type_counts,
+    total_implementation_transactions
 FROM
     tmp_contracts_summary r
     LEFT JOIN (SELECT award_id AS awardid, * FROM awards_summary) aws USING (id, awardid)
+    LEFT JOIN (
+        SELECT
+            id,
+            contract_index,
+            count(*) total_items
+        FROM
+            contract_items_summary
+        GROUP BY
+            id,
+            contract_index) items_counts USING (id, contract_index)
+    LEFT JOIN (
+        SELECT
+            id,
+            contract_index,
+            count(*) total_implementation_transactions
+        FROM
+            contract_implementation_transactions_summary
+        GROUP BY
+            id,
+            contract_index) implementation_transactions_counts USING (id, contract_index)
     LEFT JOIN (
         SELECT
             id,
@@ -73,16 +94,6 @@ FROM
         GROUP BY
             id,
             contract_index) implementation_document_documenttype_counts USING (id, contract_index)
-    LEFT JOIN (
-        SELECT
-            id,
-            contract_index,
-            count(*) total_items
-        FROM
-            contract_items_summary
-        GROUP BY
-            id,
-            contract_index) items_counts USING (id, contract_index)
     LEFT JOIN (
         SELECT
             id,
