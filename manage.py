@@ -625,7 +625,7 @@ def _run_field_lists(name, summary_table, tables_only):
     """
 
     # Allow users to measure co-occurrence of fields across related award and contract objects.
-    if summary_table in ('contracts_summary', 'awards_summary'):
+    if summary_table in {'contracts_summary', 'awards_summary'}:
         if summary_table == 'contracts_summary':
             variables['path_prefix'] = 'awards'
             format_kwargs['other_data_column'] = 'award'
