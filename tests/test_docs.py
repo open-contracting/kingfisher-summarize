@@ -168,9 +168,7 @@ def test_docs():
         subject = humanize(subject)
 
         with open(filename) as f:
-            reader = csv.DictReader(f)
-
-            for row in reader:
+            for row in csv.DictReader(f):
                 column = row['Column Name']
                 description = row['Description']
                 if not description or column in skip:  # some _no_data tables have no descriptions
