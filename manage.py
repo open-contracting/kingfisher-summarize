@@ -91,8 +91,7 @@ def sql_files(directory, *, tables_only=False, where_fragment=None):
     """
     files = {}
 
-    filenames = glob.glob(os.path.join(basedir, 'sql', directory, '*.sql'))
-    for filename in filenames:
+    for filename in glob.glob(os.path.join(basedir, 'sql', directory, '*.sql')):
         identifier = f'{directory}:{os.path.splitext(os.path.basename(filename))[0]}'
         with open(filename) as f:
             content = f.read()
@@ -108,8 +107,9 @@ def sql_files(directory, *, tables_only=False, where_fragment=None):
 def _get_export_import_tables_from_functions(content):
     exports, imports = [], []
 
-    matches = re.findall(r'\bcreate_(\w+)\(\'(\w+)\', \'(\w+)\'', content, flags=re.MULTILINE)
-    for sub_group_name, object_name, group_name in matches:
+    for sub_group_name, object_name, group_name in re.findall(
+        r'\bcreate_(\w+)\(\'(\w+)\', \'(\w+)\'', content, flags=re.MULTILINE
+    ):
         if sub_group_name == 'parties':
             exports.append(f'{group_name}_summary')
             imports.append('parties_summary')
