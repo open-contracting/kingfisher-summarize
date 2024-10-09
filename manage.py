@@ -165,7 +165,7 @@ def dependency_graph(files):
         for object_name in re.findall(r'\b(?:FROM|JOIN)\s+(\w+)', content, flags=re.MULTILINE):
             imports[identifier].add(object_name)
         imports[identifier].update(imports_from_function)
-        for object_name in re.findall(r'(?:,\n|\bWITH\s+)(\w+)\s+AS', content, flags=re.MULTILINE):
+        for object_name in re.findall(r'(?:\n|\bWITH\s+)(\w+)\s+AS', content, flags=re.MULTILINE):
             imports[identifier].discard(object_name)
         imports[identifier].difference_update(exports | ignore)
 
