@@ -178,23 +178,6 @@ The tests won't pass if you don't document the new columns!
 
      ./manage.py dev docs-table-ref NAME
 
-.. _format-sql:
-
-Format SQL files
-----------------
-
-We use `pg_format <https://github.com/darold/pgFormatter>`__ to consistently format SQL files. On macOS, using `Homebrew <https://brew.sh>`__, install it with:
-
-.. code-block:: bash
-
-   brew install pgformatter
-
-Then, run:
-
-.. code-block:: bash
-
-   find . -name '*.sql' -exec pg_format -f 1 -p '%1\$s' -o {} {} \;
-
 .. _merge:
 
 Merge your changes
