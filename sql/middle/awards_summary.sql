@@ -1,4 +1,40 @@
 CREATE TABLE awards_summary_no_data AS
+WITH document_documenttype_counts AS (
+    SELECT
+        id,
+        award_index,
+        jsonb_object_agg(coalesce(documenttype, ''), total_documenttypes) AS document_documenttype_counts,
+        count(*) AS total_documents
+    FROM (
+        SELECT
+            id,
+            award_index,
+            documenttype,
+            count(*) AS total_documenttypes
+        FROM
+            award_documents_summary
+        GROUP BY
+            id,
+            award_index,
+            documenttype
+    ) AS d
+    GROUP BY
+        id,
+        award_index
+),
+
+items_counts AS (
+    SELECT
+        id,
+        award_index,
+        count(*) AS total_items
+    FROM
+        award_items_summary
+    GROUP BY
+        id,
+        award_index
+)
+
 SELECT
     r.id,
     r.award_index,
@@ -30,40 +66,8 @@ SELECT
     total_items
 FROM
     tmp_awards_summary AS r
-LEFT JOIN (
-    SELECT
-        id,
-        award_index,
-        jsonb_object_agg(coalesce(documenttype, ''), total_documenttypes) AS document_documenttype_counts,
-        count(*) AS total_documents
-    FROM (
-        SELECT
-            id,
-            award_index,
-            documenttype,
-            count(*) AS total_documenttypes
-        FROM
-            award_documents_summary
-        GROUP BY
-            id,
-            award_index,
-            documenttype
-    ) AS d
-    GROUP BY
-        id,
-        award_index
-) AS document_documenttype_counts USING (id, award_index)
-LEFT JOIN (
-    SELECT
-        id,
-        award_index,
-        count(*) AS total_items
-    FROM
-        award_items_summary
-    GROUP BY
-        id,
-        award_index
-) AS items_counts USING (id, award_index);
+LEFT JOIN document_documenttype_counts USING (id, award_index)
+LEFT JOIN items_counts USING (id, award_index);
 
 CREATE UNIQUE INDEX awards_summary_no_data_id ON awards_summary_no_data (id, award_index);
 

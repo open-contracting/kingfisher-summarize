@@ -45,17 +45,14 @@ log_level = "INFO"
 [tool.sqlfluff.core]
 dialect = "postgres"
 large_file_skip_byte_limit = 40000
-max_line_length = 100
 exclude_rules = [
+    # Preferences
     "ST07", # structure.using
-
-    # TBD
+    # Preserve existing column order
     "L034", # structure.column_order
-    "ST05", # structure.subquery
-    "LT05", # layout.long_lines
-
-    # Unfixable
+    # Require (some) manual fixes
     "AM04", # ambiguous.column_count
+    "LT05", # layout.long_lines
     "RF02", # references.qualification
     "RF04", # references.keywords
 ]

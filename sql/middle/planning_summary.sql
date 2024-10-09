@@ -1,21 +1,5 @@
 CREATE TABLE planning_summary_no_data AS
-SELECT
-    r.id,
-    r.release_type,
-    r.collection_id,
-    r.ocid,
-    r.release_id,
-    r.data_id,
-    convert_to_numeric(planning -> 'budget' -> 'amount' ->> 'amount') AS budget_amount_amount,
-    planning -> 'budget' -> 'amount' ->> 'currency' AS budget_amount_currency,
-    planning -> 'budget' ->> 'projectID' AS budget_projectid,
-    total_documents,
-    document_documenttype_counts,
-    total_milestones,
-    milestone_type_counts
-FROM
-    tmp_planning_summary AS r
-LEFT JOIN (
+WITH document_documenttype_counts AS (
     SELECT
         id,
         jsonb_object_agg(coalesce(documenttype, ''), total_documenttypes) AS document_documenttype_counts,
@@ -33,8 +17,9 @@ LEFT JOIN (
     ) AS d
     GROUP BY
         id
-) AS document_documenttype_counts USING (id)
-LEFT JOIN (
+),
+
+milestone_type_counts AS (
     SELECT
         id,
         jsonb_object_agg(coalesce(type, ''), total_milestonetypes) AS milestone_type_counts,
@@ -52,7 +37,26 @@ LEFT JOIN (
     ) AS d
     GROUP BY
         id
-) AS milestone_type_counts USING (id);
+)
+
+SELECT
+    r.id,
+    r.release_type,
+    r.collection_id,
+    r.ocid,
+    r.release_id,
+    r.data_id,
+    convert_to_numeric(planning -> 'budget' -> 'amount' ->> 'amount') AS budget_amount_amount,
+    planning -> 'budget' -> 'amount' ->> 'currency' AS budget_amount_currency,
+    planning -> 'budget' ->> 'projectID' AS budget_projectid,
+    total_documents,
+    document_documenttype_counts,
+    total_milestones,
+    milestone_type_counts
+FROM
+    tmp_planning_summary AS r
+LEFT JOIN document_documenttype_counts USING (id)
+LEFT JOIN milestone_type_counts USING (id);
 
 CREATE UNIQUE INDEX planning_summary_no_data_id ON planning_summary_no_data (id);
 

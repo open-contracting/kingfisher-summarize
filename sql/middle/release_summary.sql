@@ -1,18 +1,14 @@
 CREATE TABLE release_summary_no_data AS
-SELECT *
-FROM
-    tmp_release_summary
-LEFT JOIN tmp_release_party_aggregates USING (id)
-LEFT JOIN (
+WITH planning_summary AS (
     SELECT
         id,
         total_documents AS total_planning_documents,
         total_milestones AS total_planning_milestones
     FROM
         planning_summary
-) AS planning_summary USING (id)
-LEFT JOIN tmp_planning_documents_aggregates USING (id)
-LEFT JOIN (
+),
+
+tender_summary AS (
     SELECT
         id,
         total_tenderers AS total_tender_tenderers,
@@ -21,7 +17,15 @@ LEFT JOIN (
         total_items AS total_tender_items
     FROM
         tender_summary
-) AS tender_summary USING (id)
+)
+
+SELECT *
+FROM
+    tmp_release_summary
+LEFT JOIN tmp_release_party_aggregates USING (id)
+LEFT JOIN planning_summary USING (id)
+LEFT JOIN tmp_planning_documents_aggregates USING (id)
+LEFT JOIN tender_summary USING (id)
 LEFT JOIN tmp_tender_documents_aggregates USING (id)
 LEFT JOIN tmp_awards_aggregates USING (id)
 LEFT JOIN tmp_award_suppliers_aggregates USING (id)

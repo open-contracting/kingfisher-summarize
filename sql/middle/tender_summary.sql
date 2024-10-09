@@ -1,4 +1,54 @@
 CREATE TABLE tender_summary_no_data AS
+WITH document_documenttype_counts AS (
+    SELECT
+        id,
+        jsonb_object_agg(coalesce(documenttype, ''), total_documenttypes) AS document_documenttype_counts,
+        count(*) AS total_documents
+    FROM (
+        SELECT
+            id,
+            documenttype,
+            count(*) AS total_documenttypes
+        FROM
+            tender_documents_summary
+        GROUP BY
+            id,
+            documenttype
+    ) AS d
+    GROUP BY
+        id
+),
+
+milestone_type_counts AS (
+    SELECT
+        id,
+        jsonb_object_agg(coalesce(type, ''), total_milestonetypes) AS milestone_type_counts,
+        count(*) AS total_milestones
+    FROM (
+        SELECT
+            id,
+            type,
+            count(*) AS total_milestonetypes
+        FROM
+            tender_milestones_summary
+        GROUP BY
+            id,
+            type
+    ) AS d
+    GROUP BY
+        id
+),
+
+items_counts AS (
+    SELECT
+        id,
+        count(*) AS total_items
+    FROM
+        tender_items_summary
+    GROUP BY
+        id
+)
+
 SELECT
     r.id,
     r.release_type,
@@ -52,53 +102,9 @@ SELECT
     total_items
 FROM
     tmp_tender_summary AS r
-LEFT JOIN (
-    SELECT
-        id,
-        jsonb_object_agg(coalesce(documenttype, ''), total_documenttypes) AS document_documenttype_counts,
-        count(*) AS total_documents
-    FROM (
-        SELECT
-            id,
-            documenttype,
-            count(*) AS total_documenttypes
-        FROM
-            tender_documents_summary
-        GROUP BY
-            id,
-            documenttype
-    ) AS d
-    GROUP BY
-        id
-) AS document_documenttype_counts USING (id)
-LEFT JOIN (
-    SELECT
-        id,
-        jsonb_object_agg(coalesce(type, ''), total_milestonetypes) AS milestone_type_counts,
-        count(*) AS total_milestones
-    FROM (
-        SELECT
-            id,
-            type,
-            count(*) AS total_milestonetypes
-        FROM
-            tender_milestones_summary
-        GROUP BY
-            id,
-            type
-    ) AS d
-    GROUP BY
-        id
-) AS milestone_type_counts USING (id)
-LEFT JOIN (
-    SELECT
-        id,
-        count(*) AS total_items
-    FROM
-        tender_items_summary
-    GROUP BY
-        id
-) AS items_counts USING (id);
+LEFT JOIN document_documenttype_counts USING (id)
+LEFT JOIN milestone_type_counts USING (id)
+LEFT JOIN items_counts USING (id);
 
 CREATE UNIQUE INDEX tender_summary_no_data_id ON tender_summary_no_data (id);
 
