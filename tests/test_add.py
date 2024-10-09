@@ -115,14 +115,30 @@ def test_command_name(kwargs, name, collections, db, caplog):
 ])
 def test_command(db, tables_only, field_counts, field_lists, tables, views, filters, filters_sql_json_path, caplog):
     # Load collection 2 first, to check that existing collections aren't included when we load collection 1.
-    with fixture(db, collections='2', tables_only=tables_only, field_counts=field_counts, field_lists=field_lists,
-                 filters=filters, filters_sql_json_path=filters_sql_json_path), \
-         fixture(db, tables_only=tables_only, field_counts=field_counts, field_lists=field_lists, filters=filters,
-                 filters_sql_json_path=filters_sql_json_path) as result:
+    with fixture(
+            db,
+            collections='2',
+            tables_only=tables_only,
+            field_counts=field_counts,
+            field_lists=field_lists,
+            filters=filters,
+            filters_sql_json_path=filters_sql_json_path
+        ) as result1, fixture(
+            db,
+            tables_only=tables_only,
+            field_counts=field_counts,
+            field_lists=field_lists,
+            filters=filters,
+            filters_sql_json_path=filters_sql_json_path
+        ) as result2:
         # Check existence of schema, tables and views.
         if field_counts:
             tables.add('field_counts')
 
+        assert result1.exit_code == 0
+        assert result1.output == ''
+        assert result2.exit_code == 0
+        assert result2.output == ''
         assert db.schema_exists('summary_collection_1')
         assert db.schema_exists('summary_collection_2')
         assert set(db.pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
@@ -386,8 +402,6 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
             if field_lists:
                 expected.append('Running field-lists routine')
 
-        assert result.exit_code == 0
-        assert result.output == ''
         assert_log_records(caplog, command, expected)
 
 
@@ -412,14 +426,30 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
 def test_command_filter(db, tables_only, field_counts, field_lists, tables, views, filters, filters_sql_json_path,
                         caplog):
     # Load collection 2 first, to check that existing collections aren't included when we load collection 1.
-    with fixture(db, collections='2', tables_only=tables_only, field_counts=field_counts, field_lists=field_lists,
-                 filters=filters, filters_sql_json_path=filters_sql_json_path), \
-         fixture(db, tables_only=tables_only, field_counts=field_counts, field_lists=field_lists, filters=filters,
-                 filters_sql_json_path=filters_sql_json_path) as result:
+    with fixture(
+            db,
+            collections='2',
+            tables_only=tables_only,
+            field_counts=field_counts,
+            field_lists=field_lists,
+            filters=filters,
+            filters_sql_json_path=filters_sql_json_path
+        ) as result1, fixture(
+            db,
+            tables_only=tables_only,
+            field_counts=field_counts,
+            field_lists=field_lists,
+            filters=filters,
+            filters_sql_json_path=filters_sql_json_path
+        ) as result2:
         # Check existence of schema, tables and views.
         if field_counts:
             tables.add('field_counts')
 
+        assert result1.exit_code == 0
+        assert result1.output == ''
+        assert result2.exit_code == 0
+        assert result2.output == ''
         assert db.schema_exists('summary_collection_1')
         assert db.schema_exists('summary_collection_2')
         assert set(db.pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
@@ -642,6 +672,4 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
             if field_lists:
                 expected.append('Running field-lists routine')
 
-        assert result.exit_code == 0
-        assert result.output == ''
         assert_log_records(caplog, command, expected)
