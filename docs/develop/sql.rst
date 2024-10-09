@@ -14,7 +14,6 @@ This how-to guide will walk you through the steps of editing SQL files (if you h
 
       pytest
 
-#. :ref:`Format the SQL files<format-sql>`
 #. To merge your changes, :ref:`push your changes to GitHub and make a pull request<merge>`
 
 Make changes
