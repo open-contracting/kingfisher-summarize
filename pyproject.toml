@@ -44,16 +44,39 @@ log_level = "INFO"
 
 [tool.sqlfluff.core]
 dialect = "postgres"
+large_file_skip_byte_limit = 40000
+max_line_length = 100
 exclude_rules = [
+    "ST07", # structure.using
+
+    # TBD
     "L034", # structure.column_order
     "ST05", # structure.subquery
-    "ST09", # structure.join_condition_order
-    # TBD
-    "AM04", # ambiguous.column_count
     "LT05", # layout.long_lines
+
+    # Unfixable
+    "AM04", # ambiguous.column_count
     "RF02", # references.qualification
     "RF04", # references.keywords
-    "ST07", # structure.using
 ]
-max_line_length = 100
-large_file_skip_byte_limit = 40000
+
+[tool.sqlfluff.rules.capitalisation.keywords]
+capitalisation_policy = "upper"
+
+[tool.sqlfluff.rules.capitalisation.literals]
+capitalisation_policy = "upper"
+
+[tool.sqlfluff.rules.capitalisation.functions]
+extended_capitalisation_policy = "lower"
+
+[tool.sqlfluff.rules.capitalisation.identifiers]
+extended_capitalisation_policy = "lower"
+
+[tool.sqlfluff.rules.capitalisation.types]
+extended_capitalisation_policy = "lower"
+
+[tool.sqlfluff.rules.convention.casting_style]
+preferred_type_casting_style = "shorthand"
+
+[tool.sqlfluff.rules.convention.not_equal]
+preferred_not_equal_style = "ansi"

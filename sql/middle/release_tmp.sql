@@ -14,17 +14,18 @@ SELECT
     d.data ->> 'language' AS language
 FROM
     release AS r
-INNER JOIN package_data AS pd ON pd.id = r.package_data_id
-INNER JOIN data AS d ON d.id = r.data_id
-INNER JOIN collection AS c ON c.id = r.collection_id
+INNER JOIN package_data AS pd ON r.package_data_id = pd.id
+INNER JOIN data AS d ON r.data_id = d.id
+INNER JOIN collection AS c ON r.collection_id = c.id
 WHERE
     collection_id IN (
         SELECT collection_id
         FROM
             summaries.selected_collections
         WHERE
-            schema=current_schema())
-        --  WHEREFRAGMENT
+            schema = current_schema()
+    )
+    --  WHEREFRAGMENT
 UNION
 SELECT
     r.id::bigint * 10 + 1 AS id,
@@ -41,17 +42,18 @@ SELECT
     d.data -> 'compiledRelease' ->> 'language' AS language
 FROM
     record AS r
-INNER JOIN package_data AS pd ON pd.id = r.package_data_id
-INNER JOIN data AS d ON d.id = r.data_id
-INNER JOIN collection AS c ON c.id = r.collection_id
+INNER JOIN package_data AS pd ON r.package_data_id = pd.id
+INNER JOIN data AS d ON r.data_id = d.id
+INNER JOIN collection AS c ON r.collection_id = c.id
 WHERE
     collection_id IN (
         SELECT collection_id
         FROM
             summaries.selected_collections
         WHERE
-            schema=current_schema())
-        --  WHEREFRAGMENT
+            schema = current_schema()
+    )
+    --  WHEREFRAGMENT
 UNION
 SELECT
     r.id::bigint * 10 + 2 AS id,
@@ -69,15 +71,16 @@ SELECT
     d.data ->> 'language' AS language
 FROM
     compiled_release AS r
-INNER JOIN data AS d ON d.id = r.data_id
+INNER JOIN data AS d ON r.data_id = d.id
 WHERE
     collection_id IN (
         SELECT collection_id
         FROM
             summaries.selected_collections
         WHERE
-            schema=current_schema())
-        --  WHEREFRAGMENT
+            schema = current_schema()
+    )
+    --  WHEREFRAGMENT
 UNION
 SELECT
     (r.id::bigint * 1000000 + (ordinality - 1)) * 10 + 3 AS id,
@@ -94,9 +97,9 @@ SELECT
     value ->> 'language' AS language
 FROM
     record AS r
-INNER JOIN package_data AS pd ON pd.id = r.package_data_id
-INNER JOIN data AS d ON d.id = r.data_id
-INNER JOIN collection AS c ON c.id = r.collection_id
+INNER JOIN package_data AS pd ON r.package_data_id = pd.id
+INNER JOIN data AS d ON r.data_id = d.id
+INNER JOIN collection AS c ON r.collection_id = c.id
 CROSS JOIN
     jsonb_array_elements(d.data -> 'releases')
     WITH ORDINALITY
@@ -108,10 +111,10 @@ WHERE
         FROM
             summaries.selected_collections
         WHERE
-            schema=current_schema())
-        --  WHEREFRAGMENT
+            schema = current_schema()
+    ) -- noqa: CV06
+    --  WHEREFRAGMENT
 ;
-
 CREATE UNIQUE INDEX tmp_release_summary_id ON tmp_release_summary (id);
 
 CREATE INDEX tmp_release_summary_data_id ON tmp_release_summary (data_id);
@@ -135,4 +138,4 @@ SELECT
     r.*
 FROM
     tmp_release_summary AS r
-INNER JOIN data AS d ON d.id = r.data_id;
+INNER JOIN data AS d ON r.data_id = d.id;

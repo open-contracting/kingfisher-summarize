@@ -86,7 +86,7 @@ SELECT
     END -> 'awards' -> award_index::integer AS award
 FROM
     awards_summary_no_data AS s
-INNER JOIN data AS d ON d.id = s.data_id;
+INNER JOIN data AS d ON s.data_id = d.id;
 
 -- The following pgpsql makes indexes on awards_summary only if it is a table and not a view,
 -- you will need to run --tables-only command line parameter to allow this to run.

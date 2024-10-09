@@ -121,7 +121,7 @@ SELECT
     END -> 'tender' AS tender
 FROM
     tender_summary_no_data AS s
-INNER JOIN data AS d ON d.id = s.data_id;
+INNER JOIN data AS d ON s.data_id = d.id;
 
 -- The following pgpsql makes indexes on tender_summary only if it is a table and not a view,
 -- you will need to run --tables-only command line parameter to allow this to run.

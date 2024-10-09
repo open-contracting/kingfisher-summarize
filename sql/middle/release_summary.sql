@@ -68,19 +68,19 @@ SELECT
     record_check.cove_output AS record_check
 FROM
     release_summary_no_data AS rs
-INNER JOIN data AS d ON d.id = rs.data_id
-INNER JOIN collection AS c ON c.id = rs.collection_id
+INNER JOIN data AS d ON rs.data_id = d.id
+INNER JOIN collection AS c ON rs.collection_id = c.id
 LEFT JOIN release_check
     ON
-        release_check.release_id = rs.table_id
+        rs.table_id = release_check.release_id
         AND release_type = 'release'
 LEFT JOIN record_check
     ON
-        record_check.record_id = rs.table_id
+        rs.table_id = record_check.record_id
         AND release_type = 'record'
 --Kingfisher Process’ compiled_release table has no package_data_id column.
 --Therefore, any rows in release_summary_no_data sourced from that table will have a NULL package_data_id.
-LEFT JOIN package_data AS pd ON pd.id = rs.package_data_id;
+LEFT JOIN package_data AS pd ON rs.package_data_id = pd.id;
 
 -- The following pgpsql makes indexes on release_summary,
 -- you will need to run --tables-only command line parameter to allow this to run.
