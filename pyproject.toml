@@ -41,3 +41,19 @@ sigterm = true
 
 [tool.pytest.ini_options]
 log_level = "INFO"
+
+[tool.sqlfluff.core]
+dialect = "postgres"
+exclude_rules = [
+    "L034", # structure.column_order
+    "ST05", # structure.subquery
+    "ST09", # structure.join_condition_order
+    # TBD
+    "AM04", # ambiguous.column_count
+    "LT05", # layout.long_lines
+    "RF02", # references.qualification
+    "RF04", # references.keywords
+    "ST07", # structure.using
+]
+max_line_length = 100
+large_file_skip_byte_limit = 40000

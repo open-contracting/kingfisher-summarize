@@ -6,11 +6,10 @@ SELECT
     r.ocid,
     r.release_id,
     r.data_id,
-    data -> 'tender' AS tender
+    r.data -> 'tender' AS tender
 FROM
-    tmp_release_summary_with_release_data r
+    tmp_release_summary_with_release_data AS r
 WHERE
-    data ? 'tender';
+    r.data ? 'tender';
 
 CREATE UNIQUE INDEX tmp_tender_summary_id ON tmp_tender_summary (id);
-

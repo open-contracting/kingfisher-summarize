@@ -1,4 +1,4 @@
-CREATE FUNCTION create_items (object_name text, group_name text, sql_fragment text)
+CREATE FUNCTION create_items(object_name text, group_name text, sql_fragment text)
 RETURNS void
 AS $$
 DECLARE
@@ -55,7 +55,7 @@ $$
 LANGUAGE plpgsql;
 
 
-CREATE FUNCTION create_documents (object_name text, group_name text, sql_fragment text)
+CREATE FUNCTION create_documents(object_name text, group_name text, sql_fragment text)
 RETURNS void
 AS $$
 DECLARE
@@ -92,7 +92,7 @@ $$
 LANGUAGE plpgsql;
 
 
-CREATE FUNCTION create_milestones (object_name text, group_name text, sql_fragment text)
+CREATE FUNCTION create_milestones(object_name text, group_name text, sql_fragment text)
 RETURNS void
 AS $$
 DECLARE
@@ -130,7 +130,7 @@ $$
 LANGUAGE plpgsql;
 
 
-CREATE FUNCTION create_parties (object_name text, group_name text, sql_fragment text, sub_query text)
+CREATE FUNCTION create_parties(object_name text, group_name text, sql_fragment text, sub_query text)
 RETURNS void
 AS $$
 DECLARE

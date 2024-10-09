@@ -6,49 +6,53 @@ SELECT
     r.ocid,
     r.release_id,
     r.data_id,
-    convert_to_numeric (planning -> 'budget' -> 'amount' ->> 'amount') budget_amount_amount,
-    planning -> 'budget' -> 'amount' ->> 'currency' budget_amount_currency,
-    planning -> 'budget' ->> 'projectID' budget_projectID,
+    convert_to_numeric(planning -> 'budget' -> 'amount' ->> 'amount') AS budget_amount_amount,
+    planning -> 'budget' -> 'amount' ->> 'currency' AS budget_amount_currency,
+    planning -> 'budget' ->> 'projectID' AS budget_projectid,
     total_documents,
     document_documenttype_counts,
     total_milestones,
     milestone_type_counts
 FROM
-    tmp_planning_summary r
-    LEFT JOIN (
+    tmp_planning_summary AS r
+LEFT JOIN (
+    SELECT
+        id,
+        jsonb_object_agg(coalesce(documenttype, ''), total_documenttypes) AS document_documenttype_counts,
+        count(*) AS total_documents
+    FROM (
         SELECT
             id,
-            jsonb_object_agg(coalesce(documentType, ''), total_documentTypes) document_documenttype_counts,
-            count(*) total_documents
-        FROM (
-            SELECT
-                id,
-                documentType,
-                count(*) total_documentTypes
-            FROM
-                planning_documents_summary
-            GROUP BY
-                id,
-                documentType) AS d
+            documenttype,
+            count(*) AS total_documenttypes
+        FROM
+            planning_documents_summary
         GROUP BY
-            id) document_documenttype_counts USING (id)
-    LEFT JOIN (
+            id,
+            documenttype
+    ) AS d
+    GROUP BY
+        id
+) AS document_documenttype_counts USING (id)
+LEFT JOIN (
+    SELECT
+        id,
+        jsonb_object_agg(coalesce(type, ''), total_milestonetypes) AS milestone_type_counts,
+        count(*) AS total_milestones
+    FROM (
         SELECT
             id,
-            jsonb_object_agg(coalesce("type", ''), total_milestoneTypes) milestone_type_counts,
-            count(*) total_milestones
-        FROM (
-            SELECT
-                id,
-                "type",
-                count(*) total_milestoneTypes
-            FROM
-                planning_milestones_summary
-            GROUP BY
-                id,
-                "type") AS d
+            type,
+            count(*) AS total_milestonetypes
+        FROM
+            planning_milestones_summary
         GROUP BY
-            id) milestone_type_counts USING (id);
+            id,
+            type
+    ) AS d
+    GROUP BY
+        id
+) AS milestone_type_counts USING (id);
 
 CREATE UNIQUE INDEX planning_summary_no_data_id ON planning_summary_no_data (id);
 
@@ -59,16 +63,19 @@ CREATE INDEX planning_summary_no_data_collection_id ON planning_summary_no_data 
 CREATE VIEW planning_summary AS
 SELECT
     s.*,
-    CASE WHEN release_type = 'record' THEN
-        d.data -> 'compiledRelease'
-    WHEN release_type = 'embedded_release' THEN
-        d.data -> 'releases' -> (mod(s.id / 10, 1000000)::integer)
-    ELSE
-        d.data
+    CASE
+        WHEN release_type = 'record'
+            THEN
+                d.data -> 'compiledRelease'
+        WHEN release_type = 'embedded_release'
+            THEN
+                d.data -> 'releases' -> (mod(s.id / 10, 1000000)::integer)
+        ELSE
+            d.data
     END -> 'planning' AS planning
 FROM
-    planning_summary_no_data s
-    JOIN data d ON d.id = s.data_id;
+    planning_summary_no_data AS s
+INNER JOIN data AS d ON d.id = s.data_id;
 
 -- The following pgpsql makes indexes on awards_summary only if it is a table and not a view,
 -- you will need to run --tables-only command line parameter to allow this to run.

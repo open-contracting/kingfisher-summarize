@@ -1,7 +1,7 @@
 CREATE TABLE relatedprocesses_summary AS
 SELECT
     r.id,
-    ORDINALITY - 1 AS relatedprocess_index,
+    ordinality - 1 AS relatedprocess_index,
     r.release_type,
     r.collection_id,
     r.ocid,
@@ -15,8 +15,9 @@ SELECT
     value ->> 'identifier' AS identifier,
     value ->> 'uri' AS uri
 FROM
-    tmp_release_summary_with_release_data r
-    CROSS JOIN jsonb_array_elements(data -> 'relatedProcesses')
+    tmp_release_summary_with_release_data AS r
+CROSS JOIN
+    jsonb_array_elements(data -> 'relatedProcesses')
     WITH ORDINALITY
 WHERE
     jsonb_typeof(data -> 'relatedProcesses') = 'array';
@@ -26,4 +27,3 @@ CREATE UNIQUE INDEX related_processes_summary_id ON relatedprocesses_summary (id
 CREATE INDEX related_processes_summary_data_id ON relatedprocesses_summary (data_id);
 
 CREATE INDEX related_processes_summary_collection_id ON relatedprocesses_summary (collection_id);
-

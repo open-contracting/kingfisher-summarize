@@ -2,7 +2,7 @@
 -- https://www.postgresql.org/docs/current/sql-createfunction.html
 -- https://www.postgresql.org/docs/current/parallel-safety.html
 
-CREATE FUNCTION convert_to_numeric (text)
+CREATE FUNCTION convert_to_numeric(text)
 RETURNS numeric
 AS $$
     SELECT
@@ -19,7 +19,7 @@ PARALLEL SAFE;
 
 -- UNSAFE due to EXCEPTION block.
 -- https://www.postgresql.org/docs/current/errcodes-appendix.html
-CREATE FUNCTION convert_to_timestamp (text)
+CREATE FUNCTION convert_to_timestamp(text)
 RETURNS timestamp
 AS $$
     BEGIN
@@ -39,7 +39,7 @@ PARALLEL UNSAFE;
 -- concat() and concat_ws() are STABLE not IMMUTABLE.
 -- Not STRICT as NULL inputs are expected.
 -- https://stackoverflow.com/a/12320369/244258
-CREATE FUNCTION hyphenate (text, text)
+CREATE FUNCTION hyphenate(text, text)
 RETURNS text
 AS $$
     SELECT

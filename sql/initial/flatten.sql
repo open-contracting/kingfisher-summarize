@@ -1,14 +1,15 @@
 -- Reference: https://www.postgresql.org/docs/current/queries-with.html
-CREATE FUNCTION flatten (jsonb)
-    RETURNS TABLE (
-        path text,
-        object_property integer,
-        array_item integer)
-    LANGUAGE sql
-    IMMUTABLE
-    STRICT
-    PARALLEL SAFE
-    AS $$
+CREATE FUNCTION flatten(jsonb)
+RETURNS TABLE (
+    path text,
+    object_property integer,
+    array_item integer
+)
+LANGUAGE sql
+IMMUTABLE
+STRICT
+PARALLEL SAFE
+AS $$
     WITH RECURSIVE t (
         key,
         value,

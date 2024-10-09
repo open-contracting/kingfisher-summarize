@@ -35,4 +35,3 @@ DROP TABLE tmp_contract_implementation_milestones_aggregates;
 DROP TABLE tmp_release_documents_aggregates;
 
 DROP TABLE tmp_release_milestones_aggregates;
-

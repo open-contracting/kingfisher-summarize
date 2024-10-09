@@ -1,7 +1,7 @@
-CREATE FUNCTION common_comments (table_name text)
-    RETURNS text
-    LANGUAGE 'plpgsql'
-    AS $$
+CREATE FUNCTION common_comments(table_name text)
+RETURNS text
+LANGUAGE plpgsql
+AS $$
 DECLARE
     TEMPLATE text;
 BEGIN
@@ -17,10 +17,10 @@ BEGIN
 END;
 $$;
 
-CREATE FUNCTION common_milestone_comments (table_name text)
-    RETURNS text
-    LANGUAGE 'plpgsql'
-    AS $$
+CREATE FUNCTION common_milestone_comments(table_name text)
+RETURNS text
+LANGUAGE plpgsql
+AS $$
 DECLARE
     TEMPLATE text;
 BEGIN
@@ -35,10 +35,10 @@ BEGIN
 END;
 $$;
 
-CREATE FUNCTION common_item_comments (table_name text)
-    RETURNS text
-    LANGUAGE 'plpgsql'
-    AS $$
+CREATE FUNCTION common_item_comments(table_name text)
+RETURNS text
+LANGUAGE plpgsql
+AS $$
 DECLARE
     TEMPLATE text;
 BEGIN
@@ -57,10 +57,10 @@ BEGIN
 END;
 $$;
 
-CREATE FUNCTION common_document_comments (table_name text)
-    RETURNS text
-    LANGUAGE 'plpgsql'
-    AS $$
+CREATE FUNCTION common_document_comments(table_name text)
+RETURNS text
+LANGUAGE plpgsql
+AS $$
 DECLARE
     TEMPLATE text;
 BEGIN
@@ -74,8 +74,7 @@ BEGIN
 END;
 $$;
 
-SELECT
-    common_comments ('parties_summary');
+SELECT common_comments('parties_summary');
 
 COMMENT ON COLUMN parties_summary.party_index IS 'Position of the party in the ``parties`` array';
 
@@ -95,8 +94,7 @@ COMMENT ON COLUMN parties_summary.total_additionalidentifiers IS 'Length of the 
 
 COMMENT ON COLUMN parties_summary.party IS 'The party object';
 
-SELECT
-    common_comments ('buyer_summary');
+SELECT common_comments('buyer_summary');
 
 COMMENT ON COLUMN buyer_summary.buyer IS 'The buyer object';
 
@@ -118,8 +116,7 @@ COMMENT ON COLUMN buyer_summary.link_with_role IS '1 if the buyer''s entry in th
 
 COMMENT ON COLUMN buyer_summary.party_index IS 'Position of the buyer in the ``parties`` array';
 
-SELECT
-    common_comments ('procuringentity_summary');
+SELECT common_comments('procuringentity_summary');
 
 COMMENT ON COLUMN procuringentity_summary.procuringentity IS 'The procuring entity object';
 
@@ -141,8 +138,7 @@ COMMENT ON COLUMN procuringentity_summary.link_with_role IS '1 if the procuring 
 
 COMMENT ON COLUMN procuringentity_summary.party_index IS 'Position of the procuring entity in the ``parties`` array';
 
-SELECT
-    common_comments ('tenderers_summary');
+SELECT common_comments('tenderers_summary');
 
 COMMENT ON COLUMN tenderers_summary.tenderer_index IS 'Position of the tenderer in the ``tenderers`` array';
 
@@ -166,20 +162,15 @@ COMMENT ON COLUMN tenderers_summary.link_with_role IS '1 if the tenderer''s entr
 
 COMMENT ON COLUMN tenderers_summary.party_index IS 'Position of the tenderer in the ``parties`` array';
 
-SELECT
-    common_comments ('planning_documents_summary');
+SELECT common_comments('planning_documents_summary');
 
-SELECT
-    common_document_comments ('planning_documents_summary');
+SELECT common_document_comments('planning_documents_summary');
 
-SELECT
-    common_comments ('planning_milestones_summary');
+SELECT common_comments('planning_milestones_summary');
 
-SELECT
-    common_milestone_comments ('planning_milestones_summary');
+SELECT common_milestone_comments('planning_milestones_summary');
 
-SELECT
-    common_comments ('planning_summary');
+SELECT common_comments('planning_summary');
 
 COMMENT ON COLUMN planning_summary.budget_amount_amount IS 'Value of the ``budget/amount/amount`` field in the planning object';
 
@@ -197,25 +188,19 @@ COMMENT ON COLUMN planning_summary.milestone_type_counts IS 'JSONB object in whi
 
 COMMENT ON COLUMN planning_summary.planning IS 'The planning object';
 
-SELECT
-    common_comments ('tender_documents_summary');
+SELECT common_comments('tender_documents_summary');
 
 COMMENT ON COLUMN tender_documents_summary.document_index IS 'Position of the document in the ``documents`` array';
 
-SELECT
-    common_document_comments ('tender_documents_summary');
+SELECT common_document_comments('tender_documents_summary');
 
-SELECT
-    common_comments ('tender_items_summary');
+SELECT common_comments('tender_items_summary');
 
-SELECT
-    common_item_comments ('tender_items_summary');
+SELECT common_item_comments('tender_items_summary');
 
-SELECT
-    common_comments ('tender_milestones_summary');
+SELECT common_comments('tender_milestones_summary');
 
-SELECT
-    common_milestone_comments ('tender_milestones_summary');
+SELECT common_milestone_comments('tender_milestones_summary');
 
 DO $$
 DECLARE
@@ -265,32 +250,25 @@ BEGIN
 END;
 $$;
 
-SELECT
-    common_comments ('tender_summary_no_data');
+SELECT common_comments('tender_summary_no_data');
 
-SELECT
-    common_comments ('tender_summary');
+SELECT common_comments('tender_summary');
 
 COMMENT ON COLUMN tender_summary.tender IS 'The tender object';
 
-SELECT
-    common_comments ('award_documents_summary');
+SELECT common_comments('award_documents_summary');
 
 COMMENT ON COLUMN award_documents_summary.award_index IS 'Position of the award in the ``awards`` array';
 
-SELECT
-    common_document_comments ('award_documents_summary');
+SELECT common_document_comments('award_documents_summary');
 
-SELECT
-    common_comments ('award_items_summary');
+SELECT common_comments('award_items_summary');
 
-SELECT
-    common_item_comments ('award_items_summary');
+SELECT common_item_comments('award_items_summary');
 
 COMMENT ON COLUMN award_items_summary.award_index IS 'Position of the award in the ``awards`` array';
 
-SELECT
-    common_comments ('award_suppliers_summary');
+SELECT common_comments('award_suppliers_summary');
 
 COMMENT ON COLUMN award_suppliers_summary.award_index IS 'Position of the award in the ``awards`` array';
 
@@ -316,8 +294,7 @@ COMMENT ON COLUMN award_suppliers_summary.link_with_role IS '1 if the supplier''
 
 COMMENT ON COLUMN award_suppliers_summary.party_index IS 'Position of the supplier in the ``parties`` array';
 
-SELECT
-    common_comments ('awards_summary');
+SELECT common_comments('awards_summary');
 
 COMMENT ON COLUMN awards_summary.award_index IS 'Position of the award in the ``awards`` array';
 
@@ -353,32 +330,25 @@ COMMENT ON COLUMN awards_summary.total_items IS 'Length of the ``items`` array i
 
 COMMENT ON COLUMN awards_summary.award IS 'The award object';
 
-SELECT
-    common_comments ('contract_documents_summary');
+SELECT common_comments('contract_documents_summary');
 
 COMMENT ON COLUMN contract_documents_summary.contract_index IS 'Position of the contract in the ``contracts`` array';
 
-SELECT
-    common_document_comments ('contract_documents_summary');
+SELECT common_document_comments('contract_documents_summary');
 
-SELECT
-    common_comments ('contract_implementation_documents_summary');
+SELECT common_comments('contract_implementation_documents_summary');
 
 COMMENT ON COLUMN contract_implementation_documents_summary.contract_index IS 'Position of the contract in the ``contracts`` array';
 
-SELECT
-    common_document_comments ('contract_implementation_documents_summary');
+SELECT common_document_comments('contract_implementation_documents_summary');
 
-SELECT
-    common_comments ('contract_implementation_milestones_summary');
+SELECT common_comments('contract_implementation_milestones_summary');
 
-SELECT
-    common_milestone_comments ('contract_implementation_milestones_summary');
+SELECT common_milestone_comments('contract_implementation_milestones_summary');
 
 COMMENT ON COLUMN contract_implementation_milestones_summary.contract_index IS 'Position of the contract in the ``contracts`` array';
 
-SELECT
-    common_comments ('contract_implementation_transactions_summary');
+SELECT common_comments('contract_implementation_transactions_summary');
 
 COMMENT ON COLUMN contract_implementation_transactions_summary.contract_index IS 'Position of the contract in the ``contracts`` array';
 
@@ -392,24 +362,19 @@ COMMENT ON COLUMN contract_implementation_transactions_summary.value_amount IS '
 
 COMMENT ON COLUMN contract_implementation_transactions_summary.value_currency IS 'Value of the ``value/currency`` field, or the deprecated ``amount/currency`` field, in the transaction object';
 
-SELECT
-    common_comments ('contract_items_summary');
+SELECT common_comments('contract_items_summary');
 
 COMMENT ON COLUMN contract_items_summary.contract_index IS 'Position of the contract in the ``contracts`` array';
 
-SELECT
-    common_item_comments ('contract_items_summary');
+SELECT common_item_comments('contract_items_summary');
 
-SELECT
-    common_comments ('contract_milestones_summary');
+SELECT common_comments('contract_milestones_summary');
 
-SELECT
-    common_milestone_comments ('contract_milestones_summary');
+SELECT common_milestone_comments('contract_milestones_summary');
 
 COMMENT ON COLUMN contract_milestones_summary.contract_index IS 'Position of the contract in the ``contracts`` array';
 
-SELECT
-    common_comments ('contracts_summary');
+SELECT common_comments('contracts_summary');
 
 COMMENT ON COLUMN contracts_summary.contract_index IS 'Position of the contract in the ``contracts`` array';
 
@@ -461,8 +426,7 @@ COMMENT ON COLUMN contracts_summary.total_implementation_transactions IS 'Length
 
 COMMENT ON COLUMN contracts_summary.contract IS 'The contract object';
 
-SELECT
-    common_comments ('relatedprocesses_summary');
+SELECT common_comments('relatedprocesses_summary');
 
 COMMENT ON COLUMN relatedprocesses_summary.relatedprocess_index IS 'Position of the relatedProcess in the ``relatedProcesses`` array';
 COMMENT ON COLUMN relatedprocesses_summary.relatedprocess IS 'The related process object';
@@ -546,11 +510,9 @@ BEGIN
 END;
 $$;
 
-SELECT
-    common_comments ('release_summary_no_data');
+SELECT common_comments('release_summary_no_data');
 
-SELECT
-    common_comments ('release_summary');
+SELECT common_comments('release_summary');
 
 COMMENT ON COLUMN release_summary.release_check IS '`Data Review Tool output <https://github.com/open-contracting/lib-cove-ocds#output-json-format>`__';
 

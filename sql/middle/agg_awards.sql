@@ -7,7 +7,7 @@ SELECT
     sum(total_documents) AS total_award_documents,
     sum(total_items) AS total_award_items,
     sum(total_suppliers) AS total_award_suppliers,
-    sum(value_amount) sum_awards_value_amount
+    sum(value_amount) AS sum_awards_value_amount
 FROM
     awards_summary
 GROUP BY
@@ -29,19 +29,19 @@ CREATE UNIQUE INDEX tmp_award_suppliers_aggregates_id ON tmp_award_suppliers_agg
 CREATE TABLE tmp_award_documents_aggregates AS
 SELECT
     id,
-    jsonb_object_agg(coalesce(documentType, ''), total_documentTypes) award_document_documenttype_counts
+    jsonb_object_agg(coalesce(documenttype, ''), total_documenttypes) AS award_document_documenttype_counts
 FROM (
     SELECT
         id,
-        documentType,
-        count(*) total_documentTypes
+        documenttype,
+        count(*) AS total_documenttypes
     FROM
         award_documents_summary
     GROUP BY
         id,
-        documentType) AS d
+        documenttype
+) AS d
 GROUP BY
     id;
 
 CREATE UNIQUE INDEX tmp_award_documents_aggregates_id ON tmp_award_documents_aggregates (id);
-
