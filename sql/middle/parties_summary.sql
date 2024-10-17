@@ -32,11 +32,10 @@ SELECT
                     ELSE
                         '[]'::jsonb
                 END
-            -- https://github.com/sqlfluff/sqlfluff/issues/4623#issuecomment-2401209085
+            -- https://github.com/sqlfluff/sqlfluff/issues/4623#issuecomment-2401209085 >3.2.4
             ) AS additional_identifier -- noqa: AL05
         WHERE
-            -- https://github.com/sqlfluff/sqlfluff/pull/6323
-            additional_identifier ?& ARRAY['scheme', 'id'] -- noqa: LT02,PRS
+            additional_identifier ?& ARRAY['scheme', 'id']
     ) AS additionalidentifiers_ids,
     CASE
         WHEN jsonb_typeof(value -> 'additionalIdentifiers') = 'array'

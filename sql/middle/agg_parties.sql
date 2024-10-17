@@ -11,7 +11,7 @@ WITH parties_role_counts AS (
             count(*) AS total_parties_roles
         FROM
             parties_summary
-        -- https://github.com/sqlfluff/sqlfluff/issues/4623#issuecomment-2401209085
+        -- https://github.com/sqlfluff/sqlfluff/issues/4623#issuecomment-2401209085 >3.2.4
         CROSS JOIN jsonb_array_elements_text(roles) AS role -- noqa: AL05
         GROUP BY
             id,
