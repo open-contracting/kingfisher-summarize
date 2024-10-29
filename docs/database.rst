@@ -40,8 +40,8 @@ If the ``release_type`` is "record", then the record's ``compiledRelease`` field
 
 Foreign key relationships exist on all `tables <https://www.postgresql.org/docs/current/sql-createtable.html>`__ (but not `views <https://www.postgresql.org/docs/current/sql-createview.html>`__) within a schema, as shown in the Entity Relationship Diagram (click on the image and zoom in to read more easily).
 
-.. image:: _static/erd.png
-   :target: _static/erd.png
+.. image:: _static/relationships.real.compact.png
+   :target: _static/relationships.real.compact.png
 
 This diagram can help to identify JOIN conditions. For example, all tables can be joined with the ``release_summary_no_data`` and ``release_summary`` tables on the ``id`` column.
 

@@ -66,4 +66,9 @@ Add a schema with the ``--tables-only`` option:
 
     ./manage.py add 123 diagram --tables-only
 
-`Use SchemaSpy <https://ocp-software-handbook.readthedocs.io/en/latest/services/postgresql.html#entity-relationship-diagram>`__ to generate a diagram, copying the output to ``docs/_static/erd.png``.
+Then, `update <https://ocp-software-handbook.readthedocs.io/en/latest/services/postgresql.html#generate-entity-relationship-diagram>`__ the :ref:`erd`. For example:
+
+.. code-block:: bash
+
+   java -jar schemaspy.jar -t pgsql -dp postgresql.jar -o schemaspy -norows -host localhost -db kingfisher_summarize -s summary_collection_1 -u MYUSER
+   mv schemaspy/diagrams/summary/relationships.real.compact.png docs/_static/

@@ -1,19 +1,10 @@
-# Editor temporary files and local virtual environment.
 *.swp
 *~
 /.ve
-# Python caches.
 __pycache__
 /.pytest_cache
-# Coverage and documentation.
-/.coverage*
+/.coverage
 /htmlcov
 /docs/_build
-# Kingfisher
 /.env
-/error.log
-/info.log
-# SchemaSpy
-/postgresql.jar
-/schemaspy.jar
 /schemaspy
