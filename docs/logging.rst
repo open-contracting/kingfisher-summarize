@@ -1,8 +1,6 @@
 Reading logs
 ============
 
-If logging is configured using a :ref:`default configuration<config-logging>`, then log messages are written to ``info.log`` (and possibly ``debug.log``).
-
 Log messages are formatted as:
 
 .. code-block:: none
@@ -15,7 +13,7 @@ In particular, you can use the ``name`` attribute to filter messages by topic. F
 
 .. code-block:: bash
 
-    grep NAME info.log | less
+    grep NAME /var/log/kingfisher-summarize.log | less
 
 where ``NAME`` is one of:
 
