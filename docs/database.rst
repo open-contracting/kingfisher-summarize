@@ -27,7 +27,7 @@ There are two cases in which other types are used:
 * Date fields are converted to the ``timestamp`` type.  **Warning:** If the value is an invalid date like ``"2020-02-30"``, or if the year is less than or equal to ``0000``, it will be converted to ``NULL``.
 * Number fields are converted to the ``numeric`` type.  **Warning:** If the value is an invalid number like ``"123a"``, it will be converted to ``NULL``.
 
-.. _relationships:
+.. _erd:
 
 How tables are related
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -38,7 +38,7 @@ The ``table_id`` column in the ``release_summary_no_data`` table refers to the `
 
 If the ``release_type`` is "record", then the record's ``compiledRelease`` field is used to generate summaries. If the ``release_type`` is "embedded_release", then the record's ``releases`` array is used to generate summaries.
 
-Foreign key relationships exist on all `tables <https://www.postgresql.org/docs/current/sql-createtable.html>`__ (but not `views <https://www.postgresql.org/docs/current/sql-createview.html>`__) within a schema, as shown in the Entity Relationship Diagram below (click on the image and zoom in to read more easily).
+Foreign key relationships exist on all `tables <https://www.postgresql.org/docs/current/sql-createtable.html>`__ (but not `views <https://www.postgresql.org/docs/current/sql-createview.html>`__) within a schema, as shown in the Entity Relationship Diagram (click on the image and zoom in to read more easily).
 
 .. image:: _static/erd.png
    :target: _static/erd.png

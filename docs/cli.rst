@@ -95,7 +95,7 @@ Use this option if:
 -  The summaries are large (tables are faster to query than views)
 -  You want to allow a user to access the schema's tables, but not Kingfisher Process' tables
 -  You want to make it easier for a user to discover the foreign key relationships between tables (for example, using ``\d <table>`` instead of ``\d+ <view>`` followed by ``\d <table>``)
--  You are :ref:`creating the Entity Relationship Diagram<create_erd>`
+-  You are :ref:`creating the Entity Relationship Diagram<create-erd>`
 
 .. _field-lists:
 

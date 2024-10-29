@@ -128,7 +128,7 @@ Calculate the top 10 buyers by award value
 
 Summary data about buyers is stored in the ``buyer_summary`` table, and summary data about awards is stored in the ``award_summary`` table.
 
-To join summary tables, use the ``id`` column, which uniquely identifies a release. To learn more about the relationships between tables, refer to the :ref:`relationships` documentation.
+To join summary tables, use the ``id`` column, which uniquely identifies a release. To learn more about the relationships between tables, refer to the :ref:`erd` documentation.
 
 The ``buyer_summary`` table doesn't include the buyer's name; however, the ``buyer`` column contains a JSONB blob of the buyer for each contracting process, from which the buyer's name can be queried.
 

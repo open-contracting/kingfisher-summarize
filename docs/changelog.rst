@@ -80,7 +80,7 @@ Changed
 Fixed
 ~~~~~
 
--  Fix support for :ref:`release types<relationships>` of "embedded_release" and "record".
+-  Fix support for :ref:`release types<erd>` of "embedded_release" and "record".
 
 2021-07-29
 ----------
