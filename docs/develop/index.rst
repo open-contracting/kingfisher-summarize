@@ -3,6 +3,10 @@ Contributing
 
 First, follow the :doc:`setup` guide, and read this page. Then, learn how to :doc:`sql` or follow the :doc:`howtos`.
 
+.. seealso::
+
+   `ADR about not using DBT <https://docs.google.com/document/d/1uJw6Z1VljmEmISgy6HYQpVEn-FRxoYJm9HHaWT8523M/edit>`__
+
 .. _sql-files:
 
 SQL files
