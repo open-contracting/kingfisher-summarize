@@ -183,13 +183,13 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
             'laborum aute nisi eiusmod',  # award_title
             'pending',  # award_status
             'ullamco in voluptate',  # award_description
-            decimal.Decimal('-95099396'),  # award_value_amount
+            decimal.Decimal(-95099396),  # award_value_amount
             'AMD',  # award_value_currency
             datetime.datetime(3263, 12, 5, 21, 24, 19, 161000),  # award_date
             datetime.datetime(4097, 9, 16, 5, 55, 19, 125000),  # award_contractperiod_startdate
             datetime.datetime(4591, 4, 29, 6, 34, 28, 472000),  # award_contractperiod_enddate
             datetime.datetime(3714, 8, 9, 7, 21, 37, 544000),  # award_contractperiod_maxextentdate
-            decimal.Decimal('72802012'),  # award_contractperiod_durationindays
+            decimal.Decimal(72802012),  # award_contractperiod_durationindays
             2,  # total_suppliers
             4,  # total_documents
             {
@@ -534,13 +534,13 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
             'et',  # award_title
             'pending',  # award_status
             'adipisicing ame',  # award_description
-            decimal.Decimal('-7139109'),  # award_value_amount
+            decimal.Decimal(-7139109),  # award_value_amount
             'AUD',  # award_value_currency
             datetime.datetime(3672, 10, 26, 4, 38, 28, 786000),  # award_date
             datetime.datetime(2192, 8, 27, 0, 9, 1, 626000),  # award_contractperiod_startdate
             datetime.datetime(4204, 1, 22, 22, 4, 18, 268000),  # award_contractperiod_enddate
             datetime.datetime(5117, 12, 26, 11, 33, 27, 496000),  # award_contractperiod_maxextentdate
-            decimal.Decimal('-30383739'),  # award_contractperiod_durationindays
+            decimal.Decimal(-30383739),  # award_contractperiod_durationindays
             5,  # total_suppliers
             4,  # total_documents
             {
