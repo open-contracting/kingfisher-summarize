@@ -82,7 +82,7 @@ LEFT JOIN record_check
     ON
         rs.table_id = record_check.record_id
         AND release_type = 'record'
---Kingfisher Process’ compiled_release table has no package_data_id column.
+--Kingfisher Process' compiled_release table has no package_data_id column.
 --Therefore, any rows in release_summary_no_data sourced from that table will have a NULL package_data_id.
 LEFT JOIN package_data AS pd ON rs.package_data_id = pd.id;
 
