@@ -8,17 +8,17 @@ from psycopg2.extras import execute_values
 class Database:
     def __init__(self):
         """Connect to the database."""
-        self.connection = psycopg2.connect(os.getenv('KINGFISHER_SUMMARIZE_DATABASE_URL'))
+        self.connection = psycopg2.connect(os.getenv("KINGFISHER_SUMMARIZE_DATABASE_URL"))
         self.cursor = self.connection.cursor()
 
     def set_search_path(self, schemas):
         """Set the search path to the given schemas."""
-        self.cursor.execute(self.format('SET search_path = {schemas}', schemas=schemas))
+        self.cursor.execute(self.format("SET search_path = {schemas}", schemas=schemas))
 
     def schema_exists(self, schema):
         """Return whether a schema exists."""
-        statement = 'SELECT EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = %(schema)s)'
-        return self.one(statement, {'schema': schema})[0]
+        statement = "SELECT EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = %(schema)s)"
+        return self.one(statement, {"schema": schema})[0]
 
     def pluck(self, statement, variables=None, **kwargs):
         """Return the first value from all the results."""
@@ -50,7 +50,7 @@ class Database:
             if isinstance(value, sql.Composable):
                 objects[key] = value
             elif isinstance(value, list):
-                objects[key] = sql.SQL(', ').join(self.identify(entry) for entry in value)
+                objects[key] = sql.SQL(", ").join(self.identify(entry) for entry in value)
             else:
                 objects[key] = self.identify(value)
         return sql.SQL(statement).format(**objects)

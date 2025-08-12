@@ -9,10 +9,10 @@ from psycopg2 import sql
 from manage import SUMMARIES, cli, construct_where_fragment
 from tests import assert_bad_argument, assert_log_records, assert_log_running, fixture, noop
 
-command = 'add'
+command = "add"
 
 TABLES = {
-    'note',
+    "note",
 }
 SUMMARY_TABLES = set()
 SUMMARY_VIEWS = set()
@@ -21,130 +21,175 @@ NO_FIELD_LIST_TABLES = set()
 NO_FIELD_LIST_VIEWS = set()
 
 for table_name, table in SUMMARIES.items():
-    FIELD_LIST_TABLES.add(f'{table_name}_field_list')
+    FIELD_LIST_TABLES.add(f"{table_name}_field_list")
 
     if table.is_table:
         SUMMARY_TABLES.add(table_name)
-        NO_FIELD_LIST_TABLES.add(f'{table_name}_no_field_list')
+        NO_FIELD_LIST_TABLES.add(f"{table_name}_no_field_list")
     else:
         SUMMARY_VIEWS.add(table_name)
-        NO_FIELD_LIST_VIEWS.add(f'{table_name}_no_field_list')
-        TABLES.add(f'{table_name}_no_data')
+        NO_FIELD_LIST_VIEWS.add(f"{table_name}_no_field_list")
+        TABLES.add(f"{table_name}_no_data")
 
 
 def test_construct_where_fragment(db):
-    assert construct_where_fragment(db.cursor, 'a', 'z') == " AND d.data->>'a' = 'z'"
-    assert construct_where_fragment(db.cursor, 'a.b', 'z') == " AND d.data->'a'->>'b' = 'z'"
-    assert construct_where_fragment(db.cursor, 'a.b.c', 'z') == " AND d.data->'a'->'b'->>'c' = 'z'"
-    assert construct_where_fragment(db.cursor, 'a.b.c.d', 'z') == " AND d.data->'a'->'b'->'c'->>'d' = 'z'"
-    assert construct_where_fragment(db.cursor, 'a.b.c', '') == " AND d.data->'a'->'b'->>'c' = ''"
-    assert construct_where_fragment(db.cursor, '', 'z') == " AND d.data->>'' = 'z'"
+    assert construct_where_fragment(db.cursor, "a", "z") == " AND d.data->>'a' = 'z'"
+    assert construct_where_fragment(db.cursor, "a.b", "z") == " AND d.data->'a'->>'b' = 'z'"
+    assert construct_where_fragment(db.cursor, "a.b.c", "z") == " AND d.data->'a'->'b'->>'c' = 'z'"
+    assert construct_where_fragment(db.cursor, "a.b.c.d", "z") == " AND d.data->'a'->'b'->'c'->>'d' = 'z'"
+    assert construct_where_fragment(db.cursor, "a.b.c", "") == " AND d.data->'a'->'b'->>'c' = ''"
+    assert construct_where_fragment(db.cursor, "", "z") == " AND d.data->>'' = 'z'"
 
 
-@pytest.mark.parametrize(('collections', 'message'), [
-    ('a', 'Collection IDs must be integers'),
-    ('1,10,100', 'Collection IDs {10, 100} not found'),
-])
+@pytest.mark.parametrize(
+    ("collections", "message"),
+    [
+        ("a", "Collection IDs must be integers"),
+        ("1,10,100", "Collection IDs {10, 100} not found"),
+    ],
+)
 def test_validate_collections(collections, message, caplog):
     runner = CliRunner()
 
     result = runner.invoke(cli, [command, collections])
 
     assert result.exit_code == 2
-    assert_bad_argument(result, 'COLLECTIONS', message)
+    assert_bad_argument(result, "COLLECTIONS", message)
     assert_log_running(caplog, command)
 
 
 def test_validate_name(caplog):
     runner = CliRunner()
 
-    result = runner.invoke(cli, [command, '1', '--name', 'camelCase'])
+    result = runner.invoke(cli, [command, "1", "--name", "camelCase"])
 
     assert result.exit_code == 2
-    assert_bad_argument(result, '--name', 'value must be lowercase')
+    assert_bad_argument(result, "--name", "value must be lowercase")
     assert_log_running(caplog, command)
 
 
-@patch('manage.summary_tables', noop)
-@patch('manage.field_counts', noop)
-@patch('manage.field_lists', noop)
-@pytest.mark.parametrize(('kwargs', 'name', 'collections'), [
-    ({}, 'collection_1', (1,)),
-    ({'collections': '1,2'}, 'collection_1_2', (1, 2)),
-    ({'name': 'custom'}, 'custom', (1,)),
-])
+@patch("manage.summary_tables", noop)
+@patch("manage.field_counts", noop)
+@patch("manage.field_lists", noop)
+@pytest.mark.parametrize(
+    ("kwargs", "name", "collections"),
+    [
+        ({}, "collection_1", (1,)),
+        ({"collections": "1,2"}, "collection_1_2", (1, 2)),
+        ({"name": "custom"}, "custom", (1,)),
+    ],
+)
 def test_command_name(kwargs, name, collections, db, caplog):
-    schema = f'summary_{name}'
+    schema = f"summary_{name}"
     identifier = sql.Identifier(schema)
 
     with fixture(db, **kwargs) as result:
         assert db.schema_exists(schema)
-        assert db.all('SELECT collection_id, schema FROM summaries.selected_collections WHERE schema=%(schema)s',
-                      {'schema': schema}) == [(collection, schema) for collection in collections]
-        assert db.all(sql.SQL('SELECT id, note FROM {schema}.note').format(schema=identifier)) == [
-            (1, 'Default'),
+        assert db.all(
+            "SELECT collection_id, schema FROM summaries.selected_collections WHERE schema=%(schema)s",
+            {"schema": schema},
+        ) == [(collection, schema) for collection in collections]
+        assert db.all(sql.SQL("SELECT id, note FROM {schema}.note").format(schema=identifier)) == [
+            (1, "Default"),
         ]
 
         assert result.exit_code == 0
-        assert result.output == ''
-        assert_log_records(caplog, command, [
-            f'Arguments: collections={collections!r} note=Default name={kwargs.get("name")} tables_only=False '
-            'filters=() filters_sql_json_path=()',
-            f'Added {name}',
-            'Running summary-tables routine',
-            'Running field-counts routine',
-            'Running field-lists routine',
-        ])
+        assert result.output == ""
+        assert_log_records(
+            caplog,
+            command,
+            [
+                f"Arguments: collections={collections!r} note=Default name={kwargs.get('name')} tables_only=False "
+                "filters=() filters_sql_json_path=()",
+                f"Added {name}",
+                "Running summary-tables routine",
+                "Running field-counts routine",
+                "Running field-lists routine",
+            ],
+        )
 
 
-@pytest.mark.parametrize(('filters', 'filters_sql_json_path'), [
-    ((), ()),
-    ((('ocid', 'dolore'),), ()),
-    ((('id', '川蝉'),), ()),
-    ((), ('$.id == "川蝉"',)),
-])
-@pytest.mark.parametrize(('tables_only', 'field_counts', 'field_lists', 'tables', 'views'), [
-    (False, True, False,
-     TABLES | SUMMARY_TABLES, SUMMARY_VIEWS),
-    (True, True, False,
-     TABLES | SUMMARY_TABLES | SUMMARY_VIEWS, set()),
-    (False, False, True,
-     TABLES | FIELD_LIST_TABLES | NO_FIELD_LIST_TABLES, SUMMARY_TABLES | SUMMARY_VIEWS | NO_FIELD_LIST_VIEWS),
-    (True, False, True,
-     TABLES | FIELD_LIST_TABLES | NO_FIELD_LIST_TABLES | SUMMARY_TABLES | SUMMARY_VIEWS | NO_FIELD_LIST_VIEWS, set()),
-])
+@pytest.mark.parametrize(
+    ("filters", "filters_sql_json_path"),
+    [
+        ((), ()),
+        ((("ocid", "dolore"),), ()),
+        ((("id", "川蝉"),), ()),
+        ((), ('$.id == "川蝉"',)),
+    ],
+)
+@pytest.mark.parametrize(
+    ("tables_only", "field_counts", "field_lists", "tables", "views"),
+    [
+        (False, True, False, TABLES | SUMMARY_TABLES, SUMMARY_VIEWS),
+        (True, True, False, TABLES | SUMMARY_TABLES | SUMMARY_VIEWS, set()),
+        (
+            False,
+            False,
+            True,
+            TABLES | FIELD_LIST_TABLES | NO_FIELD_LIST_TABLES,
+            SUMMARY_TABLES | SUMMARY_VIEWS | NO_FIELD_LIST_VIEWS,
+        ),
+        (
+            True,
+            False,
+            True,
+            TABLES | FIELD_LIST_TABLES | NO_FIELD_LIST_TABLES | SUMMARY_TABLES | SUMMARY_VIEWS | NO_FIELD_LIST_VIEWS,
+            set(),
+        ),
+    ],
+)
 def test_command(db, tables_only, field_counts, field_lists, tables, views, filters, filters_sql_json_path, caplog):
     # Load collection 2 first, to check that existing collections aren't included when we load collection 1.
-    with fixture(
+    with (
+        fixture(
             db,
-            collections='2',
+            collections="2",
             tables_only=tables_only,
             field_counts=field_counts,
             field_lists=field_lists,
             filters=filters,
-            filters_sql_json_path=filters_sql_json_path
-        ) as result1, fixture(
+            filters_sql_json_path=filters_sql_json_path,
+        ) as result1,
+        fixture(
             db,
             tables_only=tables_only,
             field_counts=field_counts,
             field_lists=field_lists,
             filters=filters,
-            filters_sql_json_path=filters_sql_json_path
-        ) as result2:
+            filters_sql_json_path=filters_sql_json_path,
+        ) as result2,
+    ):
         # Check existence of schema, tables and views.
         if field_counts:
-            tables.add('field_counts')
+            tables.add("field_counts")
 
         assert result1.exit_code == 0
-        assert result1.output == ''
+        assert result1.output == ""
         assert result2.exit_code == 0
-        assert result2.output == ''
-        assert db.schema_exists('summary_collection_1')
-        assert db.schema_exists('summary_collection_2')
-        assert set(db.pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
-                            "AND table_type = 'BASE TABLE'", {'schema': 'summary_collection_1'})) == tables
-        assert set(db.pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
-                            "AND table_type = 'VIEW'", {'schema': 'summary_collection_1'})) == views
+        assert result2.output == ""
+        assert db.schema_exists("summary_collection_1")
+        assert db.schema_exists("summary_collection_2")
+        assert (
+            set(
+                db.pluck(
+                    "SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
+                    "AND table_type = 'BASE TABLE'",
+                    {"schema": "summary_collection_1"},
+                )
+            )
+            == tables
+        )
+        assert (
+            set(
+                db.pluck(
+                    "SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
+                    "AND table_type = 'VIEW'",
+                    {"schema": "summary_collection_1"},
+                )
+            )
+            == views
+        )
 
         # Check contents of summary relations.
         rows = db.all("""
@@ -175,16 +220,16 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
 
         assert rows[0] == (
             0,  # award_index
-            'release',  # release_type
+            "release",  # release_type
             1,  # collection_id
-            'dolore',  # ocid
-            'ex laborumsit autein magna veniam',  # release_id
-            'reprehenderit magna cillum eu nisi',  # award_id
-            'laborum aute nisi eiusmod',  # award_title
-            'pending',  # award_status
-            'ullamco in voluptate',  # award_description
+            "dolore",  # ocid
+            "ex laborumsit autein magna veniam",  # release_id
+            "reprehenderit magna cillum eu nisi",  # award_id
+            "laborum aute nisi eiusmod",  # award_title
+            "pending",  # award_status
+            "ullamco in voluptate",  # award_description
             decimal.Decimal(-95099396),  # award_value_amount
-            'AMD',  # award_value_currency
+            "AMD",  # award_value_currency
             datetime.datetime(3263, 12, 5, 21, 24, 19, 161000),  # award_date
             datetime.datetime(4097, 9, 16, 5, 55, 19, 125000),  # award_contractperiod_startdate
             datetime.datetime(4591, 4, 29, 6, 34, 28, 472000),  # award_contractperiod_enddate
@@ -193,10 +238,10 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
             2,  # total_suppliers
             4,  # total_documents
             {
-                'Excepteur nisi et': 1,
-                'proident exercitation in': 1,
-                'ut magna dolore velit aute': 1,
-                'veniam enim aliqua d': 1,
+                "Excepteur nisi et": 1,
+                "proident exercitation in": 1,
+                "ut magna dolore velit aute": 1,
+                "veniam enim aliqua d": 1,
             },  # document_documenttype_counts
             5,  # total_items
         )
@@ -224,24 +269,24 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
 
         assert rows[0] == (
             0,  # party_index
-            'release',  # release_type
+            "release",  # release_type
             1,  # collection_id
-            'dolore',  # ocid
-            'ex laborumsit autein magna veniam',  # release_id
-            'voluptate officia tempor dolor',  # party_id
+            "dolore",  # ocid
+            "ex laborumsit autein magna veniam",  # release_id
+            "voluptate officia tempor dolor",  # party_id
             [
-                'ex ',
-                'in est exercitation nulla Excepteur',
-                'ipsum do',
+                "ex ",
+                "in est exercitation nulla Excepteur",
+                "ipsum do",
             ],  # roles
-            'ad proident dolor reprehenderit veniam-in quis exercitation reprehenderit',  # identifier
-            'voluptate officia tempor dolor',  # unique_identifier_attempt
+            "ad proident dolor reprehenderit veniam-in quis exercitation reprehenderit",  # identifier
+            "voluptate officia tempor dolor",  # unique_identifier_attempt
             [
-                'exercitation proident voluptate-sed culpa eamollit consectetur dolor l',
-                'magna-dolor ut indolorein in tempor magna mollit',
-                'ad occaecat amet anim-laboris ea Duisdeserunt quis sed pariatur mollit',
-                'elit mollit-officia proidentmagna',
-                'ex-minim Ut consectetur',
+                "exercitation proident voluptate-sed culpa eamollit consectetur dolor l",
+                "magna-dolor ut indolorein in tempor magna mollit",
+                "ad occaecat amet anim-laboris ea Duisdeserunt quis sed pariatur mollit",
+                "elit mollit-officia proidentmagna",
+                "ex-minim Ut consectetur",
             ],  # additionalidentifiers_ids
             5,  # total_additionalidentifiers
         )
@@ -252,14 +297,14 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
 
         if field_counts:
             # Check contents of field_counts table.
-            rows = db.all('SELECT * FROM summary_collection_1.field_counts')
+            rows = db.all("SELECT * FROM summary_collection_1.field_counts")
 
             if filters or filters_sql_json_path:
                 assert len(rows) == 1046
-                assert rows[0] == (1, 'release', 'awards', 1, 4, 1)
+                assert rows[0] == (1, "release", "awards", 1, 4, 1)
             else:
                 assert len(rows) == 65235
-                assert rows[0] == (1, 'release', 'awards', 100, 301, 100)
+                assert rows[0] == (1, "release", "awards", 100, 301, 100)
 
         if field_lists:
             # Check the count of keys in the field_list field for the lowest primary keys in each summary relation.
@@ -281,36 +326,36 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
             """
 
             expected = {
-                'award_documents_summary': 11,
-                'award_items_summary': 26,
-                'award_suppliers_summary': 28,
-                'awards_summary': 469,
-                'buyer_summary': 28,
-                'contract_documents_summary': 11,
-                'contract_implementation_documents_summary': 11,
-                'contract_implementation_milestones_summary': 29,
-                'contract_implementation_transactions_summary': 83,
-                'contract_items_summary': 26,
-                'contract_milestones_summary': 27,
-                'contracts_summary': 469,
-                'parties_summary': 34,
-                'planning_documents_summary': 11,
-                'planning_milestones_summary': 29,
-                'planning_summary': 61,
-                'procuringentity_summary': 32,
-                'relatedprocesses_summary': 6,
-                'release_summary': 1046,
-                'tender_documents_summary': 15,
-                'tender_items_summary': 25,
-                'tender_milestones_summary': 23,
-                'tender_summary': 228,
-                'tenderers_summary': 31,
+                "award_documents_summary": 11,
+                "award_items_summary": 26,
+                "award_suppliers_summary": 28,
+                "awards_summary": 469,
+                "buyer_summary": 28,
+                "contract_documents_summary": 11,
+                "contract_implementation_documents_summary": 11,
+                "contract_implementation_milestones_summary": 29,
+                "contract_implementation_transactions_summary": 83,
+                "contract_items_summary": 26,
+                "contract_milestones_summary": 27,
+                "contracts_summary": 469,
+                "parties_summary": 34,
+                "planning_documents_summary": 11,
+                "planning_milestones_summary": 29,
+                "planning_summary": 61,
+                "procuringentity_summary": 32,
+                "relatedprocesses_summary": 6,
+                "release_summary": 1046,
+                "tender_documents_summary": 15,
+                "tender_items_summary": 25,
+                "tender_milestones_summary": 23,
+                "tender_summary": 228,
+                "tenderers_summary": 31,
             }
 
             for table_name, table in SUMMARIES.items():
                 count = db.one(db.format(statement, table=table_name, primary_keys=table.primary_keys))[0]
 
-                assert count == expected[table_name], f'{table_name}: {count} != {expected[table_name]}'
+                assert count == expected[table_name], f"{table_name}: {count} != {expected[table_name]}"
 
             def result_dict(statement):
                 result = db.one(statement)
@@ -329,19 +374,19 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
 
             if filters or filters_sql_json_path:
                 assert result_dict(statement) == {
-                    'awards': 1,
-                    'awards_amount': 1,
-                    'awards_id': 1,
-                    'contracts': 0,
-                    'total': 1,
+                    "awards": 1,
+                    "awards_amount": 1,
+                    "awards_id": 1,
+                    "contracts": 0,
+                    "total": 1,
                 }
             else:
                 assert result_dict(statement) == {
-                    'awards': 213,
-                    'awards_amount': 213,
-                    'awards_id': 213,
-                    'contracts': 0,
-                    'total': 285,
+                    "awards": 213,
+                    "awards_amount": 213,
+                    "awards_id": 213,
+                    "contracts": 0,
+                    "total": 285,
                 }
 
             statement = """
@@ -357,23 +402,24 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
 
             if filters or filters_sql_json_path:
                 assert result_dict(statement) == {
-                    'contracts': 1,
-                    'contracts_amount': 1,
-                    'contracts_id': 1,
-                    'awards': 0,
-                    'total': 4,
+                    "contracts": 1,
+                    "contracts_amount": 1,
+                    "contracts_id": 1,
+                    "awards": 0,
+                    "total": 4,
                 }
             else:
                 assert result_dict(statement) == {
-                    'contracts': 213,
-                    'contracts_amount': 213,
-                    'contracts_id': 213,
-                    'awards': 0,
-                    'total': 301,
+                    "contracts": 213,
+                    "contracts_amount": 213,
+                    "contracts_id": 213,
+                    "awards": 0,
+                    "total": 301,
                 }
 
         # All columns have comments.
-        assert not db.all("""
+        assert not db.all(
+            """
             SELECT
                 isc.table_name,
                 isc.column_name,
@@ -387,75 +433,113 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
                 AND LOWER(isc.table_name) NOT LIKE '%%_field_list'
                 AND pg_catalog.col_description(format('%%s.%%s',isc.table_schema,isc.table_name)::regclass::oid,
                                                isc.ordinal_position) IS NULL
-        """, {'schema': 'summary_collection_1'})
+        """,
+            {"schema": "summary_collection_1"},
+        )
 
         expected = []
         for collection_id in [2, 1]:
-            expected.extend([
-                f'Arguments: collections=({collection_id},) note=Default name=None tables_only={tables_only!r} '
-                f'filters={filters!r} filters_sql_json_path={filters_sql_json_path!r}',
-                f'Added collection_{collection_id}',
-                'Running summary-tables routine',
-            ])
+            expected.extend(
+                [
+                    f"Arguments: collections=({collection_id},) note=Default name=None tables_only={tables_only!r} "
+                    f"filters={filters!r} filters_sql_json_path={filters_sql_json_path!r}",
+                    f"Added collection_{collection_id}",
+                    "Running summary-tables routine",
+                ]
+            )
             if field_counts:
-                expected.append('Running field-counts routine')
+                expected.append("Running field-counts routine")
             if field_lists:
-                expected.append('Running field-lists routine')
+                expected.append("Running field-lists routine")
 
         assert_log_records(caplog, command, expected)
 
 
-@pytest.mark.parametrize(('filters', 'filters_sql_json_path'), [
-    ((('tender.procurementMethod', 'direct'),), ()),
-    ((('tender.procurementMethod', 'direct'), ('tender.status', 'planned')), ()),
-    ((), ('$.tender.procurementMethod == "direct"',)),
-    ((), ('$.tender.procurementMethod == "direct"', '$.tender.status == "planned"')),
-    ((('tender.status', 'planned'),), ('$.tender.procurementMethod == "direct"',)),
-    ((('tender.procurementMethod', 'direct'),), ('$.tender.status == "planned"',)),
-])
-@pytest.mark.parametrize(('tables_only', 'field_counts', 'field_lists', 'tables', 'views'), [
-    (False, True, False,
-     TABLES | SUMMARY_TABLES, SUMMARY_VIEWS),
-    (True, True, False,
-     TABLES | SUMMARY_TABLES | SUMMARY_VIEWS, set()),
-    (False, False, True,
-     TABLES | FIELD_LIST_TABLES | NO_FIELD_LIST_TABLES, SUMMARY_TABLES | SUMMARY_VIEWS | NO_FIELD_LIST_VIEWS),
-    (True, False, True,
-     TABLES | FIELD_LIST_TABLES | NO_FIELD_LIST_TABLES | SUMMARY_TABLES | SUMMARY_VIEWS | NO_FIELD_LIST_VIEWS, set()),
-])
-def test_command_filter(db, tables_only, field_counts, field_lists, tables, views, filters, filters_sql_json_path,
-                        caplog):
+@pytest.mark.parametrize(
+    ("filters", "filters_sql_json_path"),
+    [
+        ((("tender.procurementMethod", "direct"),), ()),
+        ((("tender.procurementMethod", "direct"), ("tender.status", "planned")), ()),
+        ((), ('$.tender.procurementMethod == "direct"',)),
+        ((), ('$.tender.procurementMethod == "direct"', '$.tender.status == "planned"')),
+        ((("tender.status", "planned"),), ('$.tender.procurementMethod == "direct"',)),
+        ((("tender.procurementMethod", "direct"),), ('$.tender.status == "planned"',)),
+    ],
+)
+@pytest.mark.parametrize(
+    ("tables_only", "field_counts", "field_lists", "tables", "views"),
+    [
+        (False, True, False, TABLES | SUMMARY_TABLES, SUMMARY_VIEWS),
+        (True, True, False, TABLES | SUMMARY_TABLES | SUMMARY_VIEWS, set()),
+        (
+            False,
+            False,
+            True,
+            TABLES | FIELD_LIST_TABLES | NO_FIELD_LIST_TABLES,
+            SUMMARY_TABLES | SUMMARY_VIEWS | NO_FIELD_LIST_VIEWS,
+        ),
+        (
+            True,
+            False,
+            True,
+            TABLES | FIELD_LIST_TABLES | NO_FIELD_LIST_TABLES | SUMMARY_TABLES | SUMMARY_VIEWS | NO_FIELD_LIST_VIEWS,
+            set(),
+        ),
+    ],
+)
+def test_command_filter(
+    db, tables_only, field_counts, field_lists, tables, views, filters, filters_sql_json_path, caplog
+):
     # Load collection 2 first, to check that existing collections aren't included when we load collection 1.
-    with fixture(
+    with (
+        fixture(
             db,
-            collections='2',
+            collections="2",
             tables_only=tables_only,
             field_counts=field_counts,
             field_lists=field_lists,
             filters=filters,
-            filters_sql_json_path=filters_sql_json_path
-        ) as result1, fixture(
+            filters_sql_json_path=filters_sql_json_path,
+        ) as result1,
+        fixture(
             db,
             tables_only=tables_only,
             field_counts=field_counts,
             field_lists=field_lists,
             filters=filters,
-            filters_sql_json_path=filters_sql_json_path
-        ) as result2:
+            filters_sql_json_path=filters_sql_json_path,
+        ) as result2,
+    ):
         # Check existence of schema, tables and views.
         if field_counts:
-            tables.add('field_counts')
+            tables.add("field_counts")
 
         assert result1.exit_code == 0
-        assert result1.output == ''
+        assert result1.output == ""
         assert result2.exit_code == 0
-        assert result2.output == ''
-        assert db.schema_exists('summary_collection_1')
-        assert db.schema_exists('summary_collection_2')
-        assert set(db.pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
-                            "AND table_type = 'BASE TABLE'", {'schema': 'summary_collection_1'})) == tables
-        assert set(db.pluck("SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
-                            "AND table_type = 'VIEW'", {'schema': 'summary_collection_1'})) == views
+        assert result2.output == ""
+        assert db.schema_exists("summary_collection_1")
+        assert db.schema_exists("summary_collection_2")
+        assert (
+            set(
+                db.pluck(
+                    "SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
+                    "AND table_type = 'BASE TABLE'",
+                    {"schema": "summary_collection_1"},
+                )
+            )
+            == tables
+        )
+        assert (
+            set(
+                db.pluck(
+                    "SELECT table_name FROM information_schema.tables WHERE table_schema = %(schema)s "
+                    "AND table_type = 'VIEW'",
+                    {"schema": "summary_collection_1"},
+                )
+            )
+            == views
+        )
 
         # Check that the tender_summary table only has correctly filtered items
         rows = db.all("""
@@ -464,7 +548,7 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
             FROM summary_collection_1.tender_summary
         """)
         for row in rows:
-            assert row[0] == 'direct'
+            assert row[0] == "direct"
         if len(filters + filters_sql_json_path) > 1:
             assert len(rows) == 2
         else:
@@ -492,7 +576,7 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
             WHERE release.collection_id=1
         """)
         for row in rows:
-            if row[1] == 'direct' and (len(filters + filters_sql_json_path) == 1 or row[2] == 'planned'):
+            if row[1] == "direct" and (len(filters + filters_sql_json_path) == 1 or row[2] == "planned"):
                 assert row[0] in data_ids
             else:
                 assert row[0] not in data_ids
@@ -526,16 +610,16 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
 
         assert rows[0] == (
             0,  # award_index
-            'release',  # release_type
+            "release",  # release_type
             1,  # collection_id
-            'officia dolore non',  # ocid
-            'laborum irure consectetur fugiat',  # release_id
-            'dolorLorem fugiat ut',  # award_id
-            'et',  # award_title
-            'pending',  # award_status
-            'adipisicing ame',  # award_description
+            "officia dolore non",  # ocid
+            "laborum irure consectetur fugiat",  # release_id
+            "dolorLorem fugiat ut",  # award_id
+            "et",  # award_title
+            "pending",  # award_status
+            "adipisicing ame",  # award_description
             decimal.Decimal(-7139109),  # award_value_amount
-            'AUD',  # award_value_currency
+            "AUD",  # award_value_currency
             datetime.datetime(3672, 10, 26, 4, 38, 28, 786000),  # award_date
             datetime.datetime(2192, 8, 27, 0, 9, 1, 626000),  # award_contractperiod_startdate
             datetime.datetime(4204, 1, 22, 22, 4, 18, 268000),  # award_contractperiod_enddate
@@ -544,10 +628,10 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
             5,  # total_suppliers
             4,  # total_documents
             {
-                'in sint enim labore': 1,
-                'mollit labore Lorem': 1,
-                'minim incididunt sed ipsum': 1,
-                'ad reprehenderit sit dolor enim': 1
+                "in sint enim labore": 1,
+                "mollit labore Lorem": 1,
+                "minim incididunt sed ipsum": 1,
+                "ad reprehenderit sit dolor enim": 1,
             },  # document_documenttype_counts
             5,  # total_items
         )
@@ -575,22 +659,21 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
 
         assert rows[0] == (
             0,  # party_index
-            'release',  # release_type
+            "release",  # release_type
             1,  # collection_id
-            'officia dolore non',  # ocid
-            'laborum irure consectetur fugiat',  # release_id
-            'eu voluptateeiusmod ipsum ea',  # party_id
+            "officia dolore non",  # ocid
+            "laborum irure consectetur fugiat",  # release_id
+            "eu voluptateeiusmod ipsum ea",  # party_id
             [
-                'laborum',
-                'tempor',
+                "laborum",
+                "tempor",
             ],  # roles
-            'cupidatat consequat in ullamco-in incididunt commodo elit',  # identifier
-            'eu voluptateeiusmod ipsum ea',  # unique_identifier_attempt
+            "cupidatat consequat in ullamco-in incididunt commodo elit",  # identifier
+            "eu voluptateeiusmod ipsum ea",  # unique_identifier_attempt
             [
-                'non ei-commododolor laborum',
+                "non ei-commododolor laborum",
             ],  # additionalidentifiers_ids
             1,  # total_additionalidentifiers
-
         )
         if len(filters + filters_sql_json_path) > 1:
             assert len(rows) == 5
@@ -599,14 +682,14 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
 
         if field_counts:
             # Check contents of field_counts table.
-            rows = db.all('SELECT * FROM summary_collection_1.field_counts')
+            rows = db.all("SELECT * FROM summary_collection_1.field_counts")
 
             if len(filters + filters_sql_json_path) > 1:
                 assert len(rows) == 1515
-                assert rows[0] == (1, 'release', 'awards', 2, 7, 2)
+                assert rows[0] == (1, "release", "awards", 2, 7, 2)
             else:
                 assert len(rows) == 13077
-                assert rows[0] == (1, 'release', 'awards', 19, 55, 19)
+                assert rows[0] == (1, "release", "awards", 19, 55, 19)
 
         if field_lists:
             # Check the count of keys in the field_list field for the lowest primary keys in each summary relation.
@@ -628,48 +711,50 @@ def test_command_filter(db, tables_only, field_counts, field_lists, tables, view
             """
 
             expected = {
-                'award_documents_summary': 11,
-                'award_items_summary': 29,
-                'award_suppliers_summary': 30,
-                'awards_summary': 492,
-                'buyer_summary': 31,
-                'contract_documents_summary': 11,
-                'contract_implementation_documents_summary': 11,
-                'contract_implementation_milestones_summary': 23,
-                'contract_implementation_transactions_summary': 83,
-                'contract_items_summary': 26,
-                'contract_milestones_summary': 26,
-                'contracts_summary': 492,
-                'parties_summary': 30,
-                'planning_documents_summary': 11,
-                'planning_milestones_summary': 27,
-                'planning_summary': 99,
-                'procuringentity_summary': 30,
-                'relatedprocesses_summary': 6,
-                'release_summary': 987,
-                'tender_documents_summary': 13,
-                'tender_items_summary': 28,
-                'tender_milestones_summary': 27,
-                'tender_summary': 265,
-                'tenderers_summary': 32,
+                "award_documents_summary": 11,
+                "award_items_summary": 29,
+                "award_suppliers_summary": 30,
+                "awards_summary": 492,
+                "buyer_summary": 31,
+                "contract_documents_summary": 11,
+                "contract_implementation_documents_summary": 11,
+                "contract_implementation_milestones_summary": 23,
+                "contract_implementation_transactions_summary": 83,
+                "contract_items_summary": 26,
+                "contract_milestones_summary": 26,
+                "contracts_summary": 492,
+                "parties_summary": 30,
+                "planning_documents_summary": 11,
+                "planning_milestones_summary": 27,
+                "planning_summary": 99,
+                "procuringentity_summary": 30,
+                "relatedprocesses_summary": 6,
+                "release_summary": 987,
+                "tender_documents_summary": 13,
+                "tender_items_summary": 28,
+                "tender_milestones_summary": 27,
+                "tender_summary": 265,
+                "tenderers_summary": 32,
             }
 
             for table_name, table in SUMMARIES.items():
                 count = db.one(db.format(statement, table=table_name, primary_keys=table.primary_keys))[0]
 
-                assert count == expected[table_name], f'{table_name}: {count} != {expected[table_name]}'
+                assert count == expected[table_name], f"{table_name}: {count} != {expected[table_name]}"
 
         expected = []
         for collection_id in [2, 1]:
-            expected.extend([
-                f'Arguments: collections=({collection_id},) note=Default name=None tables_only={tables_only!r} '
-                f'filters={filters!r} filters_sql_json_path={filters_sql_json_path!r}',
-                f'Added collection_{collection_id}',
-                'Running summary-tables routine',
-            ])
+            expected.extend(
+                [
+                    f"Arguments: collections=({collection_id},) note=Default name=None tables_only={tables_only!r} "
+                    f"filters={filters!r} filters_sql_json_path={filters_sql_json_path!r}",
+                    f"Added collection_{collection_id}",
+                    "Running summary-tables routine",
+                ]
+            )
             if field_counts:
-                expected.append('Running field-counts routine')
+                expected.append("Running field-counts routine")
             if field_lists:
-                expected.append('Running field-lists routine')
+                expected.append("Running field-lists routine")
 
         assert_log_records(caplog, command, expected)

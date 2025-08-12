@@ -8,7 +8,7 @@ from psycopg2 import sql
 from manage import cli
 from tests import assert_log_records, assert_log_running, fixture, noop
 
-command = 'index'
+command = "index"
 
 
 def test_command_none(caplog):
@@ -17,12 +17,12 @@ def test_command_none(caplog):
     result = runner.invoke(cli, [command])
 
     assert result.exit_code == 0
-    assert result.output == ''
+    assert result.output == ""
     assert_log_running(caplog, command)
 
 
-@patch('manage.summary_tables', noop)
-@patch('manage.field_counts', noop)
+@patch("manage.summary_tables", noop)
+@patch("manage.field_counts", noop)
 def test_command(db, caplog):
     with fixture(db):
         runner = CliRunner()
@@ -39,15 +39,16 @@ def test_command(db, caplog):
         assert_log_records(caplog, command, [])
 
 
-@patch('manage.summary_tables', noop)
-@patch('manage.field_counts', noop)
+@patch("manage.summary_tables", noop)
+@patch("manage.field_counts", noop)
 def test_command_multiple(db, caplog):
-    with fixture(db, collections='1,2'):
+    with fixture(db, collections="1,2"):
         runner = CliRunner()
 
         statement = sql.SQL("INSERT INTO {table} (note, created_at) VALUES (%(note)s, %(created_at)s)").format(
-            table=sql.Identifier('summary_collection_1_2', 'note'))
-        db.execute(statement, {'note': 'Another', 'created_at': datetime(2000, 1, 1)})
+            table=sql.Identifier("summary_collection_1_2", "note")
+        )
+        db.execute(statement, {"note": "Another", "created_at": datetime(2000, 1, 1)})
         db.commit()
 
         result = runner.invoke(cli, [command])

@@ -3,7 +3,7 @@ from click.testing import CliRunner
 from manage import cli
 from tests import assert_log_records, fixture
 
-command = 'docs-table-ref'
+command = "docs-table-ref"
 
 
 # This is a development command, so we don't bother testing it deeply.
@@ -11,8 +11,8 @@ def test_command(db, caplog):
     with fixture(db):
         runner = CliRunner()
 
-        result = runner.invoke(cli, ['dev', command, 'collection_1'])
+        result = runner.invoke(cli, ["dev", command, "collection_1"])
 
         assert result.exit_code == 0
-        assert result.output == ''
+        assert result.output == ""
         assert_log_records(caplog, command, [])
