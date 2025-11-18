@@ -6,5 +6,5 @@ OCDS Kingfisher Summarize is used to create SQL tables that summarize the OCDS d
 
 .. |Build Status| image:: https://github.com/open-contracting/kingfisher-summarize/actions/workflows/ci.yml/badge.svg
    :target: https://github.com/open-contracting/kingfisher-summarize/actions/workflows/ci.yml
-.. |Coverage Status| image:: https://coveralls.io/repos/github/open-contracting/kingfisher-summarize/badge.svg?branch=main
-   :target: https://coveralls.io/github/open-contracting/kingfisher-summarize?branch=main
+.. |Coverage Status| image:: https://codecov.io/github/open-contracting/kingfisher-summarize/graph/badge.svg
+   :target: https://codecov.io/github/open-contracting/kingfisher-summarize
