@@ -9,3 +9,4 @@ jobs:
       personal-access-token: ${{ secrets.PAT }}
     with:
       python-version: '3.10'
+      standard-maintenance-scripts-files: requirements_base.in

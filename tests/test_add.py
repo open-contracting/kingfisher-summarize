@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 from click.testing import CliRunner
-from psycopg2 import sql
+from psycopg import sql
 
 from manage import SUMMARIES, cli, construct_where_fragment
 from tests import assert_bad_argument, assert_log_records, assert_log_running, fixture, noop
@@ -33,12 +33,12 @@ for table_name, table in SUMMARIES.items():
 
 
 def test_construct_where_fragment(db):
-    assert construct_where_fragment(db.cursor, "a", "z") == " AND d.data->>'a' = 'z'"
-    assert construct_where_fragment(db.cursor, "a.b", "z") == " AND d.data->'a'->>'b' = 'z'"
-    assert construct_where_fragment(db.cursor, "a.b.c", "z") == " AND d.data->'a'->'b'->>'c' = 'z'"
-    assert construct_where_fragment(db.cursor, "a.b.c.d", "z") == " AND d.data->'a'->'b'->'c'->>'d' = 'z'"
-    assert construct_where_fragment(db.cursor, "a.b.c", "") == " AND d.data->'a'->'b'->>'c' = ''"
-    assert construct_where_fragment(db.cursor, "", "z") == " AND d.data->>'' = 'z'"
+    assert construct_where_fragment(db, "a", "z") == " AND d.data->>'a' = 'z'"
+    assert construct_where_fragment(db, "a.b", "z") == " AND d.data->'a'->>'b' = 'z'"
+    assert construct_where_fragment(db, "a.b.c", "z") == " AND d.data->'a'->'b'->>'c' = 'z'"
+    assert construct_where_fragment(db, "a.b.c.d", "z") == " AND d.data->'a'->'b'->'c'->>'d' = 'z'"
+    assert construct_where_fragment(db, "a.b.c", "") == " AND d.data->'a'->'b'->>'c' = ''"
+    assert construct_where_fragment(db, "", "z") == " AND d.data->>'' = 'z'"
 
 
 @pytest.mark.parametrize(
