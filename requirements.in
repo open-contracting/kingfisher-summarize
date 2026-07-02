@@ -1,4 +1,2 @@
-click
-psycopg2
-python-dotenv
-tabulate
+-r requirements_base.txt
+psycopg[c]

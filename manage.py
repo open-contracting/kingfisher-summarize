@@ -15,7 +15,7 @@ from typing import NamedTuple
 
 import click
 from dotenv import load_dotenv
-from psycopg2 import sql
+from psycopg import sql
 from tabulate import tabulate
 
 from ocdskingfishersummarize.db import Database
@@ -227,7 +227,7 @@ def validate_collections(ctx, param, value):
     except ValueError:
         raise click.BadParameter("Collection IDs must be integers") from None
 
-    difference = set(ids) - set(db.pluck("SELECT id FROM collection WHERE id IN %(ids)s", {"ids": ids}))
+    difference = set(ids) - set(db.pluck("SELECT id FROM collection WHERE id = ANY(%(ids)s)", {"ids": list(ids)}))
     if difference:
         raise click.BadParameter(f"Collection IDs {difference} not found")
 
@@ -252,29 +252,27 @@ def validate_schema(ctx, param, value):
     return schema
 
 
-def construct_where_fragment(cursor, filter_field, filter_value):
+def construct_where_fragment(db, filter_field, filter_value):
     """
     Return part of a WHERE clause, for the given filter parameters.
 
-    :param cursor: a psycopg2 database cursor
+    :param db: a :class:`~ocdskingfishersummarize.db.Database` instance
     :param str filter_field: a period-separated field name, e.g. "tender.procurementMethod"
     :param str filter_value: the value of the specified field, e.g. "direct"
     """
     path = filter_field.split(".")
     format_string = " AND d.data" + "->%s" * (len(path) - 1) + "->>%s = %s"
-    where_fragment = cursor.mogrify(format_string, [*path, filter_value])
-    return where_fragment.decode()
+    return db.mogrify(format_string, [*path, filter_value])
 
 
-def construct_where_fragment_sql_json_path(cursor, filter_sql_json_path):
+def construct_where_fragment_sql_json_path(db, filter_sql_json_path):
     """
     Return part of a WHERE clause, to filter on the given SQL/JSON Path Language expression.
 
-    :param cursor: a psycopg2 database cursor
+    :param db: a :class:`~ocdskingfishersummarize.db.Database` instance
     :param str filter_sql_json_path: a SQL/JSON Path Language expression, e.g. '$.tender.procurementMethod == "direct"'
     """
-    where_fragment = cursor.mogrify(" AND jsonb_path_match(d.data,  %s)", [filter_sql_json_path])
-    return where_fragment.decode()
+    return db.mogrify(" AND jsonb_path_match(d.data,  %s)", [filter_sql_json_path])
 
 
 @click.group()
@@ -302,6 +300,7 @@ def cli(ctx, quiet):
 
     global db  # noqa: PLW0603
     db = Database()
+    ctx.call_on_close(db.close)
 
 
 @cli.command()
@@ -374,8 +373,8 @@ def add(
         name = f"collection_{'_'.join(str(_id) for _id in sorted(collections))}"
 
     where_fragment = "".join(
-        [construct_where_fragment(db.cursor, field, value) for field, value in filters]
-        + [construct_where_fragment_sql_json_path(db.cursor, filter_sjp) for filter_sjp in filters_sql_json_path]
+        [construct_where_fragment(db, field, value) for field, value in filters]
+        + [construct_where_fragment_sql_json_path(db, filter_sjp) for filter_sjp in filters_sql_json_path]
     )
 
     schema = f"{SCHEMA_PREFIX}{name}"
@@ -390,8 +389,9 @@ def add(
                   ON selected_collections (schema, collection_id)""")
 
     # Add the new summary's collections to the summaries.selected_collections table.
-    db.execute_values(
-        "INSERT INTO selected_collections (schema, collection_id) VALUES %s", [(schema, _id) for _id in collections]
+    db.executemany(
+        "INSERT INTO selected_collections (schema, collection_id) VALUES (%s, %s)",
+        [(schema, _id) for _id in collections],
     )
     # https://github.com/open-contracting/kingfisher-summarize/issues/92
     db.execute("ANALYZE selected_collections")
@@ -484,11 +484,11 @@ def _run_summary_tables(name, identifier, content):
 
     start = time()
 
-    db = Database()
-    db.set_search_path([name, "public"])
+    with Database() as db:
+        db.set_search_path([name, "public"])
 
-    db.execute(f"/* kingfisher-summarize {identifier} */\n" + content)
-    db.commit()
+        db.execute(f"/* kingfisher-summarize {identifier} */\n" + content)
+        db.commit()
 
     logger.info("%s: %ss", identifier, time() - start)
     return identifier
@@ -544,34 +544,34 @@ def _run_field_counts(name, collection_id):
 
     start = time()
 
-    db = Database()
-    db.set_search_path([name, "public"])
+    with Database() as db:
+        db.set_search_path([name, "public"])
 
-    db.execute_values(
-        "INSERT INTO field_counts VALUES %s",
-        db.all(
-            """
-        /* kingfisher-summarize field-counts */
+        db.executemany(
+            "INSERT INTO field_counts VALUES (%s, %s, %s, %s, %s, %s)",
+            db.all(
+                """
+            /* kingfisher-summarize field-counts */
 
-        SELECT
-            collection_id,
-            release_type,
-            path,
-            sum(object_property) object_property,
-            sum(array_item) array_count,
-            count(distinct id) distinct_releases
-        FROM
-            release_summary
-        CROSS JOIN
-            flatten(release)
-        WHERE
-            collection_id = %(id)s
-        GROUP BY collection_id, release_type, path
-    """,
-            {"id": collection_id},
-        ),
-    )
-    db.commit()
+            SELECT
+                collection_id,
+                release_type,
+                path,
+                sum(object_property) object_property,
+                sum(array_item) array_count,
+                count(distinct id) distinct_releases
+            FROM
+                release_summary
+            CROSS JOIN
+                flatten(release)
+            WHERE
+                collection_id = %(id)s
+            GROUP BY collection_id, release_type, path
+        """,
+                {"id": collection_id},
+            ),
+        )
+        db.commit()
 
     logger.info("Collection ID %s: %ss", collection_id, time() - start)
 
@@ -754,8 +754,10 @@ def _run_field_lists(name, summary_table, tables_only):
     db.execute(statement, **format_kwargs)
 
     for row in db.all(COLUMN_COMMENTS_SQL, {"schema": name, "table": f"{summary_table}_no_field_list"}):
-        statement = "COMMENT ON COLUMN {table}.{column} IS %(comment)s"
-        db.execute(statement, {"comment": row[2]}, table=summary_table, column=row[0])
+        # COMMENT is a utility statement that can't bind parameters server-side, so compose the
+        # comment into the statement as a SQL literal instead.
+        statement = "COMMENT ON COLUMN {table}.{column} IS {comment}"
+        db.execute(statement, table=summary_table, column=row[0], comment=sql.Literal(row[2]))
 
     if summary_table == "contracts_summary":
         comment = (
@@ -777,7 +779,7 @@ def _run_field_lists(name, summary_table, tables_only):
             "paths and values are numbers of occurrences. Paths exclude array indices."
         )
     comment += " This column is only available if the --field-lists option is used."
-    db.execute("COMMENT ON COLUMN {table}.field_list IS %(comment)s", {"comment": comment}, table=summary_table)
+    db.execute("COMMENT ON COLUMN {table}.field_list IS {comment}", table=summary_table, comment=sql.Literal(comment))
 
     db.commit()
 

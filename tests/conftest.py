@@ -5,4 +5,5 @@ from ocdskingfishersummarize.db import Database
 
 @pytest.fixture(scope="session")
 def db():
-    return Database()
+    with Database() as database:
+        yield database

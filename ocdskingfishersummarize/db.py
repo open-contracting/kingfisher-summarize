@@ -1,15 +1,24 @@
 import os
 
-import psycopg2
-from psycopg2 import sql
-from psycopg2.extras import execute_values
+import psycopg
+from psycopg import ClientCursor, sql
 
 
 class Database:
     def __init__(self):
         """Connect to the database."""
-        self.connection = psycopg2.connect(os.getenv("KINGFISHER_SUMMARIZE_DATABASE_URL"))
+        self.connection = psycopg.connect(os.getenv("KINGFISHER_SUMMARIZE_DATABASE_URL"))
         self.cursor = self.connection.cursor()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.close()
+
+    def close(self):
+        """Close the database connection."""
+        self.connection.close()
 
     def set_search_path(self, schemas):
         """Set the search path to the given schemas."""
@@ -71,9 +80,18 @@ class Database:
             statement = self.format(statement, **kwargs)
         self.cursor.execute(statement, variables)
 
-    def execute_values(self, sql, argslist):
-        """Execute the SQL statement using ``VALUES`` with a sequence of parameters."""
-        execute_values(self.cursor, sql, argslist)
+    def executemany(self, statement, argslist):
+        """Execute the SQL statement once for each sequence of parameters in ``argslist``."""
+        self.cursor.executemany(statement, argslist)
+
+    def mogrify(self, statement, variables=None):
+        """
+        Return the SQL statement with the variables bound, as a string.
+
+        psycopg's default cursor binds parameters server-side and has no ``mogrify()``, so use a
+        :class:`~psycopg.ClientCursor` to render the parameters into the statement client-side.
+        """
+        return ClientCursor(self.connection).mogrify(statement, variables)
 
     def commit(self):
         """Commit the transaction."""

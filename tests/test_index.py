@@ -3,7 +3,7 @@ from textwrap import dedent
 from unittest.mock import patch
 
 from click.testing import CliRunner
-from psycopg2 import sql
+from psycopg import sql
 
 from manage import cli
 from tests import assert_log_records, assert_log_running, fixture, noop
