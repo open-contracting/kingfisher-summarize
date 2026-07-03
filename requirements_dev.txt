@@ -11,7 +11,9 @@ packaging==24.1
 pluggy==1.6.0
     # via pytest
 psycopg==3.3.4
-    # via -r requirements_dev.in
+    # via
+    #   -r requirements_base.txt
+    #   -r requirements_dev.in
 psycopg-binary==3.3.4
     # via psycopg
 pygments==2.20.0

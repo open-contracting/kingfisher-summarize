@@ -1,3 +1,4 @@
 click
+psycopg
 python-dotenv
 tabulate
