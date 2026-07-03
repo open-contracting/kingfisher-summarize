@@ -1,4 +1,4 @@
 -r requirements_base.txt
-psycopg[binary]
 coverage[toml]
+psycopg[binary]
 pytest
