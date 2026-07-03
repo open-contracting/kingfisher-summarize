@@ -28,8 +28,9 @@ def migrate():
                 db.connection.rollback()
             else:
                 db.executemany(
-                    "INSERT INTO summaries.selected_collections (schema, collection_id) VALUES (%s, %s)",
-                    [(schema, _id) for _id in collections],
+                    "INSERT INTO summaries.selected_collections (schema, collection_id) "
+                    "VALUES (%(schema)s, %(collection_id)s)",
+                    [{"schema": schema, "collection_id": collection_id} for collection_id in collections],
                 )
                 db.commit()
 

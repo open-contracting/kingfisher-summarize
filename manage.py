@@ -390,8 +390,8 @@ def add(
 
     # Add the new summary's collections to the summaries.selected_collections table.
     db.executemany(
-        "INSERT INTO selected_collections (schema, collection_id) VALUES (%s, %s)",
-        [(schema, _id) for _id in collections],
+        "INSERT INTO selected_collections (schema, collection_id) VALUES (%(schema)s, %(collection_id)s)",
+        [{"schema": schema, "collection_id": collection_id} for collection_id in collections],
     )
     # https://github.com/open-contracting/kingfisher-summarize/issues/92
     db.execute("ANALYZE selected_collections")
