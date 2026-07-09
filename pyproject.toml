@@ -55,6 +55,8 @@ exclude_rules = [
     "LT05", # layout.long_lines
     "RF02", # references.qualification
     "RF04", # references.keywords
+    # Not relevant to this context
+    "PG01", # postgres.excessive_locks
 ]
 
 [tool.sqlfluff.rules.capitalisation.keywords]
