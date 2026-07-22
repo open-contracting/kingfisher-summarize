@@ -82,3 +82,4 @@ preferred_not_equal_style = "ansi"
 
 [tool.uv.pip]
 exclude-newer = "1 week"
+python-version = "3.10"
