@@ -220,8 +220,8 @@ def test_docs():
                     else:
                         candidates = [
                             (
-                                f"Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the {subject}'s "
-                                "entry in the parties array"
+                                f"Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the {subject}'s entry "
+                                "in the parties array"
                             ),
                         ]
 
@@ -237,9 +237,9 @@ def test_docs():
                         candidates = [
                             (
                                 f"Value of the ``id`` field in the {subject} object if set, otherwise the identifier "
-                                f"if set as above, otherwise the value of the ``name`` field in the "
-                                f"{subject}'s entry in the parties array, otherwise the value of the ``name`` "
-                                f"field in the {subject} object"
+                                f"if set as above, otherwise the value of the ``name`` field in the {subject}'s entry "
+                                f"in the parties array, otherwise the value of the ``name`` field in the {subject} "
+                                f"object"
                             )
                         ]
 
@@ -298,8 +298,8 @@ def test_docs():
                     if plural_path in string_arrays:  # e.g. parties_role
                         candidates = [
                             (
-                                f"JSONB object in which each key is a unique ``{plural_path}`` entry and each "
-                                f"value is its number of occurrences across all ``{parents[plural_path]}`` arrays"
+                                f"JSONB object in which each key is a unique ``{plural_path}`` entry and each value "
+                                f"is its number of occurrences across all ``{parents[plural_path]}`` arrays"
                             ),
                         ]
                     elif subject == "release":
@@ -309,18 +309,18 @@ def test_docs():
                         candidates = [
                             # planning_document_documenttype_counts
                             (
-                                f"JSONB object in which each key is a unique ``{plural_path}`` value and each "
-                                f"value is its number of occurrences in the ``{array}`` array"
+                                f"JSONB object in which each key is a unique ``{plural_path}`` value and each value "
+                                f"is its number of occurrences in the ``{array}`` array"
                             ),
                             # award_document_documenttype_counts
                             (
-                                f"JSONB object in which each key is a unique ``{plural_path}`` value and each "
-                                f"value is its number of occurrences across all ``{array}`` arrays"
+                                f"JSONB object in which each key is a unique ``{plural_path}`` value and each value "
+                                f"is its number of occurrences across all ``{array}`` arrays"
                             ),
                             # document_documenttype_counts
                             (
-                                f"JSONB object in which each key is a unique ``{plural_path}`` value and each "
-                                f"value is its number of occurrences across all {singularize(array)} arrays"
+                                f"JSONB object in which each key is a unique ``{plural_path}`` value and each value "
+                                f"is its number of occurrences across all {singularize(array)} arrays"
                             ),
                         ]
                     else:
@@ -328,8 +328,8 @@ def test_docs():
                         array = f"{pluralize_path_components(ancestors)}" if ancestors else parents[path]
                         candidates = [
                             (
-                                f"JSONB object in which each key is a unique ``{plural_path}`` value and each "
-                                f"value is its number of occurrences in the ``{array}`` array of the {subject} object"
+                                f"JSONB object in which each key is a unique ``{plural_path}`` value and each value "
+                                f"is its number of occurrences in the ``{array}`` array of the {subject} object"
                             ),
                         ]
 
