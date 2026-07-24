@@ -99,8 +99,10 @@ def test_command_name(kwargs, name, collections, db, caplog):
             caplog,
             command,
             [
-                f"Arguments: collections={collections!r} note=Default name={kwargs.get('name')} tables_only=False "
-                "filters=() filters_sql_json_path=()",
+                (
+                    f"Arguments: collections={collections!r} note=Default name={kwargs.get('name')} tables_only=False "
+                    "filters=() filters_sql_json_path=()"
+                ),
                 f"Added {name}",
                 "Running summary-tables routine",
                 "Running field-counts routine",
@@ -441,8 +443,11 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
         for collection_id in [2, 1]:
             expected.extend(
                 [
-                    f"Arguments: collections=({collection_id},) note=Default name=None tables_only={tables_only!r} "
-                    f"filters={filters!r} filters_sql_json_path={filters_sql_json_path!r}",
+                    (
+                        f"Arguments: collections=({collection_id},) note=Default name=None "
+                        f"tables_only={tables_only!r} filters={filters!r} "
+                        f"filters_sql_json_path={filters_sql_json_path!r}"
+                    ),
                     f"Added collection_{collection_id}",
                     "Running summary-tables routine",
                 ]
@@ -746,8 +751,11 @@ def test_command_filter(
         for collection_id in [2, 1]:
             expected.extend(
                 [
-                    f"Arguments: collections=({collection_id},) note=Default name=None tables_only={tables_only!r} "
-                    f"filters={filters!r} filters_sql_json_path={filters_sql_json_path!r}",
+                    (
+                        f"Arguments: collections=({collection_id},) note=Default name=None "
+                        f"tables_only={tables_only!r} filters={filters!r} "
+                        f"filters_sql_json_path={filters_sql_json_path!r}"
+                    ),
                     f"Added collection_{collection_id}",
                     "Running summary-tables routine",
                 ]

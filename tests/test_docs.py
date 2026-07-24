@@ -208,8 +208,10 @@ def test_docs():
 
                 elif column == "link_with_role":
                     candidates = [
-                        f"1 if the {subject}'s entry in the parties array has '{machine_subject}' in its ``roles`` "
-                        f"array, otherwise 0"
+                        (
+                            f"1 if the {subject}'s entry in the parties array has '{machine_subject}' in its "
+                            f"``roles`` array, otherwise 0"
+                        )
                     ]
 
                 elif column == "identifier" and subject != "related process":
@@ -217,21 +219,28 @@ def test_docs():
                         candidates = ["Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the party object"]
                     else:
                         candidates = [
-                            f"Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the {subject}'s entry in "
-                            "the parties array",
+                            (
+                                f"Hyphenation of ``identifier/scheme`` and ``identifier/id`` in the {subject}'s "
+                                "entry in the parties array"
+                            ),
                         ]
 
                 elif column == "unique_identifier_attempt":
                     if subject == "party":
                         candidates = [
-                            "Value of the ``id`` field in the party object if set, otherwise the identifier "
-                            "if set as above, otherwise the value of the ``name`` field in the party object"
+                            (
+                                "Value of the ``id`` field in the party object if set, otherwise the identifier "
+                                "if set as above, otherwise the value of the ``name`` field in the party object"
+                            )
                         ]
                     else:
                         candidates = [
-                            f"Value of the ``id`` field in the {subject} object if set, otherwise the identifier if "
-                            f"set as above, otherwise the value of the ``name`` field in the {subject}'s entry in the "
-                            f"parties array, otherwise the value of the ``name`` field in the {subject} object"
+                            (
+                                f"Value of the ``id`` field in the {subject} object if set, otherwise the identifier "
+                                f"if set as above, otherwise the value of the ``name`` field in the "
+                                f"{subject}'s entry in the parties array, otherwise the value of the ``name`` "
+                                f"field in the {subject} object"
+                            )
                         ]
 
                 elif column.endswith("_index"):
@@ -260,13 +269,17 @@ def test_docs():
                 elif column.endswith("_ids"):
                     if subject in party_objects:
                         candidates = [
-                            f"Hyphenation of ``scheme`` and ``id`` for each entry of the ``{path}`` array in the "
-                            f"{subject}'s entry in the parties array"
+                            (
+                                f"Hyphenation of ``scheme`` and ``id`` for each entry of the ``{path}`` array in the "
+                                f"{subject}'s entry in the parties array"
+                            )
                         ]
                     else:
                         candidates = [
-                            f"Hyphenation of ``scheme`` and ``id`` for each entry of the ``{path}`` array in the "
-                            f"{subject} object"
+                            (
+                                f"Hyphenation of ``scheme`` and ``id`` for each entry of the ``{path}`` array in the "
+                                f"{subject} object"
+                            )
                         ]
 
                 elif column.startswith("total_"):
@@ -284,8 +297,10 @@ def test_docs():
                 elif column.endswith("_counts"):
                     if plural_path in string_arrays:  # e.g. parties_role
                         candidates = [
-                            f"JSONB object in which each key is a unique ``{plural_path}`` entry and each value is "
-                            f"its number of occurrences across all ``{parents[plural_path]}`` arrays",
+                            (
+                                f"JSONB object in which each key is a unique ``{plural_path}`` entry and each "
+                                f"value is its number of occurrences across all ``{parents[plural_path]}`` arrays"
+                            ),
                         ]
                     elif subject == "release":
                         # Don't pluralize e.g. parties_role, but pluralize contract_milestone_type_counts
@@ -293,21 +308,29 @@ def test_docs():
                         array = f"{pluralize_path_components(ancestors)}" if ancestors else parents[path]
                         candidates = [
                             # planning_document_documenttype_counts
-                            f"JSONB object in which each key is a unique ``{plural_path}`` value and each value is "
-                            f"its number of occurrences in the ``{array}`` array",
+                            (
+                                f"JSONB object in which each key is a unique ``{plural_path}`` value and each "
+                                f"value is its number of occurrences in the ``{array}`` array"
+                            ),
                             # award_document_documenttype_counts
-                            f"JSONB object in which each key is a unique ``{plural_path}`` value and each value is "
-                            f"its number of occurrences across all ``{array}`` arrays",
+                            (
+                                f"JSONB object in which each key is a unique ``{plural_path}`` value and each "
+                                f"value is its number of occurrences across all ``{array}`` arrays"
+                            ),
                             # document_documenttype_counts
-                            f"JSONB object in which each key is a unique ``{plural_path}`` value and each value is "
-                            f"its number of occurrences across all {singularize(array)} arrays",
+                            (
+                                f"JSONB object in which each key is a unique ``{plural_path}`` value and each "
+                                f"value is its number of occurrences across all {singularize(array)} arrays"
+                            ),
                         ]
                     else:
                         # Pluralize e.g. implementation_document_documenttype_counts
                         array = f"{pluralize_path_components(ancestors)}" if ancestors else parents[path]
                         candidates = [
-                            f"JSONB object in which each key is a unique ``{plural_path}`` value and each value is "
-                            f"its number of occurrences in the ``{array}`` array of the {subject} object",
+                            (
+                                f"JSONB object in which each key is a unique ``{plural_path}`` value and each "
+                                f"value is its number of occurrences in the ``{array}`` array of the {subject} object"
+                            ),
                         ]
 
                 elif "_summary" in basename:
