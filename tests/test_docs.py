@@ -1,7 +1,6 @@
 import csv
-import os.path
 import re
-from glob import glob
+from pathlib import Path
 
 plurals = {
     "party": "parties",
@@ -57,7 +56,7 @@ for value in ("minValue",):
     )
 paths = {word.lower(): word for word in words}
 
-cwd = os.getcwd()
+cwd = Path.cwd()
 
 
 def humanize(word):
@@ -89,7 +88,7 @@ def column_to_path(word):
 
 
 def test_docs():
-    basedir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    basedir = Path(__file__).resolve().parent.parent
 
     # Review these manually.
     skip = {
@@ -156,8 +155,8 @@ def test_docs():
         "type": "milestones",
     }
 
-    for filename in glob(os.path.join(basedir, "docs", "definitions", "*.csv")):
-        basename = os.path.splitext(os.path.basename(filename))[0]
+    for csv_path in (basedir / "docs" / "definitions").glob("*.csv"):
+        basename = csv_path.stem
 
         if "_summary" in basename:  # e.g. "release" from "release_summary_no_data"
             subject = basename.split("_summary", 1)[0]
@@ -171,7 +170,7 @@ def test_docs():
         machine_subject = str(subject)
         subject = humanize(subject)
 
-        with open(filename) as f:
+        with csv_path.open() as f:
             for row in csv.DictReader(f):
                 column = row["Column Name"]
                 description = row["Description"]

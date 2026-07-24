@@ -2,7 +2,6 @@
 import concurrent.futures
 import csv
 import datetime
-import glob
 import hashlib
 import json
 import logging
@@ -10,6 +9,7 @@ import logging.config
 import os
 import re
 from collections import defaultdict
+from pathlib import Path
 from time import time
 from typing import NamedTuple
 
@@ -22,7 +22,7 @@ from ocdskingfishersummarize.db import Database
 from ocdskingfishersummarize.exceptions import AmbiguousSourceError
 
 flags = re.MULTILINE | re.IGNORECASE
-basedir = os.path.dirname(os.path.realpath(__file__))
+basedir = Path(__file__).resolve().parent
 
 
 class Summary(NamedTuple):
@@ -91,10 +91,9 @@ def sql_files(directory, *, tables_only=False, where_fragment=None):
     """
     files = {}
 
-    for filename in glob.glob(os.path.join(basedir, "sql", directory, "*.sql")):
-        identifier = f"{directory}:{os.path.splitext(os.path.basename(filename))[0]}"
-        with open(filename) as f:
-            content = f.read()
+    for path in (basedir / "sql" / directory).glob("*.sql"):
+        identifier = f"{directory}:{path.stem}"
+        content = path.read_text()
         if tables_only:
             content = re.sub(r"^(CREATE|DROP) VIEW", r"\1 TABLE", content, flags=flags)
         if where_fragment:
@@ -282,11 +281,13 @@ def cli(ctx, quiet):
     """Configure the command-line interface."""
     load_dotenv()
 
-    path = os.getenv(
-        "KINGFISHER_SUMMARIZE_LOGGING_JSON", os.path.join(click.get_app_dir("Kingfisher Summarize"), "logging.json")
+    path = Path(
+        os.getenv(
+            "KINGFISHER_SUMMARIZE_LOGGING_JSON", Path(click.get_app_dir("Kingfisher Summarize")) / "logging.json"
+        )
     )
-    if os.path.isfile(path):
-        with open(path) as f:
+    if path.is_file():
+        with path.open() as f:
             logging.config.dictConfig(json.load(f))
     # Python's root logger only prints warning and above.
     else:
@@ -843,9 +844,9 @@ def docs_table_ref(name):
 
     headers = ["Column Name", "Data Type", "Description"]
 
-    filename = os.path.join(basedir, "docs", "definitions", "{}.csv")
+    directory = basedir / "docs" / "definitions"
     for table in tables:
-        with open(filename.format(table), "w") as f:
+        with (directory / f"{table}.csv").open("w") as f:
             writer = csv.writer(f, lineterminator="\n")
             writer.writerow(headers)
             if "." in table:
@@ -863,12 +864,12 @@ def docs_table_ref(name):
 @dev.command()
 def hash_md5():  # pragma: no cover
     """Sort the data table fixture by the id column and update the hash_md5 column."""
-    path = os.path.join(basedir, "tests", "fixtures", "kingfisher-process.sql")
+    path = basedir / "tests" / "fixtures" / "kingfisher-process.sql"
 
     sections = {"before": [], "data": [], "after": []}
 
     section = "before"
-    with open(path) as f:
+    with path.open() as f:
         for line in f:
             if section == "data" and "\\." in line:
                 section = "after"
@@ -889,7 +890,7 @@ def hash_md5():  # pragma: no cover
 
     sections["data"].sort(key=lambda line: int(line.split("\t", 1)[0]))
 
-    with open(path, "w") as f:
+    with path.open("w") as f:
         for section in sections.values():
             for line in section:
                 f.write(line)
