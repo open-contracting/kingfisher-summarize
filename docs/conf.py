@@ -32,7 +32,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 html_theme = "furo"
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
-# Édouard Traviès, "Types du règne animal: Buffon en estampes" (Paris, 1864).
+# John Gould & Elizabeth Gould, "A synopsis of the birds of Australia, and the adjacent islands" (Edinburgh, 1835-40).
 # Digitized by the Biodiversity Heritage Library (https://doi.org/10.5962/bhl.title.102311),
 # courtesy of Museums Victoria. Public domain. https://flic.kr/p/LufYpN
 html_logo = "_static/logo.jpg"
