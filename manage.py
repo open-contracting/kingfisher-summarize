@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import concurrent.futures
 import csv
-import datetime
+import datetime as dt
 import hashlib
 import json
 import logging
@@ -403,7 +403,7 @@ def add(
     db.execute("CREATE TABLE note (id SERIAL, note TEXT NOT NULL, created_at TIMESTAMP WITHOUT TIME ZONE)")
     db.execute(
         "INSERT INTO note (note, created_at) VALUES (%(note)s, %(created_at)s)",
-        {"note": note, "created_at": datetime.datetime.now(tz=datetime.timezone.utc)},
+        {"note": note, "created_at": dt.datetime.now(tz=dt.timezone.utc)},
     )
 
     db.commit()

@@ -1,4 +1,3 @@
-import datetime
 import decimal
 from unittest.mock import patch
 
@@ -7,7 +6,7 @@ from click.testing import CliRunner
 from psycopg import sql
 
 from manage import SUMMARIES, cli, construct_where_fragment
-from tests import assert_bad_argument, assert_log_records, assert_log_running, fixture, noop
+from tests import assert_bad_argument, assert_log_records, assert_log_running, fixture, noop, timestamp
 
 command = "add"
 
@@ -232,10 +231,10 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
             "ullamco in voluptate",  # award_description
             decimal.Decimal(-95099396),  # award_value_amount
             "AMD",  # award_value_currency
-            datetime.datetime(3263, 12, 5, 21, 24, 19, 161000),  # award_date
-            datetime.datetime(4097, 9, 16, 5, 55, 19, 125000),  # award_contractperiod_startdate
-            datetime.datetime(4591, 4, 29, 6, 34, 28, 472000),  # award_contractperiod_enddate
-            datetime.datetime(3714, 8, 9, 7, 21, 37, 544000),  # award_contractperiod_maxextentdate
+            timestamp(3263, 12, 5, 21, 24, 19, 161000),  # award_date
+            timestamp(4097, 9, 16, 5, 55, 19, 125000),  # award_contractperiod_startdate
+            timestamp(4591, 4, 29, 6, 34, 28, 472000),  # award_contractperiod_enddate
+            timestamp(3714, 8, 9, 7, 21, 37, 544000),  # award_contractperiod_maxextentdate
             decimal.Decimal(72802012),  # award_contractperiod_durationindays
             2,  # total_suppliers
             4,  # total_documents
@@ -625,10 +624,10 @@ def test_command_filter(
             "adipisicing ame",  # award_description
             decimal.Decimal(-7139109),  # award_value_amount
             "AUD",  # award_value_currency
-            datetime.datetime(3672, 10, 26, 4, 38, 28, 786000),  # award_date
-            datetime.datetime(2192, 8, 27, 0, 9, 1, 626000),  # award_contractperiod_startdate
-            datetime.datetime(4204, 1, 22, 22, 4, 18, 268000),  # award_contractperiod_enddate
-            datetime.datetime(5117, 12, 26, 11, 33, 27, 496000),  # award_contractperiod_maxextentdate
+            timestamp(3672, 10, 26, 4, 38, 28, 786000),  # award_date
+            timestamp(2192, 8, 27, 0, 9, 1, 626000),  # award_contractperiod_startdate
+            timestamp(4204, 1, 22, 22, 4, 18, 268000),  # award_contractperiod_enddate
+            timestamp(5117, 12, 26, 11, 33, 27, 496000),  # award_contractperiod_maxextentdate
             decimal.Decimal(-30383739),  # award_contractperiod_durationindays
             5,  # total_suppliers
             4,  # total_documents

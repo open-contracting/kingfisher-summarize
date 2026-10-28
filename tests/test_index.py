@@ -1,4 +1,3 @@
-from datetime import datetime
 from textwrap import dedent
 from unittest.mock import patch
 
@@ -6,7 +5,7 @@ from click.testing import CliRunner
 from psycopg import sql
 
 from manage import cli
-from tests import assert_log_records, assert_log_running, fixture, noop
+from tests import assert_log_records, assert_log_running, fixture, noop, timestamp
 
 command = "index"
 
@@ -48,7 +47,7 @@ def test_command_multiple(db, caplog):
         statement = sql.SQL("INSERT INTO {table} (note, created_at) VALUES (%(note)s, %(created_at)s)").format(
             table=sql.Identifier("summary_collection_1_2", "note")
         )
-        db.execute(statement, {"note": "Another", "created_at": datetime(2000, 1, 1)})
+        db.execute(statement, {"note": "Another", "created_at": timestamp(2000, 1, 1)})
         db.commit()
 
         result = runner.invoke(cli, [command])

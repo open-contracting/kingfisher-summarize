@@ -1,10 +1,9 @@
-from datetime import datetime
 from decimal import Decimal
 from unittest.mock import patch
 
 import pytest
 
-from tests import fixture
+from tests import fixture, timestamp
 
 
 @patch("manage.dependency_graph", dict)
@@ -26,7 +25,7 @@ def test_convert_to_numeric(db, text, expected):
 @pytest.mark.parametrize(
     ("text", "expected"),
     [
-        ("2020-02-29T00:00:00Z", datetime(2020, 2, 29, 0, 0)),
+        ("2020-02-29T00:00:00Z", timestamp(2020, 2, 29)),
         ("2020-02-30T00:00:00Z", None),
         ("0000-00-00T00:00:00Z", None),
     ],

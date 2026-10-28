@@ -1,3 +1,4 @@
+import datetime as dt
 import re
 from contextlib import contextmanager
 
@@ -8,6 +9,11 @@ from manage import cli
 
 def noop(*args, **kwargs):
     return
+
+
+def timestamp(*args):
+    """Return a naive UTC datetime, like PostgreSQL's TIMESTAMP WITHOUT TIME ZONE."""
+    return dt.datetime(*args, tzinfo=dt.timezone.utc).replace(tzinfo=None)
 
 
 @contextmanager
