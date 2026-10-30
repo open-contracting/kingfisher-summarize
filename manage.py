@@ -6,6 +6,7 @@ import hashlib
 import json
 import logging
 import logging.config
+import multiprocessing
 import os
 import re
 from collections import defaultdict
@@ -34,6 +35,9 @@ class Summary(NamedTuple):
 SCHEMA_PREFIX = "summary_"
 
 MAX_COLLECTIONS = 5
+
+# Fork, so that workers inherit the logging configuration.
+MP_CONTEXT = multiprocessing.get_context("fork")
 
 SUMMARIES = {
     "award_documents_summary": Summary(["id", "award_index", "document_index"], "document", is_table=True),
@@ -202,7 +206,7 @@ def run_concurrently(graph, function, function_args):
             futures.add(executor.submit(function, *function_args(node)))
 
     futures = set()
-    with concurrent.futures.ProcessPoolExecutor() as executor:
+    with concurrent.futures.ProcessPoolExecutor(mp_context=MP_CONTEXT) as executor:
         # Submit files whose dependencies are met.
         for node in list(graph):
             submit(node)
@@ -602,7 +606,7 @@ def field_counts(name):
     db.commit()
 
     selected_collections = _get_selected_collections(name)
-    with concurrent.futures.ProcessPoolExecutor() as executor:
+    with concurrent.futures.ProcessPoolExecutor(mp_context=MP_CONTEXT) as executor:
         futures = [executor.submit(_run_field_counts, name, collection) for collection in selected_collections]
         for future in concurrent.futures.as_completed(futures):
             future.result()
