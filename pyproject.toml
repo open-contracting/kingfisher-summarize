@@ -4,7 +4,7 @@ version = "0.0.0"
 
 [tool.ruff]
 line-length = 119
-target-version = "py310"
+target-version = "py313"
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -80,4 +80,4 @@ preferred_not_equal_style = "ansi"
 
 [tool.uv.pip]
 exclude-newer = "1 week"
-python-version = "3.10"
+python-version = "3.13"
