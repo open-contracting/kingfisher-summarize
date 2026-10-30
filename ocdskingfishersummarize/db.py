@@ -4,6 +4,11 @@ import psycopg
 from psycopg import ClientCursor, sql
 
 
+def identifiers(values):
+    """Return the values as comma-separated SQL identifiers. A tuple is a dot-separated identifier."""
+    return sql.SQL(", ").join(sql.Identifier(*v) if isinstance(v, tuple) else sql.Identifier(v) for v in values)
+
+
 class Database:
     def __init__(self):
         """Connect to the database."""
@@ -22,62 +27,33 @@ class Database:
 
     def set_search_path(self, schemas):
         """Set the search path to the given schemas."""
-        self.cursor.execute(self.format("SET search_path = {schemas}", schemas=schemas))
+        self.cursor.execute(t"SET search_path = {identifiers(schemas):q}")
 
     def schema_exists(self, schema):
         """Return whether a schema exists."""
         statement = "SELECT EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = %(schema)s)"
         return self.one(statement, {"schema": schema})[0]
 
-    def pluck(self, statement, variables=None, **kwargs):
+    def pluck(self, statement, variables=None):
         """Return the first value from all the results."""
-        return [row[0] for row in self.all(statement, variables, **kwargs)]
+        return [row[0] for row in self.all(statement, variables)]
 
     def schemas(self):
         """Return a list of schema names that start with "summary_"."""
         return self.pluck("SELECT schema_name FROM information_schema.schemata WHERE schema_name LIKE 'summary_%'")
 
-    def all(self, statement, variables=None, **kwargs):
+    def all(self, statement, variables=None):
         """Execute the SQL statement and fetches all rows."""
-        self.execute(statement, variables, **kwargs)
+        self.execute(statement, variables)
         return self.cursor.fetchall()
 
-    def one(self, statement, variables=None, **kwargs):
+    def one(self, statement, variables=None):
         """Execute the SQL statement and fetches one row."""
-        self.execute(statement, variables, **kwargs)
+        self.execute(statement, variables)
         return self.cursor.fetchone()
 
-    def format(self, statement, **kwargs):
-        """
-        Format the SQL statement, expressed as a format string with keyword arguments.
-
-        A keyword argument's value is converted to a SQL identifier, or a list of SQL identifiers,
-        unless it's already a ``sql`` object.
-        """
-        objects = {}
-        for key, value in kwargs.items():
-            if isinstance(value, sql.Composable):
-                objects[key] = value
-            elif isinstance(value, list):
-                objects[key] = sql.SQL(", ").join(self.identify(entry) for entry in value)
-            else:
-                objects[key] = self.identify(value)
-        return sql.SQL(statement).format(**objects)
-
-    def identify(self, value):
-        """
-        Return the value as a SQL identifier.
-
-        If the value is a tuple, the SQL identifier will be dot-separated.
-        """
-        if not isinstance(value, tuple):
-            value = (value,)
-        return sql.Identifier(*value)
-
-    def execute(self, statement, variables=None, **kwargs):
+    def execute(self, statement, variables=None):
         """Execute the SQL statement."""
-        if kwargs:
-            statement = self.format(statement, **kwargs)
         self.cursor.execute(statement, variables)
 
     def executemany(self, statement, argslist):

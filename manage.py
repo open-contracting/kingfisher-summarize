@@ -19,7 +19,7 @@ from dotenv import load_dotenv
 from psycopg import sql
 from tabulate import tabulate
 
-from ocdskingfishersummarize.db import Database
+from ocdskingfishersummarize.db import Database, identifiers
 from ocdskingfishersummarize.exceptions import AmbiguousSourceError
 
 flags = re.MULTILINE | re.IGNORECASE
@@ -401,7 +401,7 @@ def add(
     # https://github.com/open-contracting/kingfisher-summarize/issues/92
     db.execute("ANALYZE selected_collections")
 
-    db.execute("CREATE SCHEMA {schema}", schema=schema)
+    db.execute(t"CREATE SCHEMA {schema:i}")
     db.set_search_path([schema])
 
     db.execute("CREATE TABLE note (id SERIAL, note TEXT NOT NULL, created_at TIMESTAMP WITHOUT TIME ZONE)")
@@ -427,8 +427,8 @@ def add(
 
     role = os.getenv("KINGFISHER_SUMMARIZE_READONLY_ROLE", "")
     if db.one("SELECT 1 FROM pg_roles WHERE rolname = %(role)s", {"role": role}):
-        db.execute("GRANT USAGE ON SCHEMA {schema} TO {role}", schema=schema, role=role)
-        db.execute("GRANT SELECT ON ALL TABLES IN SCHEMA {schema} TO {role}", schema=schema, role=role)
+        db.execute(t"GRANT USAGE ON SCHEMA {schema:i} TO {role:i}")
+        db.execute(t"GRANT SELECT ON ALL TABLES IN SCHEMA {schema:i} TO {role:i}")
         db.commit()
 
         logger.info("Configured read-only access to %s", name)
@@ -448,11 +448,11 @@ def remove(name):
     db.execute("DELETE FROM summaries.selected_collections WHERE schema = %(schema)s", {"schema": name})
 
     # `CASCADE` drops all objects (tables, functions, etc.) in the schema.
-    statement = db.format("DROP SCHEMA {schema} CASCADE", schema=name)
+    statement = t"DROP SCHEMA {name:i} CASCADE"
     db.execute(statement)
     db.commit()
 
-    logger.info(statement.as_string(db.connection))
+    logger.info(sql.as_string(statement, db.connection))
 
 
 def _get_selected_collections(schema):
@@ -644,56 +644,49 @@ def _run_field_lists(name, summary_table, tables_only):
 
     table = SUMMARIES[summary_table]
 
-    variables = {}
-
     if tables_only:
-        no_field_list_type = sql.SQL("TABLE")
-        final_summary_type = sql.SQL("TABLE")
+        no_field_list_type = t"TABLE"
+        final_summary_type = t"TABLE"
     else:
-        no_field_list_type = sql.SQL("TABLE" if table.is_table else "VIEW")
-        final_summary_type = sql.SQL("VIEW")
+        no_field_list_type = t"TABLE" if table.is_table else t"VIEW"
+        final_summary_type = t"VIEW"
 
+    data_column = table.data_column
+    primary_keys = identifiers(table.primary_keys)
     field_list_table = f"{summary_table}_field_list"
-    format_kwargs = {
-        "summary_table": summary_table,
-        "field_list_table": field_list_table,
-        "no_field_list_table": f"{summary_table}_no_field_list",
-        "no_field_list_type": no_field_list_type,
-        "final_summary_type": final_summary_type,
-        "data_column": table.data_column,
-        "primary_keys": table.primary_keys,
-        "qualified_primary_keys": [(summary_table, field) for field in table.primary_keys],
-        "index": f"{field_list_table}_id",
-    }
+    no_field_list_table = f"{summary_table}_no_field_list"
+    index = f"{field_list_table}_id"
 
-    counts_per_path_select = """
+    counts_per_path_select = t"""
         SELECT
-            {primary_keys},
+            {primary_keys:q},
             path,
             GREATEST(sum(array_item), sum(object_property)) path_count
         FROM
-            {summary_table}
+            {summary_table:i}
         CROSS JOIN
-            flatten({summary_table}.{data_column})
+            flatten({summary_table:i}.{data_column:i})
         GROUP BY
-            {primary_keys}, path
+            {primary_keys:q}, path
     """
 
     # Allow users to measure co-occurrence of fields across related award and contract objects.
     if summary_table in {"contracts_summary", "awards_summary"}:
         if summary_table == "contracts_summary":
-            variables["path_prefix"] = "awards"
-            format_kwargs["other_data_column"] = "award"
+            path_prefix = "awards"
+            other_data_column = "award"
         else:
-            variables["path_prefix"] = "contracts"
-            format_kwargs["other_data_column"] = "contract"
+            path_prefix = "contracts"
+            other_data_column = "contract"
 
-        counts_per_path_select += """
+        qualified_primary_keys = identifiers((summary_table, field) for field in table.primary_keys)
+
+        counts_per_path_select += t"""
         UNION ALL
 
         SELECT
-            {qualified_primary_keys},
-            %(path_prefix)s || '/' || path AS path,
+            {qualified_primary_keys:q},
+            {path_prefix} || '/' || path AS path,
             GREATEST(sum(array_item), sum(object_property)) path_count
         FROM
             awards_summary
@@ -703,15 +696,15 @@ def _run_field_lists(name, summary_table, tables_only):
             awards_summary.id = contracts_summary.id AND
             awards_summary.award_id = contracts_summary.awardid
         CROSS JOIN
-            flatten({other_data_column})
+            flatten({other_data_column:i})
         GROUP BY
-            {qualified_primary_keys}, path
+            {qualified_primary_keys:q}, path
 
         UNION ALL
 
         SELECT
-            {qualified_primary_keys},
-            %(path_prefix)s AS path,
+            {qualified_primary_keys:q},
+            {path_prefix} AS path,
             count(*) path_count
         FROM
             awards_summary
@@ -720,61 +713,56 @@ def _run_field_lists(name, summary_table, tables_only):
         ON
             awards_summary.id = contracts_summary.id AND
             awards_summary.award_id = contracts_summary.awardid
-        GROUP BY {qualified_primary_keys}
+        GROUP BY {qualified_primary_keys:q}
     """
 
     # Create a *_field_list table, add a unique index, rename the *_summary table to *_no_field_list, and re-create
     # the *_summary table. Then, copy the comments from the old to the new *_summary table.
-    statement = """
-        CREATE TABLE {field_list_table} AS
+    db.execute(t"""
+        CREATE TABLE {field_list_table:i} AS
         WITH path_counts AS (
-            INNER_SELECT
+            {counts_per_path_select:q}
         )
         SELECT
-            {primary_keys},
+            {primary_keys:q},
             jsonb_object_agg(path, path_count) AS field_list
         FROM
             path_counts
         GROUP BY
-            {primary_keys}
-    """.replace("INNER_SELECT", counts_per_path_select)
-    db.execute(statement, variables=variables, **format_kwargs)
+            {primary_keys:q}
+    """)
 
-    statement = "CREATE UNIQUE INDEX {index} ON {field_list_table}({primary_keys})"
-    db.execute(statement, **format_kwargs)
+    db.execute(t"CREATE UNIQUE INDEX {index:i} ON {field_list_table:i}({primary_keys:q})")
 
-    statement = "ALTER {no_field_list_type} {summary_table} RENAME TO {no_field_list_table}"
-    db.execute(statement, **format_kwargs)
+    db.execute(t"ALTER {no_field_list_type:q} {summary_table:i} RENAME TO {no_field_list_table:i}")
 
-    statement = """
-        CREATE {final_summary_type} {summary_table} AS
+    db.execute(t"""
+        CREATE {final_summary_type:q} {summary_table:i} AS
         SELECT
-            {no_field_list_table}.*,
-            {field_list_table}.field_list
+            {no_field_list_table:i}.*,
+            {field_list_table:i}.field_list
         FROM
-            {no_field_list_table}
+            {no_field_list_table:i}
         JOIN
-            {field_list_table} USING ({primary_keys})
-    """
-    db.execute(statement, **format_kwargs)
+            {field_list_table:i} USING ({primary_keys:q})
+    """)
 
-    for row in db.all(COLUMN_COMMENTS_SQL, {"schema": name, "table": f"{summary_table}_no_field_list"}):
+    for row in db.all(COLUMN_COMMENTS_SQL, {"schema": name, "table": no_field_list_table}):
         # COMMENT is a utility statement that can't bind parameters server-side, so compose the
         # comment into the statement as a SQL literal instead.
-        statement = "COMMENT ON COLUMN {table}.{column} IS {comment}"
-        db.execute(statement, table=summary_table, column=row[0], comment=sql.Literal(row[2]))
+        db.execute(t"COMMENT ON COLUMN {summary_table:i}.{row[0]:i} IS {row[2]:l}")
 
     if summary_table == "contracts_summary":
         comment = (
             f"All JSON paths in the {table.data_column} object as well as in the related award's "
-            f"{format_kwargs['other_data_column']} object (prefixed by {variables['path_prefix']}/), "
+            f"{other_data_column} object (prefixed by {path_prefix}/), "
             "expressed as a JSONB object in which keys are paths and values are numbers of occurrences. "
             "Paths exclude array indices."
         )
     elif summary_table == "awards_summary":
         comment = (
             f"All JSON paths in the {table.data_column} object as well as in the related contracts' "
-            f"{format_kwargs['other_data_column']} object (prefixed by {variables['path_prefix']}/), "
+            f"{other_data_column} object (prefixed by {path_prefix}/), "
             "expressed as a JSONB object in which keys are paths and values are numbers of occurrences. "
             "Paths exclude array indices."
         )
@@ -784,7 +772,7 @@ def _run_field_lists(name, summary_table, tables_only):
             "paths and values are numbers of occurrences. Paths exclude array indices."
         )
     comment += " This column is only available if the --field-lists option is used."
-    db.execute("COMMENT ON COLUMN {table}.field_list IS {comment}", table=summary_table, comment=sql.Literal(comment))
+    db.execute(t"COMMENT ON COLUMN {summary_table:i}.field_list IS {comment:l}")
 
     db.commit()
 

@@ -2,7 +2,6 @@ from textwrap import dedent
 from unittest.mock import patch
 
 from click.testing import CliRunner
-from psycopg import sql
 
 from manage import cli
 from tests import assert_log_records, assert_log_running, fixture, noop, timestamp
@@ -44,10 +43,9 @@ def test_command_multiple(db, caplog):
     with fixture(db, collections="1,2"):
         runner = CliRunner()
 
-        statement = sql.SQL("INSERT INTO {table} (note, created_at) VALUES (%(note)s, %(created_at)s)").format(
-            table=sql.Identifier("summary_collection_1_2", "note")
-        )
-        db.execute(statement, {"note": "Another", "created_at": timestamp(2000, 1, 1)})
+        note = "Another"
+        created_at = timestamp(2000, 1, 1)
+        db.execute(t"INSERT INTO summary_collection_1_2.note (note, created_at) VALUES ({note}, {created_at})")
         db.commit()
 
         result = runner.invoke(cli, [command])
