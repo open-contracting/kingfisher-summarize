@@ -13,7 +13,7 @@ def noop(*args, **kwargs):
 
 def timestamp(*args):
     """Return a naive UTC datetime, like PostgreSQL's TIMESTAMP WITHOUT TIME ZONE."""
-    return dt.datetime(*args, tzinfo=dt.timezone.utc).replace(tzinfo=None)
+    return dt.datetime(*args, tzinfo=dt.UTC).replace(tzinfo=None)
 
 
 @contextmanager

@@ -403,7 +403,7 @@ def add(
     db.execute("CREATE TABLE note (id SERIAL, note TEXT NOT NULL, created_at TIMESTAMP WITHOUT TIME ZONE)")
     db.execute(
         "INSERT INTO note (note, created_at) VALUES (%(note)s, %(created_at)s)",
-        {"note": note, "created_at": dt.datetime.now(tz=dt.timezone.utc)},
+        {"note": note, "created_at": dt.datetime.now(tz=dt.UTC)},
     )
 
     db.commit()
