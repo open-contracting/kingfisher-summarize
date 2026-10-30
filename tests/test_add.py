@@ -3,12 +3,32 @@ from unittest.mock import patch
 
 import pytest
 from click.testing import CliRunner
-from psycopg import sql
 
 from manage import SUMMARIES, cli, construct_where_fragment
+from ocdskingfishersummarize.db import identifiers
 from tests import assert_bad_argument, assert_log_records, assert_log_running, fixture, noop, timestamp
 
 command = "add"
+
+
+def field_list_count_statement(table_name, table):
+    return t"""
+        SELECT
+            count(*)
+        FROM
+            (SELECT
+                jsonb_each(field_list)
+            FROM (
+                SELECT
+                    field_list
+                FROM
+                    summary_collection_1.{table_name:i}
+                ORDER BY
+                    {identifiers(table.primary_keys):q}
+                LIMIT 1) AS field_list
+            ) AS each
+    """
+
 
 TABLES = {
     "note",
@@ -80,7 +100,6 @@ def test_validate_name(caplog):
 )
 def test_command_name(kwargs, name, collections, db, caplog):
     schema = f"summary_{name}"
-    identifier = sql.Identifier(schema)
 
     with fixture(db, **kwargs) as result:
         assert db.schema_exists(schema)
@@ -88,7 +107,7 @@ def test_command_name(kwargs, name, collections, db, caplog):
             "SELECT collection_id, schema FROM summaries.selected_collections WHERE schema=%(schema)s",
             {"schema": schema},
         ) == [(collection, schema) for collection in collections]
-        assert db.all(sql.SQL("SELECT id, note FROM {schema}.note").format(schema=identifier)) == [
+        assert db.all(t"SELECT id, note FROM {schema:i}.note") == [
             (1, "Default"),
         ]
 
@@ -309,23 +328,6 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
 
         if field_lists:
             # Check the count of keys in the field_list field for the lowest primary keys in each summary relation.
-            statement = """
-                SELECT
-                    count(*)
-                FROM
-                    (SELECT
-                        jsonb_each(field_list)
-                    FROM (
-                        SELECT
-                            field_list
-                        FROM
-                            summary_collection_1.{table}
-                        ORDER BY
-                            {primary_keys}
-                        LIMIT 1) AS field_list
-                    ) AS each
-            """
-
             expected = {
                 "award_documents_summary": 11,
                 "award_items_summary": 26,
@@ -354,7 +356,7 @@ def test_command(db, tables_only, field_counts, field_lists, tables, views, filt
             }
 
             for table_name, table in SUMMARIES.items():
-                count = db.one(db.format(statement, table=table_name, primary_keys=table.primary_keys))[0]
+                count = db.one(field_list_count_statement(table_name, table))[0]
 
                 assert count == expected[table_name], f"{table_name}: {count} != {expected[table_name]}"
 
@@ -697,23 +699,6 @@ def test_command_filter(
 
         if field_lists:
             # Check the count of keys in the field_list field for the lowest primary keys in each summary relation.
-            statement = """
-                SELECT
-                    count(*)
-                FROM
-                    (SELECT
-                        jsonb_each(field_list)
-                    FROM (
-                        SELECT
-                            field_list
-                        FROM
-                            summary_collection_1.{table}
-                        ORDER BY
-                            {primary_keys}
-                        LIMIT 1) AS field_list
-                    ) AS each
-            """
-
             expected = {
                 "award_documents_summary": 11,
                 "award_items_summary": 29,
@@ -742,7 +727,7 @@ def test_command_filter(
             }
 
             for table_name, table in SUMMARIES.items():
-                count = db.one(db.format(statement, table=table_name, primary_keys=table.primary_keys))[0]
+                count = db.one(field_list_count_statement(table_name, table))[0]
 
                 assert count == expected[table_name], f"{table_name}: {count} != {expected[table_name]}"
 
